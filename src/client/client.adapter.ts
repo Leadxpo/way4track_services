@@ -22,6 +22,7 @@ export class ClientAdapter {
         entity.joiningDate = dto.joiningDate;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
+        entity.status = dto.status
         const voucherEntity = new VoucherEntity();
         voucherEntity.id = dto.voucherId
         entity.voucherId = voucherEntity

@@ -10,13 +10,17 @@ import { HiringFilterDto } from './dto/hiring-filter.dto';
 export class HiringController {
     constructor(private readonly hiringService: HiringService) { }
 
-    @Post('saveHiringDetails')
-    async saveHiringDetails(@Body() dto: HiringDto): Promise<CommonResponse> {
+    @Post('saveHiringDetailsWithResume')
+    @UseInterceptors(FileInterceptor('file'))
+    async saveHiringDetailsWithResume(
+        @Body() dto: HiringDto,
+        @UploadedFile() file: Express.Multer.File
+    ): Promise<CommonResponse> {
         try {
-            return await this.hiringService.saveHiringDetails(dto);
+            return await this.hiringService.saveHiringDetails(dto, file);
         } catch (error) {
-            console.error('Error in save hiring details in service:', error);
-            return new CommonResponse(false, 500, 'Error saving hiring details');
+            console.error('Error in save hiring details with resume in service:', error);
+            return new CommonResponse(false, 500, 'Error saving hiring details with resume');
         }
     }
 
@@ -40,16 +44,6 @@ export class HiringController {
         }
     }
 
-    @Post('uploadResume')
-    @UseInterceptors(FileInterceptor('file'))
-    async uploadResume(@Body() hiringId: number, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            return await this.hiringService.uploadResume(hiringId, file);
-        } catch (error) {
-            console.error('Error in upload resume in service:', error);
-            return new CommonResponse(false, 500, 'Error uploading resume');
-        }
-    }
     @Post('getHiringSearchDetails')
     async getHiringSearchDetails(@Body() req: HiringFilterDto) {
         return this.hiringService.getHiringSearchDetails(req);

@@ -19,26 +19,68 @@ export class ClientService {
         private readonly branchRepo: BranchRepository
     ) { }
 
-    async saveClientDetails(dto: ClientDto): Promise<CommonResponse> {
+    async saveClientDetails(dto: ClientDto, file?: Express.Multer.File): Promise<CommonResponse> {
         try {
-            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
+            let photoPath: string | undefined;
 
+            if (file) {
+                photoPath = await this.uploadClientPhoto(file);
+            }
+
+            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
             if (!branchEntity) {
                 throw new Error('Branch not found');
             }
+
             const entity = this.clientAdapter.convertDtoToEntity(dto);
-            if (!entity.clientId) {
+
+            if (!dto.id && !entity.clientId) {
                 const clientCount = await this.clientRepository.count({
-                    where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
+                    where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
                 });
                 entity.clientId = this.generateClientId(branchEntity.branchName, clientCount + 1);
             }
-            await this.clientRepository.save(entity);
-            const message = dto.id
+
+            if (photoPath) {
+                entity.clientPhoto = photoPath;
+            }
+
+            if (dto.id) {
+                const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+                if (!existingClient) {
+                    throw new Error('Client not found');
+                }
+
+                const updatedClient = {
+                    ...existingClient,
+                    ...entity,
+                    clientPhoto: photoPath || existingClient.clientPhoto,
+                };
+
+                await this.clientRepository.save(updatedClient);
+            } else {
+                const branch = new BranchEntity()
+                branch.id = dto.branchId
+                entity.branch = branch
+                await this.clientRepository.save(entity);
+            }
+
+            const internalMessage = dto.id
                 ? 'Client details updated successfully'
                 : 'Client details created successfully';
 
-            return new CommonResponse(true, 201, message);
+            return new CommonResponse(true, 201, internalMessage);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+
+    async uploadClientPhoto(photo: Express.Multer.File): Promise<string> {
+        try {
+            const filePath = join(__dirname, '../../uploads/client_photos', `${Date.now()}.jpg`);
+            await fs.writeFile(filePath, photo.buffer);
+            return filePath;
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -87,26 +129,6 @@ export class ClientService {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {
             return new CommonResponse(false, 4579, "There Is No branch names")
-        }
-    }
-
-    async uploadClientPhoto(clientId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            const client = await this.clientRepository.findOne({ where: { id: clientId } });
-
-            if (!client) {
-                return new CommonResponse(false, 404, 'Client not found');
-            }
-
-            const filePath = join(__dirname, '../../uploads/client_photos', `${clientId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
-
-            client.clientPhoto = filePath;
-            await this.clientRepository.save(client);
-
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
         }
     }
 

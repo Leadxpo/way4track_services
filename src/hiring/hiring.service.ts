@@ -14,20 +14,51 @@ export class HiringService {
     constructor(private readonly hiringAdapter: HiringAdapter,
         private readonly hiringRepository: HiringRepository
     ) { }
-    async saveHiringDetails(dto: HiringDto): Promise<CommonResponse> {
+    async saveHiringDetails(dto: HiringDto, file?: Express.Multer.File): Promise<CommonResponse> {
         try {
+            let resumePath: string | undefined;
+
+            if (file) {
+                resumePath = await this.uploadResume(file);
+            }
+
+            if (dto.id) {
+                const existingHiring = await this.hiringRepository.findOne({ where: { id: dto.id } });
+
+                if (existingHiring) {
+                    if (!resumePath) {
+                        resumePath = existingHiring.resumePath;
+                    }
+
+                    dto.resumePath = resumePath;
+                }
+            }
+
+            const hiringEntity = this.hiringAdapter.convertDtoToEntity(dto);
+
+            await this.hiringRepository.save(hiringEntity);
+
             const internalMessage = dto.id
                 ? 'Hiring details updated successfully'
                 : 'Hiring details created successfully';
-            const hiringEntity = this.hiringAdapter.convertDtoToEntity(dto);
-            await this.hiringRepository.save(hiringEntity);
+
             return new CommonResponse(true, 65152, internalMessage);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
 
+    async uploadResume(file: Express.Multer.File): Promise<string> {
+        try {
+            const filePath = join(__dirname, '../../uploads/resumes', `${Date.now()}.pdf`);
 
+            await fs.promises.writeFile(filePath, file.buffer);
+
+            return filePath;
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
 
     async getHiringDetails(req: HiringIdDto): Promise<CommonResponse> {
         try {
@@ -56,25 +87,8 @@ export class HiringService {
         }
     }
 
-    async uploadResume(hiringId: number, file: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            const hiring = await HiringEntity.findOne({ where: { id: hiringId } });
 
-            if (!hiring) {
-                throw new ErrorResponse(404, 'Hiring record not found');
-            }
 
-            const filePath = join(__dirname, '../../uploads/resumes', `${hiringId}-${Date.now()}.pdf`);
-            await fs.promises.writeFile(filePath, file.buffer);
-
-            hiring.resumePath = filePath;
-            await this.hiringRepository.save(hiring);
-
-            return new CommonResponse(true, 200, 'Resume uploaded successfully', { resumePath: filePath });
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
 
     async getHiringSearchDetails(req: HiringFilterDto) {
         const query = this.hiringRepository.createQueryBuilder('hiring')

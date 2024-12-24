@@ -10,12 +10,16 @@ export class ClientController {
     constructor(private readonly clientService: ClientService) { }
 
     @Post('saveClientDetails')
-    async saveClientDetails(@Body() dto: ClientDto): Promise<CommonResponse> {
+    @UseInterceptors(FileInterceptor('file'))
+    async saveClientDetails(
+        @Body() dto: ClientDto,
+        @UploadedFile() file: Express.Multer.File
+    ): Promise<CommonResponse> {
         try {
-            return await this.clientService.saveClientDetails(dto);
+            return await this.clientService.saveClientDetails(dto, file);
         } catch (error) {
-            console.error('Error in save client details in service:', error);
-            return new CommonResponse(false, 500, 'Error saving client details');
+            console.error('Error in save hiring details with resume in service:', error);
+            return new CommonResponse(false, 500, 'Error saving hiring details with resume');
         }
     }
 
@@ -48,17 +52,4 @@ export class ClientController {
         }
     }
 
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('clientId') clientId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
-        try {
-            return await this.clientService.uploadClientPhoto(clientId, photo);
-        } catch (error) {
-            console.error('Error uploading client photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
 }
