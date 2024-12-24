@@ -37,7 +37,8 @@ export class VoucherResDto {
     vendorId?: number;
     vendorName?: string;
     voucherId: string;
-
+    companyCode: string;
+    unitCode: string
     // New fields
     initialPayment?: number;      // Initial Payment
     emiCount?: number;            // Number of EMI installments

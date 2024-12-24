@@ -16,7 +16,8 @@ export class ProductAssignAdapter {
     entity.branchOrPerson = dto.branchOrPerson
     entity.productAssignPhoto = dto.productAssignPhoto
 
-
+    entity.companyCode = dto.companyCode
+    entity.unitCode = dto.unitCode
     if (dto.imeiNumberFrom && dto.imeiNumberTo) {
       entity.numberOfProducts = this.calculateNumberOfProducts(dto.imeiNumberFrom, dto.imeiNumberTo);
     } else {

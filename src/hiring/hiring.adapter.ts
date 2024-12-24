@@ -15,6 +15,8 @@ export class HiringAdapter {
     entity.resumePath = dto.resumePath;
     entity.dateOfUpload = dto.dateOfUpload;
     entity.status = dto.status;
+    entity.companyCode = dto.companyCode
+    entity.unitCode = dto.unitCode
 
     return entity;
   }

@@ -18,53 +18,83 @@ export class EstimateService {
         private readonly clientRepository: ClientRepository
     ) { }
 
-    async saveEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
+    async updateEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
+            const existingEstimate = await this.estimateRepository.findOne({
+                where: { id: dto.id },
+            });
+    
+            if (!existingEstimate) {
+                return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
+            }
+    
+            const client = await this.clientRepository.findOne({
+                where: { clientId: dto.clientId },
+            });
+    
             if (!client) {
-                throw new ErrorResponse(400, `Client with ID ${dto.clientId} not found`);
+                return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
-
-            let entity: EstimateEntity;
-
-            if (dto.id) {
-                const existingEntity = await this.estimateRepository.findOne({ where: { id: dto.id } });
-                if (!existingEntity) {
-                    throw new ErrorResponse(404, `Estimate with ID ${dto.id} not found`);
-                }
-
-                entity = this.estimateRepository.merge(existingEntity, {
-                    ...dto,
-                    clientId: client,
-                });
-            } else {
-                entity = this.estimateAdapter.convertDtoToEntity(dto);
-
-                entity.clientId = client;
-
-                const estimateCount = await this.estimateRepository.count({
-                    where: { clientId: client },
-                });
-                entity.estimateId = this.generateEstimateId(estimateCount + 1);
-            }
-
-            await this.estimateRepository.save(entity);
-
-            const message = dto.id
-                ? 'Estimate details updated successfully'
-                : 'Estimate details created successfully';
-
-            return new CommonResponse(true, 201, message);
+    
+            Object.assign(existingEstimate, this.estimateAdapter.convertDtoToEntity(dto));
+            existingEstimate.clientId = client;
+    
+            await this.estimateRepository.save(existingEstimate);
+    
+            return new CommonResponse(true, 200, 'Estimate details updated successfully');
         } catch (error) {
-            console.error('Error saving estimate details:', error);
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error updating estimate details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to update estimate details: ${error.message}`);
         }
     }
+    
+    async createEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
+        try {
+            const client = await this.clientRepository.findOne({
+                where: { clientId: dto.clientId },
+            });
+    
+            if (!client) {
+                return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
+            }
+    
+            const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
+            newEstimate.clientId = client;
+    
+            const estimateCount = await this.estimateRepository.count({
+                where: { clientId: client },
+            });
+            newEstimate.estimateId = this.generateEstimateId(estimateCount + 1);
+    
+            await this.estimateRepository.save(newEstimate);
+    
+            return new CommonResponse(true, 201, 'Estimate details created successfully');
+        } catch (error) {
+            console.error(`Error creating estimate details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to create estimate details: ${error.message}`);
+        }
+    }
+    
+    async handleEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
+        if (dto.id) {
+            // If an ID is provided, update the estimate details
+            return await this.updateEstimateDetails(dto);
+        } else {
+            // If no ID is provided, create a new estimate record
+            return await this.createEstimateDetails(dto);
+        }
+    }
+    
+    private generateEstimateId(sequenceNumber: number): string {
+        const paddedNumber = sequenceNumber.toString().padStart(4, '0');
+        return `EST-${paddedNumber}`;
+    }
+    
 
 
     async deleteEstimateDetails(dto: EstimateIdDto): Promise<CommonResponse> {
         try {
-            const estimate = await this.estimateRepository.findOne({ where: { id: dto.id } });
+            const estimate = await this.estimateRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!estimate) {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
@@ -80,7 +110,7 @@ export class EstimateService {
         try {
             const estimate = await this.estimateRepository.findOne({
                 relations: ['clientId'],
-                where: { id: req.id }
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
             if (!estimate) {
@@ -94,8 +124,5 @@ export class EstimateService {
         }
     }
 
-    private generateEstimateId(sequenceNumber: number): string {
-        const paddedNumber = sequenceNumber.toString().padStart(4, '0');
-        return `EST-${paddedNumber}`;
-    }
+    
 }

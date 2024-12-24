@@ -1,6 +1,11 @@
 export class StaffIdDto {
-    id: number;
-    constructor(id: number) {
-        this.id = id;
+    staffId: string;
+    companyCode?: string;
+    unitCode?: string
+    constructor(staffId: string, companyCode?: string,
+        unitCode?: string) {
+        this.staffId = staffId;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

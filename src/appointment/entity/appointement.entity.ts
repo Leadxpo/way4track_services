@@ -32,6 +32,7 @@ export class AppointmentEntity {
         name: 'appointment_type',
         type: 'enum',
         enum: AppointmentType,
+        default: AppointmentType.PRODUCT
     })
     appointmentType: AppointmentType;
 
@@ -63,4 +64,10 @@ export class AppointmentEntity {
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.asserts)
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

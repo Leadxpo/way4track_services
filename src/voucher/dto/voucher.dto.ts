@@ -13,7 +13,7 @@ export class VoucherDto {
     purpose: string;
     creditAmount: number;
     paymentType: PaymentType;
-    client: number;
+    client?: number;
     paymentTo: string;
     debitAmount: number;
     transferredBy: string;
@@ -42,4 +42,7 @@ export class VoucherDto {
     bankAccountNumber?: string;
     paymentStatus?: PaymentStatus;
     productType?: ProductType;
+    companyCode: string;
+    unitCode: string
+    voucherId?: string
 }

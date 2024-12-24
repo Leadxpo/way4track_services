@@ -6,4 +6,7 @@ export class WorkAllocationDto {
     serviceOrProduct: string;
     otherInformation?: string;
     date: Date;
+    companyCode?: string;
+    unitCode?: string
+    workAllocationNumber?: string
 }

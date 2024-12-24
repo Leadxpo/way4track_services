@@ -44,6 +44,8 @@ export class VoucherAdapter {
       vendorId: entity.vendor && entity.vendor[0] ? entity.vendor[0].id : null,
       vendorName: entity.vendor && entity.vendor[0] ? entity.vendor[0].name : "Unknown",
       voucherId: entity.voucherId,
+      companyCode: entity.companyCode,
+      unitCode: entity.unitCode,
       // Adding new fields for completeness
       initialPayment: entity.initialPayment,
       emiCount: entity.numberOfEmi,
@@ -51,7 +53,8 @@ export class VoucherAdapter {
       emiAmount: entity.emiAmount,
       ifscCode: entity.ifscCode,
       bankAccountNumber: entity.bankAccountNumber,
-      ledgerAmount: entity.balanceAmount + entity.GST + entity.SCST + entity.CGST, // Example of calculated ledger amount
+      ledgerAmount: entity.balanceAmount + entity.GST + entity.SCST + entity.CGST,
+
     };
   }
 
@@ -101,7 +104,8 @@ export class VoucherAdapter {
     entity.emiAmount = dto.emiAmount;
     entity.ifscCode = dto.ifscCode;
     entity.bankAccountNumber = dto.bankAccountNumber;
-
+    entity.companyCode = dto.companyCode;
+    entity.unitCode = dto.unitCode
     return entity;
   }
 }

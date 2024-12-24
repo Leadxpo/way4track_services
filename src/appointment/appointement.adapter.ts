@@ -15,7 +15,8 @@ export class AppointmentAdapter {
         entity.name = dto.name;
         entity.slot = dto.slot;
         entity.description = dto.description;
-
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         const staff = new StaffEntity();
         staff.id = dto.assignedToId;
         entity.staffId = staff;
@@ -49,7 +50,9 @@ export class AppointmentAdapter {
                 entity.slot,
                 entity.description,
                 entity.status,
-                entity.appointmentId
+                entity.appointmentId,
+                entity.companyCode,
+                entity.unitCode
             );
         });
     }

@@ -5,10 +5,13 @@ export class CreateAttendanceDto {
     staffId: number;
     branchId: number;
     day: Date;
+    companyCode: string;
+    unitCode: string
     inTime?: Date;
     outTime?: Date;
     status: AttendanceStatus;
     remarks?: string;
+
 }
 
 
@@ -21,4 +24,6 @@ export class GetAttendanceDto {
     status: AttendanceStatus;
     staffName: string;
     branchName: string;
+    companyCode: string;
+    unitCode: string
 }

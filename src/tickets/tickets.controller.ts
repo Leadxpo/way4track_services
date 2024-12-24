@@ -8,10 +8,10 @@ import { TicketsIdDto } from './dto/tickets-id.dto';
 export class TicketsController {
     constructor(private readonly ticketsService: TicketsService) { }
 
-    @Post('saveTicketDetails')
-    async saveTicketDetails(@Body() dto: TicketsDto): Promise<CommonResponse> {
+    @Post('handleTicketDetails')
+    async handleTicketDetails(@Body() dto: TicketsDto): Promise<CommonResponse> {
         try {
-            return await this.ticketsService.saveTicketDetails(dto);
+            return await this.ticketsService.handleTicketDetails(dto);
         } catch (error) {
             console.error('Error in save ticket details in service:', error);
             return new CommonResponse(false, 500, 'Error saving ticket details');
@@ -28,13 +28,26 @@ export class TicketsController {
         }
     }
 
-    @Post('getTicketDetails')
-    async getTicketDetails(@Body() dto: TicketsIdDto): Promise<CommonResponse> {
+    @Post('getTicketDetailsById')
+    async getTicketDetailsById(@Body() dto: TicketsIdDto): Promise<CommonResponse> {
         try {
-            return await this.ticketsService.getTicketDetails(dto);
+            return await this.ticketsService.getTicketDetailsById(dto);
         } catch (error) {
             console.error('Error in get ticket details in service:', error);
             return new CommonResponse(false, 500, 'Error fetching ticket details');
+        }
+    }
+
+    @Post('getTicketDetails')
+    async getTicketDetails(@Body() req: {
+        ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,
+        unitCode?: string
+    }) {
+        try {
+            return this.ticketsService.getTicketDetails(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
         }
     }
 }

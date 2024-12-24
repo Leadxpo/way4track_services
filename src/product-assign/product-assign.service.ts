@@ -35,7 +35,7 @@ export class ProductAssignService {
     async getProductAssign(dto: ProductAssignIdDto): Promise<CommonResponse> {
         try {
             const productAssign = await this.productAssignRepository.findOne({
-                where: { id: dto.id },
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
                 relations: ['branchId', 'staffId', 'productId'],
             });
 
@@ -54,7 +54,9 @@ export class ProductAssignService {
                 productAssign.imeiNumberFrom,
                 productAssign.imeiNumberTo,
                 productAssign.numberOfProducts,
-                productAssign.productAssignPhoto
+                productAssign.productAssignPhoto,
+                productAssign.companyCode,
+                productAssign.unitCode
             );
 
             return new CommonResponse(true, 200, 'Product assignment fetched successfully', responseDto);
@@ -65,7 +67,7 @@ export class ProductAssignService {
 
     async deleteProductAssign(dto: ProductAssignIdDto): Promise<CommonResponse> {
         try {
-            const productAssign = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+            const productAssign = await this.productAssignRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!productAssign) {
                 throw new Error('Product assignment not found');
             }
@@ -78,7 +80,7 @@ export class ProductAssignService {
     }
 
     async assignProduct(assignData: any): Promise<ProductAssignEntity> {
-        const { productId, staffId, assignedQty, productType, assignTo } = assignData;
+        const { productId, staffId, assignedQty, productType, assignTo, companyCode, unitCode } = assignData;
 
         const productAssign = await this.productAssignRepository.findOne({ where: { productId } });
 
@@ -90,6 +92,8 @@ export class ProductAssignService {
         }
         productAssign.isAssign = true;
         productAssign.assignedQty = assignedQty;
+        productAssign.companyCode = companyCode;
+        productAssign.unitCode = unitCode;
         productAssign.assignTime = new Date();
         productAssign.assignTo = assignTo;
         productAssign.productType = productType;
@@ -100,8 +104,8 @@ export class ProductAssignService {
         return productAssign;
     }
 
-    async markInHands(productAssignId: number): Promise<ProductAssignEntity> {
-        const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
+    async markInHands(productAssignId: number, companyCode: string, unitCode: string): Promise<ProductAssignEntity> {
+        const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId, companyCode: companyCode, unitCode: unitCode } });
 
         if (!productAssign) {
             throw new Error('Product assignment not found');

@@ -29,7 +29,7 @@ export class ClientService {
             const entity = this.clientAdapter.convertDtoToEntity(dto);
             if (!entity.clientId) {
                 const clientCount = await this.clientRepository.count({
-                    where: { id: dto.id },
+                    where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
                 });
                 entity.clientId = this.generateClientId(branchEntity.branchName, clientCount + 1);
             }
@@ -47,7 +47,7 @@ export class ClientService {
 
     async deleteClientDetails(dto: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.findOne({ where: { id: dto.id } });
+            const client = await this.clientRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
@@ -60,7 +60,7 @@ export class ClientService {
 
     async getClientDetails(req: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch'], where: { id: req.id } });
+            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }

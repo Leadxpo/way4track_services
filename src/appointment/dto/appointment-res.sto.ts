@@ -15,7 +15,9 @@ export class AppointmentResDto {
     slot: Date;
     description: string;
     status: AppointmentStatus;
-    appointmentId: string
+    appointmentId: string;
+    companyCode: string;
+    unitCode: string
 
     constructor(
         id: number,
@@ -32,7 +34,9 @@ export class AppointmentResDto {
         slot: Date,
         description: string,
         status: AppointmentStatus,
-        appointmentId: string
+        appointmentId: string,
+        companyCode: string,
+        unitCode: string
     ) {
         this.id = id;
         this.name = name;
@@ -49,5 +53,7 @@ export class AppointmentResDto {
         this.description = description;
         this.status = status;
         this.appointmentId = appointmentId;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

@@ -52,9 +52,9 @@ export class ProductAssignController {
     }
 
     @Post('markInHands')
-    async markInHands(@Body() productAssignId: number): Promise<ProductAssignEntity> {
+    async markInHands(@Body() productAssignId: number, companyCode: string, unitCode: string): Promise<ProductAssignEntity> {
         try {
-            return await this.productAssignService.markInHands(productAssignId);
+            return await this.productAssignService.markInHands(productAssignId, companyCode, unitCode);
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.NOT_FOUND);
         }

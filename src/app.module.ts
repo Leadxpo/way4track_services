@@ -31,8 +31,11 @@ import { ProductAssignEntity } from './product-assign/entity/product-assign.enti
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AttendanceModule } from './attendence/attendence.module';
 import { AttendanceEntity } from './attendence/entity/attendence.entity';
-import { EstimateAssignModule } from './estimate/estimate.module';
+import { EstimateModule } from './estimate/estimate.module';
 import { EstimateEntity } from './estimate/entity/estimate.entity';
+import { LoginModule } from './login/login.module';
+import { PermissionModule } from './permissions/permissions.module';
+import { PermissionEntity } from './permissions/entity/permissions.entity';
 
 @Module({
   imports: [
@@ -42,12 +45,12 @@ import { EstimateEntity } from './estimate/entity/estimate.entity';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'WayTrackService',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity],
-      synchronize: false,
+      database: 'waytrackservice',
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity],
+      synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -64,7 +67,9 @@ import { EstimateEntity } from './estimate/entity/estimate.entity';
     ProductAssignModule,
     DashboardModule,
     AttendanceModule,
-    EstimateAssignModule
+    EstimateModule,
+    LoginModule,
+    PermissionModule
   ],
   controllers: [],
   providers: [],

@@ -9,6 +9,9 @@ import { join } from 'path';
 import { promises as fs } from 'fs';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { AttendenceRepository } from 'src/attendence/repo/attendence.repo';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { AttendanceDto } from './dto/attenace-to-staff';
+import { StaffEntity } from './entity/staff.entity';
 
 @Injectable()
 export class StaffService {
@@ -17,53 +20,98 @@ export class StaffService {
         private staffRepository: StaffRepository,
         private attendanceRepo: AttendenceRepository
     ) { }
-    async saveStaffDetails(req: StaffDto): Promise<CommonResponse> {
-        try {
-            let internalMessage: string;
-            let savedStaff;
 
-            if (req.id) {
-                const convertDto = this.adapter.convertDtoToEntity(req);
-                savedStaff = await this.staffRepository.save(convertDto);
-                internalMessage = 'Staff Details Updated Successfully';
-            } else {
-                const convertDto = this.adapter.convertDtoToEntity(req);
-                savedStaff = await this.staffRepository.save(convertDto);
-                internalMessage = 'Staff Details Created Successfully';
+    private async saveAttendanceDetails(attendanceDetails: AttendanceDto, staff: StaffEntity, branchId: number) {
+        const attendance = new AttendanceEntity();
+        attendance.day = attendanceDetails.day;
+        attendance.inTime = attendanceDetails.inTime;
+        attendance.outTime = attendanceDetails.outTime;
+        attendance.status = attendanceDetails.status;
+        attendance.staffId = staff;
+
+        const branch = new BranchEntity();
+        branch.id = branchId;
+        attendance.branchId = branch;
+
+        return await this.attendanceRepo.save(attendance);
+    }
+    async updateStaffDetails(req: StaffDto): Promise<CommonResponse> {
+        try {
+            const existingStaff = await this.staffRepository.findOne({
+                where: { id: req.id, staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
+            });
+
+            if (!existingStaff) {
+                return new CommonResponse(false, 4002, 'Staff not found for the provided id.');
             }
 
-            let attendance: AttendanceEntity = null;
+            Object.assign(existingStaff, this.adapter.convertDtoToEntity(req));
+            await this.staffRepository.save(existingStaff);
 
             if (req.attendanceDetails) {
-                attendance = new AttendanceEntity();
-                attendance.day = req.attendanceDetails.day;
-                attendance.inTime = req.attendanceDetails.inTime;
-                attendance.outTime = req.attendanceDetails.outTime;
-                attendance.status = req.attendanceDetails.status;
-                attendance.staffId = savedStaff;
-            
-                attendance = await this.attendanceRepo.save(attendance);
+                const savedAttendance = await this.saveAttendanceDetails(
+                    req.attendanceDetails,
+                    existingStaff,
+                    req.branchId
+                );
+
+                if (!existingStaff.attendance) {
+                    existingStaff.attendance = [];
+                }
+                existingStaff.attendance.push(savedAttendance);
+
+                await this.staffRepository.save(existingStaff);
             }
-            
-            savedStaff.attendance = attendance || null;
 
-            await this.staffRepository.save(savedStaff);
-
-            return new CommonResponse(true, 65152, internalMessage);
+            return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
-            throw new ErrorResponse(5416, error.message);
+            console.error(`Error updating staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
         }
     }
 
+    async createStaffDetails(req: StaffDto): Promise<CommonResponse> {
+        try {
+            const newStaff = this.adapter.convertDtoToEntity(req);
 
+            newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+
+            await this.staffRepository.save(newStaff);
+
+            if (req.attendanceDetails) {
+                const savedAttendance = await this.saveAttendanceDetails(
+                    req.attendanceDetails,
+                    newStaff,
+                    req.branchId
+                );
+                newStaff.attendance = [savedAttendance];
+                await this.staffRepository.save(newStaff);
+            }
+
+            return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
+        } catch (error) {
+            console.error(`Error creating staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
+        }
+    }
+
+    async handleStaffDetails(req: StaffDto): Promise<CommonResponse> {
+        if (req.id || req.staffId) {
+            // If an ID is provided, update the staff details
+            return await this.updateStaffDetails(req);
+        } else {
+            // If no ID is provided, create a new staff record
+            return await this.createStaffDetails(req);
+        }
+    }
 
     async deleteStaffDetails(dto: StaffIdDto): Promise<CommonResponse> {
         try {
-            const staffExists = await this.staffRepository.findOne({ where: { id: dto.id } });
+            const staffExists = await this.staffRepository.findOne({ where: { staffId: dto.staffId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!staffExists) {
-                throw new ErrorResponse(404, `staff with ID ${dto.id} does not exist`);
+                throw new ErrorResponse(404, `staff with staffId ${dto.staffId} does not exist`);
             }
-            await this.staffRepository.delete(dto.id);
+            await this.staffRepository.delete(dto.staffId);
             return new CommonResponse(true, 65153, 'staff Details Deleted Successfully');
         } catch (error) {
             throw new ErrorResponse(5417, error.message);
@@ -74,7 +122,7 @@ export class StaffService {
         try {
             const staff = await this.staffRepository.find({
                 relations: ['branch'],
-                where: { id: req.id },
+                where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
             });
 
             if (!staff.length) {

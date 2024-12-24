@@ -1,43 +1,79 @@
-import { Injectable } from '@nestjs/common';
-import { AssertsDto } from './dto/asserts.dto';
-import { AssertsEntity } from './entity/asserts-entity';
-import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { Injectable } from "@nestjs/common";
+import { AssertsEntity } from "./entity/asserts-entity";
+import { GetAssertsResDto } from "./dto/get-asserts-res.dto";
+import { VoucherEntity } from "src/voucher/entity/voucher.entity";
+import { AssertsDto } from "./dto/asserts.dto";
+import { BranchEntity } from "src/branch/entity/branch.entity";
+
 
 @Injectable()
 export class AssertsAdapter {
-    convertEntityToDto(entity: AssertsEntity): AssertsDto {
-        return {
-            id: entity.id,
-            assertsName: entity.assertsName,
-            assertsAmount: entity.assertsAmount,
-            quantity: entity.quantity,
-            branchId: entity.branchId?.id,
-            description: entity.description,
-            purchaseDate: entity.purchaseDate,
-            voucherId: entity.voucherId?.voucherId,
-            initialPayment: entity.initialPayment,
-            numberOfEmi: entity.numberOfEmi,
-            emiAmount: entity.emiAmount,
-            paymentType: entity.paymentType,
-            assetType: entity.assetType,
-            assetPhoto: entity.assetPhoto
-        };
+    convertEntityToDto(entity: AssertsEntity): GetAssertsResDto {
+        return new GetAssertsResDto(
+            entity.id,
+            entity.branchId?.id || 0,
+            entity.branchId?.branchName || '',
+            entity.assertsName || '',
+            entity.assertsAmount || 0,
+            entity.assetType,
+            entity.assertsAmount || 0,
+            entity.quantity || 0,
+            entity.description || '',
+            entity.purchaseDate || new Date(),
+            entity.assetPhoto || '',
+            entity.voucherId?.id || null,
+            entity.voucherId?.voucherId || '',
+            entity.paymentType,
+            entity.companyCode,
+            entity.unitCode,
+            entity.initialPayment,
+            entity.numberOfEmi,
+            entity.emiNumber,
+            entity.emiAmount
+        );
     }
-
-    convertAssertsDtoToEntity(dto: AssertsDto): AssertsEntity {
+    convertDtoToEntity(dto: AssertsDto): AssertsEntity {
         const entity = new AssertsEntity();
-        entity.id = dto.id;
+
         entity.assertsName = dto.assertsName;
+        entity.assetPhoto = dto.assetPhoto;
         entity.assertsAmount = dto.assertsAmount;
+        entity.assetType = dto.assetType;
         entity.quantity = dto.quantity;
-        entity.branchId = { id: dto.branchId } as any;
         entity.description = dto.description;
         entity.purchaseDate = dto.purchaseDate;
-        entity.voucherId = { id: dto.voucherId } as any;
-        entity.initialPayment = dto.initialPayment;
-        entity.numberOfEmi = dto.numberOfEmi;
-        entity.emiAmount = dto.emiAmount;
-        entity.assetPhoto = dto.assetPhoto
+        entity.paymentType = dto.paymentType;
+        entity.companyCode=dto.companyCode;
+        entity.unitCode=dto.unitCode
+        const branchEntity = new BranchEntity();
+        branchEntity.id = dto.branchId;
+        entity.branchId = branchEntity;
+        const voucherEntity = new VoucherEntity();
+        voucherEntity.id = dto.voucherId;
+        entity.voucherId = voucherEntity;
+        if (dto.id) {
+            entity.id = dto.id;
+        }
+
+        if (dto.initialPayment) {
+            entity.initialPayment = dto.initialPayment;
+        }
+
+        if (dto.numberOfEmi) {
+            entity.numberOfEmi = dto.numberOfEmi;
+        }
+
+        if (dto.emiNumber) {
+            entity.emiNumber = dto.emiNumber;
+        }
+
+        if (dto.emiAmount) {
+            entity.emiAmount = dto.emiAmount;
+        }
+
         return entity;
     }
 }
+
+
+

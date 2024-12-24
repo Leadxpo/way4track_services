@@ -9,4 +9,7 @@ export class VendorDto {
   aadharNumber: string;
   address: string;
   voucherId: number;
+  companyCode?: string;
+  unitCode?: string
+  vendorId?: string
 }

@@ -10,8 +10,11 @@ export class VendorDashboardService {
     constructor(
         private vendorRepository: VendorRepository,
     ) { }
-    async getVendorData(): Promise<CommonResponse> {
-        const VendorData = await this.vendorRepository.getvendorData()
+    async getVendorData(req: {
+        fromDate?: Date; toDate?: Date; paymentStatus?: string; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        const VendorData = await this.vendorRepository.getVendorData(req)
         if (!VendorData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

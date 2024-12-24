@@ -13,30 +13,59 @@ export class WorkAllocationService {
         private readonly workAllocationRepository: WorkAllocationRepository,
     ) { }
 
-    async saveWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
+    async updateWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         try {
-            const entity = this.workAllocationAdapter.convertDtoToEntity(dto);
+            // Find the existing work allocation by its ID
+            const existingWorkAllocation = await this.workAllocationRepository.findOne({
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
+            });
 
-            if (!entity.workAllocationNumber) {
-                const allocationCount = await this.workAllocationRepository.count({});
-                entity.workAllocationNumber = this.generateWorkAllocationNumber(allocationCount + 1);
+            if (!existingWorkAllocation) {
+                return new CommonResponse(false, 4002, 'Work Allocation not found for the provided details.');
             }
 
-            await this.workAllocationRepository.save(entity);
+            // Update the existing work allocation details
+            Object.assign(existingWorkAllocation, this.workAllocationAdapter.convertDtoToEntity(dto));
+            await this.workAllocationRepository.save(existingWorkAllocation);
 
-            const message = dto.id
-                ? 'Work Allocation updated successfully'
-                : 'Work Allocation created successfully';
-
-            return new CommonResponse(true, 201, message);
+            return new CommonResponse(true, 65152, 'Work Allocation updated successfully');
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error updating work allocation details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to update work allocation details: ${error.message}`);
         }
     }
 
+    async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
+        try {
+            const entity = this.workAllocationAdapter.convertDtoToEntity(dto);
+
+            // Generate the workAllocationNumber if not already provided
+            const allocationCount = await this.workAllocationRepository.count({});
+            entity.workAllocationNumber = this.generateWorkAllocationNumber(allocationCount + 1);
+
+            await this.workAllocationRepository.save(entity);
+
+            return new CommonResponse(true, 201, 'Work Allocation created successfully');
+        } catch (error) {
+            console.error(`Error creating work allocation details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to create work allocation details: ${error.message}`);
+        }
+    }
+
+    async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
+        if (dto.id || dto.workAllocationNumber) {
+            // If an ID is provided, update the work allocation details
+            return await this.updateWorkAllocationDetails(dto);
+        } else {
+            // If no ID is provided, create a new work allocation
+            return await this.createWorkAllocationDetails(dto);
+        }
+    }
+
+
     async deleteWorkAllocation(req: WorkAllocationIdDto): Promise<CommonResponse> {
         try {
-            const allocation = await this.workAllocationRepository.findOne({ where: { id: req.id } });
+            const allocation = await this.workAllocationRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!allocation) {
                 return new CommonResponse(false, 404, 'Work Allocation not found');
             }
@@ -50,7 +79,7 @@ export class WorkAllocationService {
     async getWorkAllocationDetails(req: WorkAllocationIdDto): Promise<CommonResponse> {
         try {
             const allocation = await this.workAllocationRepository.find({
-                where: { id: req.id },
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['staffId', 'clientId']
             });
             if (!allocation) {
@@ -64,6 +93,20 @@ export class WorkAllocationService {
             throw new ErrorResponse(500, error.message);
         }
     }
+
+    async getWorkAllocation(req: {
+        workAllocationNumber?: string; serviceOrProduct?: string; clientName?: string, companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.workAllocationRepository.getWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
 
     /**
      * Generates a work allocation number in the format #VOU-001.

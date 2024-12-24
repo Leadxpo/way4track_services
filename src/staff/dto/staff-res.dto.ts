@@ -1,3 +1,4 @@
+import { DesignationEnum } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 
 export class GetStaffResDto {
@@ -5,7 +6,7 @@ export class GetStaffResDto {
     name: string;
     phoneNumber: string;
     staffId: string;
-    designation: string;
+    designation: DesignationEnum;
     branchId: number;
     branchName: string;
     dob: Date;
@@ -14,14 +15,16 @@ export class GetStaffResDto {
     address: string;
     joiningDate: Date;
     basicSalary: number;
-    beforeExperience: Date;
+    beforeExperience: number;
     staffPhoto: string;
+    companyCode: string;
+    unitCode: string;
     constructor(
         id: number,
         name: string,
         phoneNumber: string,
         staffId: string,
-        designation: string,
+        designation: DesignationEnum,
         branchId: number,
         branchName: string,
         dob: Date,
@@ -30,8 +33,10 @@ export class GetStaffResDto {
         address: string,
         joiningDate: Date,
         basicSalary: number,
-        beforeExperience: Date,
-        staffPhoto: string
+        beforeExperience: number,
+        staffPhoto: string,
+        companyCode: string,
+        unitCode: string,
     ) {
         this.id = id;
         this.name = name;
@@ -48,5 +53,7 @@ export class GetStaffResDto {
         this.basicSalary = basicSalary;
         this.beforeExperience = beforeExperience
         this.staffPhoto = staffPhoto
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

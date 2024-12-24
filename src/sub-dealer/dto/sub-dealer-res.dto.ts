@@ -7,10 +7,13 @@ export class SubDealerResDto {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: number;
+    voucherId: string;
     voucherNames: string;
+    password: string;
     subDealerPhoto: string;
     subDealerId: string
+    companyCode?: string;
+    unitCode?: string
     constructor(
         id: number | undefined,
         name: string,
@@ -20,10 +23,13 @@ export class SubDealerResDto {
         emailId: string,
         aadharNumber: string,
         address: string,
-        voucherId: number,
+        voucherId: string,
         voucherNames: string,
+        password: string,
         subDealerPhoto: string,
-        subDealerId: string
+        subDealerId: string,
+        companyCode?: string,
+        unitCode?: string
     ) {
         this.id = id;
         this.name = name;
@@ -37,5 +43,8 @@ export class SubDealerResDto {
         this.voucherNames = voucherNames;
         this.subDealerPhoto = subDealerPhoto;
         this.subDealerId = subDealerId;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
+        this.password = password
     }
 }

@@ -1,0 +1,1 @@
+{"version":3,"file":"branch-id.dto.js","sourceRoot":"","sources":["../../../src/branch/dto/branch-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,WAAW;IAIpB,YAAY,EAAU,EAAE,WAAmB,EACvC,QAAgB;QAChB,IAAI,CAAC,EAAE,GAAG,EAAE,CAAA;QACZ,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC5B,CAAC;CACJ;AAVD,kCAUC"}

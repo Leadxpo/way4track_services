@@ -11,7 +11,6 @@ export class StaffAdapter {
         const entity = new StaffEntity();
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
-        entity.staffId = dto.staffId;
         entity.staffPhoto = dto.staffPhoto
         entity.designation = dto.designation;
         entity.dob = dto.dob;
@@ -23,11 +22,16 @@ export class StaffAdapter {
         const branchEntity = new BranchEntity();
         branchEntity.id = dto.branchId;
         entity.branch = branchEntity;
-
-
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
+        entity.password = dto.password
         entity.beforeExperience = dto.beforeExperience
         if (dto.id) {
             entity.id = dto.id;
+        }
+
+        if (dto.staffId) {
+            entity.staffId = dto.staffId
         }
         return entity;
     }
@@ -49,7 +53,9 @@ export class StaffAdapter {
                 staffMember.joiningDate,
                 staffMember.basicSalary,
                 staffMember.beforeExperience,
-                staffMember.staffPhoto
+                staffMember.staffPhoto,
+                staffMember.companyCode,
+                staffMember.unitCode
             );
         });
     }

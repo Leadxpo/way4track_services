@@ -9,10 +9,10 @@ import { AttendanceDto } from './dto/attenace-to-staff';
 export class StaffController {
     constructor(private readonly staffService: StaffService) { }
 
-    @Post('saveStaffDetails')
-    async saveStaffDetails(@Body() req: any): Promise<CommonResponse> {
+    @Post('handleStaffDetails')
+    async handleStaffDetails(@Body() req: any): Promise<CommonResponse> {
         try {
-            return this.staffService.saveStaffDetails(req);
+            return this.staffService.handleStaffDetails(req);
         } catch (error) {
             console.log("Error in create address in services..", error)
         }

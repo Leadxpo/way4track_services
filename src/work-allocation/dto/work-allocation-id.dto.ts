@@ -1,3 +1,5 @@
-export class WorkAllocationIdDto{
-    id:number;
+export class WorkAllocationIdDto {
+    id: number;
+    companyCode?: string;
+    unitCode?: string
 }

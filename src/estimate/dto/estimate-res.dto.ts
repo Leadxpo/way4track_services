@@ -11,6 +11,8 @@ export class EstimateResDto {
     productOrService: string;
     description: string;
     totalAmount: number;
+    companyCode: string;
+    unitCode: string
     products?: { name: string; quantity: number; hsnCode: string; amount: number }[];
 
     constructor(
@@ -26,6 +28,8 @@ export class EstimateResDto {
         productOrService: string,
         description: string,
         totalAmount: number,
+        companyCode: string,
+        unitCode: string,
         products?: { name: string; quantity: number; hsnCode: string; amount: number }[]
     ) {
         this.id = id;
@@ -41,5 +45,7 @@ export class EstimateResDto {
         this.description = description;
         this.totalAmount = totalAmount;
         this.products = products;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

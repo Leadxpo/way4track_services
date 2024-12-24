@@ -29,7 +29,7 @@ export class AttendanceService {
         const internalMessage = id ? 'Attendance Updated Successfully' : 'Attendance Created Successfully';
 
         if (id) {
-            attendance = await this.attendanceRepository.findOne({ where: { id } });
+            attendance = await this.attendanceRepository.findOne({ where: { id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!attendance) throw new Error('Attendance record not found');
 
             Object.assign(attendance, { staff, branch, day, inTime, outTime, status, remarks });
@@ -45,7 +45,7 @@ export class AttendanceService {
     }
 
 
-    async getAttendance(staffId?: number, branchId?: number, dateRange?: { start: string, end: string }): Promise<AttendanceEntity[]> {
+    async getAttendance(staffId?: number, branchId?: number, dateRange?: { start: string, end: string }, companyCode?: string, unitCode?: string): Promise<AttendanceEntity[]> {
         const query = this.attendanceRepository.createQueryBuilder('attendance')
             .leftJoinAndSelect('attendance.staffId', 'staff')
             .leftJoinAndSelect('attendance.branchId', 'branch');
@@ -54,6 +54,12 @@ export class AttendanceService {
         }
         if (branchId) {
             query.andWhere('attendance.branchId = :branchId', { branchId });
+        }
+        if (companyCode) {
+            query.andWhere('attendance.company_code = :companyCode', { companyCode });
+        }
+        if (unitCode) {
+            query.andWhere('attendance.unit_code = :unitCode', { unitCode });
         }
         if (dateRange) {
             query.andWhere('attendance.day BETWEEN :start AND :end', { start: dateRange.start, end: dateRange.end });

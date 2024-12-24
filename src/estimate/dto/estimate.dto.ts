@@ -7,8 +7,10 @@ export class EstimateDto {
     productOrService: string;
     description: string;
     totalAmount: number;
+    companyCode: string;
+    unitCode: string
     products?: { name: string; quantity: number; hsnCode: string; amount: number }[];
-
+    estimateId?: string
     constructor(
         id: number,
         clientId: string,
@@ -18,7 +20,10 @@ export class EstimateDto {
         productOrService: string,
         description: string,
         totalAmount: number,
-        products?: { name: string; quantity: number; hsnCode: string; amount: number }[]
+        companyCode: string,
+        unitCode: string,
+        products?: { name: string; quantity: number; hsnCode: string; amount: number }[],
+        estimateId?: string
     ) {
         this.id = id;
         this.clientId = clientId;
@@ -29,5 +34,8 @@ export class EstimateDto {
         this.description = description;
         this.totalAmount = totalAmount;
         this.products = products;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
+        this.estimateId = estimateId
     }
 }

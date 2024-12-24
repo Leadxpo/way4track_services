@@ -3,6 +3,9 @@ import { DataSource, Repository } from "typeorm";
 import { SubDealerEntity } from "../entity/sub-dealer.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { DetailSubDealerDto } from "../dto/detail-sub-dealer.dto";
+import { LoginDto } from "src/login/dto/login.dto";
+import { DesignationEnum } from "src/staff/entity/staff.entity";
+import { PaymentStatus } from "src/product/dto/payment-status.enum";
 
 
 @Injectable()
@@ -13,8 +16,11 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
         super(SubDealerEntity, dataSource.createEntityManager());
     }
 
-    async getSubDealerData() {
-        const query = await this.createQueryBuilder('sb')
+    async getSubDealerData(req: {
+        fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus, companyCode?: string;
+        unitCode?: string
+    }) {
+        const query = this.createQueryBuilder('sb')
             .select([
                 'sb.sub_dealer_id AS SubDealerId',
                 'sb.sub_dealer_phone_number AS phoneNumber',
@@ -25,9 +31,28 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'vr.voucher_id as voucherId',
             ])
             .leftJoin(VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
-            .getRawMany();
-        return query;
+            .where(`sb.company_code = "${req.companyCode}"`)
+            .andWhere(`sb.unit_code = "${req.unitCode}"`)
+
+        // Add conditional filtering based on the provided fromDate and toDate
+        if (req.fromDate) {
+            query.andWhere('sb.starting_date >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('sb.starting_date <= :toDate', { toDate: req.toDate });
+        }
+
+        // Add conditional filtering based on paymentStatus
+        if (req.paymentStatus) {
+            query.andWhere('vr.payment_status = :paymentStatus', { paymentStatus: req.paymentStatus });
+        }
+
+        // Execute the query and return the results
+        const result = await query.getRawMany();
+        return result;
     }
+
 
     async getDetailSubDealerData(req: DetailSubDealerDto) {
         const query = await this.createQueryBuilder('sb')
@@ -47,9 +72,29 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
             ])
             .leftJoin(VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
             .where(`sb.sub_dealer_id='${req.subDealerId}'`)
+            .andWhere(`sb.company_code = "${req.companyCode}"`)
+            .andWhere(`sb.unit_code = "${req.unitCode}"`)
             .groupBy(`vr.voucher_id `)
             .getRawOne();
 
+        return query;
+    }
+    async SubDealerLoginDetails(req: LoginDto) {
+        const query = this.createQueryBuilder('sf')
+            .select(`
+                sf.sub_dealer_id AS staffId,
+                sf.password AS staffPassword
+            `)
+            .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword AND sf.designation = :designation`, {
+                staffId: req.staffId,
+                staffPassword: req.password,
+                designation: DesignationEnum.SubDealer
+            })
+            .andWhere(`sf.company_code = :companyCode AND sf.unit_code = :unitCode`, {
+                companyCode: req.companyCode,
+                unitCode: req.unitCode
+            })
+            .getRawOne();
         return query;
     }
 

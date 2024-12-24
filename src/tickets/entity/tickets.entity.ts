@@ -29,7 +29,13 @@ export class TicketsEntity {
         name: 'addressing_department',
         type: 'enum',
         enum: AddressingDepartment,
-        nullable: false,
+        default: AddressingDepartment.HR
     })
     addressingDepartment: AddressingDepartment;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

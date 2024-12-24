@@ -6,12 +6,12 @@ import { AppointmentDto } from './dto/appointement.dto';
 
 @Controller('appointment')
 export class AppointmentController {
-  constructor(private readonly appointmentService: AppointmentService) {}
+  constructor(private readonly appointmentService: AppointmentService) { }
 
-  @Post('saveAppointmentDetails')
-  async saveAppointmentDetails(@Body() dto: AppointmentDto): Promise<CommonResponse> {
+  @Post('handleAppointmentDetails')
+  async handleAppointmentDetails(@Body() dto: AppointmentDto): Promise<CommonResponse> {
     try {
-      return await this.appointmentService.saveAppointmentDetails(dto);
+      return await this.appointmentService.handleAppointmentDetails(dto);
     } catch (error) {
       console.error('Error in save appointment details:', error);
       return new CommonResponse(false, 500, 'Error saving appointment details');

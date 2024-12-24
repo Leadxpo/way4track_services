@@ -1,7 +1,7 @@
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
 
-@Entity('sub-dealer')
+@Entity('sub_dealer')
 export class SubDealerEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -9,11 +9,14 @@ export class SubDealerEntity {
   @Column({ name: 'name', type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ name: 'sub_dealer_photo', type: 'text'})
+  @Column({ name: 'sub_dealer_photo', type: 'text', nullable: true })
   subDealerPhoto: string;
 
-  @Column({ name: 'sub_dealer_id', type: 'varchar', length: 10, unique: true })
+  @Column({ name: 'sub_dealer_id', type: 'varchar', length: 20, unique: true })
   subDealerId: string;
+
+  @Column({ name: 'password', type: 'varchar', length: 20, unique: true })
+  password: string;
 
   @Column({ name: 'sub_dealer_phone_number', type: 'varchar', length: 15 })
   subDealerPhoneNumber: string;
@@ -30,7 +33,7 @@ export class SubDealerEntity {
   @Column({ name: 'email', type: 'varchar', length: 150 })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 12 })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20 })
   aadharNumber: string;
 
   @Column({ name: 'address', type: 'text' })
@@ -40,4 +43,10 @@ export class SubDealerEntity {
   @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.subDealer)
   @JoinColumn({ name: 'voucher_id' })
   voucherId: VoucherEntity;
+
+  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  companyCode: string;
+
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  unitCode: string;
 }

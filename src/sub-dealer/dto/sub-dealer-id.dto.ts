@@ -1,6 +1,11 @@
 export class SubDealerIdDto {
-  id: number;
-  constructor(id: number) {
-    this.id = id;
+  subDealerId: string;
+  companyCode?: string;
+  unitCode?: string
+  constructor(subDealerId: string, companyCode?: string,
+    unitCode?: string) {
+    this.subDealerId = subDealerId;
+    this.companyCode = companyCode
+    this.unitCode = unitCode
   }
 }

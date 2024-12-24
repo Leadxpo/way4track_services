@@ -11,5 +11,8 @@ export class ClientDto {
     status: ClientStatusEnum;
     joiningDate: Date;
     amount: number;
-    clientPhoto?: string; 
+    clientPhoto?: string;
+    voucherId?: number
+    companyCode: string;
+    unitCode: string
 }

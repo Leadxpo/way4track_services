@@ -13,8 +13,11 @@ export class VendorRepository extends Repository<VendorEntity> {
         super(VendorEntity, dataSource.createEntityManager());
     }
 
-    async getvendorData() {
-        const query = await this.createQueryBuilder('ve')
+    async getVendorData(req: {
+        fromDate?: Date; toDate?: Date; paymentStatus?: string;companyCode?: string,
+        unitCode?: string
+    }) {
+        const query = this.createQueryBuilder('ve')
             .select([
                 've.vendor_id AS vendorId',
                 've.vendor_phone_number AS phoneNumber',
@@ -25,9 +28,25 @@ export class VendorRepository extends Repository<VendorEntity> {
                 'vr.voucher_id as voucherId',
             ])
             .leftJoin(VoucherEntity, 'vr', 'vr.id = ve.voucher_id')
-            .getRawMany();
-        return query;
+            .where(`ve.company_code = "${req.companyCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+
+        if (req.fromDate) {
+            query.andWhere('ve.starting_date >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('ve.starting_date <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.paymentStatus) {
+            query.andWhere('vr.payment_status = :paymentStatus', { paymentStatus: req.paymentStatus });
+        }
+
+        const result = await query.getRawMany();
+        return result;
     }
+
 
     async getDetailvendorData(req: VendorDetail) {
         const query = await this.createQueryBuilder('ve')
@@ -47,6 +66,8 @@ export class VendorRepository extends Repository<VendorEntity> {
             ])
             .leftJoin(VoucherEntity, 'vr', 'vr.id = ve.voucher_id')
             .where(`ve.vendor_id = "${req.vendorId}"`)
+            .andWhere(`ve.company_code = "${req.companyCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`)
             .getRawOne();
 
         return query;

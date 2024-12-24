@@ -4,6 +4,7 @@ import { HiringService } from './hiring.service';
 import { CommonResponse } from 'src/models/common-response';
 import { HiringIdDto } from './dto/hiring-id.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { HiringFilterDto } from './dto/hiring-filter.dto';
 
 @Controller('hiring')
 export class HiringController {
@@ -48,5 +49,9 @@ export class HiringController {
             console.error('Error in upload resume in service:', error);
             return new CommonResponse(false, 500, 'Error uploading resume');
         }
+    }
+    @Post('getHiringSearchDetails')
+    async getHiringSearchDetails(@Body() req: HiringFilterDto) {
+        return this.hiringService.getHiringSearchDetails(req);
     }
 }

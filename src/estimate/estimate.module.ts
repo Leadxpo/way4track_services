@@ -17,4 +17,4 @@ import { ClientModule } from 'src/client/client.module';
     exports: [EstimateRepository, EstimateService]
 
 })
-export class EstimateAssignModule { }
+export class EstimateModule { }

@@ -1,4 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { ClientEntity } from 'src/client/entity/client.entity';
+import { ClientStatusEnum } from 'src/client/enum/client-status.enum';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, BeforeInsert, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
@@ -14,12 +16,16 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'request_type', type: 'varchar', length: 50 })
     requestType: string;
 
+    @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
+    status: ClientStatusEnum
+
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.request)
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 
-    @Column({ name: 'request_to', type: 'varchar', length: 100 })
-    requestTo: string;
+    @ManyToOne(() => ClientEntity, (staffEntity) => staffEntity.request)
+    @JoinColumn({ name: 'client_id' })
+    clientID: ClientEntity;
 
     @Column({ name: 'description', type: 'text' })
     description: string;
@@ -33,4 +39,10 @@ export class RequestRaiseEntity extends BaseEntity {
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.request)
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

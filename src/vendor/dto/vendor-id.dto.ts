@@ -1,6 +1,11 @@
 export class VendorIdDto {
-    id: number;
-    constructor(id: number) {
-        this.id = id;
+    vendorId: string;
+    companyCode?: string;
+    unitCode?: string
+    constructor(vendorId: string, companyCode?: string,
+        unitCode?: string) {
+        this.vendorId = vendorId;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

@@ -10,7 +10,7 @@ export class VendorEntity {
   @Column({ name: 'name', type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ name: 'vendor_id', type: 'varchar', length: 10, unique: true })
+  @Column({ name: 'vendor_id', type: 'varchar', length: 20, unique: true })
   vendorId: string;
 
   @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15 })
@@ -22,7 +22,7 @@ export class VendorEntity {
   @Column({ name: 'product_type', type: 'varchar', length: 50 })
   productType: string;
 
-  @Column({ name: 'vendor_photo', type: 'text' })
+  @Column({ name: 'vendor_photo', type: 'text', nullable: true })
   vendorPhoto: string;
 
   @Column({ name: 'starting_date', type: 'date' })
@@ -31,7 +31,7 @@ export class VendorEntity {
   @Column({ name: 'email', type: 'varchar', length: 150 })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 12 })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20 })
   aadharNumber: string;
 
   @Column({ name: 'address', type: 'text' })
@@ -43,4 +43,10 @@ export class VendorEntity {
   @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor)
   @JoinColumn({ name: 'voucher_id' })
   voucherId: VoucherEntity;
+
+  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  companyCode: string;
+
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  unitCode: string;
 }

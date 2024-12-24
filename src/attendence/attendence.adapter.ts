@@ -13,6 +13,8 @@ export class AttendanceAdapter {
         entity.inTime = dto.inTime;
         entity.outTime = dto.outTime;
         entity.status = dto.status;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         return entity;
     }
 
@@ -27,6 +29,8 @@ export class AttendanceAdapter {
             status: attendance.status,
             staffName: attendance.staffId.name,
             branchName: attendance.branchId.branchName,
+            companyCode: attendance.companyCode,
+            unitCode: attendance.unitCode
         };
     }
 }

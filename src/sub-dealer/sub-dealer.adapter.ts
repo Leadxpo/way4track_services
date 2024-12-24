@@ -9,9 +9,7 @@ import { SubDealerResDto } from './dto/sub-dealer-res.dto';
 export class SubDealerAdapter {
     convertDtoToEntity(dto: SubDealerDto): SubDealerEntity {
         const entity = new SubDealerEntity();
-        if (dto.id) {
-            entity.id = dto.id;
-        }
+
         entity.name = dto.name;
         entity.subDealerPhoneNumber = dto.subDealerPhoneNumber;
         entity.alternatePhoneNumber = dto.alternatePhoneNumber;
@@ -20,9 +18,15 @@ export class SubDealerAdapter {
         entity.emailId = dto.emailId;
         entity.aadharNumber = dto.aadharNumber;
         entity.address = dto.address;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
+        entity.password = dto.password
         const voucher = new VoucherEntity()
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
+        if (dto.id) {
+            entity.id = dto.id;
+        }
         return entity;
     }
 
@@ -39,7 +43,9 @@ export class SubDealerAdapter {
                 address,
                 voucherId,
                 subDealerPhoto,
-                subDealerId
+                subDealerId,
+                companyCode,
+                unitCode
             } = vendor;
 
             return new SubDealerResDto(
@@ -51,10 +57,12 @@ export class SubDealerAdapter {
                 emailId,
                 aadharNumber,
                 address,
-                voucherId?.id,
+                voucherId?.voucherId,
                 voucherId?.name ?? '',
                 subDealerPhoto,
-                subDealerId
+                subDealerId,
+                companyCode,
+                unitCode
             );
         });
     }

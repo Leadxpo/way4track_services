@@ -8,4 +8,6 @@ export class ProductAssignDto {
     numberOfProducts: number;
     branchOrPerson: string;
     productAssignPhoto?: string
+    companyCode: string;
+    unitCode: string
 }

@@ -33,4 +33,10 @@ export class EstimateEntity extends BaseEntity {
 
     @Column('json', { nullable: true, name: 'products' })
     products: { name: string; quantity: number; hsnCode: string; amount: number }[];
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+  
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

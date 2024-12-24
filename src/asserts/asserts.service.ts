@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { AssertsAdapter } from './asserts.adapter';
 import { AssertsDto } from './dto/asserts.dto';
 import { AssertsIdDto } from './dto/asserts-id.dto';
 import { AssertsRepository } from './repo/asserts.repo';
@@ -10,28 +9,29 @@ import { join } from 'path';
 import { promises as fs } from 'fs';
 import { AssertsEntity } from './entity/asserts-entity';
 import { VoucherRepository } from 'src/voucher/repo/voucher.repo';
+import { AssertsVoucherIdDto } from './dto/asserts-voucher-id.dto';
+import { AssertsAdapter } from './asserts.adapter';
+import { BranchRepository } from 'src/branch/repo/branch.repo';
 @Injectable()
 export class AssertsService {
     constructor(
         private adapter: AssertsAdapter,
         private assertsRepository: AssertsRepository,
-        private voucherRepo: VoucherRepository
+        private voucherRepo: VoucherRepository,
+        private readonly branchRepo: BranchRepository
+
     ) { }
 
     async getAssertDetails(req: AssertsIdDto): Promise<CommonResponse> {
         try {
-
-            const voucherEntity = new VoucherEntity()
-            voucherEntity.id = req.id
             const assert = await this.assertsRepository.findOne({
                 relations: ['branchId', 'voucherId'],
-                where: { voucherId: voucherEntity },
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
             });
 
             if (!assert) {
                 return new CommonResponse(false, 404, 'Assert not found');
             }
-
             const data = this.adapter.convertEntityToDto(assert);
             return new CommonResponse(true, 6541, 'Data Retrieved Successfully', data);
         } catch (error) {
@@ -40,38 +40,27 @@ export class AssertsService {
         }
     }
 
+
     async create(createAssertsDto: AssertsDto): Promise<CommonResponse> {
         try {
-            const voucher = await this.voucherRepo.findOne({
-                where: { voucherId: createAssertsDto.voucherId },
-                relations: ['branchId'],
-            });
 
+            const branchEntity = await this.branchRepo.findOne({ where: { id: createAssertsDto.branchId } });
+
+            if (!branchEntity) {
+                throw new Error('Branch not found');
+            }
+            const voucher = await this.voucherRepo.findOne({
+                where: { id: createAssertsDto.voucherId }
+            });
             if (!voucher) {
                 throw new Error('Voucher not found');
             }
+            const entity = this.adapter.convertDtoToEntity(createAssertsDto);
 
+            await this.assertsRepository.save(entity);
             const message = createAssertsDto.id
                 ? 'Assert Details Updated Successfully'
                 : 'Assert Details Created Successfully';
-
-            const assertsEntity = new AssertsEntity();
-
-            assertsEntity.voucherId = voucher;
-            assertsEntity.branchId = voucher.branchId;
-            assertsEntity.purchaseDate = voucher.generationDate;
-
-            assertsEntity.assertsName = voucher.name;
-            assertsEntity.assertsAmount = voucher.amount;
-            assertsEntity.quantity = voucher.quantity;
-            assertsEntity.description = createAssertsDto.description;
-            assertsEntity.initialPayment = voucher.initialPayment;
-            assertsEntity.numberOfEmi = voucher.numberOfEmi;
-            assertsEntity.emiAmount = voucher.emiAmount;
-            assertsEntity.assetType = createAssertsDto.assetType;
-            assertsEntity.assetPhoto = createAssertsDto.assetPhoto;
-
-            await this.assertsRepository.save(assertsEntity);
 
             return new CommonResponse(true, 65152, message);
         } catch (error) {
@@ -79,9 +68,10 @@ export class AssertsService {
         }
     }
 
+
     async deleteAssertDetails(dto: AssertsIdDto): Promise<CommonResponse> {
         try {
-            const assertExists = await this.assertsRepository.findOne({ where: { id: dto.id } });
+            const assertExists = await this.assertsRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!assertExists) {
                 throw new ErrorResponse(404, `assert with ID ${dto.id} does not exist`);
             }

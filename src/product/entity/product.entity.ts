@@ -12,7 +12,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'product_name', type: 'varchar', length: 100 })
   productName: string;
 
-  @Column({ name: 'product_photo', type: 'text' })
+  @Column({ name: 'product_photo', type: 'text',nullable:true })
   productPhoto: string;
 
   @Column({ name: 'emi_number', type: 'varchar', length: 50 })
@@ -43,4 +43,10 @@ export class ProductEntity extends BaseEntity {
 
   @OneToMany(() => ProductAssignEntity, (product) => product.productId)
   productAssign: ProductAssignEntity[];
+
+  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  companyCode: string;
+
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  unitCode: string;
 }

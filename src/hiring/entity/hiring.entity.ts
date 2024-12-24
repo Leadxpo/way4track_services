@@ -8,7 +8,7 @@ export class HiringEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ name: 'hiring_level', type: 'enum', enum: HiringLevel })
+    @Column({ name: 'hiring_level', type: 'enum', enum: HiringLevel, default: HiringLevel.LEVEL_1 })
     hiringLevel: HiringLevel;
 
 
@@ -33,6 +33,12 @@ export class HiringEntity extends BaseEntity {
     @Column({ name: 'date_of_upload', type: 'timestamp' })
     dateOfUpload: Date;
 
-    @Column({ name: 'status', type: 'enum', enum: HiringStatus })
+    @Column({ name: 'status', type: 'enum', enum: HiringStatus, default: HiringStatus.INTERVIEWED })
     status: HiringStatus;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

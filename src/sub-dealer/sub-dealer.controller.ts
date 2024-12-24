@@ -10,10 +10,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class SubDealerController {
     constructor(private readonly subDealerService: SubDealerService) { }
 
-    @Post('saveSubDealerDetails')
-    async saveSubDealerDetails(@Body() dto: SubDealerDto) {
+    @Post('handleSubDealerDetails')
+    async handleSubDealerDetails(@Body() dto: SubDealerDto) {
         try {
-            return await this.subDealerService.saveSubDealerDetails(dto);
+            return await this.subDealerService.handleSubDealerDetails(dto);
         } catch (error) {
             console.log("Error in create address in services..", error)
         }

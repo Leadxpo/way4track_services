@@ -21,27 +21,30 @@ export class TicketsAdapter {
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branch = branch;
-
+        entity.companyCode=dto.companyCode
+        entity.unitCode=dto.unitCode
         return entity;
     }
 
-   
+
     convertEntityToDto(entities: TicketsEntity[]): GetTicketsResDto[] {
         return entities.map((entity) => {
             return new GetTicketsResDto(
-                entity.staff?.id || 0, 
-                entity.staff?.name || '', 
-                entity.staff?.phoneNumber || '', 
-                entity.problem, 
-                entity.date, 
-                entity.branch?.id || 0, 
-                entity.branch?.branchName || '', 
-                entity.ticketNumber, 
-                entity.addressingDepartment, 
+                entity.staff?.id || 0,
+                entity.staff?.name || '',
+                entity.staff?.phoneNumber || '',
+                entity.problem,
+                entity.date,
+                entity.branch?.id || 0,
+                entity.branch?.branchName || '',
+                entity.ticketNumber,
+                entity.addressingDepartment,
+                entity.companyCode,
+                entity.unitCode
             );
         });
     }
-    
 
-    
+
+
 }

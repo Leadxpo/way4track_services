@@ -10,7 +10,8 @@ export class GetTicketsResDto {
     branchName: string;
     ticketNumber: string;
     addressingDepartment: AddressingDepartment;
-
+    companyCode: string;
+    unitCOde: string;
     constructor(
         staffId: number,
         staffName: string,
@@ -21,6 +22,8 @@ export class GetTicketsResDto {
         branchName: string,
         ticketNumber: string,
         addressingDepartment: AddressingDepartment,
+        companyCode: string,
+        unitCOde: string
     ) {
         this.staffId = staffId;
         this.staffName = staffName;
@@ -31,5 +34,7 @@ export class GetTicketsResDto {
         this.branchName = branchName;
         this.ticketNumber = ticketNumber;
         this.addressingDepartment = addressingDepartment;
+        this.companyCode = companyCode;
+        this.unitCOde = unitCOde
     }
 }

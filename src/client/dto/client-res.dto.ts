@@ -12,7 +12,9 @@ export class ClientResDto {
     email: string;
     address: string;
     joiningDate: Date;
-
+    voucherId: string
+    companyCode: string;
+    unitCode: string
     constructor(
         id: number,
         name: string,
@@ -25,6 +27,9 @@ export class ClientResDto {
         email: string,
         address: string,
         joiningDate: Date,
+        voucherId: string,
+        companyCode: string,
+        unitCode: string
     ) {
         this.id = id;
         this.name = name;
@@ -37,5 +42,8 @@ export class ClientResDto {
         this.email = email;
         this.address = address;
         this.joiningDate = joiningDate;
+        this.voucherId = voucherId
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

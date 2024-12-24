@@ -11,7 +11,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColum
 
 @Entity('branches')
 export class BranchEntity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()   
   id: number;
 
   @Column({ name: 'name', type: 'varchar', length: 255 })
@@ -19,9 +19,6 @@ export class BranchEntity {
 
   @Column({ name: 'branch_number', type: 'varchar', length: 20 })
   branchNumber: string;
-
-  @Column({ name: 'manager_name', type: 'varchar', length: 255 })
-  managerName: string;
 
   @Column({ name: 'branch_address', type: 'text', nullable: true })
   branchAddress: string;
@@ -76,4 +73,10 @@ export class BranchEntity {
 
   @OneToMany(() => TicketsEntity, (ticketsEntity) => ticketsEntity.branch)
   tickets: TicketsEntity[];
+
+  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  companyCode: string;
+
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  unitCode: string;
 }

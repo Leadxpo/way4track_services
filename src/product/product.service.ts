@@ -42,6 +42,8 @@ export class ProductService {
                         price: parseFloat(row.getCell(10).value as string),
                         productDescription: row.getCell(11).value,
                         voucherId: voucherId,
+                        companyCode: row.getCell(13).value,
+                        unitCode: row.getCell(14).value
                     });
                 }
             });
@@ -56,6 +58,8 @@ export class ProductService {
                     productEntity.categoryName = product.categoryName;
                     productEntity.price = product.price;
                     productEntity.productDescription = product.productDescription;
+                    productEntity.companyCode = product.companyCode;
+                    productEntity.unitCode = product.unitCode
                     let vendor = await this.vendorRepository.findOne({
                         where: { emailId: product.vendorEmailId },
                     });

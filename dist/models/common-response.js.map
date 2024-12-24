@@ -1,0 +1,1 @@
+{"version":3,"file":"common-response.js","sourceRoot":"","sources":["../../src/models/common-response.ts"],"names":[],"mappings":";;;AAAA,MAAa,cAAc;IAYvB,YAAY,MAAe,EAAE,SAAiB,EAAE,eAAuB,EAAE,IAAU;QAC/E,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,eAAe,GAAG,eAAe,CAAC;QACvC,IAAI,CAAC,IAAI,GAAG,IAAI,CAAA;IACpB,CAAC;CACJ;AAlBD,wCAkBC"}

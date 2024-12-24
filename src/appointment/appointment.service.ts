@@ -16,38 +16,62 @@ export class AppointmentService {
     /**
      * Save or Update Appointment Details
      */
-    async saveAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
+    async updateAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         try {
-            const isUpdate = !!dto.id;
-            let entity = isUpdate
-                ? await this.appointmentRepository.findOne({ where: { id: dto.id } })
-                : null;
-
-            if (!entity) {
-                entity = this.appointmentAdapter.convertDtoToEntity(dto);
-            } else {
-                Object.assign(entity, this.appointmentAdapter.convertDtoToEntity(dto));
+            // Find the existing appointment by its ID and company/unit code
+            const existingAppointment = await this.appointmentRepository.findOne({
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
+            });
+    
+            if (!existingAppointment) {
+                return new CommonResponse(false, 4002, 'Appointment not found for the provided details.');
             }
-
-            await this.appointmentRepository.save(entity);
-
-            const message = isUpdate
-                ? 'Appointment details updated successfully'
-                : 'Appointment details created successfully';
-            return new CommonResponse(true, 200, message);
+    
+            // Update the existing appointment details
+            Object.assign(existingAppointment, this.appointmentAdapter.convertDtoToEntity(dto));
+            await this.appointmentRepository.save(existingAppointment);
+    
+            return new CommonResponse(true, 65152, 'Appointment details updated successfully');
         } catch (error) {
-            console.error('Error in saveAppointmentDetails service:', error);
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error updating appointment details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to update appointment details: ${error.message}`);
         }
     }
-
+    
+    async createAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
+        try {
+            const entity = this.appointmentAdapter.convertDtoToEntity(dto);
+    
+            // Generate the appointmentId if not already provided
+            const count = await this.appointmentRepository.count();
+            entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
+    
+            await this.appointmentRepository.save(entity);
+    
+            return new CommonResponse(true, 201, 'Appointment details created successfully');
+        } catch (error) {
+            console.error(`Error creating appointment details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to create appointment details: ${error.message}`);
+        }
+    }
+    
+    async handleAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
+        if (dto.id) {
+            // If an ID is provided, update the appointment details
+            return await this.updateAppointmentDetails(dto);
+        } else {
+            // If no ID is provided, create a new appointment
+            return await this.createAppointmentDetails(dto);
+        }
+    }
+    
     /**
      * Get Appointment Details by ID
      */
     async getAppointmentDetails(dto: AppointmentIdDto): Promise<CommonResponse> {
         try {
             const entity = await this.appointmentRepository.find({
-                where: { id: dto.id }, relations: ['branchId', 'staffId', 'clientId']
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }, relations: ['branchId', 'staffId', 'clientId']
             });
 
             if (!entity) {
@@ -68,7 +92,7 @@ export class AppointmentService {
     async deleteAppointmentDetails(dto: AppointmentIdDto): Promise<CommonResponse> {
         try {
             const appointmentExists = await this.appointmentRepository.findOne({
-                where: { id: dto.id },
+                where: { id: dto.id ,companyCode: dto.companyCode, unitCode: dto.unitCode},
             });
 
             if (!appointmentExists) {

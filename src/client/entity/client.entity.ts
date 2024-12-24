@@ -1,11 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { ClientStatusEnum } from '../enum/client-status.enum';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { ProductEntity } from 'src/product/entity/product.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
+import { ClientStatusEnum } from '../enum/client-status.enum';
+import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -20,6 +20,12 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'client_id', type: 'varchar', length: 50, unique: true })
     clientId: string;
+
+    @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
+    request: RequestRaiseEntity[];
+
+    @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
+    status: ClientStatusEnum
 
     @Column({ name: 'dob', type: 'date' })
     dob: Date;
@@ -53,4 +59,10 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'client_photo', type: 'text', nullable: true })
     clientPhoto: string;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

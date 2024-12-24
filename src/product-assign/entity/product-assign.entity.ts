@@ -34,7 +34,7 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'request_id' })
   requestId: RequestRaiseEntity;
 
-  @Column({ name: 'product_assign_photo', type: 'text' })
+  @Column({ name: 'product_assign_photo', type: 'text',nullable:true })
   productAssignPhoto: string;
 
   @Column({ name: 'branch_person', type: 'varchar', length: 20 })
@@ -57,4 +57,10 @@ export class ProductAssignEntity extends BaseEntity {
 
   @Column({ name: 'in_hands', type: 'boolean', default: false })
   inHands: boolean;
+
+  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  companyCode: string;
+
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  unitCode: string;
 }

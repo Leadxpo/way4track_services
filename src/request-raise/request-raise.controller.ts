@@ -8,10 +8,10 @@ import { RequestRaiseService } from './request-raise.service';
 export class RequestRaiseController {
     constructor(private readonly requestService: RequestRaiseService) { }
 
-    @Post('saveRequestDetails')
-    async saveRequestDetails(@Body() dto: RequestRaiseDto): Promise<CommonResponse> {
+    @Post('handleRequestDetails')
+    async handleRequestDetails(@Body() dto: RequestRaiseDto): Promise<CommonResponse> {
         try {
-            return await this.requestService.saveRequestDetails(dto);
+            return await this.requestService.handleRequestDetails(dto);
         } catch (error) {
             console.error('Error in save request details in service:', error);
             return new CommonResponse(false, 500, 'Error saving request details');
@@ -46,6 +46,19 @@ export class RequestRaiseController {
             return this.requestService.getRequestsDropDown();
         } catch (error) {
             return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+
+    @Post('getRequestsBySearch')
+    async getRequests(@Body() req: {
+        fromDate?: Date; toDate?: Date; status?: string, companyCode?: string,
+        unitCode?: string
+    }) {
+        try {
+            return this.requestService.getRequests(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
         }
     }
 }

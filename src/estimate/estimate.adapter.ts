@@ -16,6 +16,8 @@ export class EstimateAdapter {
         entity.description = dto.description;
         entity.amount = dto.totalAmount;
         entity.products = dto.products;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         const clientEntity = new ClientEntity();
         clientEntity.clientId = dto.clientId;
         entity.clientId = clientEntity;
@@ -37,7 +39,9 @@ export class EstimateAdapter {
             entity.productOrService,
             entity.description,
             entity.amount,
-            entity.products
+            entity.companyCode, entity.unitCode,
+            entity.products,
+
         );
         return dto;
     }

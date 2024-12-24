@@ -8,10 +8,10 @@ import { EstimateIdDto } from './dto/estimate-id.dto';
 export class EstimateController {
     constructor(private readonly estimateService: EstimateService) { }
 
-    @Post('saveEstimateDetails')
-    async saveEstimateDetails(@Body() dto: EstimateDto): Promise<CommonResponse> {
+    @Post('handleEstimateDetails')
+    async handleEstimateDetails(@Body() dto: EstimateDto): Promise<CommonResponse> {
         try {
-            return await this.estimateService.saveEstimateDetails(dto);
+            return await this.estimateService.handleEstimateDetails(dto);
         } catch (error) {
             console.error('Error in save estimate details in service:', error);
             return new CommonResponse(false, 500, 'Error saving estimate details');

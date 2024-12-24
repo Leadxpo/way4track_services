@@ -21,7 +21,7 @@ export class AttendanceEntity {
         name: 'status',
         type: 'enum',
         enum: AttendanceStatus,
-        nullable: false,
+        default: AttendanceStatus.PRESENT
     })
     status: AttendanceStatus;
 
@@ -32,4 +32,10 @@ export class AttendanceEntity {
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.attendance)
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

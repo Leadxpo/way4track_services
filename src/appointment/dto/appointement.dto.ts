@@ -5,10 +5,12 @@ export class AppointmentDto {
   appointmentId?: string;
   appointmentType: AppointmentType;
   name: string;
-  assignedToId: number; // Staff ID
+  assignedToId: number; 
   slot: Date;
-  branchId: number; // Branch ID
-  clientId: number; // Client ID
+  branchId: number; 
+  clientId: number; 
   description?: string;
   status?: AppointmentStatus;
+  companyCode: string;
+  unitCode: string
 }

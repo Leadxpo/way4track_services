@@ -9,10 +9,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class VendorController {
   constructor(private readonly vendorService: VendorService) { }
 
-  @Post('saveVendorDetails')
-  async saveVendorDetails(@Body() dto: VendorDto): Promise<CommonResponse> {
+  @Post('handleVendorDetails')
+  async handleVendorDetails(@Body() dto: VendorDto): Promise<CommonResponse> {
     try {
-      return await this.vendorService.saveVendorDetails(dto);
+      return await this.vendorService.handleVendorDetails(dto);
     } catch (error) {
       console.error('Error in save vendor details:', error);
       return new CommonResponse(false, 500, 'Error saving vendor details');

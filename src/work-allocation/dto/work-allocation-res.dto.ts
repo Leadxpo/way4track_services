@@ -10,7 +10,8 @@ export class WorkAllocationResDto {
     clientPhoneNumber: string;
     staffId: number;
     assignedTo: string; // Staff name
-
+    companyCode?: string;
+    unitCode?: string
     constructor(
         id: number,
         workAllocationNumber: string,
@@ -23,6 +24,8 @@ export class WorkAllocationResDto {
         clientPhoneNumber: string,
         staffId: number,
         assignedTo: string,
+        companyCode?: string,
+        unitCode?: string
     ) {
         this.id = id;
         this.workAllocationNumber = workAllocationNumber;
@@ -35,5 +38,7 @@ export class WorkAllocationResDto {
         this.clientPhoneNumber = clientPhoneNumber;
         this.staffId = staffId;
         this.assignedTo = assignedTo;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

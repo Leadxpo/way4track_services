@@ -9,7 +9,9 @@ export class ProductAssignResDto {
     imeiNumberFrom: string;
     imeiNumberTo: string;
     numberOfProducts: number;
-    productAssignPhoto: string
+    productAssignPhoto: string;
+    companyCode: string;
+    unitCode: string
     constructor(
         id: number,
         staffId: string,
@@ -21,7 +23,9 @@ export class ProductAssignResDto {
         imeiNumberFrom: string,
         imeiNumberTo: string,
         numberOfProducts: number,
-        productAssignPhoto: string
+        productAssignPhoto: string,
+        companyCode: string,
+        unitCode: string
     ) {
         this.id = id;
         this.staffId = staffId;
@@ -34,5 +38,7 @@ export class ProductAssignResDto {
         this.imeiNumberTo = imeiNumberTo;
         this.numberOfProducts = numberOfProducts;
         this.productAssignPhoto = productAssignPhoto
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

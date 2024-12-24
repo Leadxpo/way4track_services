@@ -1,18 +1,37 @@
 import { AssetType } from "../entity/asserts-entity";
+import { PaymentType } from "../enum/payment-type.enum";
 
 export class AssertsDto {
     id?: number;
-    voucherId: string;
-    assertsName?: string;
+
+    assertsName: string;
+
     assetPhoto?: string;
-    assertsAmount?: number;
-    assetType?: AssetType;
+
+    assertsAmount: number;
+
+    assetType: AssetType;
+
     quantity: number;
+
     branchId?: number;
+
     description?: string;
+
     purchaseDate: Date;
+
+    voucherId?: number;
+
+    paymentType: PaymentType;
+
     initialPayment?: number;
+
     numberOfEmi?: number;
+
+    emiNumber?: number;
+
     emiAmount?: number;
-    paymentType?: string;
+
+    companyCode: string;
+    unitCode: string
 }

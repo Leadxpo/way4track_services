@@ -12,4 +12,6 @@ export class HiringDto {
     resumePath?: string;
     dateOfUpload: Date;
     status: HiringStatus
+    companyCode: string;
+    unitCode: string
 }

@@ -3,6 +3,7 @@ import { ClientEntity } from './entity/client.entity';
 import { ClientDto } from './dto/client.dto';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientResDto } from './dto/client-res.dto';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 
 
 @Injectable()
@@ -19,7 +20,11 @@ export class ClientAdapter {
         entity.email = dto.email;
         entity.address = dto.address;
         entity.joiningDate = dto.joiningDate;
-
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
+        const voucherEntity = new VoucherEntity();
+        voucherEntity.id = dto.voucherId
+        entity.voucherId = voucherEntity
         if (dto.id) {
             entity.id = dto.id;
         }
@@ -41,6 +46,9 @@ export class ClientAdapter {
                 client.email,
                 client.address,
                 client.joiningDate,
+                client?.voucherId?.voucherId,
+                client.companyCode,
+                client.unitCode
             );
         });
     }

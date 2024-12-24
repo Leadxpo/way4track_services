@@ -26,4 +26,10 @@ export class WorkAllocationEntity extends BaseEntity {
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation)
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+  
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

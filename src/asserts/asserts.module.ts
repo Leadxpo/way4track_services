@@ -6,10 +6,12 @@ import { AssertsService } from './asserts.service';
 import { AssertsAdapter } from './asserts.adapter';
 import { AssertsRepository } from './repo/asserts.repo';
 import { VoucherModule } from 'src/voucher/voucher-module';
+import { BranchModule } from 'src/branch/branch.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([AssertsEntity]),
-    forwardRef(() => VoucherModule)],
+    forwardRef(() => VoucherModule),
+  forwardRef(()=>BranchModule)],
     controllers: [AssertsController],
     providers: [AssertsService, AssertsAdapter,  {
         provide: AssertsRepository,

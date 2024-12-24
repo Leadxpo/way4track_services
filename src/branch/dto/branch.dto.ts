@@ -2,7 +2,6 @@ export class BranchDto {
     id: number;
     branchName: string;
     branchNumber: string;
-    managerName: string;
     branchAddress?: string;
     addressLine1?: string;
     addressLine2?: string;
@@ -12,4 +11,6 @@ export class BranchDto {
     branchOpening?: Date;
     email: string;
     branchPhoto?: string;
+    companyCode: string;
+    unitCode: string
 }

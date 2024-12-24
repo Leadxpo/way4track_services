@@ -7,7 +7,6 @@ export class BranchAdapter {
         const entity = new BranchEntity();
         entity.branchName = dto.branchName;
         entity.branchNumber = dto.branchNumber;
-        entity.managerName = dto.managerName;
         entity.branchAddress = dto.branchAddress;
         entity.addressLine1 = dto.addressLine1;
         entity.addressLine2 = dto.addressLine2;
@@ -17,6 +16,8 @@ export class BranchAdapter {
         entity.branchOpening = dto.branchOpening;
         entity.email = dto.email;
         entity.branchPhoto = dto.branchPhoto;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         if (entity.id) {
             entity.id = dto.id;
         }

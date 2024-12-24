@@ -7,4 +7,6 @@ export class TicketsDto {
     date: Date;
     branchId: number;
     addressingDepartment: AddressingDepartment;
+    companyCode: string;
+    unitCode: string;
 }

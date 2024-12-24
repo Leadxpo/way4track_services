@@ -11,7 +11,7 @@ import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
-@Entity('vouchers')
+@Entity('voucher')
 export class VoucherEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -29,13 +29,13 @@ export class VoucherEntity {
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 
-    @Column({ type: 'enum', enum: RoleEnum, name: 'role' })
+    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT })
     role: RoleEnum;
 
     @Column({ name: 'purpose', type: 'varchar', length: 255 })
     purpose: string;
 
-    @Column({ name: 'credit_amount', type: 'float' })
+    @Column({ name: 'credit_amount', type: 'float', nullable: true })
     creditAmount: number;
 
     @Column({
@@ -49,19 +49,19 @@ export class VoucherEntity {
     @Column({ name: 'payment_to', type: 'varchar', length: 100 })
     paymentTo: string;
 
-    @Column({ name: 'debit_amount', type: 'float' })
+    @Column({ name: 'debit_amount', type: 'float', nullable: true })
     debitAmount: number;
 
     @Column({ name: 'transferred_by', type: 'varchar', length: 100 })
     transferredBy: string;
 
-    @Column({ name: 'bank_from', type: 'varchar', length: 100 })
+    @Column({ name: 'bank_from', type: 'varchar', length: 100, nullable: true })
     bankFrom: string;
 
-    @Column({ name: 'bank_to', type: 'varchar', length: 100 })
+    @Column({ name: 'bank_to', type: 'varchar', length: 100, nullable: true })
     bankTo: string;
 
-    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum })
+    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.INVOICE })
     voucherType: VoucherTypeEnum;
 
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -120,24 +120,24 @@ export class VoucherEntity {
     client: ClientEntity[];
 
     @OneToMany(() => VendorEntity, (voucher) => voucher.voucherId)
-    vendor: VendorEntity[]; AssertsEntity
+    vendor: VendorEntity[];
 
-    @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2 })
+    @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
     initialPayment: number;
 
-    @Column('int', { name: 'emi_count' })
+    @Column('int', { name: 'emi_count', nullable: true })
     numberOfEmi: number;
 
-    @Column('int', { name: 'emi_number' })
+    @Column('int', { name: 'emi_number', nullable: true })
     emiNumber: number;
 
-    @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2 })
+    @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true })
     emiAmount: number;
 
-    @Column('varchar', { name: 'ifsc_code', length: 20 })
+    @Column('varchar', { name: 'ifsc_code', length: 20, nullable: true })
     ifscCode: string;
 
-    @Column('varchar', { name: 'bank_account_number', length: 20 })
+    @Column('varchar', { name: 'bank_account_number', length: 20, nullable: true })
     bankAccountNumber: string;
 
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
@@ -145,4 +145,10 @@ export class VoucherEntity {
 
     @OneToMany(() => SubDealerEntity, (voucher) => voucher.voucherId)
     subDealer: SubDealerEntity[];
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    unitCode: string;
 }

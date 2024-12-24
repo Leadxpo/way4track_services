@@ -21,6 +21,8 @@ export class WorkAllocationAdapter {
         entity.serviceOrProduct = dto.serviceOrProduct;
         entity.otherInformation = dto.otherInformation;
         entity.date = dto.date;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
 
         return entity;
     }
@@ -42,6 +44,8 @@ export class WorkAllocationAdapter {
                 client?.phoneNumber || '',
                 staff?.id || 0,
                 entity?.staffId?.name || '',
+                entity.companyCode,
+                entity.unitCode
             );
         });
     }

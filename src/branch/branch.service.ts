@@ -7,6 +7,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { DesignationEnum } from 'src/staff/entity/staff.entity';
 
 @Injectable()
 export class BranchService {
@@ -32,7 +33,7 @@ export class BranchService {
 
     async deleteBranchDetails(dto: BranchIdDto): Promise<CommonResponse> {
         try {
-            const branchExists = await this.branchRepo.findOne({ where: { id: dto.id } });
+            const branchExists = await this.branchRepo.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!branchExists) {
                 throw new ErrorResponse(404, `Branch with ID ${dto.id} does not exist`);
             }
@@ -45,24 +46,38 @@ export class BranchService {
 
     async getBranchDetails(req: BranchIdDto): Promise<CommonResponse> {
         try {
-            const branches = await this.branchRepo.find({ where: { id: req.id } });
+            const branches = await this.branchRepo.find({
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
+                relations: ['staff'],
+            });
+
             if (branches.length === 0) {
                 return new CommonResponse(false, 404, 'No Branches Found');
             }
-            const data = branches.map(branch => ({
-                branchId: branch.id,
-                branchName: branch.branchName,
-                managerName: branch.managerName,
-                address: `${branch.addressLine1}, ${branch.addressLine2}, ${branch.city}, ${branch.state}, ${branch.pincode}`,
-                branchOpening: branch.branchOpening,
-                email: branch.email
-            }));
+
+            const data = branches.map(branch => {
+                const manager = branch.staff.find(
+                    (staff) => staff.designation === DesignationEnum.BranchManager
+                );
+
+                return {
+                    branchId: branch.id,
+                    branchName: branch.branchName,
+                    managerName: manager ? manager.name : 'No Manager Assigned',
+                    address: `${branch.addressLine1 || ''}, ${branch.addressLine2 || ''}, ${branch.city}, ${branch.state}, ${branch.pincode}`,
+                    branchOpening: branch.branchOpening,
+                    email: branch.email,
+                    companyCode: branch.companyCode,
+                    unitCode: branch.unitCode
+                };
+            });
 
             return new CommonResponse(true, 200, 'Branches Retrieved Successfully', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
+
 
     async getBranchNamesDropDown(): Promise<CommonResponse> {
         const data = await this.branchRepo.find({ select: ['branchName', 'id', 'branchNumber'] });

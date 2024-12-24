@@ -28,6 +28,9 @@ import { VoucherDashboardService } from './voucher-dashboard-service';
 import { AppointmentDashboardService } from './appointment-dashboard.service';
 import { AppointmentRepository } from 'src/appointment/repo/appointement.repo';
 import { AppointmentModule } from 'src/appointment/appointement.module';
+import { EstimateModule } from 'src/estimate/estimate.module';
+import { EstimateDashboardService } from './estimate-dashboard.service';
+import { EstimateRepository } from 'src/estimate/repo/estimate.repo';
 
 @Module({
     imports: [
@@ -41,6 +44,7 @@ import { AppointmentModule } from 'src/appointment/appointement.module';
         forwardRef(() => VoucherModule),
         forwardRef(() => StaffModule),
         forwardRef(() => AppointmentModule),
+        forwardRef(() => EstimateModule),
 
     ],
     providers: [
@@ -54,6 +58,7 @@ import { AppointmentModule } from 'src/appointment/appointement.module';
         TicketsDashboardService,
         AppointmentDashboardService,
         ProductAssignRepository,
+        EstimateDashboardService,
         ClientRepository,
         AssertsRepository,
         StaffRepository,
@@ -61,7 +66,8 @@ import { AppointmentModule } from 'src/appointment/appointement.module';
         VendorRepository,
         TicketsRepository,
         VoucherRepository,
-        AppointmentRepository
+        AppointmentRepository,
+        EstimateRepository
     ],
     controllers: [DashboardController],
 })

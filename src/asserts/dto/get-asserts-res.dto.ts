@@ -12,23 +12,16 @@ export class GetAssertsResDto {
     quantity: number;
     description: string;
     purchaseDate: Date;
-    paymentType: PaymentType;
-    cardNumber: string;
-    amount: number;
-    priceTotal: number;
-    initialPayment: number;
-    numberOfEmi: number;
-    emiAmount: number;
-    startingMonth: string;
-    endingMonth: string;
-    checkNumber: string;
-    bank: string;
-    bankName: string;
-    branchBank: string;
-    ifscCode: string;
-    bankAccountNumber: string;
-    upiId: string;
     assetPhoto: string;
+    voucherEntity: number;
+    voucherId: string;
+    paymentType: PaymentType;
+    initialPayment?: number;
+    numberOfEmi?: number;
+    emiNumber?: number;
+    emiAmount?: number;
+    companyCode: string;
+    unitCode: string
     constructor(
         id: number,
         branchId: number,
@@ -40,23 +33,17 @@ export class GetAssertsResDto {
         quantity: number,
         description: string,
         purchaseDate: Date,
+        assetPhoto: string,
+        voucherEntity: number,
+        voucherId: string,
         paymentType: PaymentType,
-        cardNumber: string,
-        amount: number,
-        priceTotal: number,
-        initialPayment: number,
-        numberOfEmi: number,
-        emiAmount: number,
-        startingMonth: string,
-        endingMonth: string,
-        checkNumber: string,
-        bank: string,
-        bankName: string,
-        branchBank: string,
-        ifscCode: string,
-        bankAccountNumber: string,
-        upiId: string,
-        assetPhoto: string
+        companyCode: string,
+        unitCode: string,
+        initialPayment?: number,
+        numberOfEmi?: number,
+        emiNumber?: number,
+        emiAmount?: number,
+
     ) {
         this.id = id;
         this.branchId = branchId;
@@ -68,22 +55,15 @@ export class GetAssertsResDto {
         this.quantity = quantity;
         this.description = description;
         this.purchaseDate = purchaseDate;
+        this.assetPhoto = assetPhoto;
+        this.voucherId = voucherId;
+        this.voucherId = voucherId;
         this.paymentType = paymentType;
-        this.cardNumber = cardNumber;
-        this.amount = amount;
-        this.priceTotal = priceTotal;
         this.initialPayment = initialPayment;
         this.numberOfEmi = numberOfEmi;
+        this.emiNumber = emiNumber;
         this.emiAmount = emiAmount;
-        this.startingMonth = startingMonth;
-        this.endingMonth = endingMonth;
-        this.checkNumber = checkNumber;
-        this.bank = bank;
-        this.bankName = bankName;
-        this.branchBank = branchBank;
-        this.ifscCode = ifscCode;
-        this.bankAccountNumber = bankAccountNumber;
-        this.upiId = upiId;
-        this.assetPhoto = assetPhoto;
+        this.companyCode = companyCode
+        this.unitCode = unitCode
     }
 }

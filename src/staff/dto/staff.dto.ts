@@ -1,13 +1,13 @@
+import { DesignationEnum } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { AttendanceDto } from "./attenace-to-staff";
 
 export class StaffDto {
-    id: number;
+    id?: number;
     name: string;
     phoneNumber: string;
-    staffId: string;
     branchId: number;
-    designation: string;
+    designation: DesignationEnum;
     dob: Date;
     email: string;
     aadharNumber: string;
@@ -15,7 +15,11 @@ export class StaffDto {
     joiningDate: Date;
     attendance: AttendanceStatus;
     basicSalary: number;
-    beforeExperience: Date;
+    beforeExperience: number;
     staffPhoto?: string;
     attendanceDetails?: AttendanceDto;
+    companyCode: string;
+    unitCode: string;
+    password: string;
+    staffId?: string;
 }

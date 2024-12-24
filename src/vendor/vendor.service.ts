@@ -15,45 +15,62 @@ export class VendorService {
     private readonly vendorRepository: VendorRepository,
   ) { }
 
-  private async generateVendorId(): Promise<string> {
-    const lastVendor = await this.vendorRepository
-      .createQueryBuilder('vendor')
-      .orderBy('vendor.id', 'DESC')
-      .getOne();
+  private generateVendorId(sequenceNumber: number): string {
+    const paddedNumber = sequenceNumber.toString().padStart(3, '0');
+    return `v-${paddedNumber}`;
+  }
+  async updateVendorDetails(dto: VendorDto): Promise<CommonResponse> {
+    try {
+      const existingVendor = await this.vendorRepository.findOne({
+        where: { id: dto.id, vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode },
+      });
 
-    if (!lastVendor || !lastVendor.vendorId) {
-      return 'V-001';
+      if (!existingVendor) {
+        return new CommonResponse(false, 4002, 'Vendor not found for the provided ID.');
+      }
+
+      Object.assign(existingVendor, this.vendorAdapter.convertDtoToEntity(dto));
+      await this.vendorRepository.save(existingVendor);
+
+      return new CommonResponse(true, 200, 'Vendor details updated successfully');
+    } catch (error) {
+      throw new ErrorResponse(500, `Failed to update vendor details: ${error.message}`);
     }
-
-    const lastIdNumber = parseInt(lastVendor.vendorId.split('-')[1], 10);
-    const newIdNumber = (lastIdNumber + 1).toString().padStart(3, '0');
-    return `V-${newIdNumber}`;
   }
 
-  async saveVendorDetails(dto: VendorDto): Promise<CommonResponse> {
+  async createVendorDetails(dto: VendorDto): Promise<CommonResponse> {
     try {
       const entity = this.vendorAdapter.convertDtoToEntity(dto);
-      if (!dto.id) {
-        entity.vendorId = await this.generateVendorId();
-      }
-      await this.vendorRepository.save(entity);
-      const message = dto.id
-        ? 'Vendor details updated successfully'
-        : 'Vendor details created successfully';
 
-      return new CommonResponse(true, 201, message, { vendorId: entity.vendorId });
+      if (!entity.vendorId) {
+        const allocationCount = await this.vendorRepository.count({});
+        entity.vendorId = this.generateVendorId(allocationCount + 1);
+      }
+
+      await this.vendorRepository.save(entity);
+      return new CommonResponse(true, 201, 'Vendor details created successfully');
     } catch (error) {
-      throw new ErrorResponse(500, error.message);
+      throw new ErrorResponse(500, `Failed to create vendor details: ${error.message}`);
+    }
+  }
+
+  async handleVendorDetails(dto: VendorDto): Promise<CommonResponse> {
+    if (dto.id || dto.vendorId) {
+      // If an ID or vendorId is provided, update the vendor details
+      return await this.updateVendorDetails(dto);
+    } else {
+      // If no ID is provided, create a new vendor record
+      return await this.createVendorDetails(dto);
     }
   }
 
   async deleteVendorDetails(dto: VendorIdDto): Promise<CommonResponse> {
     try {
-      const vendor = await this.vendorRepository.findOne({ where: { id: dto.id } });
+      const vendor = await this.vendorRepository.findOne({ where: { vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
       if (!vendor) {
         return new CommonResponse(false, 404, 'Vendor not found');
       }
-      await this.vendorRepository.delete(dto.id);
+      await this.vendorRepository.delete(dto.vendorId);
       return new CommonResponse(true, 200, 'Vendor details deleted successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);
@@ -62,22 +79,22 @@ export class VendorService {
 
   async getVendorDetails(req: VendorIdDto): Promise<CommonResponse> {
     try {
-        const vendor = await this.vendorRepository.findOne({
-            where: { id: req.id },
-            relations: ['voucherId'],
-        });
+      const vendor = await this.vendorRepository.findOne({
+        where: { vendorId: req.vendorId, companyCode: req.companyCode, unitCode: req.unitCode },
+        relations: ['voucherId'],
+      });
 
-        if (!vendor) {
-            return new CommonResponse(false, 404, 'Vendor not found');
-        }
+      if (!vendor) {
+        return new CommonResponse(false, 404, 'Vendor not found');
+      }
 
-        const vendorResDto = this.vendorAdapter.convertEntityToDto([vendor])[0]; 
+      const vendorResDto = this.vendorAdapter.convertEntityToDto([vendor])[0];
 
-        return new CommonResponse(true, 200, 'Vendor details fetched successfully', vendorResDto);
+      return new CommonResponse(true, 200, 'Vendor details fetched successfully', vendorResDto);
     } catch (error) {
-        throw new ErrorResponse(500, error.message);
+      throw new ErrorResponse(500, error.message);
     }
-}
+  }
 
 
   async getVendorNamesDropDown(): Promise<CommonResponse> {

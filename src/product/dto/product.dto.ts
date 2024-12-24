@@ -9,6 +9,8 @@ export class ProductDto {
   price: number;
   productDescription: string;
   voucherId?: number;
+  companyCode: string;
+  unitCode: string
 }
 
 
