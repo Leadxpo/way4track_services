@@ -41,30 +41,44 @@ export class AssertsService {
     }
 
 
-    async create(createAssertsDto: AssertsDto): Promise<CommonResponse> {
+    async create(createAssertsDto: AssertsDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-
+            // Verify if the branch exists
             const branchEntity = await this.branchRepo.findOne({ where: { id: createAssertsDto.branchId } });
-
             if (!branchEntity) {
                 throw new Error('Branch not found');
             }
-            const voucher = await this.voucherRepo.findOne({
-                where: { id: createAssertsDto.voucherId }
-            });
+
+            // Verify if the voucher exists
+            const voucher = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
             if (!voucher) {
                 throw new Error('Voucher not found');
             }
-            const entity = this.adapter.convertDtoToEntity(createAssertsDto);
 
+            // Handle photo upload
+            let filePath: string | null = null;
+            if (photo) {
+                filePath = join(__dirname, '../../uploads/assert_photos', `${Date.now()}-${photo.originalname}`);
+                await fs.writeFile(filePath, photo.buffer); // Save the photo to the file system
+            }
+
+            // Convert DTO to Entity and set the file path
+            const entity = this.adapter.convertDtoToEntity(createAssertsDto);
+            if (filePath) {
+                entity.assetPhoto = filePath; // Save the photo path in the entity
+            }
+
+            // Save the entity to the database
             await this.assertsRepository.save(entity);
+
+            // Create the success message
             const message = createAssertsDto.id
                 ? 'Assert Details Updated Successfully'
                 : 'Assert Details Created Successfully';
 
-            return new CommonResponse(true, 65152, message);
+            return new CommonResponse(true, 200, message, { photoPath: filePath });
         } catch (error) {
-            throw new ErrorResponse(5416, error.message);
+            throw new ErrorResponse(500, error.message);
         }
     }
 
@@ -82,23 +96,23 @@ export class AssertsService {
         }
     }
 
-    async uploadAssertPhoto(assertId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            const assert = await this.assertsRepository.findOne({ where: { id: assertId } });
+    // async uploadAssertPhoto(assertId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+    //     try {
+    //         const assert = await this.assertsRepository.findOne({ where: { id: assertId } });
 
-            if (!assert) {
-                return new CommonResponse(false, 404, 'assert not found');
-            }
+    //         if (!assert) {
+    //             return new CommonResponse(false, 404, 'assert not found');
+    //         }
 
-            const filePath = join(__dirname, '../../uploads/assert_photos', `${assertId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
+    //         const filePath = join(__dirname, '../../uploads/assert_photos', `${assertId}-${Date.now()}.jpg`);
+    //         await fs.writeFile(filePath, photo.buffer);
 
-            assert.assetPhoto = filePath;
-            await this.assertsRepository.save(assert);
+    //         assert.assetPhoto = filePath;
+    //         await this.assertsRepository.save(assert);
 
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
+    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+    //     } catch (error) {
+    //         throw new ErrorResponse(500, error.message);
+    //     }
+    // }
 }

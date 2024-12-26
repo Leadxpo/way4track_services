@@ -8,13 +8,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class BranchController {
     constructor(private readonly branchService: BranchService) { }
 
-    @Post('saveBranchDetails')
-    async saveBranchDetails(@Body() dto: BranchDto): Promise<CommonResponse> {
-        try {
-            return this.branchService.saveBranchDetails(dto);
-        } catch (error) {
-            console.log("Error in create address in services..", error)
-        }
+    @UseInterceptors(FileInterceptor('photo'))
+    @Post('save')
+    async saveBranchDetails(
+        @Body() dto: BranchDto,
+        @UploadedFile() photo: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        return this.branchService.saveBranchDetails(dto, photo);
     }
 
     @Post('deleteBranchDetails')
@@ -46,17 +46,17 @@ export class BranchController {
         }
     }
 
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('branchId') branchId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
-        try {
-            return await this.branchService.uploadBranchPhoto(branchId, photo);
-        } catch (error) {
-            console.error('Error uploading branch photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
+    // @Post('uploadPhoto')
+    // @UseInterceptors(FileInterceptor('photo'))
+    // async uploadPhoto(
+    //     @Body('branchId') branchId: number,
+    //     @UploadedFile() photo: Express.Multer.File
+    // ): Promise<CommonResponse> {
+    //     try {
+    //         return await this.branchService.uploadBranchPhoto(branchId, photo);
+    //     } catch (error) {
+    //         console.error('Error uploading branch photo:', error);
+    //         return new CommonResponse(false, 500, 'Error uploading photo');
+    //     }
+    // }
 }

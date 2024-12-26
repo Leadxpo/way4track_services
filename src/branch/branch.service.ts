@@ -16,16 +16,30 @@ export class BranchService {
         private branchRepo: BranchRepository
     ) { }
 
-    async saveBranchDetails(dto: BranchDto): Promise<CommonResponse> {
+    async saveBranchDetails(dto: BranchDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-            const internalMessage = dto.id
+            // Handle photo upload
+            let filePath: string | null = null;
+            if (photo) {
+                filePath = join(__dirname, '../../uploads/Branch_photos', `${Date.now()}-${photo.originalname}`);
+                await fs.writeFile(filePath, photo.buffer); // Save the photo to the file system
+            }
+
+            // Convert DTO to Entity and set the photo path
+            const entity = this.adapter.convertBranchDtoToEntity(dto);
+            if (filePath) {
+                entity.branchPhoto = filePath; // Save the photo path in the entity
+            }
+
+            // Save the branch details
+            await this.branchRepo.save(entity);
+
+            // Create the success message
+            const message = dto.id
                 ? 'Branch Details Updated Successfully'
                 : 'Branch Details Created Successfully';
 
-            const convertDto = this.adapter.convertBranchDtoToEntity(dto);
-            await this.branchRepo.save(convertDto);
-
-            return new CommonResponse(true, 65152, internalMessage);
+            return new CommonResponse(true, 65152, message, { branchPhoto: filePath });
         } catch (error) {
             throw new ErrorResponse(5416, error.message);
         }
@@ -64,9 +78,14 @@ export class BranchService {
                     branchId: branch.id,
                     branchName: branch.branchName,
                     managerName: manager ? manager.name : 'No Manager Assigned',
-                    address: `${branch.addressLine1 || ''}, ${branch.addressLine2 || ''}, ${branch.city}, ${branch.state}, ${branch.pincode}`,
+                    address: branch.branchAddress,
                     branchOpening: branch.branchOpening,
+                    addressLine1: branch.addressLine1,
+                    city: branch.city,
+                    addressLine2: branch.addressLine2,
+                    state: branch.state,
                     email: branch.email,
+                    pincode: branch.pincode,
                     companyCode: branch.companyCode,
                     unitCode: branch.unitCode
                 };
@@ -88,23 +107,23 @@ export class BranchService {
         }
     }
 
-    async uploadBranchPhoto(branchId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            const Branch = await this.branchRepo.findOne({ where: { id: branchId } });
+    // async uploadBranchPhoto(branchId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+    //     try {
+    //         const Branch = await this.branchRepo.findOne({ where: { id: branchId } });
 
-            if (!Branch) {
-                return new CommonResponse(false, 404, 'Branch not found');
-            }
+    //         if (!Branch) {
+    //             return new CommonResponse(false, 404, 'Branch not found');
+    //         }
 
-            const filePath = join(__dirname, '../../uploads/Branch_photos', `${branchId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
+    //         const filePath = join(__dirname, '../../uploads/Branch_photos', `${branchId}-${Date.now()}.jpg`);
+    //         await fs.writeFile(filePath, photo.buffer);
 
-            Branch.branchPhoto = filePath;
-            await this.branchRepo.save(Branch);
+    //         Branch.branchPhoto = filePath;
+    //         await this.branchRepo.save(Branch);
 
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
+    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+    //     } catch (error) {
+    //         throw new ErrorResponse(500, error.message);
+    //     }
+    // }
 }

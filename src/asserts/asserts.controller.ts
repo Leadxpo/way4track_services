@@ -11,14 +11,13 @@ import { AssertsVoucherIdDto } from './dto/asserts-voucher-id.dto';
 export class AssertsController {
     constructor(private readonly assertsService: AssertsService) { }
 
-    @Post('saveAssertDetails')
-    async saveAssertDetails(@Body() dto: AssertsDto): Promise<CommonResponse> {
-        try {
-            return this.assertsService.create(dto);
-        } catch (error) {
-            console.log("Error in save assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error saving assert details');
-        }
+    @UseInterceptors(FileInterceptor('photo'))
+    @Post('create')
+    async createAssert(
+        @Body() createAssertsDto: AssertsDto,
+        @UploadedFile() photo: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        return this.assertsService.create(createAssertsDto, photo);
     }
 
     @Post('deleteAssertDetails')
@@ -41,17 +40,17 @@ export class AssertsController {
         }
     }
 
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('assertId') assertId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
-        try {
-            return await this.assertsService.uploadAssertPhoto(assertId, photo);
-        } catch (error) {
-            console.error('Error uploading assert photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
+    // @Post('uploadPhoto')
+    // @UseInterceptors(FileInterceptor('photo'))
+    // async uploadPhoto(
+    //     @Body('assertId') assertId: number,
+    //     @UploadedFile() photo: Express.Multer.File
+    // ): Promise<CommonResponse> {
+    //     try {
+    //         return await this.assertsService.uploadAssertPhoto(assertId, photo);
+    //     } catch (error) {
+    //         console.error('Error uploading assert photo:', error);
+    //         return new CommonResponse(false, 500, 'Error uploading photo');
+    //     }
+    // }
 }
