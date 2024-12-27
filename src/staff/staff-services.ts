@@ -12,6 +12,7 @@ import { AttendenceRepository } from 'src/attendence/repo/attendence.repo';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AttendanceDto } from './dto/attenace-to-staff';
 import { StaffEntity } from './entity/staff.entity';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class StaffService {
@@ -21,73 +22,39 @@ export class StaffService {
         private attendanceRepo: AttendenceRepository
     ) { }
 
-    private async saveAttendanceDetails(attendanceDetails: AttendanceDto, staff: StaffEntity, branchId: number) {
-        const attendance = new AttendanceEntity();
-        attendance.day = attendanceDetails.day;
-        attendance.inTime = attendanceDetails.inTime;
-        attendance.outTime = attendanceDetails.outTime;
-        attendance.status = attendanceDetails.status;
-        attendance.staffId = staff;
-
-        const branch = new BranchEntity();
-        branch.id = branchId;
-        attendance.branchId = branch;
-
-        return await this.attendanceRepo.save(attendance);
-    }
-    async updateStaffDetails(req: StaffDto): Promise<CommonResponse> {
+    async handleStaffDetails(req: StaffDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
-            const existingStaff = await this.staffRepository.findOne({
-                where: { id: req.id, staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
-            });
+            let filePath: string | null = null;
 
-            if (!existingStaff) {
-                return new CommonResponse(false, 4002, 'Staff not found for the provided id.');
+            // Handle photo upload
+            if (photo) {
+                filePath = join(__dirname, '../../uploads/staff_photos', `${Date.now()}-${photo.originalname}`);
+                await fs.writeFile(filePath, photo.fieldname); // Save the photo
             }
 
-            Object.assign(existingStaff, this.adapter.convertDtoToEntity(req));
-            await this.staffRepository.save(existingStaff);
-
-            if (req.attendanceDetails) {
-                const savedAttendance = await this.saveAttendanceDetails(
-                    req.attendanceDetails,
-                    existingStaff,
-                    req.branchId
-                );
-
-                if (!existingStaff.attendance) {
-                    existingStaff.attendance = [];
-                }
-                existingStaff.attendance.push(savedAttendance);
-
-                await this.staffRepository.save(existingStaff);
+            if (req.id || req.staffId) {
+                // If an ID is provided, update the staff details
+                return await this.updateStaffDetails(req, filePath);
+            } else {
+                // If no ID is provided, create a new staff record
+                return await this.createStaffDetails(req, filePath);
             }
-
-            return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
-            console.error(`Error updating staff details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
+            console.error(`Error handling staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
         }
     }
 
-    async createStaffDetails(req: StaffDto): Promise<CommonResponse> {
+    async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
             const newStaff = this.adapter.convertDtoToEntity(req);
-
+            console.log(req, "+++++++++++")
             newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
-
-            await this.staffRepository.save(newStaff);
-
-            if (req.attendanceDetails) {
-                const savedAttendance = await this.saveAttendanceDetails(
-                    req.attendanceDetails,
-                    newStaff,
-                    req.branchId
-                );
-                newStaff.attendance = [savedAttendance];
-                await this.staffRepository.save(newStaff);
+            if (filePath) {
+                newStaff.staffPhoto = filePath;
             }
-
+            await this.staffRepository.insert(newStaff);
+            // await this.staffRepository.save(newStaff);
             return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
         } catch (error) {
             console.error(`Error creating staff details: ${error.message}`, error.stack);
@@ -95,16 +62,30 @@ export class StaffService {
         }
     }
 
-    async handleStaffDetails(req: StaffDto): Promise<CommonResponse> {
-        if (req.id || req.staffId) {
-            // If an ID is provided, update the staff details
-            return await this.updateStaffDetails(req);
-        } else {
-            // If no ID is provided, create a new staff record
-            return await this.createStaffDetails(req);
+    async updateStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
+        try {
+            const existingStaff = await this.staffRepository.findOne({
+                where: { id: req.id, staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
+            });
+
+            if (!existingStaff) {
+                return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
+            }
+            console.log('Existing Staff:', existingStaff);
+            const staffEntity = this.adapter.convertDtoToEntity(req);
+            console.log('Converted Entity:', staffEntity);
+            Object.assign(existingStaff, staffEntity);
+            if (filePath) {
+                existingStaff.staffPhoto = filePath;
+            }
+
+            await this.staffRepository.save(existingStaff);
+            return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
+        } catch (error) {
+            console.error(`Error updating staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
         }
     }
-
     async deleteStaffDetails(dto: StaffIdDto): Promise<CommonResponse> {
         try {
             const staffExists = await this.staffRepository.findOne({ where: { staffId: dto.staffId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
@@ -118,7 +99,19 @@ export class StaffService {
         }
     }
 
-    async getStaffDetails(req: StaffIdDto): Promise<CommonResponse> {
+
+    async getStaffDetails(req: CommonReq): Promise<CommonResponse> {
+        const branch = await this.staffRepository.find({
+            where: { companyCode: req.companyCode, unitCode: req.unitCode }
+        });
+        if (!branch.length) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        } else {
+            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
+        }
+    }
+
+    async getStaffDetailsById(req: StaffIdDto): Promise<CommonResponse> {
         try {
             const staff = await this.staffRepository.find({
                 relations: ['branch'],
@@ -146,24 +139,24 @@ export class StaffService {
         }
     }
 
-    async uploadStaffPhoto(staffId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            const staff = await this.staffRepository.findOne({ where: { id: staffId } });
+    // async uploadStaffPhoto(staffId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+    //     try {
+    //         const staff = await this.staffRepository.findOne({ where: { id: staffId } });
 
-            if (!staff) {
-                return new CommonResponse(false, 404, 'staff not found');
-            }
+    //         if (!staff) {
+    //             return new CommonResponse(false, 404, 'staff not found');
+    //         }
 
-            const filePath = join(__dirname, '../../uploads/staff_photos', `${staffId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
+    //         const filePath = join(__dirname, '../../uploads/staff_photos', `${staffId}-${Date.now()}.jpg`);
+    //         await fs.writeFile(filePath, photo.buffer);
 
-            staff.staffPhoto = filePath;
-            await this.staffRepository.save(staff);
+    //         staff.staffPhoto = filePath;
+    //         await this.staffRepository.save(staff);
 
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
+    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+    //     } catch (error) {
+    //         throw new ErrorResponse(500, error.message);
+    //     }
+    // }
 
 }

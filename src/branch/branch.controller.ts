@@ -4,16 +4,18 @@ import { BranchDto } from './dto/branch.dto';
 import { BranchIdDto } from './dto/branch-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CommonReq } from 'src/models/common-req';
 @Controller('branch')
 export class BranchController {
     constructor(private readonly branchService: BranchService) { }
 
     @UseInterceptors(FileInterceptor('photo'))
-    @Post('save')
+    @Post('saveBranchDetails')
     async saveBranchDetails(
         @Body() dto: BranchDto,
         @UploadedFile() photo: Express.Multer.File,
     ): Promise<CommonResponse> {
+        console.log('Photo:', photo);
         return this.branchService.saveBranchDetails(dto, photo);
     }
 
@@ -27,10 +29,22 @@ export class BranchController {
         }
     }
 
+
+
     @Post('getBranchDetails')
-    async getBranchDetails(@Body() req: BranchIdDto): Promise<CommonResponse> {
+    async getBranchDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return this.branchService.getBranchDetails(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+
+    @Post('getBranchDetailsById')
+    async getBranchDetailsById(@Body() req: BranchIdDto): Promise<CommonResponse> {
+        try {
+            return this.branchService.getBranchDetailsById(req);
         } catch (error) {
             console.log("Error in create address in services..", error);
             return new CommonResponse(false, 500, 'Error fetching branch type details');

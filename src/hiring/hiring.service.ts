@@ -21,28 +21,31 @@ export class HiringService {
             if (file) {
                 resumePath = await this.uploadResume(file);
             }
+            let entity: HiringEntity;
 
             if (dto.id) {
-                const existingHiring = await this.hiringRepository.findOne({ where: { id: dto.id } });
+                entity = await this.hiringRepository.findOne({ where: { id: dto.id } });
 
-                if (existingHiring) {
-                    if (!resumePath) {
-                        resumePath = existingHiring.resumePath;
-                    }
-
-                    dto.resumePath = resumePath;
+                if (!entity) {
+                    throw new ErrorResponse(404, 'details not found');
                 }
+                // Merge updated details
+                entity = this.hiringRepository.merge(entity, dto);
+
+            } else {
+                // For new branches, convert DTO to Entity
+                entity = this.hiringAdapter.convertDtoToEntity(dto);
             }
-
-            const hiringEntity = this.hiringAdapter.convertDtoToEntity(dto);
-
-            await this.hiringRepository.save(hiringEntity);
+            if (resumePath) {
+                entity.resumePath = resumePath; // Set the file path in the entity
+            }
+            await this.hiringRepository.save(entity);
 
             const internalMessage = dto.id
                 ? 'Hiring details updated successfully'
                 : 'Hiring details created successfully';
 
-            return new CommonResponse(true, 65152, internalMessage);
+            return new CommonResponse(true, 65152, internalMessage,{ resumePath: resumePath });
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -52,7 +55,7 @@ export class HiringService {
         try {
             const filePath = join(__dirname, '../../uploads/resumes', `${Date.now()}.pdf`);
 
-            await fs.promises.writeFile(filePath, file.buffer);
+            await fs.promises.writeFile(filePath, file.fieldname);
 
             return filePath;
         } catch (error) {

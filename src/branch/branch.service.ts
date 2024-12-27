@@ -8,6 +8,8 @@ import { ErrorResponse } from 'src/models/error-response';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { DesignationEnum } from 'src/staff/entity/staff.entity';
+import { CommonReq } from 'src/models/common-req';
+import { BranchEntity } from './entity/branch.entity';
 
 @Injectable()
 export class BranchService {
@@ -15,33 +17,49 @@ export class BranchService {
         private adapter: BranchAdapter,
         private branchRepo: BranchRepository
     ) { }
-
     async saveBranchDetails(dto: BranchDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-            // Handle photo upload
+            // Handle photo upload if the photo exists
             let filePath: string | null = null;
             if (photo) {
+                // Set the path where the photo will be saved
                 filePath = join(__dirname, '../../uploads/Branch_photos', `${Date.now()}-${photo.originalname}`);
-                await fs.writeFile(filePath, photo.buffer); // Save the photo to the file system
+
+                // Write the file to the disk
+                await fs.writeFile(filePath, photo.fieldname);
+                console.log('Photo received and saved at:', filePath);
             }
 
             // Convert DTO to Entity and set the photo path
-            const entity = this.adapter.convertBranchDtoToEntity(dto);
-            if (filePath) {
-                entity.branchPhoto = filePath; // Save the photo path in the entity
+            let entity: BranchEntity;
+            if (dto.id) {
+                entity = await this.branchRepo.findOneBy({ id: dto.id });
+                if (!entity) {
+                    throw new ErrorResponse(404, 'Branch not found');
+                }
+                // Merge updated details
+                entity = this.branchRepo.merge(entity, dto);
+            } else {
+                // For new branches, convert DTO to Entity
+                entity = this.adapter.convertBranchDtoToEntity(dto);
             }
 
-            // Save the branch details
+            if (filePath) {
+                entity.branchPhoto = filePath; // Set the file path in the entity
+            }
+
+            console.log('Entity to be saved:', entity); // Verify entity before saving
+
+            // Save the branch details to the database
             await this.branchRepo.save(entity);
 
-            // Create the success message
-            const message = dto.id
-                ? 'Branch Details Updated Successfully'
-                : 'Branch Details Created Successfully';
+            // Create success message
+            const message = dto.id ? 'Branch Details Updated Successfully' : 'Branch Details Created Successfully';
 
             return new CommonResponse(true, 65152, message, { branchPhoto: filePath });
         } catch (error) {
-            throw new ErrorResponse(5416, error.message);
+            console.error('Error saving branch details:', error);
+            throw new ErrorResponse(5416, error.message); // Handle error and return response
         }
     }
 
@@ -58,7 +76,18 @@ export class BranchService {
         }
     }
 
-    async getBranchDetails(req: BranchIdDto): Promise<CommonResponse> {
+    async getBranchDetails(req: CommonReq): Promise<CommonResponse> {
+        const branch = await this.branchRepo.find({
+            where: { companyCode: req.companyCode, unitCode: req.unitCode }
+        });
+        if (!branch.length) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        } else {
+            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
+        }
+    }
+
+    async getBranchDetailsById(req: BranchIdDto): Promise<CommonResponse> {
         try {
             const branches = await this.branchRepo.find({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
@@ -70,14 +99,14 @@ export class BranchService {
             }
 
             const data = branches.map(branch => {
-                const manager = branch.staff.find(
-                    (staff) => staff.designation === DesignationEnum.BranchManager
-                );
+                // const manager = branch.staff.find(
+                //     (staff) => staff.designation === DesignationEnum.BranchManager
+                // );
 
                 return {
                     branchId: branch.id,
                     branchName: branch.branchName,
-                    managerName: manager ? manager.name : 'No Manager Assigned',
+                    // managerName: manager ? manager.name : 'No Manager Assigned',
                     address: branch.branchAddress,
                     branchOpening: branch.branchOpening,
                     addressLine1: branch.addressLine1,
@@ -86,6 +115,7 @@ export class BranchService {
                     state: branch.state,
                     email: branch.email,
                     pincode: branch.pincode,
+                    branchPhoto: branch.branchPhoto,
                     companyCode: branch.companyCode,
                     unitCode: branch.unitCode
                 };
@@ -107,23 +137,4 @@ export class BranchService {
         }
     }
 
-    // async uploadBranchPhoto(branchId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-    //     try {
-    //         const Branch = await this.branchRepo.findOne({ where: { id: branchId } });
-
-    //         if (!Branch) {
-    //             return new CommonResponse(false, 404, 'Branch not found');
-    //         }
-
-    //         const filePath = join(__dirname, '../../uploads/Branch_photos', `${branchId}-${Date.now()}.jpg`);
-    //         await fs.writeFile(filePath, photo.buffer);
-
-    //         Branch.branchPhoto = filePath;
-    //         await this.branchRepo.save(Branch);
-
-    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-    //     } catch (error) {
-    //         throw new ErrorResponse(500, error.message);
-    //     }
-    // }
 }

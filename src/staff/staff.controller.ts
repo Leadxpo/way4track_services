@@ -5,17 +5,18 @@ import { StaffIdDto } from './dto/staff-id.dto';
 import { StaffService } from './staff-services';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AttendanceDto } from './dto/attenace-to-staff';
+import { CommonReq } from 'src/models/common-req';
 @Controller('staff')
 export class StaffController {
     constructor(private readonly staffService: StaffService) { }
 
+    @UseInterceptors(FileInterceptor('photo'))
     @Post('handleStaffDetails')
-    async handleStaffDetails(@Body() req: any): Promise<CommonResponse> {
-        try {
-            return this.staffService.handleStaffDetails(req);
-        } catch (error) {
-            console.log("Error in create address in services..", error)
-        }
+    async handleStaffDetails(
+        @Body() dto: StaffDto,
+        @UploadedFile() photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        return this.staffService.handleStaffDetails(dto, photo);
     }
 
     @Post('deletestaffDetails')
@@ -28,10 +29,10 @@ export class StaffController {
         }
     }
 
-    @Post('getstaffDetails')
-    async getstaffDetails(@Body() req: StaffIdDto): Promise<CommonResponse> {
+    @Post('getStaffDetailsById')
+    async getStaffDetailsById(@Body() req: StaffIdDto): Promise<CommonResponse> {
         try {
-            return this.staffService.getStaffDetails(req);
+            return this.staffService.getStaffDetailsById(req);
         } catch (error) {
             console.log("Error in create address in services..", error);
             return new CommonResponse(false, 500, 'Error fetching staff type details');
@@ -47,18 +48,13 @@ export class StaffController {
         }
     }
 
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('staffId') staffId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
+    @Post('getStaffDetails')
+    async getStaffDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
-            return await this.staffService.uploadStaffPhoto(staffId, photo);
+            return this.staffService.getStaffDetails(req);
         } catch (error) {
-            console.error('Error uploading staff photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
-
 }

@@ -7,10 +7,13 @@ import { StaffService } from './staff-services';
 import { StaffAdapter } from './staff.adaptert';
 import { AttendanceModule } from 'src/attendence/attendence.module';
 import { StaffDashboardService } from 'src/dashboard/staff-dashboard.service';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([StaffEntity]),
+    imports: [TypeOrmModule.forFeature([StaffEntity]), MulterModule.register({
+        dest: './uploads',
+    }),
     forwardRef(() => AttendanceModule)],
     controllers: [StaffController],
     providers: [StaffService, StaffRepository, StaffAdapter, StaffDashboardService],
