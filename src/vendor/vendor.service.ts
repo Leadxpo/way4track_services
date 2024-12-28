@@ -7,7 +7,6 @@ import { VendorAdapter } from './vendor.adapter';
 import { VendorRepository } from './repo/vendor.repo';
 import { join } from 'path';
 import { promises as fs } from 'fs';
-
 @Injectable()
 export class VendorService {
   constructor(
@@ -19,7 +18,7 @@ export class VendorService {
     const paddedNumber = sequenceNumber.toString().padStart(3, '0');
     return `v-${paddedNumber}`;
   }
-  async updateVendorDetails(dto: VendorDto): Promise<CommonResponse> {
+  async updateVendorDetails(dto: VendorDto, filePath: string | null): Promise<CommonResponse> {
     try {
       const existingVendor = await this.vendorRepository.findOne({
         where: { id: dto.id, vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode },
@@ -30,6 +29,9 @@ export class VendorService {
       }
 
       Object.assign(existingVendor, this.vendorAdapter.convertDtoToEntity(dto));
+      if (filePath) {
+        existingVendor.vendorPhoto = filePath;
+      }
       await this.vendorRepository.save(existingVendor);
 
       return new CommonResponse(true, 200, 'Vendor details updated successfully');
@@ -38,7 +40,7 @@ export class VendorService {
     }
   }
 
-  async createVendorDetails(dto: VendorDto): Promise<CommonResponse> {
+  async createVendorDetails(dto: VendorDto, filePath: string | null): Promise<CommonResponse> {
     try {
       const entity = this.vendorAdapter.convertDtoToEntity(dto);
 
@@ -46,22 +48,37 @@ export class VendorService {
         const allocationCount = await this.vendorRepository.count({});
         entity.vendorId = this.generateVendorId(allocationCount + 1);
       }
-
-      await this.vendorRepository.save(entity);
+      if (filePath) {
+        entity.vendorPhoto = filePath;
+      }
+      console.log(filePath, "+++")
+      await this.vendorRepository.insert(entity);
       return new CommonResponse(true, 201, 'Vendor details created successfully');
     } catch (error) {
       throw new ErrorResponse(500, `Failed to create vendor details: ${error.message}`);
     }
   }
 
-  async handleVendorDetails(dto: VendorDto): Promise<CommonResponse> {
-    if (dto.id || dto.vendorId) {
-      // If an ID or vendorId is provided, update the vendor details
-      return await this.updateVendorDetails(dto);
-    } else {
-      // If no ID is provided, create a new vendor record
-      return await this.createVendorDetails(dto);
+  async handleVendorDetails(dto: VendorDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    try {
+      let filePath: string | null = null;
+      if (photo) {
+        filePath = join(__dirname, '../../uploads/vendor_photos', `${Date.now()}-${photo.originalname}`);
+        await fs.writeFile(filePath, photo.fieldname)
+      }
+      console.log(filePath, "+++")
+      if (dto.id || dto.vendorId) {
+        // If an ID or vendorId is provided, update the vendor details
+        return await this.updateVendorDetails(dto, filePath);
+      } else {
+        // If no ID is provided, create a new vendor record
+        return await this.createVendorDetails(dto, filePath);
+      }
+    } catch (error) {
+      console.error(`Error handling vendor details: ${error.message}`, error.stack);
+      throw new ErrorResponse(5416, `Failed to handle vendor details: ${error.message}`);
     }
+
   }
 
   async deleteVendorDetails(dto: VendorIdDto): Promise<CommonResponse> {
@@ -106,23 +123,23 @@ export class VendorService {
     }
   }
 
-  async uploadVendorPhoto(vendorId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-    try {
-      const vendor = await this.vendorRepository.findOne({ where: { id: vendorId } });
+  // async uploadVendorPhoto(vendorId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+  //   try {
+  //     const vendor = await this.vendorRepository.findOne({ where: { id: vendorId } });
 
-      if (!vendor) {
-        return new CommonResponse(false, 404, 'vendor not found');
-      }
+  //     if (!vendor) {
+  //       return new CommonResponse(false, 404, 'vendor not found');
+  //     }
 
-      const filePath = join(__dirname, '../../uploads/vendor_photos', `${vendorId}-${Date.now()}.jpg`);
-      await fs.writeFile(filePath, photo.buffer);
+  //     const filePath = join(__dirname, '../../uploads/vendor_photos', `${vendorId}-${Date.now()}.jpg`);
+  //     await fs.writeFile(filePath, photo.buffer);
 
-      vendor.vendorPhoto = filePath;
-      await this.vendorRepository.save(vendor);
+  //     vendor.vendorPhoto = filePath;
+  //     await this.vendorRepository.save(vendor);
 
-      return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-    }
-  }
+  //     return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+  //   } catch (error) {
+  //     throw new ErrorResponse(500, error.message);
+  //   }
+  // }
 }

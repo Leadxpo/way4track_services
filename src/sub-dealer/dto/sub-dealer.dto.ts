@@ -13,4 +13,5 @@ export class SubDealerDto {
   unitCode?: string
   subDealerId?: string
   password: string
+  subDealerPhoto?: string;
 }

@@ -40,7 +40,7 @@ export class VendorEntity {
   @OneToMany(() => ProductEntity, (product) => product.vendorId)
   product: ProductEntity[];
 
-  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor)
+  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor,{ nullable: true })
   @JoinColumn({ name: 'voucher_id' })
   voucherId: VoucherEntity;
 

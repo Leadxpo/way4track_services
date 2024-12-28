@@ -22,7 +22,7 @@ export class SubDealerService {
     return `SD-${paddedNumber}`;
   }
 
-  async updateSubDealerDetails(dto: SubDealerDto): Promise<CommonResponse> {
+  async updateSubDealerDetails(dto: SubDealerDto, filePath: string | null): Promise<CommonResponse> {
     try {
       const existingSubDealer = await this.subDealerRepository.findOne({
         where: { id: dto.id, subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode },
@@ -31,7 +31,9 @@ export class SubDealerService {
       if (!existingSubDealer) {
         return new CommonResponse(false, 4002, 'SubDealer not found for the provided ID.');
       }
-
+      if (filePath) {
+        existingSubDealer.subDealerPhoto = filePath;
+      }
       Object.assign(existingSubDealer, this.subDealerAdapter.convertDtoToEntity(dto));
       await this.subDealerRepository.save(existingSubDealer);
 
@@ -41,7 +43,7 @@ export class SubDealerService {
     }
   }
 
-  async createSubDealerDetails(dto: SubDealerDto): Promise<CommonResponse> {
+  async createSubDealerDetails(dto: SubDealerDto, filePath: string | null): Promise<CommonResponse> {
     try {
       const entity = this.subDealerAdapter.convertDtoToEntity(dto);
 
@@ -49,8 +51,11 @@ export class SubDealerService {
         const allocationCount = await this.subDealerRepository.count({});
         entity.subDealerId = this.generateSubDealerId(allocationCount + 1);
       }
-
-      await this.subDealerRepository.save(entity);
+      if (filePath) {
+        entity.subDealerPhoto = filePath;
+      }
+      console.log(filePath, "+++")
+      await this.subDealerRepository.insert(entity);
       return new CommonResponse(true, 201, 'SubDealer details created successfully');
     } catch (error) {
       console.log(error);
@@ -58,12 +63,23 @@ export class SubDealerService {
     }
   }
 
-  async handleSubDealerDetails(dto: SubDealerDto): Promise<CommonResponse> {
-    if (dto.id || dto.subDealerId) {
-      return await this.updateSubDealerDetails(dto);
-    } else {
-      return await this.createSubDealerDetails(dto);
+  async handleSubDealerDetails(dto: SubDealerDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    try {
+      let filePath: string | null = null;
+      if (photo) {
+        filePath = join(__dirname, '../.../uploads/subDealer_photos', `${Date.now()}-${photo.originalname}`);
+        await fs.writeFile(filePath, photo.fieldname)
+      }
+      if (dto.id || dto.subDealerId) {
+        return await this.updateSubDealerDetails(dto, filePath);
+      } else {
+        return await this.createSubDealerDetails(dto, filePath);
+      }
+    } catch (error) {
+      console.error(`Error handling staff details: ${error.message}`, error.stack);
+      throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
     }
+
   }
 
 

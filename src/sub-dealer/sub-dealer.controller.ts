@@ -10,10 +10,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class SubDealerController {
     constructor(private readonly subDealerService: SubDealerService) { }
 
+    @UseInterceptors(FileInterceptor('photo'))
     @Post('handleSubDealerDetails')
-    async handleSubDealerDetails(@Body() dto: SubDealerDto) {
+    async handleSubDealerDetails(@Body() dto: SubDealerDto, @UploadedFile() photo?: Express.Multer.File) {
         try {
-            return await this.subDealerService.handleSubDealerDetails(dto);
+            return await this.subDealerService.handleSubDealerDetails(dto, photo);
         } catch (error) {
             console.log("Error in create address in services..", error)
         }
@@ -48,18 +49,18 @@ export class SubDealerController {
         }
     }
 
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('subDealerId') subDealerId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
-        try {
-            return await this.subDealerService.uploadSubDealerPhoto(subDealerId, photo);
-        } catch (error) {
-            console.error('Error uploading subDealer photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
+    // @Post('uploadPhoto')
+    // @UseInterceptors(FileInterceptor('photo'))
+    // async uploadPhoto(
+    //     @Body('subDealerId') subDealerId: number,
+    //     @UploadedFile() photo: Express.Multer.File
+    // ): Promise<CommonResponse> {
+    //     try {
+    //         return await this.subDealerService.uploadSubDealerPhoto(subDealerId, photo);
+    //     } catch (error) {
+    //         console.error('Error uploading subDealer photo:', error);
+    //         return new CommonResponse(false, 500, 'Error uploading photo');
+    //     }
+    // }
 
 }

@@ -18,63 +18,84 @@ export class ClientService {
         private readonly clientRepository: ClientRepository,
         private readonly branchRepo: BranchRepository
     ) { }
-
-    async saveClientDetails(dto: ClientDto, file?: Express.Multer.File): Promise<CommonResponse> {
+    async handleClientDetails(dto: ClientDto, file?: Express.Multer.File): Promise<CommonResponse> {
         try {
-            let photoPath: string | undefined;
+            let photoPath: string | null = null;
 
+            // Handle photo upload
             if (file) {
                 photoPath = await this.uploadClientPhoto(file);
             }
 
+            if (dto.id) {
+                // If ID exists, validate it before updating
+                const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+                if (!existingClient) {
+                    throw new ErrorResponse(404, `Client with ID ${dto.id} not found`);
+                }
+                return await this.updateClientDetails(dto, photoPath);
+            } else {
+                // Create a new client
+                return await this.createClientDetails(dto, photoPath);
+            }
+        } catch (error) {
+            console.error(`Error handling client details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to handle client details: ${error.message}`);
+        }
+    }
+
+
+    async createClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
+        try {
             const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
             if (!branchEntity) {
                 throw new Error('Branch not found');
             }
-
             const entity = this.clientAdapter.convertDtoToEntity(dto);
-
-            if (!dto.id && !entity.clientId) {
-                const clientCount = await this.clientRepository.count({
-                    where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
-                });
-                entity.clientId = this.generateClientId(branchEntity.branchName, clientCount + 1);
-            }
+            entity.clientId = `CLI(${branchEntity.branchName})-${(await this.clientRepository.count() + 1).toString().padStart(5, '0')}`;
 
             if (photoPath) {
                 entity.clientPhoto = photoPath;
             }
 
-            if (dto.id) {
-                const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
-                if (!existingClient) {
-                    throw new Error('Client not found');
-                }
 
-                const updatedClient = {
-                    ...existingClient,
-                    ...entity,
-                    clientPhoto: photoPath || existingClient.clientPhoto,
-                };
+            const branch = new BranchEntity();
+            branch.id = dto.branchId;
+            entity.branch = branch;
 
-                await this.clientRepository.save(updatedClient);
-            } else {
-                const branch = new BranchEntity()
-                branch.id = dto.branchId
-                entity.branch = branch
-                await this.clientRepository.save(entity);
-            }
+            await this.clientRepository.insert(entity);
 
-            const internalMessage = dto.id
-                ? 'Client details updated successfully'
-                : 'Client details created successfully';
-
-            return new CommonResponse(true, 201, internalMessage);
+            return new CommonResponse(true, 201, 'Client details created successfully');
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error creating client details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to create client details: ${error.message}`);
         }
     }
 
+    async updateClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
+        try {
+            const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+            if (!existingClient) {
+                throw new Error('Client not found');
+            }
+
+            const entity = this.clientAdapter.convertDtoToEntity(dto);
+
+            // Merge existing client details with new data
+            const updatedClient = {
+                ...existingClient,
+                ...entity,
+                clientPhoto: photoPath || existingClient.clientPhoto,
+            };
+
+            await this.clientRepository.save(updatedClient);
+
+            return new CommonResponse(true, 200, 'Client details updated successfully');
+        } catch (error) {
+            console.error(`Error updating client details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to update client details: ${error.message}`);
+        }
+    }
 
     async uploadClientPhoto(photo: Express.Multer.File): Promise<string> {
         try {
@@ -82,18 +103,19 @@ export class ClientService {
             await fs.writeFile(filePath, photo.buffer);
             return filePath;
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error uploading client photo: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to upload client photo: ${error.message}`);
         }
     }
 
 
     async deleteClientDetails(dto: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
-            await this.clientRepository.delete(dto.id);
+            await this.clientRepository.delete(dto.clientId);
             return new CommonResponse(true, 200, 'Client details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
@@ -102,7 +124,7 @@ export class ClientService {
 
     async getClientDetails(req: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
@@ -115,13 +137,7 @@ export class ClientService {
         }
     }
 
-    /**
-     * Generates a clientId in the format CLI(${branchName})-${paddedNumber}.
-     */
-    private generateClientId(branchName: string, sequenceNumber: number): string {
-        const paddedNumber = sequenceNumber.toString().padStart(4, '0');
-        return `CLI(${branchName})-${paddedNumber}`;
-    }
+  
 
     async getClientNamesDropDown(): Promise<CommonResponse> {
         const data = await this.clientRepository.find({ select: ['name', 'id', 'clientId'] });

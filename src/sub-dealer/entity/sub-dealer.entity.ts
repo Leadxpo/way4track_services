@@ -24,7 +24,7 @@ export class SubDealerEntity {
   @Column({ name: 'alternate_phone_number', type: 'varchar', length: 15, nullable: true })
   alternatePhoneNumber?: string;
 
-  @Column({ name: 'gst_number', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'gst_number', type: 'varchar', length: 20, unique: true, nullable: true })
   gstNumber: string;
 
   @Column({ name: 'starting_date', type: 'date' })
@@ -40,7 +40,7 @@ export class SubDealerEntity {
   address: string;
 
 
-  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.subDealer)
+  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.subDealer, { nullable: true })
   @JoinColumn({ name: 'voucher_id' })
   voucherId: VoucherEntity;
 

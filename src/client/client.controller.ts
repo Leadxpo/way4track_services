@@ -9,19 +9,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ClientController {
     constructor(private readonly clientService: ClientService) { }
 
-    @Post('saveClientDetails')
+    @Post('handleClientDetails')
     @UseInterceptors(FileInterceptor('file'))
-    async saveClientDetails(
+    async handleClientDetails(
         @Body() dto: ClientDto,
         @UploadedFile() file: Express.Multer.File
     ): Promise<CommonResponse> {
         try {
-            return await this.clientService.saveClientDetails(dto, file);
+            return await this.clientService.handleClientDetails(dto, file);
         } catch (error) {
             console.error('Error in save hiring details with resume in service:', error);
             return new CommonResponse(false, 500, 'Error saving hiring details with resume');
         }
     }
+
 
     @Post('deleteClientDetails')
     async deleteClientDetails(@Body() dto: ClientIdDto): Promise<CommonResponse> {

@@ -8,9 +8,9 @@ export class ClientDto {
     dob: Date;
     email: string;
     address: string;
-    status: ClientStatusEnum;
+    // status: ClientStatusEnum;
     joiningDate: Date;
-    amount: number;
+    // amount?: number;
     clientPhoto?: string;
     voucherId?: number
     companyCode: string;

@@ -24,8 +24,8 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
     request: RequestRaiseEntity[];
 
-    @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
-    status: ClientStatusEnum
+    // @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
+    // status: ClientStatusEnum
 
     @Column({ name: 'dob', type: 'date' })
     dob: Date;
@@ -44,7 +44,7 @@ export class ClientEntity extends BaseEntity {
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
-    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.client)
+    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.client, { nullable: true })
     @JoinColumn({ name: 'voucher_id' })
     voucherId: VoucherEntity;
 

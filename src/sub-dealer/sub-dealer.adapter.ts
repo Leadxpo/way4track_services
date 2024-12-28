@@ -21,6 +21,7 @@ export class SubDealerAdapter {
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         entity.password = dto.password
+        entity.subDealerPhoto = dto.subDealerPhoto
         const voucher = new VoucherEntity()
         voucher.id = dto.voucherId
         entity.voucherId = voucher;

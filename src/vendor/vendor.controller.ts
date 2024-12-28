@@ -9,10 +9,11 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class VendorController {
   constructor(private readonly vendorService: VendorService) { }
 
+  @UseInterceptors(FileInterceptor('photo'))
   @Post('handleVendorDetails')
-  async handleVendorDetails(@Body() dto: VendorDto): Promise<CommonResponse> {
+  async handleVendorDetails(@Body() dto: VendorDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
     try {
-      return await this.vendorService.handleVendorDetails(dto);
+      return await this.vendorService.handleVendorDetails(dto, photo);
     } catch (error) {
       console.error('Error in save vendor details:', error);
       return new CommonResponse(false, 500, 'Error saving vendor details');
@@ -44,20 +45,6 @@ export class VendorController {
       return this.vendorService.getVendorNamesDropDown();
     } catch (error) {
       return new CommonResponse(false, 500, 'Error fetching branch type details');
-    }
-  }
-
-  @Post('uploadPhoto')
-  @UseInterceptors(FileInterceptor('photo'))
-  async uploadPhoto(
-    @Body('vendorId') vendorId: number,
-    @UploadedFile() photo: Express.Multer.File
-  ): Promise<CommonResponse> {
-    try {
-      return await this.vendorService.uploadVendorPhoto(vendorId, photo);
-    } catch (error) {
-      console.error('Error uploading vendor photo:', error);
-      return new CommonResponse(false, 500, 'Error uploading photo');
     }
   }
 

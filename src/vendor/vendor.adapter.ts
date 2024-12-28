@@ -20,6 +20,7 @@ export class VendorAdapter {
         entity.address = dto.address;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
+        entity.vendorPhoto = dto.vendorPhoto
         const voucher = new VoucherEntity()
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
@@ -40,7 +41,8 @@ export class VendorAdapter {
                 address,
                 voucherId,
                 companyCode,
-                unitCode
+                unitCode,
+                vendorPhoto
             } = vendor;
 
             return new VendorResDto(
@@ -55,8 +57,9 @@ export class VendorAdapter {
                 address,
                 voucherId?.id,
                 voucherId?.name ?? '',
-               companyCode,
-               unitCode
+                companyCode,
+                unitCode,
+                vendorPhoto
             );
         });
     }
