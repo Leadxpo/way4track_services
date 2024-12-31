@@ -31,6 +31,8 @@ import { AppointmentModule } from 'src/appointment/appointement.module';
 import { EstimateModule } from 'src/estimate/estimate.module';
 import { EstimateDashboardService } from './estimate-dashboard.service';
 import { EstimateRepository } from 'src/estimate/repo/estimate.repo';
+import { AccountDashboardService } from './account.dashboard.service';
+import { AccountModule } from 'src/account/account.module';
 
 @Module({
     imports: [
@@ -45,10 +47,12 @@ import { EstimateRepository } from 'src/estimate/repo/estimate.repo';
         forwardRef(() => StaffModule),
         forwardRef(() => AppointmentModule),
         forwardRef(() => EstimateModule),
+        forwardRef(() => AccountModule)
 
     ],
     providers: [
         ProductAssignDashboardService,
+        AccountDashboardService,
         ClientDashboardService,
         AssertDashboardService,
         StaffDashboardService,

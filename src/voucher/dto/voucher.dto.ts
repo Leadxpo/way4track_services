@@ -1,37 +1,34 @@
+
 import { PaymentType } from "src/asserts/enum/payment-type.enum";
 import { RoleEnum } from "../enum/role-enum";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ProductType } from "src/product/dto/product-type.enum";
+import { GSTORTDSEnum } from "../entity/voucher.entity";
 
 export class VoucherDto {
     id?: number;
     name: string;
-    quantity: number;
+    quantity?: number;
     branchId: number;
     role: RoleEnum;
     purpose: string;
     creditAmount: number;
+    amount?: number; // nullable if not always provided
+    remainingAmount?: number; // Fixed the typo "reminingAmount"
     paymentType: PaymentType;
-    client?: number;
-    paymentTo: string;
-    debitAmount: number;
-    transferredBy: string;
-    bankFrom: string;
-    bankTo: string;
+    clientId: number;
+    staffId: number;
+    accountNumber: number; // assuming this is the account number from the account entity
     voucherType: VoucherTypeEnum;
     generationDate?: Date;
     expireDate?: Date;
     shippingAddress?: string;
     buildingAddress?: string;
-    ledgerAmount?: number;
-    balanceAmount?: number;
-    total?: number;
     hsnCode?: string;
-    GST?: number;
+    GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
-    amount?: number;
     subDealerId?: number;
     vendorId?: number;
     initialPayment?: number;
@@ -43,6 +40,13 @@ export class VoucherDto {
     paymentStatus?: PaymentStatus;
     productType?: ProductType;
     companyCode: string;
-    unitCode: string
-    voucherId?: string
+    unitCode: string;
+    voucherId?: string;
+    fromAccount?: string
+    toAccount?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    upiId?: string;
+    checkNumber?: string;
+    cardNumber?: string;
 }

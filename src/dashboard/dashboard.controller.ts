@@ -22,6 +22,8 @@ import { EstimateDashboardService } from "./estimate-dashboard.service";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { CommonReq } from "src/models/common-req";
+import { AccountDashboardService } from "./account.dashboard.service";
+import { AccountIdDto } from "src/account/dto/account.id.dto";
 
 
 
@@ -37,7 +39,8 @@ export class DashboardController {
         private readonly appointmentDashboardService: AppointmentDashboardService,
         private readonly ticketsDashboardService: TicketsDashboardService,
         private readonly voucherDashboardService: VoucherDashboardService,
-        private readonly estimateDashboardService: EstimateDashboardService
+        private readonly estimateDashboardService: EstimateDashboardService,
+        private readonly accountDashboardService: AccountDashboardService
 
     ) { }
     @Post('assertCardData')
@@ -413,6 +416,31 @@ export class DashboardController {
     async getLast30DaysCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getLast30DaysCreditAndDebitPercentages(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getAccountBySearch')
+    async getAccountBySearch(@Body() req: {
+        accountName?: string; accountNumber?: string; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.accountDashboardService.getAccountBySearch(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('addVoucher')
+    async addVoucher(@Body() req: AccountIdDto): Promise<CommonResponse> {
+        try {
+            return await this.accountDashboardService.addVoucher(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

@@ -1,10 +1,10 @@
 export class VoucherIdDto {
-    id: number;
+    voucherId: string;
     companyCode?: string;
     unitCode?: string
-    constructor(id: number, companyCode?: string,
+    constructor(voucherId: string, companyCode?: string,
         unitCode?: string) {
-        this.id = id;
+        this.voucherId = voucherId;
         this.companyCode = companyCode
         this.unitCode = unitCode
     }

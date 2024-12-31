@@ -9,6 +9,8 @@ import { VendorRepository } from 'src/vendor/repo/vendor.repo';
 import { VoucherRepository } from 'src/voucher/repo/voucher.repo';
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { ProductDto } from './dto/product.dto';
+import { ProductIdDto } from './dto/product.id.dto';
 
 @Injectable()
 export class ProductService {
@@ -17,6 +19,81 @@ export class ProductService {
         private readonly vendorRepository: VendorRepository,
         private readonly voucherRepository: VoucherRepository
     ) { }
+
+
+    async createOrUpdateProduct(productDto: ProductDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+        try {
+            let productEntity: ProductEntity;
+            let filePath: string | null = null;
+
+            // Handle photo upload
+            if (photo) {
+                filePath = join(__dirname, '../../uploads/product_photos', `${Date.now()}-${photo.originalname}`);
+                await fs.writeFile(filePath, photo.fieldname); // Save the photo
+            }
+            if (productDto.id) {
+                productEntity = await this.productRepository.findOne({
+                    where: { id: productDto.id },
+                });
+
+                if (!productEntity) {
+                    throw new ErrorResponse(400, `Product with ID ${productDto.id} not found`);
+                }
+            } else {
+                productEntity = new ProductEntity();
+            }
+
+            productEntity.productName = productDto.productName;
+            productEntity.emiNumber = productDto.emiNumber;
+            productEntity.dateOfPurchase = new Date(productDto.dateOfPurchase);
+            productEntity.imeiNumber = productDto.imeiNumber;
+            productEntity.categoryName = productDto.categoryName;
+            productEntity.price = productDto.price;
+            productEntity.productDescription = productDto.productDescription;
+            productEntity.companyCode = productDto.companyCode;
+            productEntity.unitCode = productDto.unitCode;
+            if (productDto.vendorId) {
+
+                let vendor = await this.vendorRepository.findOne({
+                    where: { id: productDto.vendorId },
+                });
+                if (vendor) {
+                    productEntity.vendorId = vendor;
+                } else {
+                    throw new ErrorResponse(400, `Voucher with ID ${productDto.vendorId} not found`);
+                }
+                if (!vendor) {
+                    vendor = new VendorEntity();
+                    vendor.name = productDto.vendorName;
+                    vendor.vendorPhoneNumber = productDto.vendorPhoneNumber;
+                    vendor.address = productDto.vendorAddress;
+                    vendor.emailId = productDto.vendorEmailId;
+                    await this.vendorRepository.save(vendor);
+                }
+
+                productEntity.vendorId = vendor;
+            }
+            if (productDto.voucherId) {
+                const voucher = await this.voucherRepository.findOne({
+                    where: { id: productDto.voucherId },
+                });
+                if (voucher) {
+                    productEntity.voucherId = voucher;
+                } else {
+                    throw new ErrorResponse(400, `Voucher with ID ${productDto.voucherId} not found`);
+                }
+            }
+            if (filePath) {
+                productEntity.productPhoto = filePath;
+            }
+            await this.productRepository.save(productEntity);
+            return new CommonResponse(true, 201, 'product details created successfully');
+
+        } catch (error) {
+            console.error('Error creating or updating product', error);
+            throw new ErrorResponse(500, 'Error creating or updating product');
+        }
+    }
 
     async bulkUploadProducts(file: Express.Multer.File): Promise<CommonResponse> {
         try {
@@ -96,23 +173,57 @@ export class ProductService {
         }
     }
 
-    async uploadProductPhoto(productId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+    async deleteProductDetails(dto: ProductIdDto): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.findOne({ where: { id: productId } });
-
+            const product = await this.productRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
-
-            const filePath = join(__dirname, '../../uploads/product_photos', `${productId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
-
-            product.productPhoto = filePath;
-            await this.productRepository.save(product);
-
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+            await this.productRepository.delete(dto.id);
+            return new CommonResponse(true, 200, 'product details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
+
+    async getproductDetails(req: ProductIdDto): Promise<CommonResponse> {
+        try {
+            const product = await this.productRepository.find({ relations: ['vendorId', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!product) {
+                return new CommonResponse(false, 404, 'product not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'product details fetched successfully', product);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+
+    async getSearchDetailProduct(req: ProductIdDto): Promise<CommonResponse> {
+        try {
+            const product = await this.productRepository.getSearchDetailProduct(req)
+            if (!product) {
+                return new CommonResponse(false, 404, 'product not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'product details fetched successfully', product);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+
+
+    async getProductNamesDropDown(): Promise<CommonResponse> {
+        const data = await this.productRepository.find({ select: ['productName', 'id', 'imeiNumber'] });
+        if (data.length) {
+            return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
+        } else {
+            return new CommonResponse(false, 4579, "There Is No branch names")
+        }
+    }
+
 }

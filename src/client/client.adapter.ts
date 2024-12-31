@@ -23,9 +23,6 @@ export class ClientAdapter {
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         // entity.status = dto.status
-        const voucherEntity = new VoucherEntity();
-        voucherEntity.id = dto.voucherId
-        entity.voucherId = voucherEntity
         if (dto.id) {
             entity.id = dto.id;
         }
@@ -47,7 +44,6 @@ export class ClientAdapter {
                 client.email,
                 client.address,
                 client.joiningDate,
-                client?.voucherId?.voucherId,
                 client.companyCode,
                 client.unitCode
             );

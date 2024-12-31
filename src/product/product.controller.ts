@@ -2,6 +2,8 @@ import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/c
 import { ProductService } from './product.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonResponse } from 'src/models/common-response';
+import { ProductDto } from './dto/product.dto';
+import { ProductIdDto } from './dto/product.id.dto';
 
 @Controller('products')
 export class ProductController {
@@ -13,17 +15,57 @@ export class ProductController {
     return this.productService.bulkUploadProducts(file);
   }
 
-  @Post('uploadPhoto')
-  @UseInterceptors(FileInterceptor('photo'))
-  async uploadPhoto(
-    @Body('productId') productId: number,
-    @UploadedFile() photo: Express.Multer.File
+  @Post('createOrUpdateProduct')
+  @UseInterceptors(FileInterceptor('file'))
+  async createOrUpdateProduct(
+    @Body() productDto: ProductDto,
+    @UploadedFile() file: Express.Multer.File
   ): Promise<CommonResponse> {
     try {
-      return await this.productService.uploadProductPhoto(productId, photo);
+      return await this.productService.createOrUpdateProduct(productDto, file);
     } catch (error) {
-      console.error('Error uploading staff photo:', error);
-      return new CommonResponse(false, 500, 'Error uploading photo');
+      console.error('Error in save details with resume in service:', error);
+      return new CommonResponse(false, 500, 'Error saving details with resume');
     }
   }
+
+  @Post('deleteProductDetails')
+  async deleteProductDetails(@Body() dto: ProductIdDto): Promise<CommonResponse> {
+    try {
+      return await this.productService.deleteProductDetails(dto);
+    } catch (error) {
+      console.error('Error in delete client details in service:', error);
+      return new CommonResponse(false, 500, 'Error deleting client details');
+    }
+  }
+
+  @Post('getproductDetails')
+  async getproductDetails(@Body() req: ProductIdDto): Promise<CommonResponse> {
+    try {
+      return await this.productService.getproductDetails(req);
+    } catch (error) {
+      console.error('Error in get client details in service:', error);
+      return new CommonResponse(false, 500, 'Error fetching client details');
+    }
+  }
+
+  @Post('getSearchDetailProduct')
+  async getSearchDetailProduct(@Body() req: ProductIdDto): Promise<CommonResponse> {
+    try {
+      return await this.productService.getSearchDetailProduct(req);
+    } catch (error) {
+      console.error('Error in get client details in service:', error);
+      return new CommonResponse(false, 500, 'Error fetching client details');
+    }
+  }
+
+  @Post('getProductNamesDropDown')
+  async getProductNamesDropDown(): Promise<CommonResponse> {
+    try {
+      return this.productService.getProductNamesDropDown();
+    } catch (error) {
+      return new CommonResponse(false, 500, 'Error fetching branch type details');
+    }
+  }
+
 }

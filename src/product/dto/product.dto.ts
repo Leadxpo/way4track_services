@@ -1,5 +1,6 @@
 
 export class ProductDto {
+  id?: number
   productName: string;
   emiNumber: string;
   dateOfPurchase: Date;
@@ -10,7 +11,12 @@ export class ProductDto {
   productDescription: string;
   voucherId?: number;
   companyCode: string;
-  unitCode: string
+  unitCode: string;
+  vendorPhoneNumber: string;
+  vendorName: string;
+  vendorAddress: string;
+  vendorEmailId: string;
+
 }
 
 

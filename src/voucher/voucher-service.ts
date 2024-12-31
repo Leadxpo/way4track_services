@@ -8,9 +8,9 @@ import { BranchRepository } from "src/branch/repo/branch.repo";
 import { ClientRepository } from "src/client/repo/client.repo";
 import { SubDealerRepository } from "src/sub-dealer/repo/sub-dealer.repo";
 import { VendorRepository } from "src/vendor/repo/vendor.repo";
-import { VoucherResDto } from "./dto/voucher-res.dto";
-import { PaymentType } from "src/asserts/enum/payment-type.enum";
 import { ErrorResponse } from "src/models/error-response";
+import { VoucherResDto } from "./dto/voucher-res.dto";
+import { AccountRepository } from "src/account/repo/account.repo";
 
 @Injectable()
 export class VoucherService {
@@ -21,6 +21,8 @@ export class VoucherService {
         private readonly subDealerRepository: SubDealerRepository,
         private readonly vendorRepository: VendorRepository,
         private readonly voucherAdapter: VoucherAdapter,
+        private readonly accountRepo: AccountRepository
+
     ) { }
 
 
@@ -33,32 +35,28 @@ export class VoucherService {
             PURCHASE: 'PU',
             INVOICE: 'INV',
         };
-    
-        // Normalize the voucherType to uppercase to avoid case mismatch issues
+
         const prefix = typePrefix[voucherType.toUpperCase()] || 'UN';
-    
-        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Get current date in YYYYMMDD format
-    
+
+        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+
         const lastVoucher = await this.voucherRepository
             .createQueryBuilder('voucher')
             .where('voucher.voucherType = :voucherType', { voucherType })
             .andWhere('voucher.voucherId LIKE :prefix', { prefix: `${prefix}-${timestamp}%` })
             .orderBy('voucher.voucherId', 'DESC')
             .getOne();
-    
+
         let sequentialNumber = 1;
         if (lastVoucher) {
             const lastVoucherNumber = lastVoucher.voucherId.split('-').pop();
             sequentialNumber = parseInt(lastVoucherNumber, 10) + 1;
         }
-    
+
         const paddedSequentialNumber = sequentialNumber.toString().padStart(3, '0');
-    
+
         return `${prefix}-${timestamp}-${paddedSequentialNumber}`;
     }
-    
-
-
     async updateVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
         try {
             const existingVoucher = await this.voucherRepository.findOne({
@@ -72,26 +70,7 @@ export class VoucherService {
             if (!existingVoucher) {
                 return new CommonResponse(false, 4002, 'Voucher not found for the provided id.');
             }
-
-            const branch = await this.branchRepository.findOne({ where: { id: voucherDto.branchId } });
-            if (!branch) {
-                throw new Error('Branch not found');
-            }
-
-            const client = voucherDto.client
-                ? await this.clientRepository.findOne({ where: { id: voucherDto.client } })
-                : null;
-
-            const subDealer = voucherDto.subDealerId
-                ? await this.subDealerRepository.findOne({ where: { id: voucherDto.subDealerId, companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode } })
-                : null;
-
-            const vendor = voucherDto.vendorId
-                ? await this.vendorRepository.findOne({ where: { id: voucherDto.vendorId, companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode } })
-                : null;
-
-
-            Object.assign(existingVoucher, this.voucherAdapter.dtoToEntity(voucherDto, branch, client, subDealer, vendor));
+            Object.assign(existingVoucher, this.voucherAdapter.dtoToEntity(voucherDto));
             await this.voucherRepository.save(existingVoucher);
 
             return new CommonResponse(true, 65152, 'Voucher Updated Successfully');
@@ -104,29 +83,13 @@ export class VoucherService {
     async createVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
         try {
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
+            const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
+            const toAccount = await this.accountRepo.findOne({ where: { accountNumber: voucherDto.toAccount } });
+            if (!toAccount) throw new Error('Account not found');
+            voucherEntity.toAccount = toAccount;
 
-            const branch = await this.branchRepository.findOne({ where: { id: voucherDto.branchId } });
-            if (!branch) {
-                throw new Error('Branch not found');
-            }
-
-            const client = voucherDto.client
-                ? await this.clientRepository.findOne({ where: { id: voucherDto.client } })
-                : null;
-
-            const subDealer = voucherDto.subDealerId
-                ? await this.subDealerRepository.findOne({ where: { id: voucherDto.subDealerId, companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode } })
-                : null;
-
-            const vendor = voucherDto.vendorId
-                ? await this.vendorRepository.findOne({ where: { id: voucherDto.vendorId, companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode } })
-                : null;
-
-            const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto, branch, client, subDealer, vendor);
             voucherEntity.voucherId = generatedVoucherId;
-
-            await this.voucherRepository.save(voucherEntity);
-
+            await this.voucherRepository.insert(voucherEntity);
             return new CommonResponse(true, 65152, 'Voucher Created Successfully');
         } catch (error) {
             console.error(`Error creating voucher details: ${error.message}`, error.stack);
@@ -147,20 +110,19 @@ export class VoucherService {
 
 
     async getAllVouchers(): Promise<VoucherResDto[]> {
-        const vouchers = await this.voucherRepository.find({
-            relations: ['branchId']
-        });
-        return vouchers.map((voucher) => this.voucherAdapter.entityToDto(voucher));
+        const vouchers = await this.voucherRepository.find();
+        return this.voucherAdapter.entityToDto(vouchers);
     }
+
 
     async deleteVoucherDetails(dto: VoucherIdDto): Promise<CommonResponse> {
         try {
-            const voucher = await this.voucherRepository.findOne({ where: { id: dto.id } });
+            const voucher = await this.voucherRepository.findOne({ where: { voucherId: dto.voucherId } });
             if (!voucher) {
                 return new CommonResponse(false, 404, 'Voucher not found');
             }
 
-            await this.voucherRepository.delete(dto.id);
+            await this.voucherRepository.delete(dto.voucherId);
             return new CommonResponse(true, 200, 'Voucher deleted successfully');
         } catch (error) {
             return new CommonResponse(false, 500, error.message);
@@ -179,7 +141,7 @@ export class VoucherService {
             id: voucher.id,
             voucherId: voucher.voucherId,
             branchName: voucher.branchId?.branchName || "Unknown",
-            clientName: voucher.client?.[0]?.name || "Unknown",
+            clientName: voucher.clientId?.[0]?.name || "Unknown",
             subDealerName: voucher.subDealer?.[0]?.name || "Unknown",
             vendorName: voucher.vendor?.[0]?.name || "Unknown"
         }));

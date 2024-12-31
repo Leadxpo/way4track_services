@@ -9,6 +9,7 @@ import { BranchModule } from 'src/branch/branch.module';
 import { VendorModule } from 'src/vendor/vendor.module';
 import { SubDealerModule } from 'src/sub-dealer/sub-dealer.module';
 import { ClientModule } from 'src/client/client.module';
+import { AccountModule } from 'src/account/account.module';
 
 @Module({
     imports: [
@@ -17,6 +18,7 @@ import { ClientModule } from 'src/client/client.module';
         forwardRef(() => VendorModule),
         forwardRef(() => SubDealerModule),
         forwardRef(() => ClientModule),
+        forwardRef(() => AccountModule)
     ],
     controllers: [VoucherController],
     providers: [VoucherService, VoucherAdapter, VoucherRepository],

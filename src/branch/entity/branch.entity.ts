@@ -1,3 +1,4 @@
+import { AccountEntity } from 'src/account/entity/account.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
@@ -11,7 +12,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColum
 
 @Entity('branches')
 export class BranchEntity {
-  @PrimaryGeneratedColumn()   
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ name: 'name', type: 'varchar', length: 255 })
@@ -58,6 +59,9 @@ export class BranchEntity {
 
   @OneToMany(() => AttendanceEntity, (asserts) => asserts.branchId)
   attendance: AttendanceEntity[];
+
+  @OneToMany(() => AccountEntity, (asserts) => asserts.branch)
+  accounts: AccountEntity[];
 
   @OneToMany(() => ProductAssignEntity, (asserts) => asserts.branchId)
   productAssign: ProductAssignEntity[];

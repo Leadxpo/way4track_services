@@ -44,9 +44,8 @@ export class ClientEntity extends BaseEntity {
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
-    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.client, { nullable: true })
-    @JoinColumn({ name: 'voucher_id' })
-    voucherId: VoucherEntity;
+    @OneToMany(() => VoucherEntity, (voucher) => voucher.clientId)
+    voucherId: VoucherEntity[];
 
     @OneToMany(() => AppointmentEntity, (asserts) => asserts.clientId)
     appiontment: AppointmentEntity[];

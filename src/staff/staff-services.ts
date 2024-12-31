@@ -102,7 +102,7 @@ export class StaffService {
 
     async getStaffDetails(req: CommonReq): Promise<CommonResponse> {
         const branch = await this.staffRepository.find({
-            where: { companyCode: req.companyCode, unitCode: req.unitCode }
+            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch']
         });
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");

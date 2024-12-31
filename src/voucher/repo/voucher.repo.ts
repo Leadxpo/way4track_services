@@ -8,6 +8,7 @@ import { VoucherIDResDTo } from "../dto/voucher-id.res.dto";
 import { InvoiceDto } from "../dto/invoice.dto";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { CommonReq } from "src/models/common-req";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 
 
 @Injectable()
@@ -171,7 +172,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             console.error('Error executing query:', error);
             throw error;
         }
-        
+
     }
 
 
@@ -516,8 +517,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
     async getSolidLiquidCash(req: CommonReq) {
-        const last30Days = new Date();
-        last30Days.setDate(last30Days.getDate() - 30);
+        // const last30Days = new Date();
+        // last30Days.setDate(last30Days.getDate() - 30);
 
         const result = await this.dataSource
             .getRepository(VoucherEntity)
@@ -525,26 +526,31 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 `SUM(CASE 
               WHEN ve.voucher_type = :receiptType 
+              ve.payment_type=:cash
                 AND ve.product_type IN ('service', 'product', 'sales') 
               THEN ve.amount 
               ELSE 0 
             END) AS solidCash`,
                 `SUM(CASE 
               WHEN ve.voucher_type = :contraType 
-                AND ve.bank_from IS NOT NULL 
+                AND  ve.payment_type=:cash IS NOT NULL 
                 AND ve.bank_to IS NULL 
               THEN ve.amount 
               ELSE 0 
             END) AS solidCashFromContra`,
+
                 `SUM(CASE 
+
               WHEN ve.voucher_type = :contraType 
                 AND ve.bank_from IS NOT NULL 
                 AND ve.bank_to IS NOT NULL 
               THEN ve.amount 
               ELSE 0 
             END) AS liquidCash`,
+                `br.name`
             ])
-            .where('ve.generation_date >= :last30Days', { last30Days })
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            // .where('ve.generation_date >= :last30Days', { last30Days })
             .andWhere('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CONTRA],
             })

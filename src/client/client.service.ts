@@ -124,7 +124,7 @@ export class ClientService {
 
     async getClientDetails(req: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.find({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }

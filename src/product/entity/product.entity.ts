@@ -12,7 +12,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'product_name', type: 'varchar', length: 100 })
   productName: string;
 
-  @Column({ name: 'product_photo', type: 'text',nullable:true })
+  @Column({ name: 'product_photo', type: 'text', nullable: true })
   productPhoto: string;
 
   @Column({ name: 'emi_number', type: 'varchar', length: 50 })
@@ -36,6 +36,18 @@ export class ProductEntity extends BaseEntity {
   @ManyToOne(() => VendorEntity, (vendorEntity) => vendorEntity.product)
   @JoinColumn({ name: 'vendor_id' })
   vendorId: VendorEntity;
+
+  @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, nullable: true })
+  vendorPhoneNumber: string;
+
+  @Column({ name: 'vendor_name', type: 'varchar', length: 100, nullable: true })
+  vendorName: string;
+
+  @Column({ name: 'vendor_address', type: 'text', nullable: true })
+  vendorAddress: string;
+
+  @Column({ name: 'vendor_email_id', type: 'varchar', length: 150, nullable: true })
+  vendorEmailId: string;
 
   @ManyToOne(() => VoucherEntity, (voucherEntity) => voucherEntity.product)
   @JoinColumn({ name: 'voucher_id' })

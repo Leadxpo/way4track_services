@@ -36,6 +36,8 @@ import { EstimateEntity } from './estimate/entity/estimate.entity';
 import { LoginModule } from './login/login.module';
 import { PermissionModule } from './permissions/permissions.module';
 import { PermissionEntity } from './permissions/entity/permissions.entity';
+import { AccountModule } from './account/account.module';
+import { AccountEntity } from './account/entity/account.entity';
 
 @Module({
   imports: [
@@ -46,8 +48,8 @@ import { PermissionEntity } from './permissions/entity/permissions.entity';
       username: 'root',
       password: 'root',
       database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity],
-      synchronize: true,
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity],
+      synchronize: false,
       logging: true,
     }),
     TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity]),
@@ -69,7 +71,8 @@ import { PermissionEntity } from './permissions/entity/permissions.entity';
     AttendanceModule,
     EstimateModule,
     LoginModule,
-    PermissionModule
+    PermissionModule,
+    AccountModule
   ],
   controllers: [],
   providers: [],
