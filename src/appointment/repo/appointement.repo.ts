@@ -13,7 +13,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
         super(AppointmentEntity, dataSource.createEntityManager());
     }
 
-    async getAllAppointmentDetails(req: CommonReq) {
+    async getAllAppointmentDetails(req: CommonReq, branch?: string) {
         const groupedBranches = await this.createQueryBuilder('appointment')
             .select([
                 'branch.name AS branchName',
@@ -22,9 +22,12 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .leftJoin('appointment.branchId', 'branch')
             .where(`appointment.company_code = "${req.companyCode}"`)
             .andWhere(`appointment.unit_code = "${req.unitCode}"`)
-            .groupBy('branch.name')
-            .orderBy('branch.name', 'ASC')
-            .getRawMany();
+        if (branch) {
+            groupedBranches.andWhere('branch.name = :branchName', { branchName: branch });
+        }
+        const result = await groupedBranches.groupBy('branch.name').getRawMany();
+
+
 
         const appointments = await this.createQueryBuilder('appointment')
             .select([
@@ -51,7 +54,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .orderBy('branch.name', 'ASC')
             .getRawMany();
 
-        return { groupedBranches, appointments };
+        return { result, appointments };
     }
 
 }

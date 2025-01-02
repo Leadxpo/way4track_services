@@ -10,8 +10,8 @@ export class AppointmentDashboardService {
     constructor(
         private appointmentRepository: AppointmentRepository,
     ) { }
-    async getAllAppointmentDetails(req:CommonReq): Promise<CommonResponse> {
-        const data = await this.appointmentRepository.getAllAppointmentDetails(req)
+    async getAllAppointmentDetails(req: CommonReq, branch?: string): Promise<CommonResponse> {
+        const data = await this.appointmentRepository.getAllAppointmentDetails(req, branch)
         if (!data) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

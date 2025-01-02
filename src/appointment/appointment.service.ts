@@ -22,39 +22,39 @@ export class AppointmentService {
             const existingAppointment = await this.appointmentRepository.findOne({
                 where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
             });
-    
+
             if (!existingAppointment) {
                 return new CommonResponse(false, 4002, 'Appointment not found for the provided details.');
             }
-    
+
             // Update the existing appointment details
             Object.assign(existingAppointment, this.appointmentAdapter.convertDtoToEntity(dto));
             await this.appointmentRepository.save(existingAppointment);
-    
+
             return new CommonResponse(true, 65152, 'Appointment details updated successfully');
         } catch (error) {
             console.error(`Error updating appointment details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to update appointment details: ${error.message}`);
         }
     }
-    
+
     async createAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         try {
             const entity = this.appointmentAdapter.convertDtoToEntity(dto);
-    
             // Generate the appointmentId if not already provided
             const count = await this.appointmentRepository.count();
             entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
-    
+
             await this.appointmentRepository.save(entity);
-    
+            console.log(entity, "_______________")
+
             return new CommonResponse(true, 201, 'Appointment details created successfully');
         } catch (error) {
             console.error(`Error creating appointment details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to create appointment details: ${error.message}`);
         }
     }
-    
+
     async handleAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         if (dto.id) {
             // If an ID is provided, update the appointment details
@@ -64,7 +64,7 @@ export class AppointmentService {
             return await this.createAppointmentDetails(dto);
         }
     }
-    
+
     /**
      * Get Appointment Details by ID
      */
@@ -92,7 +92,7 @@ export class AppointmentService {
     async deleteAppointmentDetails(dto: AppointmentIdDto): Promise<CommonResponse> {
         try {
             const appointmentExists = await this.appointmentRepository.findOne({
-                where: { id: dto.id ,companyCode: dto.companyCode, unitCode: dto.unitCode},
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
             });
 
             if (!appointmentExists) {

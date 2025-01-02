@@ -15,6 +15,10 @@ export enum AppointmentStatus {
     SENT = 'sent',
 }
 
+export enum TimePeriodEnum {
+    AM = 'AM',
+    PM = 'PM'
+}
 @Entity('appointments')
 export class AppointmentEntity {
     @PrimaryGeneratedColumn()
@@ -39,8 +43,15 @@ export class AppointmentEntity {
     @Column({ name: 'name', type: 'varchar', length: 100 })
     name: string;
 
-    @Column({ name: 'slot', type: 'timestamp' })
-    slot: Date;
+    @Column({ name: 'date', type: 'date', nullable: true })
+    date: string | null;
+
+    @Column({ name: 'time', type: 'time' })
+    slot: string;
+
+    @Column({ name: 'period', type: 'enum', enum: TimePeriodEnum })
+    period: TimePeriodEnum;
+
 
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
@@ -61,7 +72,7 @@ export class AppointmentEntity {
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
 
-    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.asserts)
+    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.appointment)
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 

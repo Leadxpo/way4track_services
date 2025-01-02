@@ -81,10 +81,10 @@ export class VoucherEntity {
     @Column({ name: 'expire_date', type: 'timestamp', nullable: true })
     expireDate: Date;
 
-    @Column({ name: 'shipping_address', type: 'varchar', length: 255, nullable: true ,default: null })
+    @Column({ name: 'shipping_address', type: 'varchar', length: 255, nullable: true, default: null })
     shippingAddress: string;
 
-    @Column({ name: 'building_address', type: 'varchar', length: 255, nullable: true ,default: null })
+    @Column({ name: 'building_address', type: 'varchar', length: 255, nullable: true, default: null })
     buildingAddress: string;
 
     @Column({ name: 'hsn_code', type: 'varchar', length: 20, nullable: true })

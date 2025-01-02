@@ -1,18 +1,20 @@
-import { AppointmentStatus, AppointmentType } from "../entity/appointement.entity";
+import { AppointmentStatus, AppointmentType, TimePeriodEnum } from "../entity/appointement.entity";
 
 export class AppointmentResDto {
     id: number;
     name: string;
     clientPhoneNumber: string;
-    clientId: number;
+    clientId: string;
     clientAddress: string;
     clientName: string;
     branchId: number;
     branchName: string;
     appointmentType: AppointmentType;
     staffId: number;
-    assignedTo: string; // Staff name
-    slot: Date;
+    assignedTo: string;
+    date: string;
+    slot: string;
+    period: TimePeriodEnum
     description: string;
     status: AppointmentStatus;
     appointmentId: string;
@@ -23,7 +25,7 @@ export class AppointmentResDto {
         id: number,
         name: string,
         clientPhoneNumber: string,
-        clientId: number,
+        clientId: string,
         clientAddress: string,
         clientName: string,
         branchId: number,
@@ -31,7 +33,9 @@ export class AppointmentResDto {
         appointmentType: AppointmentType,
         staffId: number,
         assignedTo: string,
-        slot: Date,
+        date: string,
+        slot: string,
+        period: TimePeriodEnum,
         description: string,
         status: AppointmentStatus,
         appointmentId: string,
@@ -49,7 +53,9 @@ export class AppointmentResDto {
         this.appointmentType = appointmentType;
         this.staffId = staffId;
         this.assignedTo = assignedTo;
+        this.date = date;
         this.slot = slot;
+        this.period = period;
         this.description = description;
         this.status = status;
         this.appointmentId = appointmentId;

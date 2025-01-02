@@ -13,7 +13,9 @@ export class AppointmentAdapter {
         const entity = new AppointmentEntity();
         entity.appointmentType = dto.appointmentType;
         entity.name = dto.name;
-        entity.slot = dto.slot;
+        entity.date = dto.date
+        entity.slot = dto.slot + ':00';
+        entity.period = dto.period;
         entity.description = dto.description;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
@@ -26,7 +28,7 @@ export class AppointmentAdapter {
         entity.branchId = branch;
 
         const client = new ClientEntity();
-        client.id = dto.clientId;
+        client.clientId = dto.clientId;
         entity.clientId = client;
         entity.appointmentId = dto.appointmentId;
 
@@ -35,11 +37,13 @@ export class AppointmentAdapter {
 
     convertEntityToDto(entities: AppointmentEntity[]): AppointmentResDto[] {
         return entities.map((entity) => {
+            const formattedDate = new Date(entity.date).toLocaleDateString('en-GB');
+            const formattedTime = entity.slot.substring(0, 5);
             return new AppointmentResDto(
                 entity.id,
                 entity.name,
                 entity.clientId?.phoneNumber || '',
-                entity.clientId?.id || null,
+                entity.clientId?.clientId || null,
                 entity.clientId?.address || '',
                 entity.clientId?.name,
                 entity.branchId?.id || 0,
@@ -47,7 +51,9 @@ export class AppointmentAdapter {
                 entity.appointmentType,
                 entity.staffId?.id || 0,
                 entity.staffId?.name || '',
-                entity.slot,
+                formattedDate,
+                formattedTime,
+                entity.period,
                 entity.description,
                 entity.status,
                 entity.appointmentId,
