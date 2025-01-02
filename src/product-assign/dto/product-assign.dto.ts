@@ -1,6 +1,6 @@
 export class ProductAssignDto {
     id: number;
-    staffId: number;
+    staffId: string;
     productId: number;
     branchId: number;
     imeiNumberFrom: string;

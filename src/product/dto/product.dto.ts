@@ -1,6 +1,6 @@
 
 export class ProductDto {
-  id?: number
+  id?: number;
   productName: string;
   emiNumber: string;
   dateOfPurchase: Date;
@@ -17,7 +17,19 @@ export class ProductDto {
   vendorAddress: string;
   vendorEmailId: string;
 
+  // New fields
+  supplierName: string;
+  serialNumber: string;
+  primaryNo: string;
+  secondaryNo: string;
+  primaryNetwork: string;
+  secondaryNetwork: string;
+  simStatus: string;
+  planName: string;
+  remarks1: string;
+  remarks2: string;
 }
+
 
 
 export class BulkProductDto {

@@ -3,7 +3,6 @@ import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
-
 @Entity('products')
 export class ProductEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -15,8 +14,11 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'product_photo', type: 'text', nullable: true })
   productPhoto: string;
 
-  @Column({ name: 'emi_number', type: 'varchar', length: 50 })
+  @Column({ name: 'device_model', type: 'varchar', length: 50 })
   emiNumber: string;
+
+  @Column({ name: 'emi_number', type: 'varchar', length: 50 })
+  deviceModel: string;
 
   @Column({ name: 'date_of_purchase', type: 'date' })
   dateOfPurchase: Date;
@@ -61,4 +63,35 @@ export class ProductEntity extends BaseEntity {
 
   @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
   unitCode: string;
+
+  // New columns
+  @Column({ name: 'supplier_name', type: 'varchar', length: 100, nullable: true })
+  supplierName: string;
+
+  @Column({ name: 'serial_number', type: 'varchar', length: 50, nullable: true })
+  serialNumber: string;
+
+  @Column({ name: 'primary_no', type: 'varchar', length: 15, nullable: true })
+  primaryNo: string;
+
+  @Column({ name: 'secondary_no', type: 'varchar', length: 15, nullable: true })
+  secondaryNo: string;
+
+  @Column({ name: 'primary_network', type: 'varchar', length: 50, nullable: true })
+  primaryNetwork: string;
+
+  @Column({ name: 'secondary_network', type: 'varchar', length: 50, nullable: true })
+  secondaryNetwork: string;
+
+  @Column({ name: 'sim_status', type: 'varchar', length: 20, nullable: true })
+  simStatus: string;
+
+  @Column({ name: 'plan_name', type: 'varchar', length: 100, nullable: true })
+  planName: string;
+
+  @Column({ name: 'remarks_1', type: 'text', nullable: true })
+  remarks1: string;
+
+  @Column({ name: 'remarks_2', type: 'text', nullable: true })
+  remarks2: string;
 }

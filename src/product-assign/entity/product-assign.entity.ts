@@ -9,11 +9,11 @@ export class ProductAssignEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.productAssign)
+  @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'staff_id' })
   staffId: StaffEntity;
 
-  @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.productAssign)
+  @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branchId: BranchEntity;
 
@@ -34,7 +34,7 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'request_id' })
   requestId: RequestRaiseEntity;
 
-  @Column({ name: 'product_assign_photo', type: 'text',nullable:true })
+  @Column({ name: 'product_assign_photo', type: 'text', nullable: true })
   productAssignPhoto: string;
 
   @Column({ name: 'branch_person', type: 'varchar', length: 20 })

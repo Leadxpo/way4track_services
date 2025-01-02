@@ -10,17 +10,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ProductAssignController {
     constructor(private readonly productAssignService: ProductAssignService) { }
 
-    @Post('saveProductAssign')
-    async saveProductAssign(@Body() dto: ProductAssignDto): Promise<CommonResponse> {
+    @Post('handleProductDetails')
+    @UseInterceptors(FileInterceptor('file'))
+    async handleProductDetails(@Body() dto: ProductAssignDto, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
         try {
-            return await this.productAssignService.saveProductAssign(dto);
+            return await this.productAssignService.handleProductDetails(dto, file);
         } catch (error) {
             console.error('Error in save product assignment in service:', error);
             return new CommonResponse(false, 500, 'Error saving product assignment');
         }
     }
-
-
 
     @Post('deleteProductAssign')
     async deleteProductAssign(@Body() dto: ProductAssignIdDto): Promise<CommonResponse> {
@@ -59,19 +58,4 @@ export class ProductAssignController {
             throw new HttpException(error.message, HttpStatus.NOT_FOUND);
         }
     }
-
-    @Post('uploadPhoto')
-    @UseInterceptors(FileInterceptor('photo'))
-    async uploadPhoto(
-        @Body('productAssignId') productAssignId: number,
-        @UploadedFile() photo: Express.Multer.File
-    ): Promise<CommonResponse> {
-        try {
-            return await this.productAssignService.uploadproductAssignPhoto(productAssignId, photo);
-        } catch (error) {
-            console.error('Error uploading staff photo:', error);
-            return new CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
-
 }

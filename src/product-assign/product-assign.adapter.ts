@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ProductAssignDto } from './dto/product-assign.dto';
 import { ProductAssignEntity } from './entity/product-assign.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 
 @Injectable()
 export class ProductAssignAdapter {
@@ -8,9 +11,15 @@ export class ProductAssignAdapter {
     const entity = new ProductAssignEntity();
 
     entity.id = dto.id;
-    entity.staffId = { id: dto.staffId } as any;
-    entity.branchId = { id: dto.branchId } as any;
-    entity.productId = { id: dto.productId } as any;
+    const staff = new StaffEntity()
+    staff.staffId = dto.staffId
+    entity.staffId = staff
+    const branch = new BranchEntity()
+    branch.id = dto.branchId
+    entity.branchId = branch;
+    const product = new ProductEntity()
+    product.id = dto.productId
+    entity.productId = product
     entity.imeiNumberFrom = dto.imeiNumberFrom;
     entity.imeiNumberTo = dto.imeiNumberTo;
     entity.branchOrPerson = dto.branchOrPerson

@@ -17,18 +17,69 @@ export class ProductAssignService {
         private readonly productAssignAdapter: ProductAssignAdapter,
     ) { }
 
-    async saveProductAssign(dto: ProductAssignDto): Promise<CommonResponse> {
+
+    async saveProductAssign(dto: ProductAssignDto, photoPath: string | null): Promise<CommonResponse> {
         try {
-            const internalMessage = dto.id
-                ? 'Product assignment updated successfully'
-                : 'Product assignment created successfully';
+            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
+
+            if (photoPath) {
+                entity.productAssignPhoto = photoPath;
+            }
+            await this.productAssignRepository.insert(entity);
+            return new CommonResponse(true, 201, 'Product details created successfully');
+        } catch (error) {
+            console.error(`Error creating Product details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to create Product details: ${error.message}`);
+        }
+    }
+
+    async updateProductAssign(dto: ProductAssignDto, photoPath: string | null): Promise<CommonResponse> {
+        try {
+            const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+            if (!existingProduct) {
+                throw new Error('Product not found');
+            }
 
             const entity = this.productAssignAdapter.convertDtoToEntity(dto);
-            await this.productAssignRepository.save(entity);
 
-            return new CommonResponse(true, 200, internalMessage);
+            // Merge existing Product details with new data
+            const updatedProduct = {
+                ...existingProduct,
+                ...entity,
+                productAssignPhoto: photoPath || existingProduct.productAssignPhoto,
+            };
+
+            await this.productAssignRepository.save(updatedProduct);
+
+            return new CommonResponse(true, 200, 'Product details updated successfully');
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+            console.error(`Error updating Product details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to update Product details: ${error.message}`);
+        }
+    }
+    async handleProductDetails(dto: ProductAssignDto, file?: Express.Multer.File): Promise<CommonResponse> {
+        try {
+            let photoPath: string | null = null;
+
+            // Handle photo upload
+            if (file) {
+                photoPath = await this.uploadproductAssignPhoto(file);
+            }
+
+            if (dto.id) {
+                // If ID exists, validate it before updating
+                const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+                if (!existingProduct) {
+                    throw new ErrorResponse(404, `Product with ID ${dto.id} not found`);
+                }
+                return await this.updateProductAssign(dto, photoPath);
+            } else {
+                // Create a new Product
+                return await this.saveProductAssign(dto, photoPath);
+            }
+        } catch (error) {
+            console.error(`Error handling Product details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to handle Product details: ${error.message}`);
         }
     }
 
@@ -117,21 +168,11 @@ export class ProductAssignService {
         return productAssign;
     }
 
-    async uploadproductAssignPhoto(productAssignId: number, photo: Express.Multer.File): Promise<CommonResponse> {
+    async uploadproductAssignPhoto(photo: Express.Multer.File): Promise<string> {
         try {
-            const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
-
-            if (!productAssign) {
-                return new CommonResponse(false, 404, 'productAssign not found');
-            }
-
-            const filePath = join(__dirname, '../../uploads/productAssign_photos', `${productAssignId}-${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
-
-            productAssign.productAssignPhoto = filePath;
-            await this.productAssignRepository.save(productAssign);
-
-            return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+            const filePath = join(__dirname, '../../uploads/productAssign_photos', `$${Date.now()}.jpg`);
+            await fs.writeFile(filePath, photo.fieldname);
+            return filePath
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
