@@ -3,6 +3,7 @@ import { VendorDto } from './dto/vendor.dto';
 import { VendorEntity } from './entity/vendor.entity';
 import { VendorResDto } from './dto/vendor-res.dto';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 
 @Injectable()
@@ -24,6 +25,9 @@ export class VendorAdapter {
         const voucher = new VoucherEntity()
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
+        const branch = new BranchEntity()
+        branch.id = dto.branchId
+        entity.branch = branch;
         return entity;
     }
 
@@ -42,7 +46,7 @@ export class VendorAdapter {
                 voucherId,
                 companyCode,
                 unitCode,
-                vendorPhoto
+                vendorPhoto,
             } = vendor;
 
             return new VendorResDto(
@@ -59,7 +63,9 @@ export class VendorAdapter {
                 voucherId?.name ?? '',
                 companyCode,
                 unitCode,
-                vendorPhoto
+                vendorPhoto,
+                vendor.branch?.id,
+                vendor.branch?.branchName
             );
         });
     }

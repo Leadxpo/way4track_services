@@ -14,8 +14,8 @@ export class StaffDashboardService {
         @InjectRepository(StaffRepository)
         private staffRepository: StaffRepository,
     ) { }
-    async payRoll(req:CommonReq): Promise<CommonResponse> {
-        const staffData = await this.staffRepository.payRoll(req)
+    async payRoll(req: CommonReq, branch?: string): Promise<CommonResponse> {
+        const staffData = await this.staffRepository.payRoll(req, branch)
         if (!staffData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

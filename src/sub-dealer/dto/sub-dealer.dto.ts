@@ -14,4 +14,5 @@ export class SubDealerDto {
   subDealerId?: string
   password: string
   subDealerPhoto?: string;
+  branchId?: number;
 }

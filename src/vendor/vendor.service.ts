@@ -98,7 +98,7 @@ export class VendorService {
     try {
       const vendor = await this.vendorRepository.findOne({
         where: { vendorId: req.vendorId, companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['voucherId'],
+        relations: ['voucherId', 'branch'],
       });
 
       if (!vendor) {

@@ -13,6 +13,8 @@ export class VendorResDto {
     companyCode?: string;
     unitCode?: string
     vendorPhoto?: string
+    branchId: number;
+    branchNames: string;
     constructor(
         id: number | undefined,
         name: string,
@@ -27,7 +29,9 @@ export class VendorResDto {
         voucherNames: string,
         companyCode?: string,
         unitCode?: string,
-        vendorPhoto?: string
+        vendorPhoto?: string,
+        branchId?: number,
+        branchNames?: string
     ) {
         this.id = id;
         this.name = name;
@@ -42,6 +46,8 @@ export class VendorResDto {
         this.voucherNames = voucherNames;
         this.companyCode = companyCode
         this.unitCode = unitCode;
-        this.vendorPhoto = vendorPhoto
+        this.vendorPhoto = vendorPhoto;
+        this.branchId = branchId
+        this.branchNames = branchNames
     }
 }

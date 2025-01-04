@@ -1,3 +1,4 @@
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -40,9 +41,13 @@ export class VendorEntity {
   @OneToMany(() => ProductEntity, (product) => product.vendorId)
   product: ProductEntity[];
 
-  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor,{ nullable: true })
+  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor, { nullable: true })
   @JoinColumn({ name: 'voucher_id' })
   voucherId: VoucherEntity;
+
+  @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.vendor, { nullable: true })
+  @JoinColumn({ name: 'branch_id' })
+  branch: BranchEntity;
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;

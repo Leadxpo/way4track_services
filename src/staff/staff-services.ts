@@ -138,25 +138,4 @@ export class StaffService {
             return new CommonResponse(false, 4579, "There Is No staff names")
         }
     }
-
-    // async uploadStaffPhoto(staffId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-    //     try {
-    //         const staff = await this.staffRepository.findOne({ where: { id: staffId } });
-
-    //         if (!staff) {
-    //             return new CommonResponse(false, 404, 'staff not found');
-    //         }
-
-    //         const filePath = join(__dirname, '../../uploads/staff_photos', `${staffId}-${Date.now()}.jpg`);
-    //         await fs.writeFile(filePath, photo.buffer);
-
-    //         staff.staffPhoto = filePath;
-    //         await this.staffRepository.save(staff);
-
-    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-    //     } catch (error) {
-    //         throw new ErrorResponse(500, error.message);
-    //     }
-    // }
-
 }

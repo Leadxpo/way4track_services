@@ -77,9 +77,9 @@ export class DashboardController {
     }
 
     @Post('payRoll')
-    async payRoll(@Body() req: CommonReq): Promise<CommonResponse> {
+    async payRoll(@Body() req: CommonReq, branch?: string): Promise<CommonResponse> {
         try {
-            return await this.staffDashboardService.payRoll(req)
+            return await this.staffDashboardService.payRoll(req, branch)
         }
         catch (error) {
             console.log("Error in details in service..", error);

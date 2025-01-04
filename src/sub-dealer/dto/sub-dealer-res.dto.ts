@@ -11,9 +11,12 @@ export class SubDealerResDto {
     voucherNames: string;
     password: string;
     subDealerPhoto: string;
-    subDealerId: string
+    subDealerId: string;
     companyCode?: string;
-    unitCode?: string
+    unitCode?: string;
+    branchId?: number;
+    branchName?: string;
+
     constructor(
         id: number | undefined,
         name: string,
@@ -29,7 +32,9 @@ export class SubDealerResDto {
         subDealerPhoto: string,
         subDealerId: string,
         companyCode?: string,
-        unitCode?: string
+        unitCode?: string,
+        branchId?: number,
+        branchName?: string
     ) {
         this.id = id;
         this.name = name;
@@ -41,10 +46,12 @@ export class SubDealerResDto {
         this.address = address;
         this.voucherId = voucherId;
         this.voucherNames = voucherNames;
+        this.password = password;
         this.subDealerPhoto = subDealerPhoto;
         this.subDealerId = subDealerId;
-        this.companyCode = companyCode
-        this.unitCode = unitCode
-        this.password = password
+        this.companyCode = companyCode;
+        this.unitCode = unitCode;
+        this.branchId = branchId;
+        this.branchName = branchName;
     }
 }

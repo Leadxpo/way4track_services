@@ -13,4 +13,5 @@ export class BranchDto {
     branchPhoto?: string;
     companyCode: string;
     unitCode: string
+    phoneNumber: string;
 }

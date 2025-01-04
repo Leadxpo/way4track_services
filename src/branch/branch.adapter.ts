@@ -17,7 +17,8 @@ export class BranchAdapter {
         entity.email = dto.email;
         entity.branchPhoto = dto.branchPhoto;
         entity.companyCode = dto.companyCode
-        entity.unitCode = dto.unitCode
+        entity.unitCode = dto.unitCode;
+        entity.phoneNumber = dto.phoneNumber
         if (entity.id) {
             entity.id = dto.id;
         }

@@ -100,7 +100,7 @@ export class SubDealerService {
 
   async getSubDealerDetails(req: SubDealerIdDto): Promise<CommonResponse> {
     try {
-      const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: req.subDealerId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['voucherId'] });
+      const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: req.subDealerId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['voucherId', 'branch'] });
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }
@@ -121,23 +121,4 @@ export class SubDealerService {
     }
   }
 
-  async uploadSubDealerPhoto(subDealerId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-    try {
-      const subDealer = await this.subDealerRepository.findOne({ where: { id: subDealerId } });
-
-      if (!subDealer) {
-        return new CommonResponse(false, 404, 'subDealer not found');
-      }
-
-      const filePath = join(__dirname, '../../uploads/subDealer_photos', `${subDealerId}-${Date.now()}.jpg`);
-      await fs.writeFile(filePath, photo.buffer);
-
-      subDealer.subDealerPhoto = filePath;
-      await this.subDealerRepository.save(subDealer);
-
-      return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-    }
-  }
 }

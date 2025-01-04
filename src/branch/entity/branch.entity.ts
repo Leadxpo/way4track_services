@@ -6,7 +6,9 @@ import { ClientEntity } from 'src/client/entity/client.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
@@ -17,6 +19,9 @@ export class BranchEntity {
 
   @Column({ name: 'name', type: 'varchar', length: 255 })
   branchName: string;
+
+  @Column({ name: 'phone_number', type: 'varchar', length: 15 })
+  phoneNumber: string;
 
   @Column({ name: 'branch_number', type: 'varchar', length: 20 })
   branchNumber: string;
@@ -68,6 +73,12 @@ export class BranchEntity {
 
   @OneToMany(() => VoucherEntity, (voucherEntity) => voucherEntity.branchId)
   voucher: VoucherEntity[];
+
+  @OneToMany(() => VendorEntity, (VendorEntity) => VendorEntity.branch)
+  vendor: VendorEntity[];
+
+  @OneToMany(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.branch)
+  subDealer: SubDealerEntity[];
 
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.branchId)
   appointment: AppointmentEntity[];

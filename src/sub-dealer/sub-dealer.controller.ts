@@ -49,18 +49,4 @@ export class SubDealerController {
         }
     }
 
-    // @Post('uploadPhoto')
-    // @UseInterceptors(FileInterceptor('photo'))
-    // async uploadPhoto(
-    //     @Body('subDealerId') subDealerId: number,
-    //     @UploadedFile() photo: Express.Multer.File
-    // ): Promise<CommonResponse> {
-    //     try {
-    //         return await this.subDealerService.uploadSubDealerPhoto(subDealerId, photo);
-    //     } catch (error) {
-    //         console.error('Error uploading subDealer photo:', error);
-    //         return new CommonResponse(false, 500, 'Error uploading photo');
-    //     }
-    // }
-
 }

@@ -17,10 +17,10 @@ export class StaffRepository extends Repository<StaffEntity> {
         super(StaffEntity, dataSource.createEntityManager());
     }
 
-    async payRoll(req: CommonReq) {
+    async payRoll(req: CommonReq, branch?: string) {
         const query = this.createQueryBuilder('sf')
             .select(`
-                sf.staffId AS staffId,
+                sf.staff_id AS staffId,
                 sf.name AS staffName,
                 br.name AS branch,
                 ROUND(DATEDIFF(CURDATE(), sf.joining_date) / 365.25, 2) AS inExperience,
@@ -33,8 +33,11 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .where(`sf.company_code = "${req.companyCode}"`)
             .andWhere(`sf.unit_code = "${req.unitCode}"`)
-            .getRawMany();
-        return query;
+        if (branch) {
+            query.andWhere('br.name LIKE :branchName', { branchName: `%${branch}%` });
+        }
+        const payRollData = query.getRawMany();
+        return payRollData;
     }
 
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
@@ -103,12 +106,19 @@ export class StaffRepository extends Repository<StaffEntity> {
 
     async getStaffSearchDetails(req: StaffSearchDto) {
         const query = this.createQueryBuilder('staff')
-            .leftJoinAndSelect('staff.branch', 'branch')
-            .where(`staff.company_code = "${req.companyCode}"`)
-            .andWhere(`staff.unit_code = "${req.unitCode}"`)
+            .select([
+                'branch.name AS branchName',
+                'staff.staff_id AS staffId',
+                'staff.name AS staffName',
+                'staff.designation AS designation',
+                'staff.phone_number AS phoneNumber',
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.staffId) {
-            query.andWhere('staff.staffId = :staffId', { staffId: req.staffId });
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
         if (req.name) {
             query.andWhere('staff.name LIKE :name', { name: `%${req.name}%` });
@@ -117,11 +127,11 @@ export class StaffRepository extends Repository<StaffEntity> {
             query.andWhere('branch.name LIKE :branchName', { branchName: `%${req.branchName}%` });
         }
 
-        const staffDetails = await query.getMany();
+        // Use getRawMany if you want to use custom column aliases
+        const staffDetails = await query.getRawMany();
+        console.log(staffDetails, '+++++++++++++++++');
         return staffDetails;
     }
-
-
 
 }
 
