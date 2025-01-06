@@ -40,42 +40,82 @@ export class StaffRepository extends Repository<StaffEntity> {
         return payRollData;
     }
 
-    async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
-        const { date, staffId } = req;
+    // async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
+    //     const { date, staffId } = req;
+    //     console.log(req, "+++++++++++++++++++++")
+    //     const query = await this.createQueryBuilder('sf')
+    //         .select(`
+    //             DATE_FORMAT(a.day, "%Y-%m") AS formattedMonth,
+    //             sf.name AS name,
+    //             sf.phone_number AS phoneNumber,
+    //             sf.designation AS designation,
+    //             sf.dob AS dob,
+    //             sf.email AS email,
+    //             sf.aadhar_number AS aadharNumber,
+    //             sf.address AS address,
+    //             br.name AS branchName,
+    //             YEAR(a.day) AS year,
+    //             MONTH(a.day) AS month,
+    //             MIN(a.in_time) AS inTime,
+    //             MAX(a.out_time) AS outTime,
+    //             SUM(TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)) AS totalHours,
+    //             GROUP_CONCAT(DISTINCT a.status) AS status
+    //         `)
+    //         .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
+    //         .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
+    //         .where(`MONTH(a.day) =MONTH("${date}")`)
+    //         .andWhere(`YEAR(a.day) =YEAR("${date}")`)
+    //         .andWhere('sf.staff_id = :staffId', { staffId: staffId })
+    //         .where(`sf.company_code = "${req.companyCode}"`)
+    //         .andWhere(`sf.unit_code = "${req.unitCode}"`)
+    //         .groupBy(`sf.name, sf.phone_number, sf.designation, sf.dob, sf.email, sf.aadhar_number, sf.address, br.name, YEAR(a.day), MONTH(a.day),a.day`)
+    //         .orderBy('YEAR(a.day), MONTH(a.day)')
+    //         .getRawOne();
 
+    //     console.log(query);
+
+    //     return query;
+    // }
+
+    async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
+        const { date, staffId, companyCode, unitCode } = req;
+        console.log(req, "+++++++++++++++++++++");
+
+        // Ensure the date parameter is in a valid format
         const query = await this.createQueryBuilder('sf')
-            .select([
-                'DATE_FORMAT(a.day, "%Y-%m") AS formattedMonth',
-                'sf.name AS staffName',
-                'sf.phone_number AS phoneNumber',
-                'sf.designation AS designation',
-                'sf.dob AS dob',
-                'sf.email AS email',
-                'sf.aadhar_number AS aadharNumber',
-                'sf.address AS address',
-                'br.name AS branchName',
-                'YEAR(a.day) AS year',
-                'MONTH(a.day) AS month',
-                'MIN(a.in_time) AS inTime',
-                'MAX(a.out_time) AS outTime',
-                'SUM(TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)) AS totalHours',
-                'GROUP_CONCAT(DISTINCT a.status) AS status'
-            ])
+            .select(`
+                DATE_FORMAT(a.day, "%Y-%m") AS formattedMonth,
+                sf.name AS name,
+                sf.phone_number AS phoneNumber,
+                sf.designation AS designation,
+                sf.dob AS dob,
+                sf.email AS email,
+                sf.aadhar_number AS aadharNumber,
+                sf.address AS address,
+                br.name AS branchName,
+                YEAR(a.day) AS year,
+                MONTH(a.day) AS month,
+                MIN(a.in_time) AS inTime,
+                MAX(a.out_time) AS outTime,
+                SUM(TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)) AS totalHours,
+                GROUP_CONCAT(DISTINCT a.status) AS status
+            `)
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
-            .where(`MONTH(a.day) =MONTH("${date}")`)
-            .andWhere(`YEAR(a.day) =YEAR("${date}")`)
-            .andWhere(`sf.staff_id ="${staffId}"`)
-            .where(`sf.company_code = "${req.companyCode}"`)
-            .andWhere(`sf.unit_code = "${req.unitCode}"`)
-            .groupBy('sf.name, sf.phone_number, sf.designation, sf.dob, sf.email, sf.aadhar_number, sf.address, br.name, YEAR(a.day), MONTH(a.day),a.day')
+            .where('sf.staff_id = :staffId', { staffId })
+            .andWhere('sf.company_code = :companyCode', { companyCode })
+            .andWhere('sf.unit_code = :unitCode', { unitCode })
+            .andWhere('YEAR(a.day) = :year', { year: new Date(date).getFullYear() })
+            .andWhere('MONTH(a.day) = :month', { month: new Date(date).getMonth() + 1 }) // Ensure proper month format
+            .groupBy('sf.name, sf.phone_number, sf.designation, sf.dob, sf.email, sf.aadhar_number, sf.address, br.name, YEAR(a.day), MONTH(a.day), a.day')
             .orderBy('YEAR(a.day), MONTH(a.day)')
-            .getRawMany();
+            .getRawOne();
 
         console.log(query);
 
         return query;
     }
+
 
     async LoginDetails(req: LoginDto) {
         const query = this.createQueryBuilder('sf')

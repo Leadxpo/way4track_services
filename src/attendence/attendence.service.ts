@@ -19,7 +19,7 @@ export class AttendanceService {
     async saveAttendance(dto: CreateAttendanceDto): Promise<CommonResponse> {
         const { id, staffId, branchId, day, inTime, outTime, status, remarks } = dto;
 
-        const staff = await this.staffRepository.findOne({ where: { id: staffId } });
+        const staff = await this.staffRepository.findOne({ where: { staffId: staffId } });
         if (!staff) throw new Error('Staff not found');
 
         const branch = await this.branchRepository.findOne({ where: { id: branchId } });

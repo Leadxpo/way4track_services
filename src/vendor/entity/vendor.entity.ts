@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('vendor')
@@ -40,6 +41,9 @@ export class VendorEntity {
 
   @OneToMany(() => ProductEntity, (product) => product.vendorId)
   product: ProductEntity[];
+
+  @OneToMany(() => WorkAllocationEntity, (product) => product.vendorId)
+  workAllocation: WorkAllocationEntity[];
 
   @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor, { nullable: true })
   @JoinColumn({ name: 'voucher_id' })

@@ -5,12 +5,16 @@ import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { TicketsRepository } from './repo/tickets.repo';
 import { TicketsIdDto } from './dto/tickets-id.dto';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { NotificationService } from 'src/notifications/notification.service';
+import { TicketsEntity } from './entity/tickets.entity';
 
 @Injectable()
 export class TicketsService {
     constructor(
         private readonly ticketsAdapter: TicketsAdapter,
         private readonly ticketsRepository: TicketsRepository,
+        private readonly notificationService: NotificationService
     ) { }
 
     async updateTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
@@ -18,39 +22,59 @@ export class TicketsService {
             const existingTicket = await this.ticketsRepository.findOne({
                 where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
             });
-    
+
             if (!existingTicket) {
                 return new CommonResponse(false, 4002, 'Ticket not found for the provided ID.');
             }
-    
+
             // Update the ticket details
             Object.assign(existingTicket, this.ticketsAdapter.convertDtoToEntity(dto));
             await this.ticketsRepository.save(existingTicket);
-    
+
             return new CommonResponse(true, 200, 'Ticket details updated successfully', existingTicket.ticketNumber);
         } catch (error) {
             console.error(`Error updating ticket details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update ticket details: ${error.message}`);
         }
     }
-    
+
     async createTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
+        let successResponse: CommonResponse;
+        let newTicket: TicketsEntity;
         try {
-            const newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
-    
+            // Convert DTO to entity
+            newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
+
             // Generate a unique ticket number
             const count = await this.ticketsRepository.count();
             newTicket.ticketNumber = `Tickets-${(count + 1).toString().padStart(5, '0')}`;
-    
-            await this.ticketsRepository.save(newTicket);
-    
-            return new CommonResponse(true, 201, 'Ticket details created successfully', newTicket.ticketNumber);
+
+            // Save the ticket data to the database
+            const savedTicket = await this.ticketsRepository.save(newTicket);
+
+            if (!savedTicket) {
+                throw new Error('Failed to save ticket details');
+            }
+
+            // Send a success response after successfully saving the data
+            successResponse = new CommonResponse(true, 201, 'Ticket details created successfully', newTicket.ticketNumber);
+
+            // Send the notification after the successful creation of the ticket
+            try {
+                await this.notificationService.createNotification(savedTicket, NotificationEnum.Ticket);
+            } catch (notificationError) {
+                console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                // Log the notification failure but don't affect the main operation
+            }
+
+            return successResponse;
         } catch (error) {
             console.error(`Error creating ticket details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create ticket details: ${error.message}`);
         }
     }
-    
+
+
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
         if (dto.id) {
             // If an ID is provided, update the ticket details
@@ -60,7 +84,7 @@ export class TicketsService {
             return await this.createTicketDetails(dto);
         }
     }
-    
+
 
 
     async deleteTicketDetails(req: TicketsIdDto): Promise<CommonResponse> {

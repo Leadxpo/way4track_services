@@ -5,12 +5,16 @@ import { WorkAllocationAdapter } from './work-allocation.adapter';
 import { CommonResponse } from '../models/common-response';
 import { ErrorResponse } from '../models/error-response';
 import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { WorkAllocationEntity } from './entity/work-allocation.entity';
+import { NotificationService } from 'src/notifications/notification.service';
 
 @Injectable()
 export class WorkAllocationService {
     constructor(
         private readonly workAllocationAdapter: WorkAllocationAdapter,
         private readonly workAllocationRepository: WorkAllocationRepository,
+        private readonly notificationService: NotificationService
     ) { }
 
     async updateWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
@@ -35,22 +39,46 @@ export class WorkAllocationService {
         }
     }
 
+
+
     async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
+        let successResponse: CommonResponse;
+        let newWorkAllocation: WorkAllocationEntity;
         try {
-            const entity = this.workAllocationAdapter.convertDtoToEntity(dto);
+            // Convert DTO to entity
+            newWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
 
-            // Generate the workAllocationNumber if not already provided
+            // Generate a unique work allocation number
             const allocationCount = await this.workAllocationRepository.count({});
-            entity.workAllocationNumber = this.generateWorkAllocationNumber(allocationCount + 1);
+            newWorkAllocation.workAllocationNumber = this.generateWorkAllocationNumber(allocationCount + 1);
 
-            await this.workAllocationRepository.save(entity);
+            // Save the work allocation data to the database
+            const savedWorkAllocation = await this.workAllocationRepository.save(newWorkAllocation);
 
-            return new CommonResponse(true, 201, 'Work Allocation created successfully');
+            if (!savedWorkAllocation) {
+                throw new Error('Failed to save work allocation details');
+            }
+
+            // Send a success response after successfully saving the data
+            successResponse = new CommonResponse(true, 201, 'Work Allocation created successfully', newWorkAllocation.workAllocationNumber);
+
+            // Send the notification after the successful creation of the work allocation
+            try {
+                if (savedWorkAllocation.install) {
+                    await this.notificationService.createNotification(savedWorkAllocation, NotificationEnum.Technician);
+                }
+            } catch (notificationError) {
+                console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                // Log the notification failure but don't affect the main operation
+            }
+
+            return successResponse;
         } catch (error) {
             console.error(`Error creating work allocation details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to create work allocation details: ${error.message}`);
+            throw new ErrorResponse(500, `Failed to create work allocation details: ${error.message}`);
         }
     }
+
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         if (dto.id || dto.workAllocationNumber) {
@@ -74,6 +102,19 @@ export class WorkAllocationService {
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
+    }
+
+    async markInstall(productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
+        const product = await this.workAllocationRepository.findOne({ where: { id: productId, companyCode: companyCode, unitCode: unitCode } });
+
+        if (!product) {
+            throw new Error('Product ment not found');
+        }
+
+        product.install = true;
+        await this.workAllocationRepository.save(product);
+
+        return product;
     }
 
     async getWorkAllocationDetails(req: WorkAllocationIdDto): Promise<CommonResponse> {

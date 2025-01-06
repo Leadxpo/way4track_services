@@ -15,6 +15,7 @@ import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entit
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 
 export enum DesignationEnum {
   CEO = 'CEO',
@@ -91,6 +92,9 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.staffId)
   appointment: AppointmentEntity[];
+
+  @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.user)
+  notifications: NotificationEntity[];
 
   @OneToMany(() => AttendanceEntity, (attendanceEntity) => attendanceEntity.staffId, { cascade: true })
   attendance: AttendanceEntity[];

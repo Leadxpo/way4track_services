@@ -2,7 +2,7 @@ import { AttendanceStatus } from "src/staff/enum/attendence-status.enum";
 
 export class CreateAttendanceDto {
     id: number;
-    staffId: number;
+    staffId: string;
     branchId: number;
     day: Date;
     companyCode: string;
@@ -16,7 +16,8 @@ export class CreateAttendanceDto {
 
 
 export class GetAttendanceDto {
-    staffId: number;
+    staffId: string;
+    // staffUniqueId?: string;
     branchId: number;
     day: Date;
     inTime: Date;

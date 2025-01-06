@@ -3,6 +3,7 @@ import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
@@ -10,6 +11,7 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('branches')
@@ -55,6 +57,12 @@ export class BranchEntity {
 
   @OneToMany(() => AssertsEntity, (asserts) => asserts.branchId)
   asserts: AssertsEntity[];
+
+  @OneToMany(() => NotificationEntity, (asserts) => asserts.branch)
+  notifications: NotificationEntity[];
+
+  @OneToMany(() => WorkAllocationEntity, (asserts) => asserts.branchId)
+  workAllocation: WorkAllocationEntity[];
 
   @OneToMany(() => ClientEntity, (asserts) => asserts.branch)
   client: ClientEntity[];

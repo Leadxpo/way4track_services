@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { WorkAllocationService } from './work-allocation.service';
 import { WorkAllocationDto } from './dto/work-allocation.dto';
 import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
 import { CommonResponse } from 'src/models/common-response';
+import { WorkAllocationEntity } from './entity/work-allocation.entity';
 
 @Controller('work-allocations')
 export class WorkAllocationController {
@@ -49,6 +50,15 @@ export class WorkAllocationController {
         } catch (error) {
             console.error('Error in delete vendor details:', error);
             return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('markInstall')
+    async markInstall(@Body() productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
+        try {
+            return await this.workAllocationService.markInstall(productId, companyCode, unitCode);
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.NOT_FOUND);
         }
     }
 }

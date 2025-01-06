@@ -7,7 +7,7 @@ export class AttendanceAdapter {
 
     toEntity(dto: CreateAttendanceDto): AttendanceEntity {
         const entity = new AttendanceEntity();
-        entity.staffId = { id: dto.staffId } as StaffEntity;
+        entity.staffId = { staffId: dto.staffId } as StaffEntity;
         entity.branchId = { id: dto.branchId } as BranchEntity;
         entity.day = dto.day;
         entity.inTime = dto.inTime;
@@ -21,7 +21,7 @@ export class AttendanceAdapter {
 
     toDto(attendance: AttendanceEntity): GetAttendanceDto {
         return {
-            staffId: attendance.staffId.id,
+            staffId: attendance.staffId.staffId,
             branchId: attendance.branchId.id,
             day: attendance.day,
             inTime: attendance.inTime,

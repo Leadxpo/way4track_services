@@ -5,12 +5,16 @@ import { RequestRaiseAdapter } from './request-raise.adapter';
 import { RequestRaiseIdDto } from './dto/request-raise-id.dto';
 import { RequestRaiseDto } from './dto/request-raise.dto';
 import { RequestRaiseRepository } from './repo/request-raise.repo';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { NotificationService } from 'src/notifications/notification.service';
+import { RequestRaiseEntity } from './entity/request-raise.entity';
 
 @Injectable()
 export class RequestRaiseService {
     constructor(
         private readonly requestAdapter: RequestRaiseAdapter,
         private readonly requestRepository: RequestRaiseRepository,
+        private readonly notificationService: NotificationService
     ) { }
 
     async updateRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
@@ -46,9 +50,11 @@ export class RequestRaiseService {
 
 
     async createRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
+        let successResponse: CommonResponse;
+        let entity: RequestRaiseEntity;
         try {
             // Convert DTO to entity
-            const entity = this.requestAdapter.convertDtoToEntity(dto);
+            entity = this.requestAdapter.convertDtoToEntity(dto);
 
             // Ensure 'id' is not set before creating a new entity
             entity.id = undefined;  // Set to undefined to prevent accidental update.
@@ -56,15 +62,31 @@ export class RequestRaiseService {
             // Manually generate the requestId
             entity.requestId = `RR-${(await this.requestRepository.count() + 1).toString().padStart(5, '0')}`;
 
-            // Use the insert method to avoid triggering an update query
-            await this.requestRepository.insert(entity);
+            // Save the request data to the database
+            const savedEntity = await this.requestRepository.save(entity);
 
-            return new CommonResponse(true, 201, 'Request details created successfully');
+            if (!savedEntity) {
+                throw new Error('Failed to save request details');
+            }
+
+            // Send a success response after successfully saving the data
+            successResponse = new CommonResponse(true, 201, 'Request details created successfully');
+
+            // Send the notification after the successful creation of the request
+            try {
+                await this.notificationService.createNotification(savedEntity, NotificationEnum.Request);
+            } catch (notificationError) {
+                console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                // Log the notification failure but don't affect the main operation
+            }
+
+            return successResponse;
         } catch (error) {
             console.error(`Error creating request details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to create request details: ${error.message}`);
         }
     }
+
 
 
     async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {

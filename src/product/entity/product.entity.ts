@@ -1,6 +1,7 @@
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('products')
@@ -57,6 +58,9 @@ export class ProductEntity extends BaseEntity {
 
   @OneToMany(() => ProductAssignEntity, (product) => product.productId)
   productAssign: ProductAssignEntity[];
+
+  @OneToMany(() => WorkAllocationEntity, (product) => product.productId)
+  workAllocation: WorkAllocationEntity[];
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;
