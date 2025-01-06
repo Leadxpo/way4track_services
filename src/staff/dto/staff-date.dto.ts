@@ -1,12 +1,13 @@
 // dto/staff-attendance.dto.ts
 
 export class StaffAttendanceQueryDto {
-    date: string;
-    staffId: string
+    staffId?: string
     companyCode?: string;
     unitCode?: string
-    constructor(date: string, staffId: string, companyCode?: string,
-        unitCode?: string) {
+    date?: string;
+    constructor(staffId?: string, companyCode?: string,
+        date?: string,
+        unitCode?: string,) {
         this.date = date;
         this.staffId = staffId
         this.companyCode = companyCode

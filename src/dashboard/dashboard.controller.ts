@@ -24,6 +24,7 @@ import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { CommonReq } from "src/models/common-req";
 import { AccountDashboardService } from "./account.dashboard.service";
 import { AccountIdDto } from "src/account/dto/account.id.dto";
+import { ClientSearchDto } from "src/client/dto/client-search.dto";
 
 
 
@@ -183,6 +184,17 @@ export class DashboardController {
     async getDetailClientData(@Body() req: ClientDetailDto): Promise<CommonResponse> {
         try {
             return await this.clientDashboardService.getDetailClientData(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getSearchDetailClient')
+    async getSearchDetailClient(@Body() req: ClientSearchDto): Promise<CommonResponse> {
+        try {
+            return await this.clientDashboardService.getSearchDetailClient(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

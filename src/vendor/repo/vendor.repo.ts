@@ -14,7 +14,7 @@ export class VendorRepository extends Repository<VendorEntity> {
     }
 
     async getVendorData(req: {
-        fromDate?: Date; toDate?: Date; paymentStatus?: string;companyCode?: string,
+        fromDate?: Date; toDate?: Date; paymentStatus?: string; companyCode?: string,
         unitCode?: string
     }) {
         const query = this.createQueryBuilder('ve')
@@ -27,7 +27,7 @@ export class VendorRepository extends Repository<VendorEntity> {
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
             ])
-            .leftJoin(VoucherEntity, 'vr', 'vr.id = ve.voucher_id')
+            .leftJoin('ve.voucher_id', 'vr')
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
 
@@ -64,7 +64,7 @@ export class VendorRepository extends Repository<VendorEntity> {
                 'vr.generation_date AS generationDate',
                 've.product_type AS productType',
             ])
-            .leftJoin(VoucherEntity, 'vr', 'vr.id = ve.voucher_id')
+            .leftJoin('ve.voucher_id', 'vr')
             .where(`ve.vendor_id = "${req.vendorId}"`)
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)

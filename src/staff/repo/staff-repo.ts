@@ -39,52 +39,24 @@ export class StaffRepository extends Repository<StaffEntity> {
         const payRollData = query.getRawMany();
         return payRollData;
     }
-
-    // async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
-    //     const { date, staffId } = req;
-    //     console.log(req, "+++++++++++++++++++++")
-    //     const query = await this.createQueryBuilder('sf')
-    //         .select(`
-    //             DATE_FORMAT(a.day, "%Y-%m") AS formattedMonth,
-    //             sf.name AS name,
-    //             sf.phone_number AS phoneNumber,
-    //             sf.designation AS designation,
-    //             sf.dob AS dob,
-    //             sf.email AS email,
-    //             sf.aadhar_number AS aadharNumber,
-    //             sf.address AS address,
-    //             br.name AS branchName,
-    //             YEAR(a.day) AS year,
-    //             MONTH(a.day) AS month,
-    //             MIN(a.in_time) AS inTime,
-    //             MAX(a.out_time) AS outTime,
-    //             SUM(TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)) AS totalHours,
-    //             GROUP_CONCAT(DISTINCT a.status) AS status
-    //         `)
-    //         .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
-    //         .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
-    //         .where(`MONTH(a.day) =MONTH("${date}")`)
-    //         .andWhere(`YEAR(a.day) =YEAR("${date}")`)
-    //         .andWhere('sf.staff_id = :staffId', { staffId: staffId })
-    //         .where(`sf.company_code = "${req.companyCode}"`)
-    //         .andWhere(`sf.unit_code = "${req.unitCode}"`)
-    //         .groupBy(`sf.name, sf.phone_number, sf.designation, sf.dob, sf.email, sf.aadhar_number, sf.address, br.name, YEAR(a.day), MONTH(a.day),a.day`)
-    //         .orderBy('YEAR(a.day), MONTH(a.day)')
-    //         .getRawOne();
-
-    //     console.log(query);
-
-    //     return query;
-    // }
+   
 
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
         const { date, staffId, companyCode, unitCode } = req;
         console.log(req, "+++++++++++++++++++++");
-
+    
         // Ensure the date parameter is in a valid format
+        const selectedDate = new Date(date);
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth() + 1;
+    
+        // Calculate the first and last day of the month
+        const firstDayOfMonth = new Date(year, selectedDate.getMonth(), 1);
+        const lastDayOfMonth = new Date(year, selectedDate.getMonth() + 1, 0); // Last day of the month
+    
         const query = await this.createQueryBuilder('sf')
             .select(`
-                DATE_FORMAT(a.day, "%Y-%m") AS formattedMonth,
+                DATE_FORMAT(a.day, "%Y-%m-%d") AS day,
                 sf.name AS name,
                 sf.phone_number AS phoneNumber,
                 sf.designation AS designation,
@@ -93,11 +65,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 sf.aadhar_number AS aadharNumber,
                 sf.address AS address,
                 br.name AS branchName,
-                YEAR(a.day) AS year,
-                MONTH(a.day) AS month,
                 MIN(a.in_time) AS inTime,
                 MAX(a.out_time) AS outTime,
-                SUM(TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)) AS totalHours,
+                TIMESTAMPDIFF(HOUR, MIN(a.in_time), MAX(a.out_time)) AS totalHours,
                 GROUP_CONCAT(DISTINCT a.status) AS status
             `)
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
@@ -105,16 +75,53 @@ export class StaffRepository extends Repository<StaffEntity> {
             .where('sf.staff_id = :staffId', { staffId })
             .andWhere('sf.company_code = :companyCode', { companyCode })
             .andWhere('sf.unit_code = :unitCode', { unitCode })
-            .andWhere('YEAR(a.day) = :year', { year: new Date(date).getFullYear() })
-            .andWhere('MONTH(a.day) = :month', { month: new Date(date).getMonth() + 1 }) // Ensure proper month format
-            .groupBy('sf.name, sf.phone_number, sf.designation, sf.dob, sf.email, sf.aadhar_number, sf.address, br.name, YEAR(a.day), MONTH(a.day), a.day')
-            .orderBy('YEAR(a.day), MONTH(a.day)')
-            .getRawOne();
-
+            .andWhere('a.day BETWEEN :startDate AND :endDate', {
+                startDate: firstDayOfMonth,
+                endDate: lastDayOfMonth,
+            })
+            .groupBy(`
+                a.day,
+                sf.name,
+                sf.phone_number,
+                sf.designation,
+                sf.dob,
+                sf.email,
+                sf.aadhar_number,
+                sf.address,
+                br.name
+            `)
+            .orderBy('a.day')
+            .getRawMany();
+    
         console.log(query);
-
-        return query;
+    
+        // Create a response structure for all days of the month
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const allDaysOfMonth = Array.from({ length: daysInMonth }, (_, i) => {
+            const currentDate = new Date(year, month - 1, i + 1);
+            const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+            const attendance = query.find((q) => q.day === formattedDate);
+    
+            return {
+                day: formattedDate,
+                name: attendance?.name || null,
+                phoneNumber: attendance?.phoneNumber || null,
+                designation: attendance?.designation || null,
+                dob: attendance?.dob || null,
+                email: attendance?.email || null,
+                aadharNumber: attendance?.aadharNumber || null,
+                address: attendance?.address || null,
+                branchName: attendance?.branchName || null,
+                inTime: attendance?.inTime || null,
+                outTime: attendance?.outTime || null,
+                totalHours: attendance?.totalHours || 0,
+                status: attendance?.status || 'Absent', // Default to 'Absent' if no record is found
+            };
+        });
+    
+        return allDaysOfMonth;
     }
+    
 
 
     async LoginDetails(req: LoginDto) {

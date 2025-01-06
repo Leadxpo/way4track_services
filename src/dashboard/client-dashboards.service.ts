@@ -1,5 +1,6 @@
 
 import { Injectable } from "@nestjs/common";
+import { ClientSearchDto } from "src/client/dto/client-search.dto";
 import { ClientDetailDto } from "src/client/dto/detail.client.dto";
 import { ClientRepository } from "src/client/repo/client.repo";
 import { CommonReq } from "src/models/common-req";
@@ -23,6 +24,16 @@ export class ClientDashboardService {
 
     async getDetailClientData(req: ClientDetailDto): Promise<CommonResponse> {
         const clientData = await this.clientRepository.getDetailClientData(req)
+        if (!clientData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", clientData)
+        }
+
+    }
+
+    async getSearchDetailClient(req: ClientSearchDto): Promise<CommonResponse> {
+        const clientData = await this.clientRepository.getSearchDetailClient(req)
         if (!clientData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

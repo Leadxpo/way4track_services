@@ -124,12 +124,13 @@ export class ClientService {
 
     async getClientDetails(req: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.findOne({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
             else {
-                const data = this.clientAdapter.convertEntityToDto(client)
+                const data = this.clientAdapter.convertEntityToDto([client])
+                console.log(data, "+++++++++++")
                 return new CommonResponse(true, 200, 'Client details fetched successfully', data);
             }
         } catch (error) {
@@ -137,7 +138,7 @@ export class ClientService {
         }
     }
 
-  
+
 
     async getClientNamesDropDown(): Promise<CommonResponse> {
         const data = await this.clientRepository.find({ select: ['name', 'id', 'clientId'] });
