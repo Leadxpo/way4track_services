@@ -14,6 +14,12 @@ import { AccountRepository } from "src/account/repo/account.repo";
 
 @Injectable()
 export class VoucherService {
+    findById(voucherId: number) {
+        throw new Error("Method not implemented.");
+    }
+    findOne(voucherId: number) {
+        throw new Error("Method not implemented.");
+    }
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly branchRepository: BranchRepository,

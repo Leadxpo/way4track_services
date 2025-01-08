@@ -17,7 +17,7 @@ export class HiringAdapter {
     entity.status = dto.status;
     entity.companyCode = dto.companyCode
     entity.unitCode = dto.unitCode
-
+    entity.levelWiseData = dto.levelWiseData
     return entity;
   }
 }

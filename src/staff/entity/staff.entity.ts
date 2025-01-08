@@ -16,6 +16,7 @@ import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { NotificationEntity } from 'src/notifications/entity/notification.entity';
+import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 
 export enum DesignationEnum {
   CEO = 'CEO',
@@ -92,6 +93,9 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.staffId)
   appointment: AppointmentEntity[];
+
+  @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.staffId)
+  permissions: PermissionEntity[];
 
   @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.user)
   notifications: NotificationEntity[];

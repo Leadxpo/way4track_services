@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 import { HiringStatus } from '../enum/hiring-status.enum';
 import { HiringLevel } from '../enum/hiring-level.enum';
+import { DesignationEnum } from 'src/staff/entity/staff.entity';
 
 
 @Entity('hiring')
@@ -25,7 +26,18 @@ export class HiringEntity extends BaseEntity {
     address: string;
 
     @Column('json', { name: 'qualifications' })
-    qualifications: { qualificationName: string; marks: number; yearOfPass: number }[];
+    qualifications: {
+        qualificationName: string; marks: number; yearOfPass: number
+    }[];
+
+    @Column('json', { name: 'level_wise_data', nullable: true })
+    levelWiseData: {
+        dateOfConductor: number,
+        conductorBy: DesignationEnum.HR,
+        conductorPlace: string,
+        result: string,
+        review: string,
+    }[];
 
     @Column({ name: 'resume_path', type: 'varchar', nullable: true })
     resumePath: string;

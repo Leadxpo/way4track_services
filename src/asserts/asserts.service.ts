@@ -96,23 +96,4 @@ export class AssertsService {
         }
     }
 
-    // async uploadAssertPhoto(assertId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-    //     try {
-    //         const assert = await this.assertsRepository.findOne({ where: { id: assertId } });
-
-    //         if (!assert) {
-    //             return new CommonResponse(false, 404, 'assert not found');
-    //         }
-
-    //         const filePath = join(__dirname, '../../uploads/assert_photos', `${assertId}-${Date.now()}.jpg`);
-    //         await fs.writeFile(filePath, photo.buffer);
-
-    //         assert.assetPhoto = filePath;
-    //         await this.assertsRepository.save(assert);
-
-    //         return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-    //     } catch (error) {
-    //         throw new ErrorResponse(500, error.message);
-    //     }
-    // }
 }

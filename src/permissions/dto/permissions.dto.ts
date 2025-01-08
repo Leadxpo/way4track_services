@@ -1,21 +1,17 @@
-import { DesignationEnum } from "src/staff/entity/staff.entity";
 import { Roles } from "./role.enum";
 
 export class PermissionsDto {
     id?: number;
-    userId: string;
-    userName: string;
-    phoneNumber: string;
-    permissions: PermissionDto[];
+    permissions: Permission[];
     companyCode: string;
-    unitCode: string
-    designation: DesignationEnum;
-     role: Roles;
+    unitCode: string;
+    staffId?: string; // Staff ID used to find the related StaffEntity
 }
 
-export class PermissionDto {
-    name: string;
+export class Permission {
+    name: Roles;
     add: boolean;
     edit: boolean;
     view: boolean;
+    delete: boolean;
 }

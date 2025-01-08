@@ -34,23 +34,23 @@ export class AssertsAdapter {
     }
     convertDtoToEntity(dto: AssertsDto): AssertsEntity {
         const entity = new AssertsEntity();
-
-        entity.assertsName = dto.assertsName;
-        entity.assetPhoto = dto.assetPhoto;
-        entity.assertsAmount = dto.assertsAmount;
-        entity.assetType = dto.assetType;
-        entity.quantity = dto.quantity;
-        entity.description = dto.description;
-        entity.purchaseDate = dto.purchaseDate;
-        entity.paymentType = dto.paymentType;
-        entity.companyCode=dto.companyCode;
-        entity.unitCode=dto.unitCode
-        const branchEntity = new BranchEntity();
-        branchEntity.id = dto.branchId;
-        entity.branchId = branchEntity;
         const voucherEntity = new VoucherEntity();
         voucherEntity.id = dto.voucherId;
         entity.voucherId = voucherEntity;
+        entity.assertsName = voucherEntity.name;
+        entity.assetPhoto = dto.assetPhoto;
+        entity.assertsAmount = voucherEntity.amount;
+        entity.assetType = dto.assetType;
+        entity.quantity = voucherEntity.quantity;
+        entity.description = dto.description;
+        entity.purchaseDate = voucherEntity.generationDate;
+        entity.paymentType = voucherEntity.paymentType;
+        entity.companyCode = dto.companyCode;
+        entity.unitCode = dto.unitCode
+        const branchEntity = new BranchEntity();
+        branchEntity.id = dto.branchId;
+        entity.branchId = voucherEntity.branchId;
+
         if (dto.id) {
             entity.id = dto.id;
         }

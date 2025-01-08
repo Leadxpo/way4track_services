@@ -20,15 +20,15 @@ export class AssertsController {
         return this.assertsService.create(createAssertsDto, photo);
     }
 
-    @Post('deleteAssertDetails')
-    async deleteAssertDetails(@Body() dto: AssertsIdDto): Promise<CommonResponse> {
-        try {
-            return this.assertsService.deleteAssertDetails(dto);
-        } catch (error) {
-            console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
-        }
-    }
+    // @Post('deleteAssertDetails')
+    // async deleteAssertDetails(@Body() dto: AssertsIdDto): Promise<CommonResponse> {
+    //     try {
+    //         return this.assertsService.deleteAssertDetails(dto);
+    //     } catch (error) {
+    //         console.log("Error in delete assert details in service..", error);
+    //         return new CommonResponse(false, 500, 'Error deleting assert details');
+    //     }
+    // }
 
     @Post('getAssertDetails')
     async getAssertDetails(@Body() req: AssertsIdDto): Promise<CommonResponse> {

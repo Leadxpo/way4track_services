@@ -29,4 +29,54 @@ export class PermissionsController {
             return new CommonResponse(false, 500, 'Error fetching Permission type details');
         }
     }
+
+    @Post('getStaffPermissions')
+    async getStaffPermissions(@Body() req: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
+        try {
+            return this.service.getStaffPermissions(req);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+
+    @Post('editPermissions')
+    async editPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+        try {
+            return this.service.editPermissions(staffId, companyCode, unitCode);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+
+    @Post('addPermissions')
+    async addPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+        try {
+            return this.service.addPermissions(staffId, companyCode, unitCode);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+
+    @Post('viewPermissions')
+    async viewPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+        try {
+            return this.service.viewPermissions(staffId, companyCode, unitCode);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+
+    @Post('deletePermissions')
+    async deletePermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+        try {
+            return this.service.deletePermissions(staffId, companyCode, unitCode);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
 }
