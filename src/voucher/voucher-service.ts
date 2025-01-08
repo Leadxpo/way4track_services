@@ -141,9 +141,9 @@ export class VoucherService {
             id: voucher.id,
             voucherId: voucher.voucherId,
             branchName: voucher.branchId?.branchName || "Unknown",
-            clientName: voucher.clientId?.[0]?.name || "Unknown",
-            subDealerName: voucher.subDealer?.[0]?.name || "Unknown",
-            vendorName: voucher.vendor?.[0]?.name || "Unknown"
+            clientName: voucher.clientId?.name || "Unknown",
+            subDealerName: voucher.subDealer?.name || "Unknown",
+            vendorName: voucher.vendorId.name || "Unknown"
         }));
 
         if (formattedData.length) {

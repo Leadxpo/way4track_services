@@ -7,8 +7,8 @@ export class SubDealerResDto {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: string;
-    voucherNames: string;
+    // voucherId: string;
+    // voucherNames: string;
     password: string;
     subDealerPhoto: string;
     subDealerId: string;
@@ -26,8 +26,8 @@ export class SubDealerResDto {
         emailId: string,
         aadharNumber: string,
         address: string,
-        voucherId: string,
-        voucherNames: string,
+        // voucherId: string,
+        // voucherNames: string,
         password: string,
         subDealerPhoto: string,
         subDealerId: string,
@@ -44,8 +44,8 @@ export class SubDealerResDto {
         this.emailId = emailId;
         this.aadharNumber = aadharNumber;
         this.address = address;
-        this.voucherId = voucherId;
-        this.voucherNames = voucherNames;
+        // this.voucherId = voucherId;
+        // this.voucherNames = voucherNames;
         this.password = password;
         this.subDealerPhoto = subDealerPhoto;
         this.subDealerId = subDealerId;

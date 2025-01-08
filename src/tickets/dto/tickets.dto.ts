@@ -1,4 +1,4 @@
-import { AddressingDepartment } from "../enum/tickets.enum";
+import { AddressingDepartment } from "../entity/tickets.entity";
 
 export class TicketsDto {
     id?: number;

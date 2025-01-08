@@ -23,11 +23,11 @@ export class SubDealerAdapter {
         entity.password = dto.password;
         entity.subDealerPhoto = dto.subDealerPhoto;
 
-        if (dto.voucherId) {
-            const voucher = new VoucherEntity();
-            voucher.id = dto.voucherId;
-            entity.voucherId = voucher;
-        }
+        // if (dto.voucherId) {
+        //     const voucher = new VoucherEntity();
+        //     voucher.id = dto.voucherId;
+        //     entity.voucherId = voucher;
+        // }
 
         if (dto.branchId) {
             const branch = new BranchEntity();
@@ -70,8 +70,7 @@ export class SubDealerAdapter {
                 emailId,
                 aadharNumber,
                 address,
-                voucherId?.voucherId ?? '',
-                voucherId?.name ?? '',
+            
                 subDealerPhoto,
                 subDealerId,
                 companyCode,

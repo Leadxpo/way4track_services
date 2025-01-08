@@ -89,6 +89,7 @@ export class VendorService {
       }
       await this.vendorRepository.delete(dto.vendorId);
       return new CommonResponse(true, 200, 'Vendor details deleted successfully');
+      
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
@@ -98,7 +99,7 @@ export class VendorService {
     try {
       const vendor = await this.vendorRepository.findOne({
         where: { vendorId: req.vendorId, companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['voucherId', 'branch'],
+        relations: ['branch'],
       });
 
       if (!vendor) {
@@ -123,23 +124,4 @@ export class VendorService {
     }
   }
 
-  // async uploadVendorPhoto(vendorId: number, photo: Express.Multer.File): Promise<CommonResponse> {
-  //   try {
-  //     const vendor = await this.vendorRepository.findOne({ where: { id: vendorId } });
-
-  //     if (!vendor) {
-  //       return new CommonResponse(false, 404, 'vendor not found');
-  //     }
-
-  //     const filePath = join(__dirname, '../../uploads/vendor_photos', `${vendorId}-${Date.now()}.jpg`);
-  //     await fs.writeFile(filePath, photo.buffer);
-
-  //     vendor.vendorPhoto = filePath;
-  //     await this.vendorRepository.save(vendor);
-
-  //     return new CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-  //   } catch (error) {
-  //     throw new ErrorResponse(500, error.message);
-  //   }
-  // }
 }

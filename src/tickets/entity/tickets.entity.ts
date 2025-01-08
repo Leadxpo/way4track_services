@@ -1,8 +1,19 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { AddressingDepartment } from '../enum/tickets.enum';
 
+export enum AddressingDepartment {
+    CEO = 'CEO',
+    HR = 'HR',
+    Accountant = 'Accountant',
+    Operator = 'Operator',
+    WarehouseManager = 'Warehouse Manager',
+    BranchManager = 'Branch Manager',
+    SubDealer = 'Sub Dealer',
+    Technician = 'Technician',
+    SalesMan = 'Sales Man',
+    CallCenter = 'Call Center',
+}
 @Entity('tickets')
 export class TicketsEntity {
     @PrimaryGeneratedColumn()
@@ -29,7 +40,7 @@ export class TicketsEntity {
         name: 'addressing_department',
         type: 'enum',
         enum: AddressingDepartment,
-        default: AddressingDepartment.HR
+        default: AddressingDepartment.CEO
     })
     addressingDepartment: AddressingDepartment;
 

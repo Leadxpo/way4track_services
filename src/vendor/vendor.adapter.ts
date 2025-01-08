@@ -22,9 +22,9 @@ export class VendorAdapter {
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         entity.vendorPhoto = dto.vendorPhoto
-        const voucher = new VoucherEntity()
-        voucher.id = dto.voucherId
-        entity.voucherId = voucher;
+        // const voucher = new VoucherEntity()
+        // voucher.id = dto.voucherId
+        // entity.voucherId = voucher;
         const branch = new BranchEntity()
         branch.id = dto.branchId
         entity.branch = branch;
@@ -59,8 +59,8 @@ export class VendorAdapter {
                 emailId,
                 aadharNumber,
                 address,
-                voucherId?.id,
-                voucherId?.name ?? '',
+                // voucherId?.id,
+                // voucherId?.name ?? '',
                 companyCode,
                 unitCode,
                 vendorPhoto,

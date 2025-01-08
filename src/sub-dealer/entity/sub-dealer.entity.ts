@@ -1,6 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('sub_dealer')
 export class SubDealerEntity {
@@ -40,10 +40,8 @@ export class SubDealerEntity {
   @Column({ name: 'address', type: 'text' })
   address: string;
 
-
-  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.subDealer, { nullable: true })
-  @JoinColumn({ name: 'voucher_id' })
-  voucherId: VoucherEntity;
+  @OneToMany(() => VoucherEntity, (product) => product.subDealer)
+  voucherId: VoucherEntity[];
 
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.subDealer, { nullable: true })
   @JoinColumn({ name: 'branch_id' })

@@ -45,9 +45,8 @@ export class VendorEntity {
   @OneToMany(() => WorkAllocationEntity, (product) => product.vendorId)
   workAllocation: WorkAllocationEntity[];
 
-  @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.vendor, { nullable: true })
-  @JoinColumn({ name: 'voucher_id' })
-  voucherId: VoucherEntity;
+  @OneToMany(() => VoucherEntity, (product) => product.vendorId)
+  voucherId: VoucherEntity[];
 
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.vendor, { nullable: true })
   @JoinColumn({ name: 'branch_id' })

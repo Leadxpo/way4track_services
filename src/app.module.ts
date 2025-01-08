@@ -38,6 +38,8 @@ import { PermissionModule } from './permissions/permissions.module';
 import { PermissionEntity } from './permissions/entity/permissions.entity';
 import { AccountModule } from './account/account.module';
 import { AccountEntity } from './account/entity/account.entity';
+import { NotificationModule } from './notifications/notification.module';
+import { NotificationEntity } from './notifications/entity/notification.entity';
 
 @Module({
   imports: [
@@ -48,11 +50,11 @@ import { AccountEntity } from './account/entity/account.entity';
       username: 'root',
       password: 'root',
       database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity],
-      synchronize: false,
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity],
+      synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -72,7 +74,8 @@ import { AccountEntity } from './account/entity/account.entity';
     EstimateModule,
     LoginModule,
     PermissionModule,
-    AccountModule
+    AccountModule,
+    NotificationModule
   ],
   controllers: [],
   providers: [],

@@ -100,7 +100,7 @@ export class SubDealerService {
 
   async getSubDealerDetails(req: SubDealerIdDto): Promise<CommonResponse> {
     try {
-      const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: req.subDealerId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['voucherId', 'branch'] });
+      const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: req.subDealerId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }

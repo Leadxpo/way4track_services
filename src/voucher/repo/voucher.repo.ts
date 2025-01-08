@@ -9,6 +9,9 @@ import { InvoiceDto } from "../dto/invoice.dto";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { CommonReq } from "src/models/common-req";
 import { BranchEntity } from "src/branch/entity/branch.entity";
+import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { VendorEntity } from "src/vendor/entity/vendor.entity";
+import { ProductEntity } from "src/product/entity/product.entity";
 
 
 @Injectable()
@@ -568,5 +571,37 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         };
     }
 
+    async getProductsPhotos(req: {
+        subDealerId?: string;
+        vendorId?: string;
+        companyCode: string;
+        unitCode: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'pr.product_name as productName',
+                'pr.product_photo as productPhoto'
+            ])
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = ve.sub_dealer_id')
+            .leftJoin(VendorEntity, 'vn', 'vn.id = ve.vendor_id')
+            .leftJoin(ProductEntity, 'pr', 'pr.id = ve.product_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.vendorId) {
+            query.andWhere('ve.vendor_id = :vendorId', { vendorId: req.vendorId });
+        } else if (req.subDealerId) {
+            query.andWhere('ve.sub_dealer_id = :subDealerId', { subDealerId: req.subDealerId });
+        } else {
+            throw new Error('Either vendorId or subDealerId must be provided.');
+        }
+
+        const results = await query.getRawMany();
+
+        return results.map((result) => ({
+            productName: result.productName,
+            productPhoto: result.productPhoto
+        }));
+    }
 
 }

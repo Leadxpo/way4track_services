@@ -8,8 +8,8 @@ export class VendorResDto {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: number;
-    voucherNames: string;
+    // voucherId: number;
+    // voucherNames: string;
     companyCode?: string;
     unitCode?: string
     vendorPhoto?: string
@@ -25,8 +25,8 @@ export class VendorResDto {
         emailId: string,
         aadharNumber: string,
         address: string,
-        voucherId: number,
-        voucherNames: string,
+        // voucherId: number,
+        // voucherNames: string,
         companyCode?: string,
         unitCode?: string,
         vendorPhoto?: string,
@@ -42,8 +42,8 @@ export class VendorResDto {
         this.emailId = emailId;
         this.aadharNumber = aadharNumber;
         this.address = address;
-        this.voucherId = voucherId;
-        this.voucherNames = voucherNames;
+        // this.voucherId = voucherId;
+        // this.voucherNames = voucherNames;
         this.companyCode = companyCode
         this.unitCode = unitCode;
         this.vendorPhoto = vendorPhoto;

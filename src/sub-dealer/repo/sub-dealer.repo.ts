@@ -30,7 +30,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
             ])
-            .leftJoin(VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
+            .leftJoin('sb.voucherId', 'vr')
             .where(`sb.company_code = "${req.companyCode}"`)
             .andWhere(`sb.unit_code = "${req.unitCode}"`)
 
@@ -63,6 +63,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'sb.starting_date AS joiningDate',
                 'vr.payment_status AS paymentStatus',
                 'vr.amount AS amount',
+                'vr.quantity as quantity',
                 'vr.voucher_id AS voucherId',
                 'sb.email AS email',
                 'sb.address AS address',
@@ -70,7 +71,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'vr.generation_date AS generationDate',
                 'vr.product_type AS productType',
             ])
-            .leftJoin(VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
+            .leftJoin('sb.voucherId', 'vr')
             .where(`sb.sub_dealer_id='${req.subDealerId}'`)
             .andWhere(`sb.company_code = "${req.companyCode}"`)
             .andWhere(`sb.unit_code = "${req.unitCode}"`)
@@ -98,6 +99,6 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
         return query;
     }
 
-
+   
 
 }

@@ -8,7 +8,7 @@ export class SubDealerDto {
   emailId: string;
   aadharNumber: string;
   address: string;
-  voucherId: number;
+  // voucherId: number;
   companyCode?: string;
   unitCode?: string
   subDealerId?: string

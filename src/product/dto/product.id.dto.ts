@@ -1,5 +1,5 @@
 export class ProductIdDto {
-    id: number
+    id?: number
     companyCode: string;
     unitCode: string
     productName?: string

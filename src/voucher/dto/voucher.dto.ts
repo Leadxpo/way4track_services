@@ -49,4 +49,5 @@ export class VoucherDto {
     upiId?: string;
     checkNumber?: string;
     cardNumber?: string;
+    product?: number;
 }

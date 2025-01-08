@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { VendorEntity } from "../entity/vendor.entity";
-import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { VendorDetail } from "../dto/vendor-id.deatil";
 
 
@@ -27,7 +26,7 @@ export class VendorRepository extends Repository<VendorEntity> {
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
             ])
-            .leftJoin('ve.voucher_id', 'vr')
+            .leftJoin('ve.voucherId', 'vr')
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
 
@@ -59,12 +58,13 @@ export class VendorRepository extends Repository<VendorEntity> {
                 'vr.amount AS amount',
                 'vr.voucher_id AS voucherId',
                 've.email AS email',
+                'vr.quantity AS quantity',
                 've.address AS address',
                 'vr.name AS voucherName',
                 'vr.generation_date AS generationDate',
                 've.product_type AS productType',
             ])
-            .leftJoin('ve.voucher_id', 'vr')
+            .leftJoin('ve.voucherId', 'vr')
             .where(`ve.vendor_id = "${req.vendorId}"`)
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)

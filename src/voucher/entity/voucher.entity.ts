@@ -108,8 +108,9 @@ export class VoucherEntity {
     @Column({ name: 'remining_amount', type: 'float' })
     remainingAmount: number;
 
-    @OneToMany(() => ProductEntity, product => product.voucherId)
-    product: ProductEntity[];
+    @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.voucherId, { nullable: true })
+    @JoinColumn({ name: 'product_id' })
+    product: ProductEntity;
 
     @Column({
         type: 'enum',
@@ -127,9 +128,10 @@ export class VoucherEntity {
     })
     productType: ProductType;
 
-    @OneToMany(() => VendorEntity, (voucher) => voucher.voucherId)
-    vendor: VendorEntity[];
 
+    @ManyToOne(() => VendorEntity, (VendorEntity) => VendorEntity.voucherId, { nullable: true })
+    @JoinColumn({ name: 'vendor_id' })
+    vendorId: VendorEntity;
 
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'client_id' })
@@ -154,8 +156,9 @@ export class VoucherEntity {
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
 
-    @OneToMany(() => SubDealerEntity, (voucher) => voucher.voucherId)
-    subDealer: SubDealerEntity[];
+    @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.voucherId, { nullable: true })
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealer: SubDealerEntity;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

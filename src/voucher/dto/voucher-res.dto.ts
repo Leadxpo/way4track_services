@@ -44,7 +44,8 @@ export class VoucherResDto {
     unitCode: string;
     paymentStatus: PaymentStatus;
     productType: ProductType;
-
+    product?: number
+    productName?: string
     upiId?: string;
     checkNumber?: string;
     cardNumber?: string;
@@ -98,8 +99,9 @@ export class VoucherResDto {
         emiNumber?: number,
         emiAmount?: number,
         fromAccountId?: string,
-        toAccountId?: string
-
+        toAccountId?: string,
+        product?: number,
+        productName?: string
     ) {
         this.id = id;
         this.name = name;
@@ -145,5 +147,7 @@ export class VoucherResDto {
         this.emiAmount = emiAmount ?? 0;
         this.toAccountId = toAccountId
         this.fromAccountId = fromAccountId
+        this.product = product
+        this.productName = productName
     }
 }

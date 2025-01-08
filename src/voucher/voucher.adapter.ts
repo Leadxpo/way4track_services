@@ -8,6 +8,7 @@ import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { AccountEntity } from "src/account/entity/account.entity";
 import { VoucherResDto } from "./dto/voucher-res.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
+import { ProductEntity } from "src/product/entity/product.entity";
 
 @Injectable()
 export class VoucherAdapter {
@@ -38,14 +39,18 @@ export class VoucherAdapter {
     staff.id = dto.staffId;
     entity.staffId = staff;
 
+    const product = new ProductEntity();
+    product.id = dto.product;
+    entity.product = product;
+
     const subDealer = new SubDealerEntity();
     subDealer.id = dto.subDealerId
-    entity.subDealer = subDealer[0]
+    entity.subDealer = subDealer
 
 
     const vendor = new VendorEntity();
     vendor.id = dto.vendorId
-    entity.vendor = vendor[0]
+    entity.vendorId = vendor
     // Basic fields
     entity.role = dto.role;
     entity.purpose = dto.purpose;
@@ -117,8 +122,8 @@ export class VoucherAdapter {
           voucher.unitCode,
           voucher.paymentStatus,
           voucher.productType,
-          voucher.vendor ? voucher.vendor[0].id : null,
-          voucher.vendor ? voucher.vendor[0].name : "",
+          voucher.vendorId ? voucher.vendorId.id : null,
+          voucher.vendorId ? voucher.vendorId.name : "",
           voucher.quantity,
           voucher.generationDate,
           voucher.expireDate,
@@ -130,8 +135,8 @@ export class VoucherAdapter {
           voucher.SCST,
           voucher.CGST,
           voucher.amount,
-          voucher.subDealer ? voucher.subDealer[0].id : null,
-          voucher.subDealer ? voucher.subDealer[0].name : "",
+          voucher.subDealer ? voucher.subDealer.id : null,
+          voucher.subDealer ? voucher.subDealer.name : "",
           voucher.upiId,
           voucher.checkNumber,
           voucher.cardNumber,
@@ -140,7 +145,9 @@ export class VoucherAdapter {
           voucher.emiNumber,
           voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
-          voucher.toAccount?.accountNumber || ""
+          voucher.toAccount?.accountNumber || "",
+          voucher.product?.id || null,
+          voucher.product?.productName || ""
         );
       });
     } else {
@@ -167,8 +174,8 @@ export class VoucherAdapter {
           voucher.unitCode,
           voucher.paymentStatus,
           voucher.productType,
-          voucher.vendor ? voucher.vendor[0].id : null,
-          voucher.vendor ? voucher.vendor[0].name : "",
+          voucher.vendorId ? voucher.vendorId.id : null,
+          voucher.vendorId ? voucher.vendorId.name : "",
           voucher.quantity,
           voucher.generationDate,
           voucher.expireDate,
@@ -180,8 +187,8 @@ export class VoucherAdapter {
           voucher.SCST,
           voucher.CGST,
           voucher.amount,
-          voucher.subDealer ? voucher.subDealer[0].id : null,
-          voucher.subDealer ? voucher.subDealer[0].name : "",
+          voucher.subDealer ? voucher.subDealer.id : null,
+          voucher.subDealer ? voucher.subDealer.name : "",
           voucher.upiId,
           voucher.checkNumber,
           voucher.cardNumber,
@@ -190,7 +197,9 @@ export class VoucherAdapter {
           voucher.emiNumber,
           voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
-          voucher.toAccount?.accountNumber || ""
+          voucher.toAccount?.accountNumber || "",
+          voucher.product?.id || null,
+          voucher.product?.productName || ""
         )
       ];
     }

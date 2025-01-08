@@ -101,7 +101,7 @@ export class ProductService {
             if (!voucher) {
                 throw new ErrorResponse(400, `Voucher with ID ${productDto.voucherId} not found`);
             }
-            productEntity.voucherId = voucher;
+            productEntity.voucherId = [voucher];
         }
 
         return productEntity;

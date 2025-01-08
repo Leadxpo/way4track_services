@@ -314,6 +314,23 @@ export class DashboardController {
         }
     }
 
+
+    @Post('getProductsPhotos')
+    async getProductsPhotos(@Body() req: {
+        subDealerId?: string;
+        vendorId?: string;
+        companyCode: string;
+        unitCode: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getProductsPhotos(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getPaymentData')
     async getPaymentData(@Body() req: {
         fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus; companyCode?: string;

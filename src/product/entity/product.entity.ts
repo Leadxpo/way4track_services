@@ -52,9 +52,8 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'vendor_email_id', type: 'varchar', length: 150, nullable: true })
   vendorEmailId: string;
 
-  @ManyToOne(() => VoucherEntity, (voucherEntity) => voucherEntity.product)
-  @JoinColumn({ name: 'voucher_id' })
-  voucherId: VoucherEntity;
+  @OneToMany(() => VoucherEntity, (product) => product.product)
+  voucherId: VoucherEntity[];
 
   @OneToMany(() => ProductAssignEntity, (product) => product.productId)
   productAssign: ProductAssignEntity[];

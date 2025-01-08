@@ -27,11 +27,11 @@ export class TicketsDashboardService {
         try {
             const queryBuilder = this.ticketsRepositort.createQueryBuilder('ticket')
                 .select([
-                    'ticket.ticket_number',
+                    'ticket.ticket_number as ticketNumber',
                     'staff.name AS staffName',
-                    'ticket.addressing_department',
+                    'ticket.addressing_department as addressingDepartment',
                     'branch.name AS branchName',
-                    'ticket.date',
+                    'ticket.date as date',
                 ])
                 .leftJoin('ticket.staff', 'staff')
                 .leftJoin('ticket.branch', 'branch')
