@@ -5,6 +5,7 @@ import { AssertsService } from './asserts.service';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AssertsVoucherIdDto } from './dto/asserts-voucher-id.dto';
+import { CommonReq } from 'src/models/common-req';
 
 
 @Controller('asserts')
@@ -20,15 +21,15 @@ export class AssertsController {
         return this.assertsService.create(createAssertsDto, photo);
     }
 
-    // @Post('deleteAssertDetails')
-    // async deleteAssertDetails(@Body() dto: AssertsIdDto): Promise<CommonResponse> {
-    //     try {
-    //         return this.assertsService.deleteAssertDetails(dto);
-    //     } catch (error) {
-    //         console.log("Error in delete assert details in service..", error);
-    //         return new CommonResponse(false, 500, 'Error deleting assert details');
-    //     }
-    // }
+    @Post('deleteAssertDetails')
+    async deleteAssertDetails(@Body() dto: AssertsIdDto): Promise<CommonResponse> {
+        try {
+            return this.assertsService.deleteAssertDetails(dto);
+        } catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
 
     @Post('getAssertDetails')
     async getAssertDetails(@Body() req: AssertsIdDto): Promise<CommonResponse> {
@@ -40,17 +41,14 @@ export class AssertsController {
         }
     }
 
-    // @Post('uploadPhoto')
-    // @UseInterceptors(FileInterceptor('photo'))
-    // async uploadPhoto(
-    //     @Body('assertId') assertId: number,
-    //     @UploadedFile() photo: Express.Multer.File
-    // ): Promise<CommonResponse> {
-    //     try {
-    //         return await this.assertsService.uploadAssertPhoto(assertId, photo);
-    //     } catch (error) {
-    //         console.error('Error uploading assert photo:', error);
-    //         return new CommonResponse(false, 500, 'Error uploading photo');
-    //     }
-    // }
+    @Post('getAllAssertDetails')
+    async getAllAssertDetails(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return this.assertsService.getAllAssertDetails(req);
+        } catch (error) {
+            console.log("Error in get assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error fetching assert details');
+        }
+    }
+
 }

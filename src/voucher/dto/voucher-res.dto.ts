@@ -54,7 +54,7 @@ export class VoucherResDto {
     initialPayment?: number;
     emiCount?: number;  // Number of EMI installments
     emiNumber?: number;  // EMI number
-    emiAmount?: number;  // EMI amount
+    // emiAmount?: number;  // EMI amount
     constructor(
         id: number,
         name: string,
@@ -97,7 +97,7 @@ export class VoucherResDto {
         initialPayment?: number,
         emiCount?: number,
         emiNumber?: number,
-        emiAmount?: number,
+        // emiAmount?: number,
         fromAccountId?: string,
         toAccountId?: string,
         product?: number,
@@ -144,7 +144,7 @@ export class VoucherResDto {
         this.initialPayment = initialPayment ?? 0;
         this.emiCount = emiCount ?? 0;
         this.emiNumber = emiNumber ?? 0;
-        this.emiAmount = emiAmount ?? 0;
+        // this.emiAmount = emiAmount ?? 0;
         this.toAccountId = toAccountId
         this.fromAccountId = fromAccountId
         this.product = product

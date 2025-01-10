@@ -242,19 +242,28 @@ export class PermissionsService {
 
     async updatePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
+            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } });
 
-            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } })
             if (!staff) {
                 throw new ErrorResponse(5417, 'Permission record not found');
             }
-            const updatedRecord = this.repo.merge(this.adapter.convertPermissionDtoToEntity(dto));
-            await this.repo.save(updatedRecord);
+
+            const updatedEntity = this.repo.merge(this.adapter.convertPermissionDtoToEntity(dto));
+
+            // Set staffId to the existing staff reference
+            updatedEntity.staffId = staff;
+
+            console.log('Updated entity to save:', updatedEntity);
+
+            await this.repo.save(updatedEntity);
 
             return new CommonResponse(true, 65152, 'Permission Details Updated Successfully');
         } catch (error) {
+            console.error('Error:', error.message);
             throw new ErrorResponse(5416, error.message);
         }
     }
+
 
     async handlePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         if (dto.staffId) {

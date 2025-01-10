@@ -12,6 +12,7 @@ import { VoucherRepository } from 'src/voucher/repo/voucher.repo';
 import { AssertsVoucherIdDto } from './dto/asserts-voucher-id.dto';
 import { AssertsAdapter } from './asserts.adapter';
 import { BranchRepository } from 'src/branch/repo/branch.repo';
+import { CommonReq } from 'src/models/common-req';
 @Injectable()
 export class AssertsService {
     constructor(
@@ -40,43 +41,52 @@ export class AssertsService {
         }
     }
 
+    async getAllAssertDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const assert = await this.assertsRepository.find({
+                relations: ['branchId', 'voucherId'],
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
+            });
+
+            if (!assert) {
+                return new CommonResponse(false, 404, 'Assert not found');
+            }
+            return new CommonResponse(true, 6541, 'Data Retrieved Successfully', assert);
+        } catch (error) {
+            console.error('Error in getAssertDetails service:', error);
+            return new CommonResponse(false, 500, 'Error fetching assert details');
+        }
+    }
+
 
     async create(createAssertsDto: AssertsDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-            // Verify if the branch exists
-            const branchEntity = await this.branchRepo.findOne({ where: { id: createAssertsDto.branchId } });
-            if (!branchEntity) {
-                throw new Error('Branch not found');
-            }
+            const voucher = await this.voucherRepo.findOne({ where: { voucherId: createAssertsDto.voucherId } });
 
-            // Verify if the voucher exists
-            const voucher = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
             if (!voucher) {
                 throw new Error('Voucher not found');
             }
 
-            // Handle photo upload
             let filePath: string | null = null;
             if (photo) {
                 filePath = join(__dirname, '../../uploads/assert_photos', `${Date.now()}-${photo.originalname}`);
-                await fs.writeFile(filePath, photo.buffer); // Save the photo to the file system
+                await fs.writeFile(filePath, photo.buffer);
             }
 
-            // Convert DTO to Entity and set the file path
-            const entity = this.adapter.convertDtoToEntity(createAssertsDto);
+            const entity = await this.adapter.convertDtoToEntity(createAssertsDto);
+
             if (filePath) {
-                entity.assetPhoto = filePath; // Save the photo path in the entity
+                entity.assetPhoto = filePath;
             }
 
-            // Save the entity to the database
             await this.assertsRepository.save(entity);
 
-            // Create the success message
             const message = createAssertsDto.id
                 ? 'Assert Details Updated Successfully'
                 : 'Assert Details Created Successfully';
 
             return new CommonResponse(true, 200, message, { photoPath: filePath });
+
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }

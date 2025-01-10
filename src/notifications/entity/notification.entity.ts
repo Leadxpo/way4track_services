@@ -22,10 +22,10 @@ export class NotificationEntity {
     @Column()
     message: string;
 
-    @Column({ default: false })
+    @Column({ default: false, name: 'is_read' })
     isRead: boolean;
 
-    @CreateDateColumn()
+    @CreateDateColumn({name:'created_at'})
     createdAt: Date;
 
     @Column({

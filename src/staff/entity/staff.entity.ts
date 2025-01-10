@@ -46,7 +46,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'staff_id', type: 'varchar', unique: true })
   staffId: string;
 
-  @Column({ name: 'password', type: 'varchar', unique: true })
+  @Column({ name: 'password', type: 'varchar' })
   password: string;
 
   @Column({ name: 'staff_photo', type: 'text', nullable: true })

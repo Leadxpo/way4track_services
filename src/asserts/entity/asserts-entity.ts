@@ -60,22 +60,12 @@ export class AssertsEntity {
         default: PaymentType.CASH,
     })
     paymentType: PaymentType;
-
-    @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
-    initialPayment: number;
-
-    @Column('int', { name: 'emi_count', nullable: true })
-    numberOfEmi: number;
-
     @Column('int', { name: 'emi_number', nullable: true })
     emiNumber: number;
 
-    @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true })
-    emiAmount: number;
-
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;
-  
+
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 }

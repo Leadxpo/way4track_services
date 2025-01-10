@@ -34,7 +34,7 @@ export class VoucherDto {
     initialPayment?: number;
     numberOfEmi?: number;
     emiNumber?: number;
-    emiAmount?: number;
+    // emiAmount?: number;
     ifscCode?: string;
     bankAccountNumber?: string;
     paymentStatus?: PaymentStatus;

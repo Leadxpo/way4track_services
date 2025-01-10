@@ -41,13 +41,30 @@ export class DashboardController {
         private readonly ticketsDashboardService: TicketsDashboardService,
         private readonly voucherDashboardService: VoucherDashboardService,
         private readonly estimateDashboardService: EstimateDashboardService,
-        private readonly accountDashboardService: AccountDashboardService
+        private readonly accountDashboardService: AccountDashboardService,
 
     ) { }
-    @Post('assertCardData')
-    async assertCardData(@Body() req: CommonReq): Promise<CommonResponse> {
+    @Post('assertsCardData')
+    async assertsCardData(@Body() req: {
+        unitCode: string;
+        companyCode: string; branch?: string
+    }): Promise<CommonResponse> {
         try {
-            return await this.assertService.assertCardData(req)
+            return await this.assertService.assertsCardData(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getAssertDataByDate')
+    async getAssertDataByDate(@Body() req: {
+        fromDate?: Date; toDate?: Date; companyCode?: string,
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.assertService.getAssertDataByDate(req)
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);

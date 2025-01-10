@@ -1,8 +1,9 @@
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany, ManyToMany } from 'typeorm';
 
 @Entity('products')
 export class ProductEntity extends BaseEntity {
@@ -32,6 +33,9 @@ export class ProductEntity extends BaseEntity {
 
   @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2 })
   price: number;
+
+  @Column({ name: 'quantity', type: 'int'})
+  quantity: number;
 
   @Column({ name: 'product_description', type: 'text' })
   productDescription: string;
@@ -97,4 +101,8 @@ export class ProductEntity extends BaseEntity {
 
   @Column({ name: 'remarks_2', type: 'text', nullable: true })
   remarks2: string;
+
+  @ManyToOne(() => EstimateEntity, (estimate) => estimate.products)
+  estimate: EstimateEntity;
+  
 }

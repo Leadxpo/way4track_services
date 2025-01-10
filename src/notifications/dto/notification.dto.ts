@@ -53,11 +53,13 @@ export class GetNotificationDto {
     }
 }
 
-
 export class UpdateNotificationDto {
     isRead: boolean;
     unitCode: string;
     companyCode: string;
+    id?: number;        // For marking a single notification as read
+    ids?: number[];     // For marking multiple notifications as read
 }
+
 
 

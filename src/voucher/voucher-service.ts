@@ -11,6 +11,11 @@ import { VendorRepository } from "src/vendor/repo/vendor.repo";
 import { ErrorResponse } from "src/models/error-response";
 import { VoucherResDto } from "./dto/voucher-res.dto";
 import { AccountRepository } from "src/account/repo/account.repo";
+import { PaymentStatus } from "src/product/dto/payment-status.enum";
+import { VoucherTypeEnum } from "./enum/voucher-type-enum";
+import { VoucherEntity } from "./entity/voucher.entity";
+import { PayEmiDto } from "./dto/pay-emi.dto";
+import { PaymentType } from "src/asserts/enum/payment-type.enum";
 
 @Injectable()
 export class VoucherService {
@@ -90,28 +95,121 @@ export class VoucherService {
         try {
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
-            const toAccount = await this.accountRepo.findOne({ where: { accountNumber: voucherDto.toAccount } });
-            if (!toAccount) throw new Error('Account not found');
+            const toAccount = await this.accountRepo.findOne({
+                where: { accountNumber: voucherDto.toAccount },
+            });
+            if (!toAccount) {
+                throw new ErrorResponse(4001, 'To Account not found.');
+            }
             voucherEntity.toAccount = toAccount;
-
             voucherEntity.voucherId = generatedVoucherId;
             await this.voucherRepository.insert(voucherEntity);
-            return new CommonResponse(true, 65152, 'Voucher Created Successfully');
+            return new CommonResponse(
+                true,
+                65152,
+                `Voucher Created Successfully with ID: ${generatedVoucherId}`
+            );
         } catch (error) {
             console.error(`Error creating voucher details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to create voucher details: ${error.message}`);
+            throw new ErrorResponse(
+                error?.code || 5416,
+                `Failed to create voucher details: ${error.message}`
+            );
         }
     }
 
+    private calculateEmiAmount(amount: number, numberOfEmi: number): number {
+        if (numberOfEmi <= 0) throw new Error('Number of EMIs must be greater than 0.');
+        return parseFloat((amount / numberOfEmi).toFixed(2));
+    }
 
+
+    async payEmi(payEmiDto: PayEmiDto): Promise<CommonResponse> {
+        try {
+            const { voucherId, companyCode, unitCode, amountPaid, emiNumber } = payEmiDto;
+
+            if (!voucherId) {
+                const newVoucherId = await this.generateVoucherNumber(VoucherTypeEnum.PAYMENT);
+
+                const voucherEntity = new VoucherEntity();
+                voucherEntity.voucherId = newVoucherId;
+                voucherEntity.companyCode = companyCode;
+                voucherEntity.unitCode = unitCode;
+
+                const emiAmount = this.calculateEmiAmount(voucherEntity.amount, 12);
+                voucherEntity.initialPayment = emiAmount;
+                voucherEntity.remainingAmount = voucherEntity.amount - emiAmount;
+                voucherEntity.numberOfEmi = 12;
+                voucherEntity.emiNumber = 1;
+
+                await this.voucherRepository.save(voucherEntity);
+
+                return new CommonResponse(
+                    true,
+                    65152,
+                    `First EMI paid successfully. Voucher ID: ${newVoucherId}`
+                );
+            }
+            else {
+                const existingVoucher = await this.voucherRepository.findOne({
+                    where: { voucherId, companyCode, unitCode },
+                });
+
+                if (!existingVoucher) {
+                    return new CommonResponse(false, 4002, 'Voucher not found.');
+                }
+
+                if (existingVoucher.emiNumber + 1 !== emiNumber) {
+                    return new CommonResponse(false, 4003, 'Invalid EMI payment sequence.');
+                }
+
+                existingVoucher.remainingAmount -= amountPaid;
+                existingVoucher.emiNumber = emiNumber;
+
+                if (existingVoucher.remainingAmount <= 0) {
+                    existingVoucher.paymentStatus = PaymentStatus.ACCEPTED;
+                }
+
+                await this.voucherRepository.save(existingVoucher);
+
+                return new CommonResponse(
+                    true,
+                    65153,
+                    `EMI number ${emiNumber} paid successfully. Remaining amount: ${existingVoucher.remainingAmount}`
+                );
+            }
+        } catch (error) {
+            console.error(`Error handling EMI payment: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to process EMI payment: ${error.message}`);
+        }
+    }
 
     async handleVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
-        if (voucherDto.voucherId || voucherDto.id) {
-            return await this.updateVoucher(voucherDto);
-        } else {
-            return await this.createVoucher(voucherDto);
+        try {
+            if (voucherDto.voucherId || voucherDto.id) {
+                if (voucherDto.paymentType === PaymentType.EMI) {
+                    const payEmiDto: PayEmiDto = {
+                        voucherId: voucherDto.voucherId,
+                        companyCode: voucherDto.companyCode,
+                        unitCode: voucherDto.unitCode,
+                        amountPaid: voucherDto.initialPayment,
+                        emiNumber: voucherDto.emiNumber,
+                    };
+
+                    return await this.payEmi(payEmiDto);
+                }
+
+                return await this.updateVoucher(voucherDto);
+            } else {
+                return await this.createVoucher(voucherDto);
+            }
+        } catch (error) {
+            console.error(`Error in handleVoucher: ${error.message}`, error.stack);
+            throw new ErrorResponse(5417, `Failed to handle voucher: ${error.message}`);
         }
     }
+
+
 
 
 
@@ -138,22 +236,11 @@ export class VoucherService {
 
     async getVoucherNamesDropDown(): Promise<CommonResponse> {
         const data = await this.voucherRepository.find({
-            select: ['name', 'id', 'voucherId'],
+            select: ['id', 'voucherId'],
             relations: ['branchId']
         });
-
-        const formattedData = data.map(voucher => ({
-            name: voucher.name,
-            id: voucher.id,
-            voucherId: voucher.voucherId,
-            branchName: voucher.branchId?.branchName || "Unknown",
-            clientName: voucher.clientId?.name || "Unknown",
-            subDealerName: voucher.subDealer?.name || "Unknown",
-            vendorName: voucher.vendorId.name || "Unknown"
-        }));
-
-        if (formattedData.length) {
-            return new CommonResponse(true, 75483, "Data Retrieved Successfully", formattedData);
+        if (data.length) {
+            return new CommonResponse(true, 75483, "Data Retrieved Successfully", data);
         } else {
             return new CommonResponse(false, 4579, "No vouchers found");
         }

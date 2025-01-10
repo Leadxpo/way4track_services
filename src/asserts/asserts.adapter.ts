@@ -4,10 +4,15 @@ import { GetAssertsResDto } from "./dto/get-asserts-res.dto";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { AssertsDto } from "./dto/asserts.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
+import { PaymentType } from "./enum/payment-type.enum";
+import { VoucherRepository } from "src/voucher/repo/voucher.repo";
 
 
 @Injectable()
 export class AssertsAdapter {
+    constructor(
+        private readonly voucherRepository: VoucherRepository,
+    ) { }
     convertEntityToDto(entity: AssertsEntity): GetAssertsResDto {
         return new GetAssertsResDto(
             entity.id,
@@ -26,53 +31,53 @@ export class AssertsAdapter {
             entity.paymentType,
             entity.companyCode,
             entity.unitCode,
-            entity.initialPayment,
-            entity.numberOfEmi,
             entity.emiNumber,
-            entity.emiAmount
         );
     }
-    convertDtoToEntity(dto: AssertsDto): AssertsEntity {
+    async convertDtoToEntity(dto: AssertsDto): Promise<AssertsEntity> {
         const entity = new AssertsEntity();
-        const voucherEntity = new VoucherEntity();
-        voucherEntity.id = dto.voucherId;
-        entity.voucherId = voucherEntity;
-        entity.assertsName = voucherEntity.name;
-        entity.assetPhoto = dto.assetPhoto;
-        entity.assertsAmount = voucherEntity.amount;
-        entity.assetType = dto.assetType;
-        entity.quantity = voucherEntity.quantity;
-        entity.description = dto.description;
-        entity.purchaseDate = voucherEntity.generationDate;
-        entity.paymentType = voucherEntity.paymentType;
-        entity.companyCode = dto.companyCode;
-        entity.unitCode = dto.unitCode
-        const branchEntity = new BranchEntity();
-        branchEntity.id = dto.branchId;
-        entity.branchId = voucherEntity.branchId;
+
+        if (dto.voucherId) {
+            const voucherEntity = await this.voucherRepository.findOne({ where: { voucherId: dto.voucherId } });
+
+            if (!voucherEntity) {
+                throw new Error(`Voucher with ID ${dto.voucherId} not found`);
+            }
+
+            entity.voucherId = voucherEntity;
+            entity.assertsName = voucherEntity.name; 
+            entity.assetPhoto = dto.assetPhoto; 
+            entity.assertsAmount = voucherEntity.amount;
+            entity.assetType = dto.assetType; 
+            entity.quantity = voucherEntity.quantity;
+            entity.description = dto.description 
+            entity.purchaseDate = voucherEntity.generationDate;
+            entity.paymentType = voucherEntity.paymentType;
+            entity.companyCode = dto.companyCode;
+            entity.unitCode = dto.unitCode;
+
+          
+            if (dto.branchId) {
+                const branchEntity = new BranchEntity();
+                branchEntity.id = dto.branchId;
+                entity.branchId = branchEntity;
+            }
+
+            if (voucherEntity.paymentType === PaymentType.EMI) {
+                entity.emiNumber = voucherEntity.emiNumber;
+            }
+        } else {
+            throw new Error('Voucher ID is required');
+        }
+
 
         if (dto.id) {
             entity.id = dto.id;
         }
 
-        if (dto.initialPayment) {
-            entity.initialPayment = dto.initialPayment;
-        }
-
-        if (dto.numberOfEmi) {
-            entity.numberOfEmi = dto.numberOfEmi;
-        }
-
-        if (dto.emiNumber) {
-            entity.emiNumber = dto.emiNumber;
-        }
-
-        if (dto.emiAmount) {
-            entity.emiAmount = dto.emiAmount;
-        }
-
         return entity;
     }
+
 }
 
 

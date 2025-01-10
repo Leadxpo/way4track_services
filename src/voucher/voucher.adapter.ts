@@ -79,7 +79,7 @@ export class VoucherAdapter {
     entity.initialPayment = dto.initialPayment;
     entity.numberOfEmi = dto.numberOfEmi;
     entity.emiNumber = dto.emiNumber;
-    entity.emiAmount = dto.emiAmount;
+    // entity.emiAmount = dto.emiAmount;
 
     // Company and unit info
     entity.upiId = dto.upiId;
@@ -143,7 +143,7 @@ export class VoucherAdapter {
           voucher.initialPayment,
           voucher.numberOfEmi,
           voucher.emiNumber,
-          voucher.emiAmount,
+          // voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",
           voucher.product?.id || null,
@@ -195,7 +195,7 @@ export class VoucherAdapter {
           voucher.initialPayment,
           voucher.numberOfEmi,
           voucher.emiNumber,
-          voucher.emiAmount,
+          // voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",
           voucher.product?.id || null,

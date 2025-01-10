@@ -41,7 +41,7 @@ export class PermissionsController {
     }
 
     @Post('editPermissions')
-    async editPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+    async editPermissions(@Body() @Body() { staffId, companyCode, unitCode }: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         try {
             return this.service.editPermissions(staffId, companyCode, unitCode);
         } catch (error) {
@@ -51,7 +51,7 @@ export class PermissionsController {
     }
 
     @Post('addPermissions')
-    async addPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+    async addPermissions(@Body() @Body() { staffId, companyCode, unitCode }: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         try {
             return this.service.addPermissions(staffId, companyCode, unitCode);
         } catch (error) {
@@ -61,7 +61,7 @@ export class PermissionsController {
     }
 
     @Post('viewPermissions')
-    async viewPermissions(@Body() staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
+    async viewPermissions(@Body() @Body() { staffId, companyCode, unitCode }: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         try {
             return this.service.viewPermissions(staffId, companyCode, unitCode);
         } catch (error) {

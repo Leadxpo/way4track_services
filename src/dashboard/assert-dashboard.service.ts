@@ -11,7 +11,10 @@ export class AssertDashboardService {
         @InjectRepository(AssertsRepository)
         private assertRepo: AssertsRepository,
     ) { }
-    async assertCardData(req: CommonReq): Promise<CommonResponse> {
+    async assertsCardData(req: {
+        unitCode: string;
+        companyCode: string; branch?: string
+    }): Promise<CommonResponse> {
         const cardData = await this.assertRepo.assertsCardData(req)
         if (!cardData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
@@ -20,4 +23,18 @@ export class AssertDashboardService {
         }
 
     }
+
+    async getAssertDataByDate(req: {
+        fromDate?: Date; toDate?: Date; companyCode?: string,
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        const cardData = await this.assertRepo.getAssertDataByDate(req)
+        if (!cardData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", cardData)
+        }
+
+    }
+
 }

@@ -1,3 +1,5 @@
+import { GSTORTDSEnum } from "src/voucher/entity/voucher.entity";
+
 export class EstimateResDto {
     id: number;
     clientId: string;
@@ -12,8 +14,14 @@ export class EstimateResDto {
     description: string;
     totalAmount: number;
     companyCode: string;
-    unitCode: string
-    products?: { name: string; quantity: number; hsnCode: string; amount: number }[];
+    unitCode: string;
+    hsnCode: string;
+    products?: { name: string; quantity: number; amount: number }[];  // Modified to include name, quantity, and amount
+    estimateId?: string;
+    invoiceId?: string;
+    GSTORTDS?: GSTORTDSEnum;
+    SCST?: number;
+    CGST?: number;
 
     constructor(
         id: number,
@@ -30,7 +38,13 @@ export class EstimateResDto {
         totalAmount: number,
         companyCode: string,
         unitCode: string,
-        products?: { name: string; quantity: number; hsnCode: string; amount: number }[]
+        products?: { name: string; quantity: number; amount: number }[],  // Modified to match the structure
+        estimateId?: string,
+        invoiceId?: string,
+        GSTORTDS?: GSTORTDSEnum,
+        SCST?: number,
+        CGST?: number,
+        hsnCode?: string
     ) {
         this.id = id;
         this.clientId = clientId;
@@ -45,7 +59,13 @@ export class EstimateResDto {
         this.description = description;
         this.totalAmount = totalAmount;
         this.products = products;
-        this.companyCode = companyCode
-        this.unitCode = unitCode
+        this.companyCode = companyCode;
+        this.unitCode = unitCode;
+        this.estimateId = estimateId;
+        this.invoiceId = invoiceId;
+        this.GSTORTDS = GSTORTDS;
+        this.SCST = SCST;
+        this.CGST = CGST;
+        this.hsnCode = hsnCode;
     }
 }

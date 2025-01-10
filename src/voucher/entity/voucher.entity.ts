@@ -45,7 +45,7 @@ export class VoucherEntity {
     @JoinColumn({ name: 'to_account_id' })
     toAccount: AccountEntity;
 
-    @Column({ name: 'voucher_id', type: 'varchar', length: 50, unique: true })
+    @Column({ name: 'voucher_id', type: 'varchar', length: 50, unique: true, nullable: false })
     voucherId: string;
 
     @ManyToOne(() => BranchEntity, (branch) => branch.voucher, { nullable: true })
@@ -72,7 +72,7 @@ export class VoucherEntity {
     })
     paymentType: PaymentType;
 
-    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.INVOICE })
+    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.PAYMENT })
     voucherType: VoucherTypeEnum;
 
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
@@ -150,8 +150,8 @@ export class VoucherEntity {
     @Column('int', { name: 'emi_number', nullable: true })
     emiNumber: number;
 
-    @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true })
-    emiAmount: number;
+    // @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true })
+    // emiAmount: number;
 
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
