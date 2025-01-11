@@ -13,23 +13,22 @@ export class VoucherResDto {
     branchName: string;
     role: RoleEnum;
     purpose: string;
-    creditAmount: number;  // Credit amount for the voucher
+    creditAmount: number;
     paymentType: PaymentType;
     clientId: number;
     clientName: string;
-    staffId: string;  // Changed to staffId for consistency
+    staffId: string;
     staffName: string;
-    toAccountId: string;  // Account to which the voucher is issued
+    toAccountId: string
     toAccount: string;
-    fromAccountId: string;  // Account from which the voucher is issued
-    // Account to which the voucher is issued
-    fromAccount: string;  // Account from which the voucher is issued
+    fromAccountId: string;
+    fromAccount: string;
     voucherType: VoucherTypeEnum;
     generationDate?: Date;
     expireDate?: Date;
     shippingAddress?: string;
     buildingAddress?: string;
-    remainingAmount?: number;  // Fixed typo and made it consistent with VoucherDto
+    remainingAmount?: number;
     hsnCode?: string;
     GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
@@ -49,12 +48,11 @@ export class VoucherResDto {
     upiId?: string;
     checkNumber?: string;
     cardNumber?: string;
-
-    // New fields for EMI and payment information
     initialPayment?: number;
-    emiCount?: number;  // Number of EMI installments
-    emiNumber?: number;  // EMI number
-    // emiAmount?: number;  // EMI amount
+    emiCount?: number;
+    emiNumber?: number;
+    invoice?: number
+    invoiceId?: string
     constructor(
         id: number,
         name: string,
@@ -97,11 +95,12 @@ export class VoucherResDto {
         initialPayment?: number,
         emiCount?: number,
         emiNumber?: number,
-        // emiAmount?: number,
         fromAccountId?: string,
         toAccountId?: string,
         product?: number,
-        productName?: string
+        productName?: string,
+        invoice?: number,
+        invoiceId?: string
     ) {
         this.id = id;
         this.name = name;
@@ -144,10 +143,11 @@ export class VoucherResDto {
         this.initialPayment = initialPayment ?? 0;
         this.emiCount = emiCount ?? 0;
         this.emiNumber = emiNumber ?? 0;
-        // this.emiAmount = emiAmount ?? 0;
         this.toAccountId = toAccountId
         this.fromAccountId = fromAccountId
         this.product = product
         this.productName = productName
+        this.invoice = invoice;
+        this.invoiceId = invoiceId;
     }
 }

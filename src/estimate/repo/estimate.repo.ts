@@ -3,6 +3,7 @@ import { DataSource, Repository } from "typeorm";
 import { EstimateEntity } from "../entity/estimate.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
+import { InvoiceDto } from "src/voucher/dto/invoice.dto";
 
 
 
@@ -15,7 +16,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
     }
 
     async getEstimates(req: {
-        fromDate?: string; toDate?: string; status?: ClientStatusEnum;companyCode?: string;
+        fromDate?: string; toDate?: string; status?: ClientStatusEnum; companyCode?: string;
         unitCode?: string
     }) {
         const query = this.createQueryBuilder('estimate')
@@ -41,5 +42,4 @@ export class EstimateRepository extends Repository<EstimateEntity> {
         const result = await query.getRawMany();
         return result;
     }
-
 }

@@ -4,5 +4,5 @@ export enum VoucherTypeEnum {
     JOURNAL = 'journal',
     CONTRA = 'contra',
     PURCHASE = 'purchase',
-    INVOICE = 'invoice',
+    // INVOICE = 'invoice',
 }

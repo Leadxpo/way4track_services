@@ -1,5 +1,6 @@
 export class VoucherIDResDTo {
-    voucherId: string;
+    inVoiceId?: string;
+    voucherId?:string;
     companyCode?: string;
     unitCode?: string
 }

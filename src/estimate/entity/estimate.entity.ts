@@ -2,6 +2,7 @@ import { ClientEntity } from "src/client/entity/client.entity";
 import { ProductEntity } from "src/product/entity/product.entity";
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ProductDetailDto } from "../dto/estimate.dto";
+import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 export enum GSTORTDSEnum {
     GST = "GST",
     TDS = "TDS"
@@ -47,6 +48,9 @@ export class EstimateEntity extends BaseEntity {
 
     @OneToMany(() => ProductEntity, (product) => product.estimate, { eager: true })
     products: ProductEntity[];
+
+    @OneToMany(() => VoucherEntity, (product) => product.estimate, { eager: true })
+    invoice: VoucherEntity[];
 
     @Column({ type: 'json', name: 'product_details', nullable: true })
     productDetails: {

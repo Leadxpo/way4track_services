@@ -84,7 +84,7 @@ export class AccountRepository extends Repository<AccountEntity> {
             case VoucherTypeEnum.PAYMENT:
             case VoucherTypeEnum.JOURNAL:
             case VoucherTypeEnum.PURCHASE:
-            case VoucherTypeEnum.INVOICE:
+            // case VoucherTypeEnum.INVOICE:
                 updatedTotal -= voucherAmount;
                 break;
             case VoucherTypeEnum.CONTRA:

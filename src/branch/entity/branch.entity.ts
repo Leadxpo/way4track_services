@@ -22,8 +22,8 @@ export class BranchEntity {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   branchName: string;
 
-  @Column({ name: 'phone_number', type: 'varchar', length: 15 })
-  phoneNumber: string;
+  // @Column({ name: 'phone_number', type: 'varchar', length: 15 })
+  // phoneNumber: string;
 
   @Column({ name: 'branch_number', type: 'varchar', length: 20 })
   branchNumber: string;

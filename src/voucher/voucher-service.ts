@@ -16,6 +16,8 @@ import { VoucherTypeEnum } from "./enum/voucher-type-enum";
 import { VoucherEntity } from "./entity/voucher.entity";
 import { PayEmiDto } from "./dto/pay-emi.dto";
 import { PaymentType } from "src/asserts/enum/payment-type.enum";
+import { EstimateRepository } from "src/estimate/repo/estimate.repo";
+import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 
 @Injectable()
 export class VoucherService {
@@ -27,12 +29,9 @@ export class VoucherService {
     }
     constructor(
         private readonly voucherRepository: VoucherRepository,
-        private readonly branchRepository: BranchRepository,
-        private readonly clientRepository: ClientRepository,
-        private readonly subDealerRepository: SubDealerRepository,
-        private readonly vendorRepository: VendorRepository,
         private readonly voucherAdapter: VoucherAdapter,
-        private readonly accountRepo: AccountRepository
+        private readonly accountRepo: AccountRepository,
+        private readonly estimateRepo: EstimateRepository
 
     ) { }
 
@@ -44,7 +43,7 @@ export class VoucherService {
             JOURNAL: 'JU',
             CONTRA: 'CO',
             PURCHASE: 'PU',
-            INVOICE: 'INV',
+            // INVOICE: 'INV',
         };
 
         const prefix = typePrefix[voucherType.toUpperCase()] || 'UN';
@@ -103,6 +102,13 @@ export class VoucherService {
             }
             voucherEntity.toAccount = toAccount;
             voucherEntity.voucherId = generatedVoucherId;
+            if (voucherDto.invoice) {
+
+                const estimate = this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
+                if (!estimate) {
+                    throw new ErrorResponse(4001, 'estimate not found.');
+                }
+            }
             await this.voucherRepository.insert(voucherEntity);
             return new CommonResponse(
                 true,

@@ -50,4 +50,5 @@ export class VoucherDto {
     checkNumber?: string;
     cardNumber?: string;
     product?: number;
+    invoice?: string
 }

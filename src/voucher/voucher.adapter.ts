@@ -9,6 +9,7 @@ import { AccountEntity } from "src/account/entity/account.entity";
 import { VoucherResDto } from "./dto/voucher-res.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { ProductEntity } from "src/product/entity/product.entity";
+import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 
 @Injectable()
 export class VoucherAdapter {
@@ -51,6 +52,10 @@ export class VoucherAdapter {
     const vendor = new VendorEntity();
     vendor.id = dto.vendorId
     entity.vendorId = vendor
+
+    const estimatePayment = new EstimateEntity()
+    estimatePayment.invoiceId = dto.invoice
+    entity.estimate = estimatePayment
     // Basic fields
     entity.role = dto.role;
     entity.purpose = dto.purpose;
@@ -147,7 +152,9 @@ export class VoucherAdapter {
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",
           voucher.product?.id || null,
-          voucher.product?.productName || ""
+          voucher.product?.productName || "",
+          voucher.estimate?.id || null,
+          voucher.estimate?.invoiceId
         );
       });
     } else {
@@ -199,7 +206,9 @@ export class VoucherAdapter {
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",
           voucher.product?.id || null,
-          voucher.product?.productName || ""
+          voucher.product?.productName || "",
+          voucher.estimate?.id || null,
+          voucher.estimate?.invoiceId
         )
       ];
     }

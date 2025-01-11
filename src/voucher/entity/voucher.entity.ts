@@ -12,6 +12,7 @@ import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { AccountEntity } from 'src/account/entity/account.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 
 export enum GSTORTDSEnum {
     GST = "GST",
@@ -150,9 +151,6 @@ export class VoucherEntity {
     @Column('int', { name: 'emi_number', nullable: true })
     emiNumber: number;
 
-    // @Column('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true })
-    // emiAmount: number;
-
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
 
@@ -165,4 +163,8 @@ export class VoucherEntity {
 
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
+
+    @ManyToOne(() => EstimateEntity, (EstimateEntity) => EstimateEntity.invoice, { nullable: true })
+    @JoinColumn({ name: 'invoice_id' })
+    estimate: EstimateEntity;
 }
