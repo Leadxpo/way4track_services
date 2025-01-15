@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { AccountEntity } from "../entity/account.entity";
-import { BranchEntity } from "src/branch/entity/branch.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { VoucherTypeEnum } from "src/voucher/enum/voucher-type-enum";
 import { AccountIdDto } from "../dto/account.id.dto";
