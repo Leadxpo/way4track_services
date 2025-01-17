@@ -9,7 +9,7 @@ dist
 build
 # Environment
 .env
-/src/app.module.ts
+src/app.module.ts
 sharontelematics-1530044111318-0b877bc770fc.json
 # Logs
 npm-debug.log*
