@@ -173,6 +173,17 @@ export class DashboardController {
         }
     }
 
+    @Post('totalProducts')
+    async totalProducts(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.productAssignDashboardService.totalProducts(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getDetailSubDealerData')
     async getDetailSubDealerData(@Body() req: DetailSubDealerDto): Promise<CommonResponse> {
         try {

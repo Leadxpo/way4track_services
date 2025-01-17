@@ -498,6 +498,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `DATE(ve.generation_date) AS date`,
                 `ve.product_type AS productType`,
                 `branch.name AS branchName`,
+                // `branch.manager_name AS managerName`,
                 `branch.branch_number AS branchNumber`,
                 `branch.branch_address AS branchAddress`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,

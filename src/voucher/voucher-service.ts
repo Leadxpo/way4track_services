@@ -21,12 +21,7 @@ import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 
 @Injectable()
 export class VoucherService {
-    findById(voucherId: number) {
-        throw new Error("Method not implemented.");
-    }
-    findOne(voucherId: number) {
-        throw new Error("Method not implemented.");
-    }
+  
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly voucherAdapter: VoucherAdapter,
