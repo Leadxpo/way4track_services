@@ -17,7 +17,8 @@ import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 import { AccountEntity } from "src/account/entity/account.entity";
 import * as ExcelJS from 'exceljs';
 import { Workbook } from 'exceljs';
-
+import { Response } from 'express';
+import { StreamableFile } from '@nestjs/common';
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -545,14 +546,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END) AS serviceSales`,
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate || '1900-01-01' })
+            .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate })
             .andWhere('ve.generation_date <= :toDate', { toDate: req.toDate || new Date() })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        if (req.branchName) {
-            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
-        }
+
+        query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+
 
         const data = await query
             .groupBy('DATE(ve.generation_date)')
@@ -561,34 +562,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .orderBy('DATE(ve.generation_date)', 'ASC')
             .addOrderBy('branch.name', 'ASC')
             .getRawMany();
-
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Total Sales Report');
-
-        worksheet.columns = [
-            { header: 'Date', key: 'date', width: 15 },
-            { header: 'Branch Name', key: 'branchName', width: 20 },
-            { header: 'Service Sales', key: 'serviceSales', width: 20 },
-        ];
-
-        data.forEach((row) => {
-            worksheet.addRow({
-                date: row.date,
-                branchName: row.branchName,
-                serviceSales: row.serviceSales,
-            });
-        });
-
-        const excelBuffer = await workbook.xlsx.writeBuffer();
-
-        return {
-            headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename=total_sales_report.xlsx',
-            },
-            body: excelBuffer,
-        };
+        return data
     }
+
+
 
 
     async getDayBookData(req: BranchChartDto) {
@@ -679,42 +656,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         const data = await query.getRawMany();
 
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('DayBook Report');
-
-        worksheet.columns = [
-            { header: 'Date', key: 'date', width: 15 },
-            { header: 'Voucher ID', key: 'voucherId', width: 15 },
-            { header: 'Product Type', key: 'productType', width: 20 },
-            { header: 'Voucher Type', key: 'voucherType', width: 20 },
-            { header: 'Purpose', key: 'purpose', width: 25 },
-            { header: 'Credit Amount', key: 'creditAmount', width: 20 },
-            { header: 'Debit Amount', key: 'debitAmount', width: 20 },
-            { header: 'Balance Amount', key: 'balanceAmount', width: 20 },
-        ];
-
-        data.forEach((row) => {
-            worksheet.addRow({
-                date: row.date,
-                voucherId: row.voucherId,
-                productType: row.productType,
-                voucherType: row.voucherType,
-                purpose: row.purpose,
-                creditAmount: row.creditAmount,
-                debitAmount: row.debitAmount,
-                balanceAmount: row.balanceAmount,
-            });
-        });
-
-        const excelBuffer = await workbook.xlsx.writeBuffer();
-
-        return {
-            headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename=daybook_report.xlsx',
-            },
-            body: excelBuffer,
-        };
+        return data;
+       
     }
 
     async getPurchaseCount(req: CommonReq): Promise<any> {

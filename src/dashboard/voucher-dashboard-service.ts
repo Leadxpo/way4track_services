@@ -82,14 +82,26 @@ export class VoucherDashboardService {
         companyCode?: string;
         unitCode?: string;
     }): Promise<CommonResponse> {
-        const VoucherData = await this.voucherRepository.getTotalSalesForReport(req)
-        if (!VoucherData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
-        }
+        try {
+            const data = [];
+            const voucherData = await this.voucherRepository.getTotalSalesForReport(req);
 
+            for (const item of voucherData) {
+                const obj = {
+                    date: item.date,
+                    branchName: item.branchName,
+                    serviceSales: item.serviceSales,
+                };
+                data.push(obj);
+            }
+
+            return new CommonResponse(true, 200, 'Data retrieved successfully', data);
+        } catch (err) {
+            console.error('Error in getTotalSalesForReport:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
+        }
     }
+
 
     async getPurchaseData(req: CommonReq): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getPurchaseData(req)
@@ -144,13 +156,27 @@ export class VoucherDashboardService {
         companyCode?: string;
         unitCode?: string;
     }): Promise<CommonResponse> {
-        const VoucherData = await this.voucherRepository.getDayBookDataForReport(req)
-        if (!VoucherData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        try {
+            const data = [];
+            const VoucherData = await this.voucherRepository.getDayBookDataForReport(req)
+            for (const row of VoucherData) {
+                const obj = {
+                    date: row.date,
+                    voucherId: row.voucherId,
+                    productType: row.productType,
+                    voucherType: row.voucherType,
+                    purpose: row.purpose,
+                    creditAmount: row.creditAmount,
+                    debitAmount: row.debitAmount,
+                    balanceAmount: row.balanceAmount,
+                }
+                data.push(obj)
+            }
+            return new CommonResponse(true, 200, 'Data retrieved successfully', data);
+        } catch (err) {
+            console.error('Error in getTotalSalesForReport:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
         }
-
     }
 
     async getLedgerDataForReport(req: {

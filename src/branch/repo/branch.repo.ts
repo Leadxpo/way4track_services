@@ -14,7 +14,7 @@ export class BranchRepository extends Repository<BranchEntity> {
             .select([
                 'st.name AS name',
                 'st.designation AS designation',
-                'br.name AS branchName', // Ensure `name` is correct
+                'br.name AS branchName', 
                 'st.staff_photo AS staffPhoto',
                 'as.asserts_name AS assertsName',
                 'as.asserts_photo AS assertsPhoto',
