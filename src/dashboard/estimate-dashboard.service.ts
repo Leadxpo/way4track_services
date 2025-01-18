@@ -12,14 +12,27 @@ export class EstimateDashboardService {
         private repo: EstimateRepository,
     ) { }
 
-    async getEstimates(req: { fromDate?: string; toDate?: string; status?: ClientStatusEnum;companyCode?: string;
-        unitCode?: string }): Promise<CommonResponse> {
+    async getEstimates(req: {
+        fromDate?: string; toDate?: string; status?: ClientStatusEnum; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
         const VendorData = await this.repo.getEstimates(req)
         if (!VendorData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
             return new CommonResponse(true, 200, "Data retrieved successfully", VendorData)
         }
+    }
 
+    async getEstimatesForReport(req: {
+        estimateId?: string; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        const VendorData = await this.repo.getEstimatesForReport(req)
+        if (!VendorData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VendorData)
+        }
     }
 }

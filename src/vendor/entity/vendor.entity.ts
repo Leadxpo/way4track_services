@@ -15,7 +15,7 @@ export class VendorEntity {
   @Column({ name: 'vendor_id', type: 'varchar', length: 20, unique: true })
   vendorId: string;
 
-  @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15 })
+  @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, default: '' })
   vendorPhoneNumber: string;
 
   @Column({ name: 'alternate_phone_number', type: 'varchar', length: 15, nullable: true })

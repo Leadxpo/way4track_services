@@ -46,4 +46,28 @@ export class EstimateRepository extends Repository<EstimateEntity> {
         const result = await query.getRawMany();
         return result;
     }
+
+    async getEstimatesForReport(req: {
+        estimateId?: string; companyCode?: string;
+        unitCode?: string
+    }) {
+        const query = this.createQueryBuilder('estimate')
+            .select([
+                'estimate.estimate_id AS estimateNumber',
+                'client.name AS clientName',
+                'estimate.estimate_date AS estimateDate',
+                'estimate.expire_date AS expiryDate',
+                'estimate.amount AS amount',
+                've.payment_status AS paymentStatus',
+                've.amount AS amount',
+                've.voucher_id as voucherId',
+            ])
+            .leftJoin('estimate.invoice', 've')
+            .leftJoin(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .andWhere(`estimate.company_code = "${req.companyCode}"`)
+            .andWhere(`estimate.unit_code = "${req.unitCode}"`)
+        query.andWhere('estimate.estimate_id = :estimateId', { estimateId: req.estimateId });
+        const result = await query.getRawMany();
+        return result;
+    }
 }

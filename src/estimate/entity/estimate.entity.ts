@@ -12,7 +12,7 @@ export class EstimateEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation)
+    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation, { eager: true })
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
 
@@ -26,7 +26,7 @@ export class EstimateEntity extends BaseEntity {
     estimateId: string;
 
     @Column({ type: 'varchar', name: 'invoice_id', nullable: true })
-    invoiceId: string;                                                                                                                                                                                                                                               
+    invoiceId: string;
 
     @Column({ type: 'date', name: 'expire_date' })
     expireDate: string;

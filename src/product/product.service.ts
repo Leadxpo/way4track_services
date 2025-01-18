@@ -11,13 +11,14 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { ProductDto } from './dto/product.dto';
 import { ProductIdDto } from './dto/product.id.dto';
-
+import { DataSource } from "typeorm";
 @Injectable()
 export class ProductService {
     constructor(
         private readonly productRepository: ProductRepository,
         private readonly vendorRepository: VendorRepository,
-        private readonly voucherRepository: VoucherRepository
+        private readonly voucherRepository: VoucherRepository,
+        private dataSource: DataSource
     ) { }
 
 
@@ -74,8 +75,6 @@ export class ProductService {
             remarks2: productDto.remarks2 ?? productEntity.remarks2,
             productPhoto: filePath || productEntity.productPhoto,
         });
-
-        // Handle vendor data
         if (productDto.vendorEmailId) {
             let vendor = await this.vendorRepository.findOne({
                 where: { emailId: productDto.vendorEmailId },
@@ -88,11 +87,14 @@ export class ProductService {
                     address: productDto.vendorAddress,
                     emailId: productDto.vendorEmailId,
                 });
+                if (!vendor.vendorId) {
+                    const allocationCount = await this.vendorRepository.count({});
+                    vendor.vendorId = this.generateVendorId(allocationCount + 1);
+                }
                 await this.vendorRepository.save(vendor);
             }
             productEntity.vendorId = vendor;
         }
-
         // Handle voucher data
         if (productDto.voucherId) {
             const voucher = await this.voucherRepository.findOne({
@@ -106,7 +108,10 @@ export class ProductService {
 
         return productEntity;
     }
-
+    private generateVendorId(sequenceNumber: number): string {
+        const paddedNumber = sequenceNumber.toString().padStart(3, '0');
+        return `v-${paddedNumber}`;
+    }
     async createOrUpdateProduct(productDto: ProductDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
             const productEntity = await this.handleProductData(productDto, photo);
@@ -119,6 +124,10 @@ export class ProductService {
     }
 
     async bulkUploadProducts(file: Express.Multer.File): Promise<CommonResponse> {
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
         try {
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(file.buffer);
@@ -128,6 +137,7 @@ export class ProductService {
             worksheet.eachRow((row, rowIndex) => {
                 if (rowIndex > 1) {
                     const voucherId = row.getCell(15).value;
+
                     data.push({
                         productName: row.getCell(1).value,
                         emiNumber: row.getCell(2).value,
@@ -147,12 +157,34 @@ export class ProductService {
                         price: parseFloat(row.getCell(16).value as string),
                         productDescription: row.getCell(17).value,
                         companyCode: row.getCell(18).value,
-                        unitCode: row.getCell(19).value,
-                        simStatus: row.getCell(20).value,
-                        planName: row.getCell(21).value,
-                        remarks1: row.getCell(22).value,
-                        remarks2: row.getCell(23).value,
+                        vendorPhoneNumber: row.getCell(19)?.value, // Ensure you are fetching the phone number from the row
                     });
+
+                    // data.push({
+                    //     productName: row.getCell(1).value,
+                    //     emiNumber: row.getCell(2).value,
+                    //     dateOfPurchase: row.getCell(3).value,
+                    //     vendorName: row.getCell(4).value,
+                    //     vendorEmailId: row.getCell(5).value,
+                    //     vendorAddress: row.getCell(6).value,
+                    //     imeiNumber: row.getCell(7).value,
+                    //     supplierName: row.getCell(8).value,
+                    //     serialNumber: row.getCell(9).value,
+                    //     primaryNo: row.getCell(10).value,
+                    //     secondaryNo: row.getCell(11).value,
+                    //     primaryNetwork: row.getCell(12).value,
+                    //     secondaryNetwork: row.getCell(13).value,
+                    //     categoryName: row.getCell(14).value,
+                    //     voucherId: voucherId,
+                    //     price: parseFloat(row.getCell(16).value as string),
+                    //     productDescription: row.getCell(17).value,
+                    //     companyCode: row.getCell(18).value,
+                    //     unitCode: row.getCell(19).value,
+                    //     simStatus: row.getCell(20).value,
+                    //     planName: row.getCell(21).value,
+                    //     remarks1: row.getCell(22).value,
+                    //     remarks2: row.getCell(23).value,
+                    // });
                 }
             });
 
@@ -161,12 +193,18 @@ export class ProductService {
                     return this.handleProductData(productDto);
                 })
             );
+            await queryRunner.manager.save(productEntities);
+            await queryRunner.commitTransaction();
 
+            return new CommonResponse(true, 201, 'Products uploaded successfully');
             await this.productRepository.save(productEntities);
             return new CommonResponse(true, 201, 'Products uploaded successfully');
         } catch (error) {
-            console.error('Error in bulk upload', error);
-            throw new ErrorResponse(500, 'Error uploading products');
+            await queryRunner.rollbackTransaction();
+            throw new ErrorResponse(500, 'Bulk upload failed');
+        }
+        finally {
+            await queryRunner.release();
         }
     }
 

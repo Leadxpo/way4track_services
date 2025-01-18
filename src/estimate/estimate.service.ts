@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { EstimateDto, ProductDetailDto } from './dto/estimate.dto';
-import { CommonResponse } from 'src/models/common-response';
-import { ErrorResponse } from 'src/models/error-response';
-import { EstimateAdapter } from './estimate.adapter';
-import { EstimateResDto } from './dto/estimate-res.dto';
-import { EstimateIdDto } from './dto/estimate-id.dto';
-import { EstimateRepository } from './repo/estimate.repo';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { ClientRepository } from 'src/client/repo/client.repo';
-import { EstimateEntity } from './entity/estimate.entity';
-import { In, IsNull, Not } from 'typeorm';
+import { CommonResponse } from 'src/models/common-response';
+import { ErrorResponse } from 'src/models/error-response';
 import { ProductRepository } from 'src/product/repo/product.repo';
-import { ProductEntity } from 'src/product/entity/product.entity';
+import { In, IsNull, Not } from 'typeorm';
+import { EstimateIdDto } from './dto/estimate-id.dto';
+import { EstimateResDto } from './dto/estimate-res.dto';
+import { EstimateDto } from './dto/estimate.dto';
+import { EstimateAdapter } from './estimate.adapter';
+import { EstimateRepository } from './repo/estimate.repo';
 
 @Injectable()
 export class EstimateService {
@@ -83,9 +81,6 @@ export class EstimateService {
         }
     }
 
-
-    // Define ProductDetailDto to match the fields you're using
-
     async createEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({
@@ -119,11 +114,17 @@ export class EstimateService {
                     };
                 })
             );
+            // Ensure the productDetails are correctly associated
+
+
 
             const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
             newEstimate.clientId = client;
-            newEstimate.productDetails = productDetails;
-
+            // newEstimate.productDetails = productDetails;
+            newEstimate.productDetails = productDetails.map((prodDetail) => ({
+                ...prodDetail,  // spread to ensure each product is saved individually
+                estimate: newEstimate, // associate each product with the estimate
+            }));
             // Calculate total amount
             const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
             newEstimate.amount = totalAmount;
@@ -143,14 +144,9 @@ export class EstimateService {
         }
     }
 
-
-
-
-
     private async getInvoiceCount(client: ClientEntity): Promise<number> {
         return this.estimateRepository.count({ where: { clientId: client, invoiceId: Not(IsNull()) } });
     }
-
 
     async handleEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         if (dto.id || dto.estimateId) {
@@ -172,8 +168,6 @@ export class EstimateService {
         const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         return `INV-${paddedNumber}-${timestamp}`;
     }
-
-
 
     async deleteEstimateDetails(dto: EstimateIdDto): Promise<CommonResponse> {
         try {
@@ -206,6 +200,4 @@ export class EstimateService {
             throw new ErrorResponse(500, error.message);
         }
     }
-
-
 }

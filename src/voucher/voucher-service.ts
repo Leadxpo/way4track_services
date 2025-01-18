@@ -124,7 +124,6 @@ export class VoucherService {
         return parseFloat((amount / numberOfEmi).toFixed(2));
     }
 
-
     async payEmi(payEmiDto: PayEmiDto): Promise<CommonResponse> {
         try {
             const { voucherId, companyCode, unitCode, amountPaid, emiNumber } = payEmiDto;
@@ -210,15 +209,10 @@ export class VoucherService {
         }
     }
 
-
-
-
-
     async getAllVouchers(): Promise<VoucherResDto[]> {
         const vouchers = await this.voucherRepository.find();
         return this.voucherAdapter.entityToDto(vouchers);
     }
-
 
     async deleteVoucherDetails(dto: VoucherIdDto): Promise<CommonResponse> {
         try {
@@ -234,7 +228,6 @@ export class VoucherService {
         }
     }
 
-
     async getVoucherNamesDropDown(): Promise<CommonResponse> {
         const data = await this.voucherRepository.find({
             select: ['id', 'voucherId'],
@@ -246,6 +239,5 @@ export class VoucherService {
             return new CommonResponse(false, 4579, "No vouchers found");
         }
     }
-
 
 }

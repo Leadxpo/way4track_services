@@ -86,11 +86,20 @@ export class BranchService {
         }
     }
 
+    async getBranchStaff(req: BranchIdDto): Promise<CommonResponse> {
+        const branch = await this.branchRepo.getBranchStaff(req)
+        if (!branch.length) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        } else {
+            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
+        }
+    }
+
     async getBranchDetailsById(req: BranchIdDto): Promise<CommonResponse> {
         try {
             const branch = await this.branchRepo.findOne({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
-                relations: ['staff'],
+                relations: ['staff', 'asserts'],
             });
 
             if (!branch) {
@@ -112,13 +121,26 @@ export class BranchService {
                 branchPhoto: branch.branchPhoto,
                 companyCode: branch.companyCode,
                 unitCode: branch.unitCode,
+                staff: branch.staff.map(staff => ({
+                    name: staff.name,
+                    designation: staff.designation,
+                    staffPhoto: staff.staffPhoto,
+                })),
+                asserts: branch.asserts.map(assert => ({
+                    name: assert.assertsName,
+                    photo: assert.assetPhoto,
+                    amount: assert.assertsAmount,
+                    type: assert.assetType
+                })),
             };
 
+            console.log(data, "data");
             return new CommonResponse(true, 200, 'Branch Retrieved Successfully', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
+
 
 
 

@@ -51,6 +51,16 @@ export class BranchController {
         }
     }
 
+    @Post('getBranchStaff')
+    async getBranchStaff(@Body() req: BranchIdDto): Promise<CommonResponse> {
+        try {
+            return this.branchService.getBranchStaff(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+
     @Post('getBranchNamesDropDown')
     async getBranchNamesDropDown(): Promise<CommonResponse> {
         try {

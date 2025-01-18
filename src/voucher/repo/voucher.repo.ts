@@ -15,7 +15,8 @@ import { ProductEntity } from "src/product/entity/product.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 import { AccountEntity } from "src/account/entity/account.entity";
-
+import * as ExcelJS from 'exceljs';
+import { Workbook } from 'exceljs';
 
 @Injectable()
 
@@ -58,7 +59,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const result = await query.getRawMany();
         return result;
     }
-
 
     async getDetailInVoiceData(req: VoucherIDResDTo) {
         const query = await this.createQueryBuilder('ve')
@@ -107,7 +107,31 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
     }
 
+    async getReceiptDataForReport(filters: {
+        voucherId?: string; companyCode?: string;
+        unitCode?: string
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS receiptId',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                'cl.name AS clientName',
+                've.payment_status AS paymentStatus',
+                've.amount AS amount',
+                'branch.name AS branchName',
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
+            .andWhere(`ve.company_code = "${filters.companyCode}"`)
+            .andWhere(`ve.unit_code = "${filters.unitCode}"`)
 
+        query.andWhere('ve.voucher_id = :voucherId', { voucherId: filters.voucherId });
+
+        const result = await query.getRawMany();
+        return result;
+    }
     async getReceiptData(filters: {
         voucherId?: string; clientName?: string; paymentStatus?: PaymentStatus; companyCode?: string;
         unitCode?: string
@@ -144,7 +168,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const result = await query.getRawMany();
         return result;
     }
-
 
     async getPaymentData(filters: {
         fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus; companyCode?: string;
@@ -187,7 +210,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         }
 
     }
-
 
     async getPurchaseData(req: CommonReq) {
         const query = await this.createQueryBuilder('ve')
@@ -257,7 +279,103 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
+    async getLedgerDataForReport(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        clientName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS voucherId',
+                've.name AS name',
+                'cl.name AS clientName',
+                've.generation_date AS generationDate',
+                've.expire_date AS expireDate',
+                've.payment_status AS paymentStatus',
+                'cl.phone_number AS phoneNumber',
+                'cl.email AS email',
+                'cl.address AS address',
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - 
+                SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`,
+                've.purpose AS purpose',
+                'branch.name AS branchName',
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
+            })
+            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode });
+        query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        query.andWhere('cl.name = :clientName', { clientName: req.clientName });
+        query.groupBy('ve.voucher_id')
+            .addGroupBy('ve.name')
+            .addGroupBy('cl.name')
+            .addGroupBy('branch.name')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.expire_date')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('cl.phone_number')
+            .addGroupBy('cl.email')
+            .addGroupBy('cl.address')
+            .addGroupBy('ve.purpose')
+            .orderBy('YEAR(ve.generation_date)', 'ASC')
+            .addOrderBy('MONTH(ve.generation_date)', 'ASC');
+        const data = await query.getRawMany();
+        const workbook = new Workbook();
+        const worksheet = workbook.addWorksheet('Ledger Report');
+        worksheet.columns = [
+            { header: 'Voucher ID', key: 'voucherId', width: 20 },
+            { header: 'Name', key: 'name', width: 25 },
+            { header: 'Client Name', key: 'clientName', width: 25 },
+            { header: 'Generation Date', key: 'generationDate', width: 20 },
+            { header: 'Expire Date', key: 'expireDate', width: 20 },
+            { header: 'Payment Status', key: 'paymentStatus', width: 20 },
+            { header: 'Phone Number', key: 'phoneNumber', width: 15 },
+            { header: 'Email', key: 'email', width: 25 },
+            { header: 'Address', key: 'address', width: 30 },
+            { header: 'Credit Amount', key: 'creditAmount', width: 20 },
+            { header: 'Debit Amount', key: 'debitAmount', width: 20 },
+            { header: 'Balance Amount', key: 'balanceAmount', width: 20 },
+            { header: 'Purpose', key: 'purpose', width: 25 },
+            { header: 'Branch Name', key: 'branchName', width: 20 },
+        ];
 
+        data.forEach((row) => {
+            worksheet.addRow({
+                voucherId: row.voucherId,
+                name: row.name,
+                clientName: row.clientName,
+                generationDate: row.generationDate,
+                expireDate: row.expireDate,
+                paymentStatus: row.paymentStatus,
+                phoneNumber: row.phoneNumber,
+                email: row.email,
+                address: row.address,
+                creditAmount: row.creditAmount,
+                debitAmount: row.debitAmount,
+                balanceAmount: row.balanceAmount,
+                purpose: row.purpose,
+                branchName: row.branchName,
+            });
+        });
+
+        const excelBuffer = await workbook.xlsx.writeBuffer();
+
+        return {
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': 'attachment; filename=ledger_report.xlsx',
+            },
+            body: excelBuffer,
+        };
+    }
 
     async getDetailLedgerData(req: VoucherIDResDTo) {
         const query = await this.createQueryBuilder('ve')
@@ -367,6 +485,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
 
     }
+
     async getYearWiseCreditAndDebitPercentages(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -389,6 +508,88 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query;
     }
+
+    async getTotalProductAndServiceSales(req: CommonReq) {
+        const query = await this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS date`,
+                `branch.id AS id`,
+                `branch.name AS branchName`,
+                `SUM(CASE WHEN ve.product_type = 'product' THEN ve.amount ELSE 0 END) AS productSales`,
+                `SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END) AS serviceSales`,
+                `SUM(CASE WHEN ve.product_type IN ('product', 'service') THEN ve.amount ELSE 0 END) AS totalSales`,
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .where('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
+            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
+            .groupBy('DATE(ve.generation_date), branch.id, branch.name')
+            .orderBy('DATE(ve.generation_date)', 'ASC')
+            .addOrderBy('branch.name', 'ASC')
+            .getRawMany();
+
+        return query;
+    }
+
+    async getTotalSalesForReport(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS date`,
+                `branch.name AS branchName`,
+                `SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END) AS serviceSales`,
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate || '1900-01-01' })
+            .andWhere('ve.generation_date <= :toDate', { toDate: req.toDate || new Date() })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        const data = await query
+            .groupBy('DATE(ve.generation_date)')
+            .addGroupBy('branch.id')
+            .addGroupBy('branch.name')
+            .orderBy('DATE(ve.generation_date)', 'ASC')
+            .addOrderBy('branch.name', 'ASC')
+            .getRawMany();
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Total Sales Report');
+
+        worksheet.columns = [
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Branch Name', key: 'branchName', width: 20 },
+            { header: 'Service Sales', key: 'serviceSales', width: 20 },
+        ];
+
+        data.forEach((row) => {
+            worksheet.addRow({
+                date: row.date,
+                branchName: row.branchName,
+                serviceSales: row.serviceSales,
+            });
+        });
+
+        const excelBuffer = await workbook.xlsx.writeBuffer();
+
+        return {
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': 'attachment; filename=total_sales_report.xlsx',
+            },
+            body: excelBuffer,
+        };
+    }
+
 
     async getDayBookData(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')
@@ -431,7 +632,90 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query;
     }
 
+    async getDayBookDataForReport(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
+                `ve.voucher_id AS voucherId`,
+                `ve.product_type AS productType`,
+                `ve.voucher_type AS voucherType`,
+                `ve.purpose AS purpose`,
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
+                `SUM(
+                CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END
+            ) - 
+            SUM(
+                CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END
+            ) AS balanceAmount`
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
+            })
+            .andWhere(`ve.company_code = "${req.companyCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`);
+        query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        query.groupBy(
+            `YEAR(ve.generation_date), 
+          MONTH(ve.generation_date), 
+          ve.product_type, 
+          DATE(ve.generation_date), 
+          ve.voucher_id, 
+          ve.voucher_type, 
+          ve.purpose`
+        )
+            .orderBy('YEAR(ve.generation_date)', 'ASC')
+            .addOrderBy('MONTH(ve.generation_date)', 'ASC')
+            .addOrderBy('ve.product_type', 'ASC');
 
+        const data = await query.getRawMany();
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('DayBook Report');
+
+        worksheet.columns = [
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Voucher ID', key: 'voucherId', width: 15 },
+            { header: 'Product Type', key: 'productType', width: 20 },
+            { header: 'Voucher Type', key: 'voucherType', width: 20 },
+            { header: 'Purpose', key: 'purpose', width: 25 },
+            { header: 'Credit Amount', key: 'creditAmount', width: 20 },
+            { header: 'Debit Amount', key: 'debitAmount', width: 20 },
+            { header: 'Balance Amount', key: 'balanceAmount', width: 20 },
+        ];
+
+        data.forEach((row) => {
+            worksheet.addRow({
+                date: row.date,
+                voucherId: row.voucherId,
+                productType: row.productType,
+                voucherType: row.voucherType,
+                purpose: row.purpose,
+                creditAmount: row.creditAmount,
+                debitAmount: row.debitAmount,
+                balanceAmount: row.balanceAmount,
+            });
+        });
+
+        const excelBuffer = await workbook.xlsx.writeBuffer();
+
+        return {
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition': 'attachment; filename=daybook_report.xlsx',
+            },
+            body: excelBuffer,
+        };
+    }
 
     async getPurchaseCount(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('ve')
@@ -496,34 +780,36 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const query = this.createQueryBuilder('ve')
             .select([
                 `DATE(ve.generation_date) AS date`,
-                `ve.product_type AS productType`,
+                `branch.id as id`,
                 `branch.name AS branchName`,
-                // `branch.manager_name AS managerName`,
                 `branch.branch_number AS branchNumber`,
                 `branch.branch_address AS branchAddress`,
-                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
-                `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
-                `ROUND(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) / NULLIF(SUM(ve.amount), 0) * 100, 2) AS creditPercentage`,
-                `ROUND(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) / NULLIF(SUM(ve.amount), 0) * 100, 2) AS debitPercentage`
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) AS creditAmount`,
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) AS debitAmount`,
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(ve.amount), 0) * 100, 2
+                ) AS creditPercentage`,
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(ve.amount), 0) * 100, 2
+                ) AS debitPercentage`
             ])
-            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id') // Include all branches
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
             .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
-            .andWhere(`ve.company_code = "${req.companyCode}"`)
-            .andWhere(`ve.unit_code = "${req.unitCode}"`)
-            .groupBy(
-                `DATE(ve.generation_date), 
-                ve.product_type, 
+            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
+            .groupBy(`
+                DATE(ve.generation_date), 
+                branch.id, 
                 branch.name, 
                 branch.branch_number, 
-                branch.branch_address`
-            )
-            .orderBy(
-                `DATE(ve.generation_date)`, 'ASC'
-            )
-            .addOrderBy('ve.product_type', 'ASC')
+                branch.branch_address
+            `)
+            .orderBy(`DATE(ve.generation_date)`, 'ASC')
             .addOrderBy('branch.name', 'ASC')
             .addOrderBy('branch.branch_number', 'ASC')
             .getRawMany();
@@ -592,9 +878,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             details: aggregatedResult.details,
         };
     }
-
-
-
 
     async getProductsPhotos(req: {
         subDealerId?: string;
