@@ -48,7 +48,6 @@ export class StaffService {
     async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
             const newStaff = this.adapter.convertDtoToEntity(req);
-            console.log(req, "+++++++++++")
             newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
             if (filePath) {
                 newStaff.staffPhoto = filePath;
@@ -71,9 +70,7 @@ export class StaffService {
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
-            console.log('Existing Staff:', existingStaff);
             const staffEntity = this.adapter.convertDtoToEntity(req);
-            console.log('Converted Entity:', staffEntity);
             Object.assign(existingStaff, staffEntity);
             if (filePath) {
                 existingStaff.staffPhoto = filePath;

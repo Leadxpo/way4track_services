@@ -15,7 +15,6 @@ export class BranchController {
         @Body() dto: BranchDto,
         @UploadedFile() photo: Express.Multer.File,
     ): Promise<CommonResponse> {
-        console.log('Photo:', photo);
         return this.branchService.saveBranchDetails(dto, photo);
     }
 
@@ -69,18 +68,4 @@ export class BranchController {
             return new CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
-
-    // @Post('uploadPhoto')
-    // @UseInterceptors(FileInterceptor('photo'))
-    // async uploadPhoto(
-    //     @Body('branchId') branchId: number,
-    //     @UploadedFile() photo: Express.Multer.File
-    // ): Promise<CommonResponse> {
-    //     try {
-    //         return await this.branchService.uploadBranchPhoto(branchId, photo);
-    //     } catch (error) {
-    //         console.error('Error uploading branch photo:', error);
-    //         return new CommonResponse(false, 500, 'Error uploading photo');
-    //     }
-    // }
 }

@@ -16,7 +16,6 @@ export class AssertsRepository extends Repository<AssertsEntity> {
         companyCode: string; branch?: string
     }) {
         try {
-            console.log('Service input:', req);
 
             // Branch grouping
             const groupedBranchesQuery = this.createQueryBuilder('as')
@@ -29,7 +28,6 @@ export class AssertsRepository extends Repository<AssertsEntity> {
                 groupedBranchesQuery.andWhere('branch.name = :branchName', { branchName: req.branch });
             }
 
-            console.log('Grouped Branches Query:', groupedBranchesQuery.getQuery());
             const groupedBranches = await groupedBranchesQuery.groupBy('branch.name').getRawMany();
 
             // Office assets
@@ -44,7 +42,6 @@ export class AssertsRepository extends Repository<AssertsEntity> {
                 officeAssertsQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
 
-            console.log('Office Asserts Query:', officeAssertsQuery.getQuery());
             const officeAsserts = await officeAssertsQuery.getRawOne();
 
             // Transport assets

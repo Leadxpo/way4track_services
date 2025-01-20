@@ -51,7 +51,6 @@ export class VendorService {
       if (filePath) {
         entity.vendorPhoto = filePath;
       }
-      console.log(filePath, "+++")
       await this.vendorRepository.insert(entity);
       return new CommonResponse(true, 201, 'Vendor details created successfully');
     } catch (error) {
@@ -66,7 +65,6 @@ export class VendorService {
         filePath = join(__dirname, '../../uploads/vendor_photos', `${Date.now()}-${photo.originalname}`);
         await fs.writeFile(filePath, photo.fieldname)
       }
-      console.log(filePath, "+++")
       if (dto.id || dto.vendorId) {
         // If an ID or vendorId is provided, update the vendor details
         return await this.updateVendorDetails(dto, filePath);
@@ -89,7 +87,7 @@ export class VendorService {
       }
       await this.vendorRepository.delete(dto.vendorId);
       return new CommonResponse(true, 200, 'Vendor details deleted successfully');
-      
+
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }

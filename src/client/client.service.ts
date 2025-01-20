@@ -130,7 +130,6 @@ export class ClientService {
             }
             else {
                 const data = this.clientAdapter.convertEntityToDto([client])
-                console.log(data, "+++++++++++")
                 return new CommonResponse(true, 200, 'Client details fetched successfully', data);
             }
         } catch (error) {

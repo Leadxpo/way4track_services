@@ -127,7 +127,6 @@ export class WorkAllocationService {
                 return new CommonResponse(false, 404, 'Work Allocation not found');
             } else {
                 const data = await this.workAllocationAdapter.convertEntityToDto(allocation)
-                console.log(data, "++++++++++++++++++++++++")
                 return new CommonResponse(true, 200, 'Work Allocation fetched successfully', data);
             }
         } catch (error) {

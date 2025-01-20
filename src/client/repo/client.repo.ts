@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ClientEntity } from "../entity/client.entity";
-import { DataSource, Repository } from "typeorm";
-import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
-import { ClientDetailDto } from "../dto/detail.client.dto";
-import { ClientSearchDto } from "../dto/client-search.dto";
 import { CommonReq } from "src/models/common-req";
+import { DataSource, Repository } from "typeorm";
+import { ClientSearchDto } from "../dto/client-search.dto";
+import { ClientDetailDto } from "../dto/detail.client.dto";
+import { ClientEntity } from "../entity/client.entity";
 
 
 
@@ -27,7 +26,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
             ])
-            .leftJoin(VoucherEntity, 'vr', 'vr.id = cl.voucher_id')
+            .leftJoin('cl.voucherId', 'vr')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
             .getRawMany();
@@ -35,7 +34,6 @@ export class ClientRepository extends Repository<ClientEntity> {
     }
 
     async getDetailClientData(req: ClientDetailDto) {
-        console.log(req, "++++++++++++++++++++++")
         const query = await this.createQueryBuilder('cl')
             .select([
                 'cl.client_id AS clientId',

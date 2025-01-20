@@ -26,7 +26,6 @@ export class BranchService {
 
                 // Write the file to the disk
                 await fs.writeFile(filePath, photo.fieldname);
-                console.log('Photo received and saved at:', filePath);
             }
 
             // Convert DTO to Entity and set the photo path
@@ -47,7 +46,6 @@ export class BranchService {
                 entity.branchPhoto = filePath; // Set the file path in the entity
             }
 
-            console.log('Entity to be saved:', entity); // Verify entity before saving
 
             // Save the branch details to the database
             await this.branchRepo.save(entity);
@@ -134,7 +132,6 @@ export class BranchService {
                 })),
             };
 
-            console.log(data, "data");
             return new CommonResponse(true, 200, 'Branch Retrieved Successfully', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);

@@ -43,7 +43,6 @@ export class StaffRepository extends Repository<StaffEntity> {
 
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
         const { date, staffId, companyCode, unitCode } = req;
-        console.log(req, "+++++++++++++++++++++");
     
         // Ensure the date parameter is in a valid format
         const selectedDate = new Date(date);
@@ -92,8 +91,6 @@ export class StaffRepository extends Repository<StaffEntity> {
             `)
             .orderBy('a.day')
             .getRawMany();
-    
-        console.log(query);
     
         // Create a response structure for all days of the month
         const daysInMonth = new Date(year, month, 0).getDate();
@@ -147,7 +144,6 @@ export class StaffRepository extends Repository<StaffEntity> {
                 }
             )
             .getRawOne();
-        console.log(query, "____________");
         return query;
     }
 
@@ -176,7 +172,6 @@ export class StaffRepository extends Repository<StaffEntity> {
 
         // Use getRawMany if you want to use custom column aliases
         const staffDetails = await query.getRawMany();
-        console.log(staffDetails, '+++++++++++++++++');
         return staffDetails;
     }
 

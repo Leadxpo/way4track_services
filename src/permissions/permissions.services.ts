@@ -224,7 +224,6 @@ export class PermissionsService {
             entity.staffId = staff; // Use the full staff entity instead of just the ID
 
             // Debugging logs
-            console.log('Entity to insert:', entity);
 
             // Save the permission entity
             await this.repo.save(entity);
@@ -253,7 +252,6 @@ export class PermissionsService {
             // Set staffId to the existing staff reference
             updatedEntity.staffId = staff;
 
-            console.log('Updated entity to save:', updatedEntity);
 
             await this.repo.save(updatedEntity);
 

@@ -46,8 +46,6 @@ export class AppointmentService {
             entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
 
             await this.appointmentRepository.save(entity);
-            console.log(entity, "_______________")
-
             return new CommonResponse(true, 201, 'Appointment details created successfully');
         } catch (error) {
             console.error(`Error creating appointment details: ${error.message}`, error.stack);

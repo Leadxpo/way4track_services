@@ -73,7 +73,6 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         if (req.staffName) {
             query.andWhere('staff.name = :staffName', { staffName: req.staffName });
         }
-        console.log(query, "{{{{{{{{{{{{{{{{{{{")
         const result = await query.getRawMany();
         return result;
     }

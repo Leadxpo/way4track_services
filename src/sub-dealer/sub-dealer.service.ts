@@ -54,7 +54,6 @@ export class SubDealerService {
       if (filePath) {
         entity.subDealerPhoto = filePath;
       }
-      console.log(filePath, "+++")
       await this.subDealerRepository.insert(entity);
       return new CommonResponse(true, 201, 'SubDealer details created successfully');
     } catch (error) {

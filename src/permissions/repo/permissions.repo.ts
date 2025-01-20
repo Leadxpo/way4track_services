@@ -15,9 +15,7 @@ export class PermissionRepository extends Repository<PermissionEntity> {
     }
 
     async getStaffPermissions(req: { staffId?: string, companyCode: string, unitCode: string }) {
-        console.log('companyCode:', req.companyCode);
-        console.log('unitCode:', req.unitCode);
-        console.log('staffId:', req.staffId);
+       
 
         const query = this.createQueryBuilder('permission')
             .select([
@@ -41,7 +39,6 @@ export class PermissionRepository extends Repository<PermissionEntity> {
         }
 
         const staffDetails = await query.getRawMany();
-        console.log(staffDetails, "{{{{{{{{")
         return staffDetails;
     }
 
