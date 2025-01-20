@@ -1,24 +1,20 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource, Repository } from "typeorm";
-import { VoucherEntity } from "../entity/voucher.entity";
-import { VoucherTypeEnum } from "../enum/voucher-type-enum";
-import { BranchChartDto } from "../dto/balance-chart.dto";
-import { ProductType } from "src/product/dto/product-type.enum";
-import { VoucherIDResDTo } from "../dto/voucher-id.res.dto";
-import { InvoiceDto } from "../dto/invoice.dto";
-import { PaymentStatus } from "src/product/dto/payment-status.enum";
-import { CommonReq } from "src/models/common-req";
+import { AccountEntity } from "src/account/entity/account.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
-import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
-import { VendorEntity } from "src/vendor/entity/vendor.entity";
-import { ProductEntity } from "src/product/entity/product.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { EstimateEntity } from "src/estimate/entity/estimate.entity";
-import { AccountEntity } from "src/account/entity/account.entity";
-import * as ExcelJS from 'exceljs';
-import { Workbook } from 'exceljs';
-import { Response } from 'express';
-import { StreamableFile } from '@nestjs/common';
+import { CommonReq } from "src/models/common-req";
+import { PaymentStatus } from "src/product/dto/payment-status.enum";
+import { ProductType } from "src/product/dto/product-type.enum";
+import { ProductEntity } from "src/product/entity/product.entity";
+import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { VendorEntity } from "src/vendor/entity/vendor.entity";
+import { DataSource, Repository } from "typeorm";
+import { BranchChartDto } from "../dto/balance-chart.dto";
+import { InvoiceDto } from "../dto/invoice.dto";
+import { VoucherIDResDTo } from "../dto/voucher-id.res.dto";
+import { VoucherEntity } from "../entity/voucher.entity";
+import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -329,53 +325,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .orderBy('YEAR(ve.generation_date)', 'ASC')
             .addOrderBy('MONTH(ve.generation_date)', 'ASC');
         const data = await query.getRawMany();
-        const workbook = new Workbook();
-        const worksheet = workbook.addWorksheet('Ledger Report');
-        worksheet.columns = [
-            { header: 'Voucher ID', key: 'voucherId', width: 20 },
-            { header: 'Name', key: 'name', width: 25 },
-            { header: 'Client Name', key: 'clientName', width: 25 },
-            { header: 'Generation Date', key: 'generationDate', width: 20 },
-            { header: 'Expire Date', key: 'expireDate', width: 20 },
-            { header: 'Payment Status', key: 'paymentStatus', width: 20 },
-            { header: 'Phone Number', key: 'phoneNumber', width: 15 },
-            { header: 'Email', key: 'email', width: 25 },
-            { header: 'Address', key: 'address', width: 30 },
-            { header: 'Credit Amount', key: 'creditAmount', width: 20 },
-            { header: 'Debit Amount', key: 'debitAmount', width: 20 },
-            { header: 'Balance Amount', key: 'balanceAmount', width: 20 },
-            { header: 'Purpose', key: 'purpose', width: 25 },
-            { header: 'Branch Name', key: 'branchName', width: 20 },
-        ];
 
-        data.forEach((row) => {
-            worksheet.addRow({
-                voucherId: row.voucherId,
-                name: row.name,
-                clientName: row.clientName,
-                generationDate: row.generationDate,
-                expireDate: row.expireDate,
-                paymentStatus: row.paymentStatus,
-                phoneNumber: row.phoneNumber,
-                email: row.email,
-                address: row.address,
-                creditAmount: row.creditAmount,
-                debitAmount: row.debitAmount,
-                balanceAmount: row.balanceAmount,
-                purpose: row.purpose,
-                branchName: row.branchName,
-            });
-        });
 
-        const excelBuffer = await workbook.xlsx.writeBuffer();
-
-        return {
-            headers: {
-                'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': 'attachment; filename=ledger_report.xlsx',
-            },
-            body: excelBuffer,
-        };
+        return data;
     }
 
     async getDetailLedgerData(req: VoucherIDResDTo) {
@@ -618,6 +570,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
+                `ve.generation_date as generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
                 `ve.voucher_id AS voucherId`,
                 `ve.product_type AS productType`,
@@ -657,7 +610,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const data = await query.getRawMany();
 
         return data;
-       
+
     }
 
     async getPurchaseCount(req: CommonReq): Promise<any> {

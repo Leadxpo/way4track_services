@@ -127,13 +127,33 @@ export class VoucherDashboardService {
         voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
         unitCode?: string
     }): Promise<CommonResponse> {
-        const VoucherData = await this.voucherRepository.getLedgerData(req)
-        if (!VoucherData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        try {
+            const data = [];
+            const VoucherData = await this.voucherRepository.getLedgerData(req)
+            for (const row of VoucherData) {
+                const obj = {
+                    voucherId: row.voucherId,
+                    name: row.name,
+                    clientName: row.clientName,
+                    generationDate: row.generationDate,
+                    expireDate: row.expireDate,
+                    paymentStatus: row.paymentStatus,
+                    phoneNumber: row.phoneNumber,
+                    email: row.email,
+                    address: row.address,
+                    creditAmount: row.creditAmount,
+                    debitAmount: row.debitAmount,
+                    balanceAmount: row.balanceAmount,
+                    purpose: row.purpose,
+                    branchName: row.branchName,
+                }
+                data.push(obj)
+            }
+            return new CommonResponse(true, 200, 'Data retrieved successfully', data);
+        } catch (err) {
+            console.error('Error in getTotalSalesForReport:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
         }
-
     }
 
     async getAllVouchers(req: {

@@ -70,6 +70,7 @@ export class VoucherEntity {
         name: 'payment_type',
         enum: PaymentType,
         default: PaymentType.CASH,
+        nullable: true
     })
     paymentType: PaymentType;
 
