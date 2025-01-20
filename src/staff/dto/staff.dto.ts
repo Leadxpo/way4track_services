@@ -8,11 +8,11 @@ export class StaffDto {
     phoneNumber: string;
     branchId: number;
     designation: DesignationEnum;
-    dob: Date;
+    dob: string;
     email: string;
     aadharNumber: string;
     address: string;
-    joiningDate: Date;
+    joiningDate: string;
     attendance: AttendanceStatus;
     basicSalary: number;
     beforeExperience: number;

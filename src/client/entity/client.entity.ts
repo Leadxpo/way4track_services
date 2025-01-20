@@ -15,7 +15,7 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'name', type: 'varchar', length: 100 })
     name: string;
 
-    @Column({ name: 'phone_number', type: 'varchar', length: 15 })
+    @Column({ name: 'phone_number', type: 'varchar', length: 15, unique: true })
     phoneNumber: string;
 
     @Column({ name: 'client_id', type: 'varchar', length: 50, unique: true })
@@ -24,20 +24,17 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
     request: RequestRaiseEntity[];
 
-    // @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
-    // status: ClientStatusEnum
-
     @Column({ name: 'dob', type: 'date' })
-    dob: Date;
+    dob: string;
 
-    @Column({ name: 'email', type: 'varchar', length: 150 })
+    @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
     email: string;
 
     @Column({ name: 'address', type: 'text' })
     address: string;
 
     @Column({ name: 'joining_date', type: 'date' })
-    joiningDate: Date;
+    joiningDate: string;
 
 
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client)

@@ -85,7 +85,6 @@ export class VoucherDashboardService {
         try {
             const data = [];
             const voucherData = await this.voucherRepository.getTotalSalesForReport(req);
-
             for (const item of voucherData) {
                 const obj = {
                     date: item.date,
@@ -123,13 +122,16 @@ export class VoucherDashboardService {
 
     }
 
-    async getLedgerData(req: {
-        voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
-        unitCode?: string
+    async getLedgerDataForReport(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        clientName?: string;
+        companyCode?: string;
+        unitCode?: string;
     }): Promise<CommonResponse> {
         try {
             const data = [];
-            const VoucherData = await this.voucherRepository.getLedgerData(req)
+            const VoucherData = await this.voucherRepository.getLedgerDataForReport(req)
             for (const row of VoucherData) {
                 const obj = {
                     voucherId: row.voucherId,
@@ -199,14 +201,11 @@ export class VoucherDashboardService {
         }
     }
 
-    async getLedgerDataForReport(req: {
-        fromDate?: Date;
-        toDate?: Date;
-        clientName?: string;
-        companyCode?: string;
-        unitCode?: string;
+    async getLedgerData(req: {
+        voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
+        unitCode?: string
     }): Promise<CommonResponse> {
-        const VoucherData = await this.voucherRepository.getLedgerDataForReport(req)
+        const VoucherData = await this.voucherRepository.getLedgerData(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

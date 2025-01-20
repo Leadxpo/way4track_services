@@ -5,12 +5,10 @@ export class ClientDto {
     name: string;
     branchId: number;
     phoneNumber: string;
-    dob: Date;
+    dob: string;
     email: string;
     address: string;
-    // status: ClientStatusEnum;
-    joiningDate: Date;
-    // amount?: number;
+    joiningDate: string;
     clientPhoto?: string;
     voucherId?: number
     companyCode: string;

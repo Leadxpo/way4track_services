@@ -291,6 +291,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.generation_date AS generationDate',
                 've.expire_date AS expireDate',
                 've.payment_status AS paymentStatus',
+                've.voucher_type AS voucherType',
                 'cl.phone_number AS phoneNumber',
                 'cl.email AS email',
                 'cl.address AS address',

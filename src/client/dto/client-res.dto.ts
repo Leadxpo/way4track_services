@@ -1,4 +1,3 @@
-import { ClientStatusEnum } from "../enum/client-status.enum";
 
 export class ClientResDto {
     id: number;
@@ -8,10 +7,10 @@ export class ClientResDto {
     clientPhoto: string;
     branchId: number;
     branchName: string;
-    dob: Date;
+    dob: string;
     email: string;
     address: string;
-    joiningDate: Date;
+    joiningDate: string;
     companyCode: string;
     unitCode: string
     constructor(
@@ -22,10 +21,10 @@ export class ClientResDto {
         clientPhoto: string,
         branchId: number,
         branchName: string,
-        dob: Date,
+        dob: string,
         email: string,
         address: string,
-        joiningDate: Date,
+        joiningDate: string,
         companyCode: string,
         unitCode: string
     ) {

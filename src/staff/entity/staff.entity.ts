@@ -61,7 +61,7 @@ export class StaffEntity extends BaseEntity {
   designation: DesignationEnum;
 
   @Column({ name: 'dob', type: 'date' })
-  dob: Date;
+  dob: string;
 
   @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
   email: string;
@@ -73,7 +73,7 @@ export class StaffEntity extends BaseEntity {
   address: string;
 
   @Column({ name: 'joining_date', type: 'date' })
-  joiningDate: Date;
+  joiningDate: string;
 
   @Column({ name: 'before_experience', type: 'int', comment: 'Experience in years' })
   beforeExperience: number;
