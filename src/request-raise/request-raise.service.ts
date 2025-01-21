@@ -127,14 +127,6 @@ export class RequestRaiseService {
         }
     }
 
-    /**
-     * Generates a requestId in the format RR-${paddedNumber}.
-     */
-    // private generateRequestId(sequenceNumber: number): string {
-    //     const paddedNumber = sequenceNumber.toString().padStart(4, '0');
-    //     return `RR-${paddedNumber}`;
-    // }
-
     async getRequestsDropDown(): Promise<CommonResponse> {
         const data = await this.requestRepository.find({ select: ['id', 'requestId'] });
         if (data.length) {

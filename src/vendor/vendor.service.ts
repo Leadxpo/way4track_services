@@ -7,6 +7,7 @@ import { VendorAdapter } from './vendor.adapter';
 import { VendorRepository } from './repo/vendor.repo';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { CommonReq } from 'src/models/common-req';
 @Injectable()
 export class VendorService {
   constructor(
@@ -93,11 +94,11 @@ export class VendorService {
     }
   }
 
-  async getVendorDetails(req: VendorIdDto): Promise<CommonResponse> {
+  async getVendorDetailsById(req: VendorIdDto): Promise<CommonResponse> {
     try {
       const vendor = await this.vendorRepository.findOne({
         where: { vendorId: req.vendorId, companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['branch'],
+        relations: ['branch', 'voucherId'],
       });
 
       if (!vendor) {
@@ -105,6 +106,25 @@ export class VendorService {
       }
 
       const vendorResDto = this.vendorAdapter.convertEntityToDto([vendor])[0];
+
+      return new CommonResponse(true, 200, 'Vendor details fetched successfully', vendorResDto);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
+
+  async getVendorDetails(req: CommonReq): Promise<CommonResponse> {
+    try {
+      const vendor = await this.vendorRepository.find({
+        where: { companyCode: req.companyCode, unitCode: req.unitCode },
+        relations: ['branch','voucherId'],
+      });
+
+      if (!vendor) {
+        return new CommonResponse(false, 404, 'Vendor not found');
+      }
+
+      const vendorResDto = this.vendorAdapter.convertEntityToDto(vendor);
 
       return new CommonResponse(true, 200, 'Vendor details fetched successfully', vendorResDto);
     } catch (error) {

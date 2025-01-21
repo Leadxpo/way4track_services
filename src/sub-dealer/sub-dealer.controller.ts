@@ -4,6 +4,7 @@ import { SubDealerService } from './sub-dealer.service';
 import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CommonReq } from 'src/models/common-req';
 
 
 @Controller('subdealer')
@@ -30,8 +31,18 @@ export class SubDealerController {
         }
     }
 
+    @Post('getSubDealerDetailById')
+    async getSubDealerDetailById(@Body() dto: SubDealerIdDto) {
+        try {
+            return await this.subDealerService.getSubDealerDetailById(dto);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching staff type details');
+        }
+    }
+
     @Post('getSubDealerDetails')
-    async getSubDealerDetails(@Body() dto: SubDealerIdDto) {
+    async getSubDealerDetails(@Body() dto: CommonReq) {
         try {
             return await this.subDealerService.getSubDealerDetails(dto);
         } catch (error) {

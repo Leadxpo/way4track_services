@@ -4,6 +4,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonResponse } from 'src/models/common-response';
 import { ProductDto } from './dto/product.dto';
 import { ProductIdDto } from './dto/product.id.dto';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('products')
 export class ProductController {
@@ -43,6 +44,16 @@ export class ProductController {
   async getproductDetails(@Body() req: ProductIdDto): Promise<CommonResponse> {
     try {
       return await this.productService.getproductDetails(req);
+    } catch (error) {
+      console.error('Error in get client details in service:', error);
+      return new CommonResponse(false, 500, 'Error fetching client details');
+    }
+  }
+
+  @Post('getAllproductDetails')
+  async getAllproductDetails(@Body() req: CommonReq): Promise<CommonResponse> {
+    try {
+      return await this.productService.getAllproductDetails(req);
     } catch (error) {
       console.error('Error in get client details in service:', error);
       return new CommonResponse(false, 500, 'Error fetching client details');

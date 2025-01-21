@@ -9,6 +9,7 @@ import { HiringRepository } from './repo/hiring.repo';
 import { join } from 'path';
 import * as fs from 'fs';
 import { HiringFilterDto } from './dto/hiring-filter.dto';
+import { CommonReq } from 'src/models/common-req';
 @Injectable()
 export class HiringService {
     constructor(private readonly hiringAdapter: HiringAdapter,
@@ -45,7 +46,7 @@ export class HiringService {
                 ? 'Hiring details updated successfully'
                 : 'Hiring details created successfully';
 
-            return new CommonResponse(true, 65152, internalMessage,{ resumePath: resumePath });
+            return new CommonResponse(true, 65152, internalMessage, { resumePath: resumePath });
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -63,9 +64,21 @@ export class HiringService {
         }
     }
 
-    async getHiringDetails(req: HiringIdDto): Promise<CommonResponse> {
+    async getHiringDetailsById(req: HiringIdDto): Promise<CommonResponse> {
         try {
-            const hiring = await HiringEntity.find({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const hiring = await HiringEntity.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!hiring) {
+                throw new ErrorResponse(404, 'Hiring record not found');
+            }
+            return new CommonResponse(true, 200, 'Hiring details fetched successfully', hiring);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getHiringDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const hiring = await HiringEntity.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!hiring.length) {
                 throw new ErrorResponse(404, 'Hiring record not found');
             }

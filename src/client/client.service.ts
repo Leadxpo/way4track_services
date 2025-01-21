@@ -10,6 +10,7 @@ import { BranchRepository } from 'src/branch/repo/branch.repo';
 import { join } from 'path';
 import { writeFile } from 'fs';
 import { promises as fs } from 'fs';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class ClientService {
@@ -43,7 +44,6 @@ export class ClientService {
             throw new ErrorResponse(500, `Failed to handle client details: ${error.message}`);
         }
     }
-
 
     async createClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
         try {
@@ -108,7 +108,6 @@ export class ClientService {
         }
     }
 
-
     async deleteClientDetails(dto: ClientIdDto): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
@@ -122,7 +121,7 @@ export class ClientService {
         }
     }
 
-    async getClientDetails(req: ClientIdDto): Promise<CommonResponse> {
+    async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
@@ -137,7 +136,20 @@ export class ClientService {
         }
     }
 
-
+    async getClientDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!client) {
+                return new CommonResponse(false, 404, 'Client not found');
+            }
+            else {
+                const data = this.clientAdapter.convertEntityToDto(client)
+                return new CommonResponse(true, 200, 'Client details fetched successfully', data);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
 
     async getClientNamesDropDown(): Promise<CommonResponse> {
         const data = await this.clientRepository.find({ select: ['name', 'id', 'clientId'] });

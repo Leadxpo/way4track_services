@@ -4,6 +4,7 @@ import { VendorDto } from './dto/vendor.dto';
 import { VendorIdDto } from './dto/vendor-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('vendor')
 export class VendorController {
@@ -30,8 +31,18 @@ export class VendorController {
     }
   }
 
+  @Post('getVendorDetailsById')
+  async getVendorDetailsById(@Body() req: VendorIdDto): Promise<CommonResponse> {
+    try {
+      return await this.vendorService.getVendorDetailsById(req);
+    } catch (error) {
+      console.error('Error in get vendor details:', error);
+      return new CommonResponse(false, 500, 'Error fetching vendor details');
+    }
+  }
+
   @Post('getVendorDetails')
-  async getVendorDetails(@Body() req: VendorIdDto): Promise<CommonResponse> {
+  async getVendorDetails(@Body() req: CommonReq): Promise<CommonResponse> {
     try {
       return await this.vendorService.getVendorDetails(req);
     } catch (error) {

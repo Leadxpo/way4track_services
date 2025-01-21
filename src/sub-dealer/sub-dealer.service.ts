@@ -7,6 +7,7 @@ import { SubDealerDto } from './dto/sub-dealer.dto';
 import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
 import { join } from 'path';
 import { promises as fs } from 'fs';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class SubDealerService {
@@ -97,7 +98,21 @@ export class SubDealerService {
     }
   }
 
-  async getSubDealerDetails(req: SubDealerIdDto): Promise<CommonResponse> {
+  async getSubDealerDetails(req: CommonReq): Promise<CommonResponse> {
+    try {
+      const subDealer = await this.subDealerRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
+      if (!subDealer) {
+        return new CommonResponse(false, 404, 'SubDealer not found');
+      }
+      const resDto = this.subDealerAdapter.convertEntityToDto(subDealer);
+
+      return new CommonResponse(true, 200, 'SubDealer details fetched successfully', resDto);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
+
+  async getSubDealerDetailById(req: SubDealerIdDto): Promise<CommonResponse> {
     try {
       const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: req.subDealerId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
       if (!subDealer) {

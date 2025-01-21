@@ -4,6 +4,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { ClientDto } from './dto/client.dto';
 import { ClientService } from './client.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('client')
 export class ClientController {
@@ -23,7 +24,6 @@ export class ClientController {
         }
     }
 
-
     @Post('deleteClientDetails')
     async deleteClientDetails(@Body() dto: ClientIdDto): Promise<CommonResponse> {
         try {
@@ -35,9 +35,19 @@ export class ClientController {
     }
 
     @Post('getClientDetails')
-    async getClientDetails(@Body() req: ClientIdDto): Promise<CommonResponse> {
+    async getClientDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return await this.clientService.getClientDetails(req);
+        } catch (error) {
+            console.error('Error in get client details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching client details');
+        }
+    }
+
+    @Post('getClientDetailsById')
+    async getClientDetailsById(@Body() req: ClientIdDto): Promise<CommonResponse> {
+        try {
+            return await this.clientService.getClientDetailsById(req);
         } catch (error) {
             console.error('Error in get client details in service:', error);
             return new CommonResponse(false, 500, 'Error fetching client details');

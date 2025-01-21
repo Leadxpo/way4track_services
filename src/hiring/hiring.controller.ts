@@ -5,6 +5,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { HiringIdDto } from './dto/hiring-id.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HiringFilterDto } from './dto/hiring-filter.dto';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('hiring')
 export class HiringController {
@@ -34,8 +35,18 @@ export class HiringController {
         }
     }
 
+    @Post('getHiringDetailsById')
+    async getHiringDetailsById(@Body() dto: HiringIdDto): Promise<CommonResponse> {
+        try {
+            return await this.hiringService.getHiringDetailsById(dto);
+        } catch (error) {
+            console.error('Error in get hiring details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching hiring details');
+        }
+    }
+
     @Post('getHiringDetails')
-    async getHiringDetails(@Body() dto: HiringIdDto): Promise<CommonResponse> {
+    async getHiringDetails(@Body() dto: CommonReq): Promise<CommonResponse> {
         try {
             return await this.hiringService.getHiringDetails(dto);
         } catch (error) {

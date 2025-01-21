@@ -12,6 +12,7 @@ import { join } from 'path';
 import { ProductDto } from './dto/product.dto';
 import { ProductIdDto } from './dto/product.id.dto';
 import { DataSource } from "typeorm";
+import { CommonReq } from 'src/models/common-req';
 @Injectable()
 export class ProductService {
     constructor(
@@ -223,7 +224,21 @@ export class ProductService {
 
     async getproductDetails(req: ProductIdDto): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.find({ relations: ['vendorId', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const product = await this.productRepository.findOne({ relations: ['vendorId', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!product) {
+                return new CommonResponse(false, 404, 'product not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'product details fetched successfully', product);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getAllproductDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const product = await this.productRepository.find({ relations: ['vendorId', 'voucherId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
