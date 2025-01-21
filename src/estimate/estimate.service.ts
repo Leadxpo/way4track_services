@@ -31,7 +31,7 @@ export class EstimateService {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
             }
 
-            const client = await this.clientRepository.findOne({ where: { id: dto.clientId } });
+            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
@@ -84,27 +84,25 @@ export class EstimateService {
     async createEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({
-                where: { id: dto.clientId },
+                where: { clientId: dto.clientId },
             });
-
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
 
-            // Fetch products and calculate total costs
+            if (!Array.isArray(dto.productDetails) || dto.productDetails.length === 0) {
+                return new CommonResponse(false, 400, 'Product details must be a non-empty array');
+            }
+
             const productDetails = await Promise.all(
                 dto.productDetails.map(async (productDetail) => {
                     const product = await this.productRepository.findOne({
-                        where: { id: productDetail.productId },  // Ensure using correct property
+                        where: { id: productDetail.productId },
                     });
-
                     if (!product) {
                         throw new Error(`Product with ID ${productDetail.productId} not found`);
                     }
-
                     const totalCost = product.price * productDetail.quantity;
-
-                    // Return the product detail in the required format
                     return {
                         productId: product.id,
                         productName: product.productName,
@@ -114,29 +112,23 @@ export class EstimateService {
                     };
                 })
             );
-            // Ensure the productDetails are correctly associated
-
-
 
             const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
             newEstimate.clientId = client;
-            // newEstimate.productDetails = productDetails;
             newEstimate.productDetails = productDetails.map((prodDetail) => ({
-                ...prodDetail,  // spread to ensure each product is saved individually
-                estimate: newEstimate, // associate each product with the estimate
+                ...prodDetail,
+                estimate: newEstimate,
             }));
-            // Calculate total amount
+
             const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
             newEstimate.amount = totalAmount;
 
-            // Generate Estimate ID
             const estimateCount = await this.estimateRepository.count({
                 where: { clientId: client },
             });
             newEstimate.estimateId = this.generateEstimateId(estimateCount + 1);
 
             await this.estimateRepository.save(newEstimate);
-
             return new CommonResponse(true, 201, 'Estimate details created successfully');
         } catch (error) {
             console.error(`Error creating estimate details: ${error.message}`, error.stack);
@@ -150,10 +142,8 @@ export class EstimateService {
 
     async handleEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         if (dto.id || dto.estimateId) {
-            // If an ID is provided, update the estimate details
             return await this.updateEstimateDetails(dto);
         } else {
-            // If no ID is provided, create a new estimate record
             return await this.createEstimateDetails(dto);
         }
     }
