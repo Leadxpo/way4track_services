@@ -33,7 +33,7 @@ export class VendorEntity {
   @Column({ name: 'email', type: 'varchar', length: 150 })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20 })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20,unique:true })
   aadharNumber: string;
 
   @Column({ name: 'address', type: 'text' })
