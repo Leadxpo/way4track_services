@@ -24,16 +24,16 @@ export class VoucherAdapter {
 
     // Accounts
     const toAccount = new AccountEntity();
-    toAccount.accountNumber = dto.toAccount;
+    toAccount.id = dto.toAccount;
     entity.toAccount = toAccount;
 
     const fromAccount = new AccountEntity();
-    fromAccount.accountNumber = dto.fromAccount;
+    fromAccount.id = dto.fromAccount;
     entity.fromAccount = fromAccount;
 
     // Client
     const client = new ClientEntity();
-    client.id = dto.clientId;
+    client.clientId = dto.clientId;
     entity.clientId = client;
 
     const staff = new StaffEntity();
@@ -115,7 +115,7 @@ export class VoucherAdapter {
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
-          voucher.clientId?.id || null,
+          voucher.clientId?.clientId || "",
           voucher.clientId?.name || "Unknown",
           voucher.staffId?.staffId || "",
           voucher.staffId?.name || "",
@@ -169,7 +169,7 @@ export class VoucherAdapter {
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
-          voucher.clientId?.id || null,
+          voucher.clientId?.clientId || "",
           voucher.clientId?.name || "Unknown",
           voucher.staffId?.staffId || "",
           voucher.staffId?.name || "",

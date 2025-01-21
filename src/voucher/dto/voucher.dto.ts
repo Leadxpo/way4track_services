@@ -17,7 +17,7 @@ export class VoucherDto {
     amount?: number; // nullable if not always provided
     remainingAmount?: number; // Fixed the typo "reminingAmount"
     paymentType: PaymentType;
-    clientId: number;
+    clientId: string;
     staffId: number;
     accountNumber?: number; // assuming this is the account number from the account entity
     voucherType: VoucherTypeEnum;
@@ -42,8 +42,8 @@ export class VoucherDto {
     companyCode: string;
     unitCode: string;
     voucherId?: string;
-    fromAccount?: string
-    toAccount?: string;
+    fromAccount?: number
+    toAccount?: number;
     createdAt?: Date;
     updatedAt?: Date;
     upiId?: string;

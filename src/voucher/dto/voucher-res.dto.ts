@@ -15,7 +15,7 @@ export class VoucherResDto {
     purpose: string;
     creditAmount: number;
     paymentType: PaymentType;
-    clientId: number;
+    clientId: string;
     clientName: string;
     staffId: string;
     staffName: string;
@@ -62,7 +62,7 @@ export class VoucherResDto {
         purpose: string,
         creditAmount: number,
         paymentType: PaymentType,
-        clientId: number,
+        clientId: string,
         clientName: string,
         staffId: string,
         staffName: string,

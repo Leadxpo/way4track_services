@@ -104,7 +104,7 @@ export class VoucherEntity {
     @Column({ name: 'amount', type: 'float' })
     amount: number;
 
-    @Column({ name: 'credit_amount', type: 'float' })
+    @Column({ name: 'credit_amount', type: 'float', nullable: true, default: null })
     creditAmount: number;
 
     @Column({ name: 'remining_amount', type: 'float' })

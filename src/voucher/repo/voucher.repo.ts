@@ -692,7 +692,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                     NULLIF(SUM(ve.amount), 0) * 100, 2
                 ) AS debitPercentage`
             ])
-            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id') // Include all branches
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id') 
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })

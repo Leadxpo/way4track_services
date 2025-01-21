@@ -85,7 +85,7 @@ export class VoucherService {
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
             const toAccount = await this.accountRepo.findOne({
-                where: { accountNumber: voucherDto.toAccount },
+                where: { id: voucherDto.toAccount },
             });
             if (!toAccount) {
                 throw new ErrorResponse(4001, 'To Account not found.');
