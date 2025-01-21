@@ -1,11 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
-import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
-import { ClientStatusEnum } from '../enum/client-status.enum';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {

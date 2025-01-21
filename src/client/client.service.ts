@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { ClientRepository } from './repo/client.repo';
-import { ClientDto } from './dto/client.dto';
-import { ClientIdDto } from './dto/client-id.dto';
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { BranchRepository } from 'src/branch/repo/branch.repo';
+import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { ClientAdapter } from './client.adapter';
-import { BranchEntity } from 'src/branch/entity/branch.entity';
-import { BranchRepository } from 'src/branch/repo/branch.repo';
-import { join } from 'path';
-import { writeFile } from 'fs';
-import { promises as fs } from 'fs';
-import { CommonReq } from 'src/models/common-req';
+import { ClientIdDto } from './dto/client-id.dto';
+import { ClientDto } from './dto/client.dto';
+import { ClientRepository } from './repo/client.repo';
 
 @Injectable()
 export class ClientService {
