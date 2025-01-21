@@ -22,7 +22,7 @@ export class EstimateAdapter {
         entity.unitCode = dto.unitCode;
 
         const clientEntity = new ClientEntity();
-        clientEntity.id = dto.clientId;
+        clientEntity.clientId = dto.clientId;
         entity.clientId = clientEntity;
 
         entity.quantity = dto.quantity;
@@ -31,15 +31,11 @@ export class EstimateAdapter {
         if (dto.CGST) entity.CGST = dto.CGST;
         entity.hsnCode = dto.hsnCode;
 
-        if (dto.productDetails) {
+        if (!dto.productDetails || dto.productDetails.length === 0) {
+            entity.productDetails = [];
+        } else {
             entity.productDetails = dto.productDetails.map((productDetail) => {
-                const productEntity = new ProductEntity();
-                productEntity.id = productDetail.productId;
-                productEntity.productName = productDetail.productName;
-                productEntity.price = productDetail.costPerUnit;
-
-                const totalCost = productDetail.quantity * productDetail.costPerUnit;
-
+                const totalCost = productDetail.quantity * (productDetail.costPerUnit || 0);
                 return {
                     productId: productDetail.productId,
                     productName: productDetail.productName,
@@ -49,6 +45,7 @@ export class EstimateAdapter {
                 };
             });
         }
+
 
         return entity;
     }
