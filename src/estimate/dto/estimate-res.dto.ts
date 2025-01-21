@@ -8,7 +8,7 @@ export class EstimateResDto {
     clientEmail: string;
     clientPhoneNumber: string;
     buildingAddress: string;
-    estimateDate: string;
+    estimateDate: Date;
     expireDate: string;
     productOrService: string;
     description: string;
@@ -31,7 +31,7 @@ export class EstimateResDto {
         clientEmail: string,
         clientPhoneNumber: string,
         buildingAddress: string,
-        estimateDate: string,
+        estimateDate: Date,
         expireDate: string,
         productOrService: string,
         description: string,

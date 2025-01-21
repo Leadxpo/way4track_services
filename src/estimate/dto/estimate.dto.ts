@@ -4,7 +4,7 @@ export class EstimateDto {
     id: number;
     clientId: number;
     buildingAddress: string;
-    estimateDate: string;
+    estimateDate: Date;
     expireDate: string;
     productOrService: string;
     description: string;

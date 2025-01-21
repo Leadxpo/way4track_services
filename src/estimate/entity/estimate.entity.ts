@@ -1,8 +1,8 @@
 import { ClientEntity } from "src/client/entity/client.entity";
+import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { ProductDetailDto } from "../dto/estimate.dto";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export enum GSTORTDSEnum {
     GST = "GST",
     TDS = "TDS"
@@ -19,8 +19,8 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'varchar', length: 255, name: 'building_address' })
     buildingAddress: string;
 
-    @Column({ type: 'date', name: 'estimate_date' })
-    estimateDate: string;
+    @Column({ name: 'estimate_date', type: 'timestamp',nullable: true })
+    estimateDate: Date;
 
     @Column({ type: 'varchar', name: 'estimate_id' })
     estimateId: string;
@@ -69,6 +69,9 @@ export class EstimateEntity extends BaseEntity {
 
     @Column({ name: 'gst/tds', type: 'enum', nullable: true, enum: GSTORTDSEnum })
     GSTORTDS: GSTORTDSEnum;
+
+    @Column({ name: 'status', type: 'enum', nullable: true, enum: ClientStatusEnum })
+    status: ClientStatusEnum;
 
     @Column({ name: 'scst', type: 'float', nullable: true })
     SCST: number;
