@@ -61,7 +61,7 @@ export class StaffEntity extends BaseEntity {
   designation: DesignationEnum;
 
   @Column({ name: 'dob', type: 'date' })
-  dob: string;
+  dob: Date;
 
   @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
   email: string;

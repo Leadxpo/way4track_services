@@ -63,20 +63,23 @@ export class StaffService {
 
     async updateStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
-            const existingStaff = await this.staffRepository.findOne({
-                where: { id: req.id, staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
-            });
 
+            let existingStaff: StaffEntity | null = null;
+            if (req.id) {
+                existingStaff = await this.staffRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            } else if (req.staffId) {
+                existingStaff = await this.staffRepository.findOne({ where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            }
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
             const staffEntity = this.adapter.convertDtoToEntity(req);
-            Object.assign(existingStaff, staffEntity);
-            if (filePath) {
-                existingStaff.staffPhoto = filePath;
-            }
-
-            await this.staffRepository.save(existingStaff);
+            const updatedStaff = {
+                ...existingStaff,
+                ...staffEntity,
+                staffPhoto: filePath || existingStaff.staffPhoto,
+            };
+            await this.staffRepository.save(updatedStaff);
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
             console.error(`Error updating staff details: ${error.message}`, error.stack);

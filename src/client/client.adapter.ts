@@ -27,6 +27,9 @@ export class ClientAdapter {
             entity.id = dto.id;
         }
 
+        if (dto.clientId) {
+            entity.clientId = dto.clientId;
+        }
         return entity;
     }
 

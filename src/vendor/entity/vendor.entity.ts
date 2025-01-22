@@ -2,7 +2,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('vendor')
 export class VendorEntity {

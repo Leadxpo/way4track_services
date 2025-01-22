@@ -10,6 +10,7 @@ import { ClientAdapter } from './client.adapter';
 import { ClientIdDto } from './dto/client-id.dto';
 import { ClientDto } from './dto/client.dto';
 import { ClientRepository } from './repo/client.repo';
+import { ClientEntity } from './entity/client.entity';
 
 @Injectable()
 export class ClientService {
@@ -27,12 +28,8 @@ export class ClientService {
                 photoPath = await this.uploadClientPhoto(file);
             }
 
-            if (dto.id) {
-                // If ID exists, validate it before updating
-                const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
-                if (!existingClient) {
-                    throw new ErrorResponse(404, `Client with ID ${dto.id} not found`);
-                }
+            if (dto.id || dto.clientId) {
+
                 return await this.updateClientDetails(dto, photoPath);
             } else {
                 // Create a new client
@@ -73,7 +70,15 @@ export class ClientService {
 
     async updateClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
         try {
-            const existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+            // Check for client by id or clientId
+            let existingClient: ClientEntity | null = null;
+
+            if (dto.id) {
+                existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+            } else if (dto.clientId) {
+                existingClient = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
+            }
+
             if (!existingClient) {
                 throw new Error('Client not found');
             }
@@ -95,6 +100,7 @@ export class ClientService {
             throw new ErrorResponse(500, `Failed to update client details: ${error.message}`);
         }
     }
+
 
     async uploadClientPhoto(photo: Express.Multer.File): Promise<string> {
         try {

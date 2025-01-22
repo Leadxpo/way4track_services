@@ -10,6 +10,7 @@ export class ClientDto {
     address: string;
     joiningDate: string;
     clientPhoto?: string;
+    clientId?: string;
     voucherId?: number
     companyCode: string;
     unitCode: string
