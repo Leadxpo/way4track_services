@@ -16,12 +16,19 @@ export class ClientAdapter {
         branchEntity.id = dto.branchId;
         entity.branch = branchEntity;
         entity.clientPhoto = dto.clientPhoto
-        entity.dob = dto.dob;
+        // entity.dob = dto.dob;
         entity.email = dto.email;
         entity.address = dto.address;
-        entity.joiningDate = dto.joiningDate;
+        // entity.joiningDate = dto.joiningDate;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
+        if (entity.dob) {
+            entity.dob = new Date(entity.dob).toISOString().split('T')[0];
+        }
+        if (entity.joiningDate) {
+            entity.joiningDate = new Date(entity.joiningDate).toISOString().split('T')[0];
+        }
+
         // entity.status = dto.status
         if (dto.id) {
             entity.id = dto.id;

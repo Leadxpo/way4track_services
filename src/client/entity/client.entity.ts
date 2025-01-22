@@ -24,7 +24,7 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
     request: RequestRaiseEntity[];
 
-    @Column({ name: 'dob', type: 'date' })
+    @Column({ name: 'dob', type: 'date', nullable: true })
     dob: string;
 
     @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
@@ -33,7 +33,7 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'address', type: 'text' })
     address: string;
 
-    @Column({ name: 'joining_date', type: 'date' })
+    @Column({ name: 'joining_date', type: 'date', nullable: true })
     joiningDate: string;
 
 
