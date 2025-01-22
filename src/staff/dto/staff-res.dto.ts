@@ -9,7 +9,7 @@ export class GetStaffResDto {
     designation: DesignationEnum;
     branchId: number;
     branchName: string;
-    dob: string;
+    dob: Date;
     email: string;
     aadharNumber: string;
     address: string;
@@ -27,7 +27,7 @@ export class GetStaffResDto {
         designation: DesignationEnum,
         branchId: number,
         branchName: string,
-        dob: string,
+        dob: Date,
         email: string,
         aadharNumber: string,
         address: string,

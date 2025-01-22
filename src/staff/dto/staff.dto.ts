@@ -8,7 +8,7 @@ export class StaffDto {
     phoneNumber: string;
     branchId: number;
     designation: DesignationEnum;
-    dob: string;
+    dob: Date;
     email: string;
     aadharNumber: string;
     address: string;
