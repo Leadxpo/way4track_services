@@ -21,22 +21,22 @@ export class VendorEntity {
   @Column({ name: 'alternate_phone_number', type: 'varchar', length: 15, nullable: true })
   alternatePhoneNumber?: string;
 
-  @Column({ name: 'product_type', type: 'varchar', length: 50 })
+  @Column({ name: 'product_type', type: 'varchar', length: 50, nullable: true })
   productType: string;
 
   @Column({ name: 'vendor_photo', type: 'text', nullable: true })
   vendorPhoto: string;
 
-  @Column({ name: 'starting_date', type: 'date' })
+  @Column({ name: 'starting_date', type: 'date' , nullable: true})
   startingDate: Date;
 
-  @Column({ name: 'email', type: 'varchar', length: 150 })
+  @Column({ name: 'email', type: 'varchar', length: 150, nullable: true,unique:true })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20,unique:true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20,unique:true, nullable: true })
   aadharNumber: string;
 
-  @Column({ name: 'address', type: 'text' })
+  @Column({ name: 'address', type: 'text' , nullable: true})
   address: string;
 
   @OneToMany(() => ProductEntity, (product) => product.vendorId)

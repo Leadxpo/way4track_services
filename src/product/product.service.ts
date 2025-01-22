@@ -55,7 +55,7 @@ export class ProductService {
         // Update fields from DTO or keep existing values
         Object.assign(productEntity, {
             productName: productDto.productName ?? productEntity.productName,
-            emiNumber: productDto.emiNumber ?? productEntity.emiNumber,
+            // emiNumber: productDto.emiNumber ?? productEntity.emiNumber,
             dateOfPurchase: productDto.dateOfPurchase
                 ? new Date(productDto.dateOfPurchase)
                 : productEntity.dateOfPurchase,
@@ -75,6 +75,9 @@ export class ProductService {
             remarks1: productDto.remarks1 ?? productEntity.remarks1,
             remarks2: productDto.remarks2 ?? productEntity.remarks2,
             productPhoto: filePath || productEntity.productPhoto,
+            deviceModel: productDto.deviceModel || productEntity.deviceModel,
+            imeiNumber: productDto.imeiNumber || productEntity.imeiNumber,
+            quantity: productDto.quantity || productEntity.quantity
         });
         if (productDto.vendorEmailId) {
             let vendor = await this.vendorRepository.findOne({
@@ -87,6 +90,8 @@ export class ProductService {
                     vendorPhoneNumber: productDto.vendorPhoneNumber,
                     address: productDto.vendorAddress,
                     emailId: productDto.vendorEmailId,
+                    companyCode: productDto.companyCode,
+                    unitCode: productDto.unitCode
                 });
                 if (!vendor.vendorId) {
                     const allocationCount = await this.vendorRepository.count({});
@@ -116,6 +121,7 @@ export class ProductService {
     async createOrUpdateProduct(productDto: ProductDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
             const productEntity = await this.handleProductData(productDto, photo);
+            console.log(productEntity, productDto, "{{{{{{{{{{{{{{{{{{{{")
             await this.productRepository.save(productEntity);
             return new CommonResponse(true, 201, 'Product details created successfully');
         } catch (error) {
@@ -158,34 +164,9 @@ export class ProductService {
                         price: parseFloat(row.getCell(16).value as string),
                         productDescription: row.getCell(17).value,
                         companyCode: row.getCell(18).value,
-                        vendorPhoneNumber: row.getCell(19)?.value, // Ensure you are fetching the phone number from the row
+                        vendorPhoneNumber: row.getCell(19)?.value,
+                        deviceModel: row.getCell(20)?.value, // Ensure you are fetching the phone number from the row
                     });
-
-                    // data.push({
-                    //     productName: row.getCell(1).value,
-                    //     emiNumber: row.getCell(2).value,
-                    //     dateOfPurchase: row.getCell(3).value,
-                    //     vendorName: row.getCell(4).value,
-                    //     vendorEmailId: row.getCell(5).value,
-                    //     vendorAddress: row.getCell(6).value,
-                    //     imeiNumber: row.getCell(7).value,
-                    //     supplierName: row.getCell(8).value,
-                    //     serialNumber: row.getCell(9).value,
-                    //     primaryNo: row.getCell(10).value,
-                    //     secondaryNo: row.getCell(11).value,
-                    //     primaryNetwork: row.getCell(12).value,
-                    //     secondaryNetwork: row.getCell(13).value,
-                    //     categoryName: row.getCell(14).value,
-                    //     voucherId: voucherId,
-                    //     price: parseFloat(row.getCell(16).value as string),
-                    //     productDescription: row.getCell(17).value,
-                    //     companyCode: row.getCell(18).value,
-                    //     unitCode: row.getCell(19).value,
-                    //     simStatus: row.getCell(20).value,
-                    //     planName: row.getCell(21).value,
-                    //     remarks1: row.getCell(22).value,
-                    //     remarks2: row.getCell(23).value,
-                    // });
                 }
             });
 
@@ -196,9 +177,6 @@ export class ProductService {
             );
             await queryRunner.manager.save(productEntities);
             await queryRunner.commitTransaction();
-
-            return new CommonResponse(true, 201, 'Products uploaded successfully');
-            await this.productRepository.save(productEntities);
             return new CommonResponse(true, 201, 'Products uploaded successfully');
         } catch (error) {
             await queryRunner.rollbackTransaction();

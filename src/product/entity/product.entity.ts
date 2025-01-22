@@ -17,9 +17,6 @@ export class ProductEntity extends BaseEntity {
   productPhoto: string;
 
   @Column({ name: 'device_model', type: 'varchar', length: 50 })
-  emiNumber: string;
-
-  @Column({ name: 'emi_number', type: 'varchar', length: 50 })
   deviceModel: string;
 
   @Column({ name: 'date_of_purchase', type: 'date' })
@@ -34,7 +31,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ name: 'quantity', type: 'int'})
+  @Column({ name: 'quantity', type: 'int' })
   quantity: number;
 
   @Column({ name: 'product_description', type: 'text' })
@@ -104,5 +101,5 @@ export class ProductEntity extends BaseEntity {
 
   @ManyToOne(() => EstimateEntity, (estimate) => estimate.products)
   estimate: EstimateEntity;
-  
+
 }
