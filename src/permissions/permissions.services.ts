@@ -350,7 +350,7 @@ export class PermissionsService {
         return new CommonResponse(true, 200, 'Permission details fetched successfully', addPermission);
 
     }
-    async getStaffPermissions(req: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
+    async getStaffPermissions(req: { staffId?: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         const data = await this.repo.getStaffPermissions(req)
         if (!data) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])

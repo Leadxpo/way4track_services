@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ClientEntity } from './entity/client.entity';
-import { ClientDto } from './dto/client.dto';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientResDto } from './dto/client-res.dto';
-import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { ClientDto } from './dto/client.dto';
+import { ClientEntity } from './entity/client.entity';
 
 
 @Injectable()

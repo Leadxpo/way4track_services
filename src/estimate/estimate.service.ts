@@ -89,11 +89,9 @@ export class EstimateService {
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
-
             if (!Array.isArray(dto.productDetails) || dto.productDetails.length === 0) {
                 return new CommonResponse(false, 400, 'Product details must be a non-empty array');
             }
-
             const productDetails = await Promise.all(
                 dto.productDetails.map(async (productDetail) => {
                     const product = await this.productRepository.findOne({
@@ -112,22 +110,18 @@ export class EstimateService {
                     };
                 })
             );
-
             const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
             newEstimate.clientId = client;
             newEstimate.productDetails = productDetails.map((prodDetail) => ({
                 ...prodDetail,
                 estimate: newEstimate,
             }));
-
             const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
             newEstimate.amount = totalAmount;
-
             const estimateCount = await this.estimateRepository.count({
                 where: { clientId: client },
             });
             newEstimate.estimateId = this.generateEstimateId(estimateCount + 1);
-
             await this.estimateRepository.save(newEstimate);
             return new CommonResponse(true, 201, 'Estimate details created successfully');
         } catch (error) {

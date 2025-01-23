@@ -31,7 +31,7 @@ export class PermissionsController {
     }
 
     @Post('getStaffPermissions')
-    async getStaffPermissions(@Body() req: { staffId: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
+    async getStaffPermissions(@Body() req: { staffId?: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         try {
             return this.service.getStaffPermissions(req);
         } catch (error) {

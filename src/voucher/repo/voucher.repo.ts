@@ -518,9 +518,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return data
     }
 
-
-
-
     async getDayBookData(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')
             .select([

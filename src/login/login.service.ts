@@ -6,6 +6,8 @@ import { LoginDto } from "./dto/login.dto";
 import { StaffRepository } from "src/staff/repo/staff-repo";
 import { DesignationEnum } from "src/staff/entity/staff.entity";
 import { SubDealerRepository } from "src/sub-dealer/repo/sub-dealer.repo";
+import { SubDealerService } from "src/sub-dealer/sub-dealer.service";
+import { StaffService } from "src/staff/staff-services";
 
 @Injectable()
 export class LoginService {
@@ -13,7 +15,9 @@ export class LoginService {
     constructor(
         @InjectRepository(StaffRepository)
         private staffRepository: StaffRepository,
-        private subDealerRepo: SubDealerRepository
+        private subDealerRepo: SubDealerRepository,
+        private subDealerService: SubDealerService,
+        private staffService: StaffService
     ) { }
     async LoginDetails(req: LoginDto): Promise<CommonResponse> {
         let login;
@@ -32,4 +36,21 @@ export class LoginService {
         }
     }
 
-}
+    async ProfileDetails(req: LoginDto): Promise<CommonResponse> {
+        let login;
+        if (!req.staffId || !req.password || !req.designation || !req.companyCode || !req.unitCode) {
+            throw new Error('Missing required login details.');
+        }
+        if (req.designation === DesignationEnum.SubDealer) {
+            login = await this.subDealerService.getSubDealerProfileDetails(req);
+        } else {
+            login = await this.staffService.getStaffProfileDetails(req);
+        }
+        if (!login) {
+            return new CommonResponse(false, 401, "Data does not match the credentials.", []);
+        } else {
+            return new CommonResponse(true, 200, "Login successful.", login);
+        }
+    }
+
+} 

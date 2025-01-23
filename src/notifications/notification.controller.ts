@@ -1,7 +1,7 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { NotificationService } from './notification.service';
-import { GetNotificationDto, UpdateNotificationDto } from './dto/notification.dto';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
+import { UpdateNotificationDto } from './dto/notification.dto';
+import { NotificationService } from './notification.service';
 
 
 @Controller('notifications')

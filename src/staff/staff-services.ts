@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { AttendenceRepository } from 'src/attendence/repo/attendence.repo';
+import { LoginDto } from 'src/login/dto/login.dto';
+import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
-import { StaffAdapter } from './staff.adaptert';
-import { StaffRepository } from './repo/staff-repo';
-import { StaffDto } from './dto/staff.dto';
 import { StaffIdDto } from './dto/staff-id.dto';
-import { join } from 'path';
-import { promises as fs } from 'fs';
-import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
-import { AttendenceRepository } from 'src/attendence/repo/attendence.repo';
-import { BranchEntity } from 'src/branch/entity/branch.entity';
-import { AttendanceDto } from './dto/attenace-to-staff';
+import { StaffDto } from './dto/staff.dto';
 import { StaffEntity } from './entity/staff.entity';
-import { CommonReq } from 'src/models/common-req';
+import { StaffRepository } from './repo/staff-repo';
+import { StaffAdapter } from './staff.adaptert';
 
 @Injectable()
 export class StaffService {
@@ -116,6 +114,28 @@ export class StaffService {
             const staff = await this.staffRepository.find({
                 relations: ['branch', 'voucherId'],
                 where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
+            });
+
+            if (!staff.length) {
+                return new CommonResponse(false, 404, 'staff not found');
+            } else {
+                const data = this.adapter.convertEntityToDto(staff)
+                return new CommonResponse(true, 200, 'staff details fetched successfully', data);
+            }
+        } catch (error) {
+            console.error("Error in getstaffDetails service:", error);
+            return new CommonResponse(false, 500, 'Error fetching staff details');
+        }
+    }
+
+    async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
+        try {
+            const staff = await this.staffRepository.find({
+                relations: ['branch', 'voucherId', 'notifications'],
+                where: {
+                    staffId: req.staffId, password: req.password,
+                    designation: req.designation, companyCode: req.companyCode, unitCode: req.unitCode
+                },
             });
 
             if (!staff.length) {

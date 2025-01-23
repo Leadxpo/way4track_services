@@ -8,6 +8,8 @@ import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { CommonReq } from 'src/models/common-req';
+import { LoginDto } from 'src/login/dto/login.dto';
+import { DesignationEnum } from 'src/staff/entity/staff.entity';
 
 @Injectable()
 export class SubDealerService {
@@ -82,9 +84,6 @@ export class SubDealerService {
 
   }
 
-
-
-
   async deleteSubDealerDetails(dto: SubDealerIdDto): Promise<CommonResponse> {
     try {
       const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
@@ -132,6 +131,20 @@ export class SubDealerService {
       return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
     } else {
       return new CommonResponse(false, 4579, "There Is No branch names")
+    }
+  }
+
+  async getSubDealerProfileDetails(req: LoginDto): Promise<CommonResponse> {
+    try {
+      const subDealer = await this.subDealerRepository.find({ where: { subDealerId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
+      if (!subDealer) {
+        return new CommonResponse(false, 404, 'SubDealer not found');
+      }
+      const resDto = this.subDealerAdapter.convertEntityToDto(subDealer);
+
+      return new CommonResponse(true, 200, 'SubDealer details fetched successfully', resDto);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
     }
   }
 

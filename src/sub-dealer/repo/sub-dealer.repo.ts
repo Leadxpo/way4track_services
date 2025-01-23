@@ -80,6 +80,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
 
         return query;
     }
+
     async SubDealerLoginDetails(req: LoginDto) {
         const query = this.createQueryBuilder('sf')
             .select(`
@@ -98,7 +99,4 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
             .getRawOne();
         return query;
     }
-
-   
-
 }
