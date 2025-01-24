@@ -112,6 +112,12 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => VoucherEntity, (VoucherEntity) => VoucherEntity.staffId)
   voucherId: VoucherEntity[];
 
+  @OneToMany(() => RequestRaiseEntity, (voucher) => voucher.requestFrom)
+  staffFrom: RequestRaiseEntity[];
+
+  @OneToMany(() => RequestRaiseEntity, (voucher) => voucher.requestTo)
+  staffTo: RequestRaiseEntity[];
+
   @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
   request: RequestRaiseEntity[];
 

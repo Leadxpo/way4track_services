@@ -16,7 +16,10 @@ export class NotificationService {
         private readonly notificationAdapter: NotificationAdapter
     ) { }
 
-    async createNotification(entity: RequestRaiseEntity | TicketsEntity | WorkAllocationEntity, type: NotificationEnum): Promise<void> {
+    async createNotification(
+        entity: RequestRaiseEntity | TicketsEntity | WorkAllocationEntity,
+        type: NotificationEnum
+    ): Promise<void> {
         let message: string;
         let createdAt: Date;
         let user: any;
@@ -27,23 +30,23 @@ export class NotificationService {
         if (type === NotificationEnum.Request && entity instanceof RequestRaiseEntity) {
             message = entity.description;
             createdAt = entity.createdDate;
-            user = entity.staffId;
-            branch = entity.branchId;
+            user = entity.staffId; // Assuming staffId is a number
+            branch = entity.branchId; // Assuming branchId is a number
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         } else if (type === NotificationEnum.Ticket && entity instanceof TicketsEntity) {
             message = entity.problem;
             createdAt = entity.date;
-            user = entity.staff;
-            branch = entity.branch;
+            user = entity.staff; // Assuming staff is an object
+            branch = entity.branch; // Assuming branch is an object
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         } else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
             if (entity.staffId?.designation === 'Technician' && entity.install) {
                 message = `Technician allocated for ${entity.serviceOrProduct}`;
                 createdAt = entity.date;
-                user = entity.staffId;
-                branch = entity.branchId;
+                user = entity.staffId; // Assuming staffId is a number
+                branch = entity.branchId; // Assuming branchId is a number
                 companyCode = entity.companyCode;
                 unitCode = entity.unitCode;
             } else {
@@ -58,18 +61,14 @@ export class NotificationService {
             createdAt,
             isRead: false,
             notificationType: type,
-            userId: user.id,
-            branchId: branch.id,
+            userId: typeof user === 'object' ? user.id : user, // Fallback for primitive
+            branchId: typeof branch === 'object' ? branch.id : branch, // Fallback for primitive
             companyCode,
             unitCode
         });
 
-        await this.notificationRepository.save(notificationEntity);
+        await this.notificationRepository.insert(notificationEntity);
     }
-
-
-
-    // Assuming UpdateNotificationDto has a `isRead` property
 
     async markAsRead(ids: number[], updateNotificationDto: UpdateNotificationDto) {
         // If only a single id is provided, convert it to an array

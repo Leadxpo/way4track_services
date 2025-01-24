@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { ClientStatusEnum } from 'src/client/enum/client-status.enum';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, BeforeInsert, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
@@ -22,6 +23,14 @@ export class RequestRaiseEntity extends BaseEntity {
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.request)
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
+
+    @ManyToOne(() => StaffEntity, (account) => account.staffFrom, { nullable: true })
+    @JoinColumn({ name: 'request_from' })
+    requestFrom: StaffEntity;
+
+    @ManyToOne(() => StaffEntity, (account) => account.staffTo, { nullable: true })
+    @JoinColumn({ name: 'request_to' })
+    requestTo: StaffEntity;
 
     @ManyToOne(() => ClientEntity, (staffEntity) => staffEntity.request)
     @JoinColumn({ name: 'client_id' })
@@ -45,4 +54,7 @@ export class RequestRaiseEntity extends BaseEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
+
+    @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.request)
+    notifications: NotificationEntity[];
 }

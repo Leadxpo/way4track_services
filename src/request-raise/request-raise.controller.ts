@@ -3,6 +3,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { RequestRaiseIdDto } from './dto/request-raise-id.dto';
 import { RequestRaiseDto } from './dto/request-raise.dto';
 import { RequestRaiseService } from './request-raise.service';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('requests')
 export class RequestRaiseController {
@@ -33,6 +34,17 @@ export class RequestRaiseController {
     async getRequestDetails(@Body() dto: RequestRaiseIdDto): Promise<CommonResponse> {
         try {
             return await this.requestService.getRequestDetails(dto);
+
+        } catch (error) {
+            console.error('Error in get request details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching request details');
+        }
+    }
+
+    @Post('getAllRequestDetails')
+    async getAllRequestDetails(@Body() dto: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.requestService.getAllRequestDetails(dto);
 
         } catch (error) {
             console.error('Error in get request details in service:', error);

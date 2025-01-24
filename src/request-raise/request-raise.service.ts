@@ -8,6 +8,7 @@ import { RequestRaiseRepository } from './repo/request-raise.repo';
 import { NotificationEnum } from 'src/notifications/entity/notification.entity';
 import { NotificationService } from 'src/notifications/notification.service';
 import { RequestRaiseEntity } from './entity/request-raise.entity';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class RequestRaiseService {
@@ -118,6 +119,18 @@ export class RequestRaiseService {
     async getRequestDetails(req: RequestRaiseIdDto): Promise<CommonResponse> {
         try {
             const request = await this.requestRepository.findOne({ relations: ['staffId', 'branchId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!request) {
+                return new CommonResponse(false, 404, 'Request not found');
+            }
+            return new CommonResponse(true, 200, 'Request details fetched successfully', request);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getAllRequestDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!request) {
                 return new CommonResponse(false, 404, 'Request not found');
             }

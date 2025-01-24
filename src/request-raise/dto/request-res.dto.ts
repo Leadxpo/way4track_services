@@ -3,7 +3,7 @@ import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 export class RequestResDto {
     id: number;
     requestType: string;
-    staffID: number;
+    staffID: string;
     requestBY: string;
     requestTo: string;
     description: string;
@@ -17,7 +17,7 @@ export class RequestResDto {
     constructor(
         id: number,
         requestType: string,
-        staffID: number,
+        staffID: string,
 
         requestBY: string,
         requestTo: string,
