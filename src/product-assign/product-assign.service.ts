@@ -94,23 +94,23 @@ export class ProductAssignService {
                 throw new Error('Product assignment not found');
             }
 
-            const responseDto = new ProductAssignResDto(
-                productAssign.id,
-                productAssign.staffId.id.toString(),
-                productAssign.staffId.name,
-                productAssign.branchId.id,
-                productAssign.branchId.branchName,
-                productAssign.productId.productName,
-                productAssign.productId.categoryName,
-                productAssign.imeiNumberFrom,
-                productAssign.imeiNumberTo,
-                productAssign.numberOfProducts,
-                productAssign.productAssignPhoto,
-                productAssign.companyCode,
-                productAssign.unitCode
-            );
+            // const responseDto = new ProductAssignResDto(
+            //     productAssign.id,
+            //     productAssign.staffId.id.toString(),
+            //     productAssign.staffId.name,
+            //     productAssign.branchId.id,
+            //     productAssign.branchId.branchName,
+            //     productAssign.productId.productName,
+            //     productAssign.productId.categoryName,
+            //     productAssign.imeiNumberFrom,
+            //     productAssign.imeiNumberTo,
+            //     productAssign.numberOfProducts,
+            //     productAssign.productAssignPhoto,
+            //     productAssign.companyCode,
+            //     productAssign.unitCode
+            // );
 
-            return new CommonResponse(true, 200, 'Product assignment fetched successfully', responseDto);
+            return new CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -178,7 +178,7 @@ export class ProductAssignService {
         }
     }
 
-    
+
 }
 
 

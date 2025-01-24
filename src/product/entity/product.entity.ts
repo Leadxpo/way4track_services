@@ -10,34 +10,34 @@ export class ProductEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'product_name', type: 'varchar', length: 100 })
+  @Column({ name: 'product_name', type: 'varchar', length: 100, nullable: true })
   productName: string;
 
   @Column({ name: 'product_photo', type: 'text', nullable: true })
   productPhoto: string;
 
-  @Column({ name: 'device_model', type: 'varchar', length: 50 })
+  @Column({ name: 'device_model', type: 'varchar', length: 50, nullable: true })
   deviceModel: string;
 
-  @Column({ name: 'date_of_purchase', type: 'date' })
+  @Column({ name: 'date_of_purchase', type: 'date', nullable: true })
   dateOfPurchase: Date;
 
-  @Column({ name: 'imei_number', type: 'varchar', length: 20 })
+  @Column({ name: 'imei_number', type: 'varchar', length: 20, nullable: true })
   imeiNumber: string;
 
-  @Column({ name: 'category_name', type: 'varchar', length: 50 })
+  @Column({ name: 'category_name', type: 'varchar', length: 50, nullable: true })
   categoryName: string;
 
-  @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2 })
+  @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2, nullable: true })
   price: number;
 
-  @Column({ name: 'quantity', type: 'int' })
+  @Column({ name: 'quantity', type: 'int', nullable: true })
   quantity: number;
 
-  @Column({ name: 'product_description', type: 'text' })
+  @Column({ name: 'product_description', type: 'text', nullable: true })
   productDescription: string;
 
-  @ManyToOne(() => VendorEntity, (vendorEntity) => vendorEntity.product)
+  @ManyToOne(() => VendorEntity, (vendorEntity) => vendorEntity.product, { nullable: true })
   @JoinColumn({ name: 'vendor_id' })
   vendorId: VendorEntity;
 
@@ -99,7 +99,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'remarks_2', type: 'text', nullable: true })
   remarks2: string;
 
-  @ManyToOne(() => EstimateEntity, (estimate) => estimate.products)
+  @ManyToOne(() => EstimateEntity, (estimate) => estimate.products, { nullable: true })
   estimate: EstimateEntity;
 
 }

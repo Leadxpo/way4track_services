@@ -26,6 +26,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pa.number_of_products AS numberOfProducts',
                 'sa.name AS staffName',
                 'br.name AS branchName',
+                'pr.product_name as productName',
+                'pr.product_photo as productPhoto'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id')
@@ -43,6 +45,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             numberOfProducts: item.numberOfProducts,
             staffName: item.staffName,
             branchName: item.branchName,
+            productName: item.productName,
+            productPhoto: item.productPhoto
         }));
     }
 
@@ -76,7 +80,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         };
     }
 
-    async getTotalAssignedAndStockLast30Days(req:CommonReq): Promise<any> {
+    async getTotalAssignedAndStockLast30Days(req: CommonReq): Promise<any> {
         const result = await this.createQueryBuilder('pa')
             .select('SUM(pa.assigned_qty)', 'totalAssigned')
             .leftJoin(ProductEntity, 'p', 'p.id = pa.product_id')
@@ -105,7 +109,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         return finalResult;
     }
 
-    async getAssignedQtyLast30Days(req:CommonReq) {
+    async getAssignedQtyLast30Days(req: CommonReq) {
         const result = await
             this.createQueryBuilder('productAssign')
                 .innerJoinAndSelect('productAssign.product_id', 'product')

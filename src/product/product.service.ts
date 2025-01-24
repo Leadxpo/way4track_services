@@ -143,29 +143,28 @@ export class ProductService {
             const data = [];
             worksheet.eachRow((row, rowIndex) => {
                 if (rowIndex > 1) {
-                    const voucherId = row.getCell(15).value;
+                    const voucherId = row.getCell(14).value;
 
                     data.push({
                         productName: row.getCell(1).value,
-                        emiNumber: row.getCell(2).value,
-                        dateOfPurchase: row.getCell(3).value,
-                        vendorName: row.getCell(4).value,
-                        vendorEmailId: row.getCell(5).value,
-                        vendorAddress: row.getCell(6).value,
-                        imeiNumber: row.getCell(7).value,
-                        supplierName: row.getCell(8).value,
-                        serialNumber: row.getCell(9).value,
-                        primaryNo: row.getCell(10).value,
-                        secondaryNo: row.getCell(11).value,
-                        primaryNetwork: row.getCell(12).value,
-                        secondaryNetwork: row.getCell(13).value,
-                        categoryName: row.getCell(14).value,
+                        dateOfPurchase: row.getCell(2).value,
+                        vendorName: row.getCell(3).value,
+                        vendorEmailId: row.getCell(4).value,
+                        vendorAddress: row.getCell(5).value,
+                        imeiNumber: row.getCell(6).value,
+                        supplierName: row.getCell(7).value,
+                        serialNumber: row.getCell(8).value,
+                        primaryNo: row.getCell(9).value,
+                        secondaryNo: row.getCell(10).value,
+                        primaryNetwork: row.getCell(11).value,
+                        secondaryNetwork: row.getCell(12).value,
+                        categoryName: row.getCell(13).value,
                         voucherId: voucherId,
-                        price: parseFloat(row.getCell(16).value as string),
-                        productDescription: row.getCell(17).value,
-                        companyCode: row.getCell(18).value,
-                        vendorPhoneNumber: row.getCell(19)?.value,
-                        deviceModel: row.getCell(20)?.value, // Ensure you are fetching the phone number from the row
+                        price: parseFloat(row.getCell(15).value as string),
+                        productDescription: row.getCell(16).value,
+                        companyCode: row.getCell(17).value,
+                        vendorPhoneNumber: row.getCell(18)?.value,
+                        deviceModel: row.getCell(19)?.value, // Ensure you are fetching the phone number from the row
                     });
                 }
             });
@@ -228,7 +227,6 @@ export class ProductService {
         }
     }
 
-
     async getSearchDetailProduct(req: ProductIdDto): Promise<CommonResponse> {
         try {
             const product = await this.productRepository.getSearchDetailProduct(req)
@@ -242,8 +240,6 @@ export class ProductService {
             throw new ErrorResponse(500, error.message);
         }
     }
-
-
 
     async getProductNamesDropDown(): Promise<CommonResponse> {
         const data = await this.productRepository.find({ select: ['productName', 'id', 'imeiNumber'] });

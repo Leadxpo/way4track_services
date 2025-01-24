@@ -9,13 +9,13 @@ export class VendorEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ name: 'name', type: 'varchar', length: 100 })
+  @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
   name: string;
 
-  @Column({ name: 'vendor_id', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'vendor_id', type: 'varchar', length: 20, unique: true, nullable: true })
   vendorId: string;
 
-  @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, default: '' })
+  @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, default: '', nullable: true })
   vendorPhoneNumber: string;
 
   @Column({ name: 'alternate_phone_number', type: 'varchar', length: 15, nullable: true })
@@ -27,25 +27,25 @@ export class VendorEntity {
   @Column({ name: 'vendor_photo', type: 'text', nullable: true })
   vendorPhoto: string;
 
-  @Column({ name: 'starting_date', type: 'date' , nullable: true})
+  @Column({ name: 'starting_date', type: 'date', nullable: true })
   startingDate: Date;
 
-  @Column({ name: 'email', type: 'varchar', length: 150, nullable: true,unique:true })
+  @Column({ name: 'email', type: 'varchar', length: 150, nullable: true, unique: true })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20,unique:true, nullable: true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })
   aadharNumber: string;
 
-  @Column({ name: 'address', type: 'text' , nullable: true})
+  @Column({ name: 'address', type: 'text', nullable: true })
   address: string;
 
-  @OneToMany(() => ProductEntity, (product) => product.vendorId)
+  @OneToMany(() => ProductEntity, (product) => product.vendorId, { nullable: true })
   product: ProductEntity[];
 
-  @OneToMany(() => WorkAllocationEntity, (product) => product.vendorId)
+  @OneToMany(() => WorkAllocationEntity, (product) => product.vendorId, { nullable: true })
   workAllocation: WorkAllocationEntity[];
 
-  @OneToMany(() => VoucherEntity, (product) => product.vendorId)
+  @OneToMany(() => VoucherEntity, (product) => product.vendorId, { nullable: true })
   voucherId: VoucherEntity[];
 
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.vendor, { nullable: true })

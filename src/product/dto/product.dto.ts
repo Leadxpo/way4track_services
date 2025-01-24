@@ -2,7 +2,6 @@
 export class ProductDto {
   id?: number;
   productName: string;
-  // emiNumber: string;
   dateOfPurchase: Date;
   vendorId: number;
   imeiNumber: string;
@@ -17,7 +16,6 @@ export class ProductDto {
   vendorAddress: string;
   vendorEmailId: string;
   quantity: number
-  // New fields
   supplierName: string;
   serialNumber: string;
   primaryNo: string;
