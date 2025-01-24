@@ -299,8 +299,28 @@ export class VoucherDashboardService {
 
     }
 
+    async getProductTypeCreditAndDebitPercentages(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getProductTypeCreditAndDebitPercentages(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getSolidLiquidCash(req: CommonReq): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getSolidLiquidCash(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getBranchWiseSolidLiquidCash(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getBranchWiseSolidLiquidCash(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

@@ -318,6 +318,17 @@ export class DashboardController {
         }
     }
 
+    @Post('getBranchWiseSolidLiquidCash')
+    async getBranchWiseSolidLiquidCash(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getBranchWiseSolidLiquidCash(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
 
     @Post('getVoucherData')
     async getVoucherData(@Body() req: InvoiceDto): Promise<CommonResponse> {
@@ -565,6 +576,17 @@ export class DashboardController {
     async getLast30DaysCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getLast30DaysCreditAndDebitPercentages(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getProductTypeCreditAndDebitPercentages')
+    async getProductTypeCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getProductTypeCreditAndDebitPercentages(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

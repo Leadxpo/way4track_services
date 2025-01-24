@@ -689,7 +689,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                     NULLIF(SUM(ve.amount), 0) * 100, 2
                 ) AS debitPercentage`
             ])
-            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id') 
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
@@ -805,5 +805,102 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             productPhoto: result.productPhoto
         }));
     }
+
+    async getBranchWiseSolidLiquidCash(req: CommonReq) {
+        const result = await this.dataSource
+            .getRepository(VoucherEntity)
+            .createQueryBuilder('ve')
+            .select([
+                'br.name AS branchName',
+                `SUM(CASE 
+                    WHEN ve.voucher_type = :receipt 
+                    AND ve.payment_type = :cash 
+                    AND ve.product_type IN ('service', 'product', 'sales') 
+                    THEN ve.amount ELSE 0 END) AS solidCash`,
+                `SUM(CASE 
+                    WHEN ve.voucher_type = :contra 
+                    AND ve.from_account_id IS NOT NULL 
+                    THEN ve.amount ELSE 0 END) AS liquidCash`,
+            ])
+            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+            .where('ve.voucher_type IN (:...voucherTypes)', {
+                voucherTypes: ['receipt', 'contra'],
+            })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name') // Group by branch name
+            .setParameters({
+                receipt: 'receipt',
+                contra: 'contra',
+                cash: 'cash',
+            })
+            .getRawMany();
+
+        // Format the response
+        return result.map(row => ({
+            branchName: row.branchName || 'Unknown Branch',
+            solidCash: parseFloat(row.solidCash || 0),
+            liquidCash: parseFloat(row.liquidCash || 0),
+        }));
+    }
+
+
+    async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS date`,
+                `branch.id AS branchId`,
+                `branch.name AS branchName`,
+                `branch.branch_number AS branchNumber`,
+                `branch.branch_address AS branchAddress`,
+                // Credit Amount
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) AS creditAmount`,
+                // Debit Amount
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) AS debitAmount`,
+                // Percentages for Credit Types
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS serviceCreditPercentage`,
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'product' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS productCreditPercentage`,
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'sales' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS salesCreditPercentage`,
+                // Percentages for Debit Types
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'expanses' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS expansesDebitPercentage`,
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'salaries' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS salariesDebitPercentage`
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
+            })
+            .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy(`
+                DATE(ve.generation_date), 
+                branch.id, 
+                branch.name, 
+                branch.branch_number, 
+                branch.branch_address
+            `)
+            .orderBy(`DATE(ve.generation_date)`, 'ASC')
+            .addOrderBy('branch.name', 'ASC')
+            .addOrderBy('branch.branch_number', 'ASC')
+            .getRawMany();
+
+        return query;
+    }
+
 
 }
