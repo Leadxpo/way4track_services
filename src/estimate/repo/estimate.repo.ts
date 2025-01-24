@@ -3,9 +3,6 @@ import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { DataSource, Repository } from "typeorm";
 import { EstimateEntity } from "../entity/estimate.entity";
-
-
-
 @Injectable()
 
 export class EstimateRepository extends Repository<EstimateEntity> {
@@ -26,6 +23,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
 
         const query = this.createQueryBuilder('estimate')
             .select([
+                'estimate.id as id',
                 'estimate.estimate_id AS estimateNumber',
                 'client.name AS clientName',
                 'estimate.estimate_date AS estimateDate',
@@ -59,6 +57,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
     }) {
         const query = this.createQueryBuilder('estimate')
             .select([
+                'estimate.id as id',
                 'estimate.estimate_id AS estimateNumber',
                 'client.name AS clientName',
                 'estimate.estimate_date AS estimateDate',

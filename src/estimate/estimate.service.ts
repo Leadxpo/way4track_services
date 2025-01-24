@@ -10,6 +10,7 @@ import { EstimateResDto } from './dto/estimate-res.dto';
 import { EstimateDto } from './dto/estimate.dto';
 import { EstimateAdapter } from './estimate.adapter';
 import { EstimateRepository } from './repo/estimate.repo';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class EstimateService {
@@ -80,7 +81,6 @@ export class EstimateService {
             throw new ErrorResponse(500, `Failed to update estimate details: ${error.message}`);
         }
     }
-
     async createEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({
@@ -89,9 +89,7 @@ export class EstimateService {
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
-            if (!Array.isArray(dto.productDetails) || dto.productDetails.length === 0) {
-                return new CommonResponse(false, 400, 'Product details must be a non-empty array');
-            }
+
             const productDetails = await Promise.all(
                 dto.productDetails.map(async (productDetail) => {
                     const product = await this.productRepository.findOne({
@@ -100,29 +98,47 @@ export class EstimateService {
                     if (!product) {
                         throw new Error(`Product with ID ${productDetail.productId} not found`);
                     }
-                    const totalCost = product.price * productDetail.quantity;
+
+                    // Ensure quantity is a valid number (default to 0 if missing)
+                    const quantity = productDetail.quantity ? parseInt(productDetail.quantity.toString(), 10) : 0;
+
+                    if (quantity <= 0) {
+                        throw new Error(`Quantity for product ${product.productName} must be greater than 0`);
+                    }
+
+                    // Ensure costPerUnit is a valid number (convert string to number)
+                    const costPerUnit = parseFloat(product.price.toString()) || 0;
+
+                    if (costPerUnit <= 0) {
+                        throw new Error(`Cost per unit for product ${product.productName} must be greater than 0`);
+                    }
+
+                    // Calculate total cost for the product
+                    const totalCost = costPerUnit * quantity;
+
                     return {
                         productId: product.id,
                         productName: product.productName,
-                        quantity: productDetail.quantity,
-                        costPerUnit: product.price,
-                        totalCost: totalCost,
+                        quantity: quantity,
+                        costPerUnit: costPerUnit,
+                        totalCost: totalCost || 0, // Ensure totalCost is a valid number
                     };
                 })
             );
+
+            const totalAmount = productDetails.reduce((sum, product) => sum + (product.totalCost || 0), 0);
+
             const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
             newEstimate.clientId = client;
-            newEstimate.productDetails = productDetails.map((prodDetail) => ({
-                ...prodDetail,
-                estimate: newEstimate,
-            }));
-            const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
-            newEstimate.amount = totalAmount;
-            const estimateCount = await this.estimateRepository.count({
-                where: { clientId: client },
-            });
-            newEstimate.estimateId = this.generateEstimateId(estimateCount + 1);
+            newEstimate.productDetails = productDetails;
+            newEstimate.amount = totalAmount || 0;
+            newEstimate.estimateId = `EST-${(await this.estimateRepository.count() + 1).toString().padStart(4, '0')}`;
+
+            console.log(newEstimate, "___________"); // Log the newEstimate to check if productDetails are correct
+
+            // Save the estimate entity
             await this.estimateRepository.save(newEstimate);
+
             return new CommonResponse(true, 201, 'Estimate details created successfully');
         } catch (error) {
             console.error(`Error creating estimate details: ${error.message}`, error.stack);
@@ -142,10 +158,6 @@ export class EstimateService {
         }
     }
 
-    private generateEstimateId(sequenceNumber: number): string {
-        const paddedNumber = sequenceNumber.toString().padStart(4, '0');
-        return `EST-${paddedNumber}`;
-    }
 
     private generateInvoiceId(sequenceNumber: number): string {
         const paddedNumber = sequenceNumber.toString().padStart(4, '0');
@@ -170,7 +182,7 @@ export class EstimateService {
     async getEstimateDetails(req: EstimateIdDto): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.findOne({
-                relations: ['clientId'],
+                relations: ['clientId', 'products'],
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
@@ -178,7 +190,25 @@ export class EstimateService {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
 
-            const data: EstimateResDto = this.estimateAdapter.convertEntityToResDto(estimate);
+            const data: EstimateResDto[] = this.estimateAdapter.convertEntityToResDto([estimate]);
+            return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getAllEstimateDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const estimate = await this.estimateRepository.find({
+                relations: ['clientId', 'products'],
+                where: { companyCode: req.companyCode, unitCode: req.unitCode }
+            });
+
+            if (!estimate) {
+                return new CommonResponse(false, 404, 'Estimate not found');
+            }
+
+            const data: EstimateResDto[] = this.estimateAdapter.convertEntityToResDto(estimate);
             return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);

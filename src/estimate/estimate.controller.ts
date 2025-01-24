@@ -3,6 +3,7 @@ import { EstimateDto } from './dto/estimate.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { EstimateService } from './estimate.service';
 import { EstimateIdDto } from './dto/estimate-id.dto';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('estimate')
 export class EstimateController {
@@ -32,6 +33,16 @@ export class EstimateController {
     async getEstimateDetails(@Body() req: EstimateIdDto): Promise<CommonResponse> {
         try {
             return await this.estimateService.getEstimateDetails(req);
+        } catch (error) {
+            console.error('Error in get estimate details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching estimate details');
+        }
+    }
+
+    @Post('getAllEstimateDetails')
+    async getAllEstimateDetails(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.estimateService.getAllEstimateDetails(req);
         } catch (error) {
             console.error('Error in get estimate details in service:', error);
             return new CommonResponse(false, 500, 'Error fetching estimate details');

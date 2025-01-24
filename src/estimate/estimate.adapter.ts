@@ -24,6 +24,7 @@ export class EstimateAdapter {
         const clientEntity = new ClientEntity();
         clientEntity.clientId = dto.clientId;
         entity.clientId = clientEntity;
+        entity.quantity = dto.quantity
 
         entity.quantity = dto.quantity;
         if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
@@ -50,8 +51,8 @@ export class EstimateAdapter {
         return entity;
     }
 
-    convertEntityToResDto(entity: EstimateEntity): EstimateResDto {
-        const dto = new EstimateResDto(
+    convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
+        return entities.map(entity => new EstimateResDto(
             entity.id,
             entity.clientId.clientId,
             entity.clientId.name,
@@ -69,7 +70,7 @@ export class EstimateAdapter {
             entity.productDetails?.map(product => ({
                 name: product.productName,
                 quantity: product.quantity,
-                amount: product.totalCost / product.quantity,
+                amount: product.quantity > 0 ? product.totalCost / product.quantity : 0, // Avoid division by zero
             })),
             entity.estimateId,
             entity.invoiceId,
@@ -77,8 +78,8 @@ export class EstimateAdapter {
             entity.SCST,
             entity.CGST,
             entity.hsnCode
-        );
-        return dto;
+        ));
     }
+
 }
 

@@ -16,34 +16,34 @@ export class EstimateEntity extends BaseEntity {
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
 
-    @Column({ type: 'varchar', length: 255, name: 'building_address' })
+    @Column({ type: 'varchar', length: 255, name: 'building_address', nullable: true })
     buildingAddress: string;
 
-    @Column({ name: 'estimate_date', type: 'timestamp',nullable: true })
+    @Column({ name: 'estimate_date', type: 'timestamp', nullable: true })
     estimateDate: Date;
 
-    @Column({ type: 'varchar', name: 'estimate_id' })
+    @Column({ type: 'varchar', name: 'estimate_id', nullable: true })
     estimateId: string;
 
     @Column({ type: 'varchar', name: 'invoice_id', nullable: true })
     invoiceId: string;
 
-    @Column({ type: 'date', name: 'expire_date' })
+    @Column({ type: 'date', name: 'expire_date', nullable: true })
     expireDate: string;
 
-    @Column({ type: 'varchar', length: 100, name: 'product_or_service' })
+    @Column({ type: 'varchar', length: 100, name: 'product_or_service', nullable: true })
     productOrService: string;
 
-    @Column({ type: 'varchar', length: 255, name: 'description' })
+    @Column({ type: 'varchar', length: 255, name: 'description', nullable: true })
     description: string;
 
-    @Column({ type: 'float', name: 'amount' })
+    @Column({ type: 'float', name: 'amount', nullable: true })
     amount: number;
 
-    @Column({ type: 'float', name: 'quantity' })
+    @Column({ type: 'float', name: 'quantity', nullable: true })
     quantity: number;
 
-    @Column({ type: 'float', name: 'hsn_code' })
+    @Column({ type: 'float', name: 'hsn_code', nullable: true })
     hsnCode: string;
 
     @OneToMany(() => ProductEntity, (product) => product.estimate, { eager: true })
