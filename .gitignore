@@ -1,12 +1,8 @@
-dist
 .DS_Store
-node_modules
 # Dependencies
-node_modules
-
-# Build outputs
-dist
-build
+node_modules/
+dist/*
+uploads/
 # Environment
 .env
 src/app.module.ts
