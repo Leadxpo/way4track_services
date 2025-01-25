@@ -132,6 +132,12 @@ export class ProductService {
 
     async bulkUploadProducts(file: Express.Multer.File): Promise<CommonResponse> {
 
+        const getCellValue = (cell: ExcelJS.Cell) => {
+            if (cell.value && typeof cell.value === 'object') {
+                return (cell.value as any).text || cell.value.toString();
+            }
+            return cell.value ? cell.value.toString() : null;
+        };
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -141,34 +147,73 @@ export class ProductService {
             const worksheet = workbook.worksheets[0];
 
             const data = [];
+            // worksheet.eachRow((row, rowIndex) => {
+            //     if (rowIndex > 1) {
+            //         const voucherId = row.getCell(14).value;
+
+            //         data.push({
+            //             productName: row.getCell(1).value,
+            //             dateOfPurchase: row.getCell(2).value,
+            //             vendorName: row.getCell(3).value,
+            //             vendorEmailId: row.getCell(4).value,
+            //             vendorAddress: row.getCell(5).value,
+            //             imeiNumber: row.getCell(6).value,
+            //             supplierName: row.getCell(7).value,
+            //             serialNumber: row.getCell(8).value,
+            //             primaryNo: row.getCell(9).value,
+            //             secondaryNo: row.getCell(10).value,
+            //             primaryNetwork: row.getCell(11).value,
+            //             secondaryNetwork: row.getCell(12).value,
+            //             categoryName: row.getCell(13).value,
+            //             voucherId: voucherId,
+            //             price: parseFloat(row.getCell(15).value as string),
+            //             productDescription: row.getCell(16).value,
+            //             companyCode: row.getCell(17).value,
+            //             vendorPhoneNumber: row.getCell(18)?.value,
+            //             deviceModel: row.getCell(19)?.value,
+            //             unitCode: row.getCell(20).value,
+            //             simStatus: row.getCell(21).value,
+            //             planName: row.getCell(22).value,
+            //             remarks1: row.getCell(23).value,
+            //             remarks2: row.getCell(24).value,
+            //             quantity: row.getCell(25).value,
+
+            //         });
+            //     }
+            // });
             worksheet.eachRow((row, rowIndex) => {
                 if (rowIndex > 1) {
-                    const voucherId = row.getCell(14).value;
+                    const voucherId = getCellValue(row.getCell(14));
 
                     data.push({
-                        productName: row.getCell(1).value,
-                        dateOfPurchase: row.getCell(2).value,
-                        vendorName: row.getCell(3).value,
-                        vendorEmailId: row.getCell(4).value,
-                        vendorAddress: row.getCell(5).value,
-                        imeiNumber: row.getCell(6).value,
-                        supplierName: row.getCell(7).value,
-                        serialNumber: row.getCell(8).value,
-                        primaryNo: row.getCell(9).value,
-                        secondaryNo: row.getCell(10).value,
-                        primaryNetwork: row.getCell(11).value,
-                        secondaryNetwork: row.getCell(12).value,
-                        categoryName: row.getCell(13).value,
+                        productName: getCellValue(row.getCell(1)),
+                        dateOfPurchase: getCellValue(row.getCell(2)),
+                        vendorName: getCellValue(row.getCell(3)),
+                        vendorEmailId: getCellValue(row.getCell(4)),
+                        vendorAddress: getCellValue(row.getCell(5)),
+                        imeiNumber: getCellValue(row.getCell(6)),
+                        supplierName: getCellValue(row.getCell(7)),
+                        serialNumber: getCellValue(row.getCell(8)),
+                        primaryNo: getCellValue(row.getCell(9)),
+                        secondaryNo: getCellValue(row.getCell(10)),
+                        primaryNetwork: getCellValue(row.getCell(11)),
+                        secondaryNetwork: getCellValue(row.getCell(12)),
+                        categoryName: getCellValue(row.getCell(13)),
                         voucherId: voucherId,
-                        price: parseFloat(row.getCell(15).value as string),
-                        productDescription: row.getCell(16).value,
-                        companyCode: row.getCell(17).value,
-                        vendorPhoneNumber: row.getCell(18)?.value,
-                        deviceModel: row.getCell(19)?.value, // Ensure you are fetching the phone number from the row
+                        price: parseFloat(getCellValue(row.getCell(15)) || '0'),
+                        productDescription: getCellValue(row.getCell(16)),
+                        companyCode: getCellValue(row.getCell(17)),
+                        vendorPhoneNumber: getCellValue(row.getCell(18)),
+                        deviceModel: getCellValue(row.getCell(19)),
+                        unitCode: getCellValue(row.getCell(20)),
+                        simStatus: getCellValue(row.getCell(21)),
+                        planName: getCellValue(row.getCell(22)),
+                        remarks1: getCellValue(row.getCell(23)),
+                        remarks2: getCellValue(row.getCell(24)),
+                        quantity: parseInt(getCellValue(row.getCell(25)) || '0', 10),
                     });
                 }
             });
-
             const productEntities = await Promise.all(
                 data.map(async (productDto) => {
                     return this.handleProductData(productDto);
@@ -185,6 +230,11 @@ export class ProductService {
             await queryRunner.release();
         }
     }
+
+
+
+
+
 
     async deleteProductDetails(dto: ProductIdDto): Promise<CommonResponse> {
         try {

@@ -62,10 +62,10 @@ export class ProductEntity extends BaseEntity {
   @OneToMany(() => WorkAllocationEntity, (product) => product.productId)
   workAllocation: WorkAllocationEntity[];
 
-  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'company_code', length: 20, nullable: true, default: 'WAY4TRACK' })
   companyCode: string;
 
-  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: true, default: 'WAY4' })
   unitCode: string;
 
   // New columns
