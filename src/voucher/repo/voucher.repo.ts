@@ -433,7 +433,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
-            .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date)');
+            .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date)');
 
         const result = await query.getRawMany();
         return result;
@@ -904,3 +904,5 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
 
 }
+    
+    
