@@ -37,7 +37,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.amount AS amount',
             ])
             .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
-            .leftJoin(EstimateEntity, 'es', 've.invoice_id = es.id')
+            .leftJoin(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -77,7 +77,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'pr.price AS productPrice',
             ])
             .leftJoin(ClientEntity, 'cl', 'cl.client_id = ve.id')
-            .leftJoin(EstimateEntity, 'es', 've.invoice_id = es.id')
+            .leftJoin(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .leftJoin(ProductEntity, 'pr', 've.product=pr.id')
             .where('es.invoice_id = :inVoiceId', { inVoiceId: req.inVoiceId })
@@ -96,6 +96,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .addGroupBy('pr.price')
             .addGroupBy('ve.expire_date')
             .addGroupBy('ve.payment_status')
+            .addGroupBy('es.estimate_date') // Add this line
+            .addGroupBy('es.expire_date')   // If needed, add this too
             .getRawOne();
 
         return query;
