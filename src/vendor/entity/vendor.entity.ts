@@ -57,4 +57,7 @@ export class VendorEntity {
 
   @Column('varchar', { name: 'unit_code', length: 20, nullable: false, default: 'WAY4' })
   unitCode: string;
+
+  @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
+  GSTNumber: string;
 }

@@ -230,7 +230,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query;
     }
 
-    async getLedgerData(req: {
+    async getLedgerDataTable(req: {
         voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
         unitCode?: string
     }) {
@@ -238,8 +238,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 've.voucher_id AS ledgerId',
                 'cl.name AS clientName',
+                'sb.name AS subDealerName',
+                'vr.name AS vendorName',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
+                'cl.phone_number AS phoneNumber',
+                'cl.email AS email',
+                'cl.address AS address',
+                'cl.GST_number as GSTNumber',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
                 'branch.name AS branchName',
@@ -249,6 +255,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
+            .leftJoin(VendorEntity, 'vr', 've.vendor_id = vr.id')
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -262,6 +270,63 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         if (req.paymentStatus) {
             query.andWhere('ve.payment_status = :paymentStatus', { paymentStatus: req.paymentStatus });
+        }
+
+        query.groupBy('ve.voucher_id')
+            .addGroupBy('cl.name')
+            .addGroupBy('branch.name')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.amount');
+
+        const result = await query.getRawMany();
+        return result;
+    }
+
+    async getLedgerDataById(req: {
+        voucherId?: number; companyCode?: string;
+        unitCode?: string
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS ledgerId',
+                'cl.name AS clientName',
+                'sb.name AS subDealerName',
+                'vr.name AS vendorName',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                'cl.phone_number AS phoneNumber',
+                'cl.email AS email',
+                'cl.address AS address',
+                'cl.client_photo as clientPhoto',
+                'cl.GST_number as GSTNumber',
+                'sb.sub_dealer_phone_number AS subDealerPhoneNumber',
+                'sb.gst_number AS gstNumber',
+                'sb.address AS sbAddress',
+                'sb.sub_dealer_photo as subDealerPhoto',
+                'sb.email as emailId',
+                'vr.vendor_phone_number AS vendorPhoneNumber',
+                'vr.GST_number AS gstNumber',
+                'vr.address AS vrAddress',
+                'vr.vendor_photo as vendorPhoto',
+                'vr.email as emailId',
+                've.payment_status AS paymentStatus',
+                've.amount AS amount',
+                'branch.name AS branchName',
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
+            .leftJoin(VendorEntity, 'vr', 've.vendor_id = vr.id')
+            .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
+            .andWhere(`ve.company_code = "${req.companyCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+        if (req.voucherId) {
+            query.andWhere('ve.voucher_id = :voucherId', { voucherId: req.voucherId });
         }
 
         query.groupBy('ve.voucher_id')
@@ -291,10 +356,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.generation_date AS generationDate',
                 've.expire_date AS expireDate',
                 've.payment_status AS paymentStatus',
-                've.voucher_type AS voucherType',
                 'cl.phone_number AS phoneNumber',
                 'cl.email AS email',
                 'cl.address AS address',
+                'cl.client_photo as clientPhoto',
+                'cl.GST_number as GSTNumber',
+                've.voucher_type AS voucherType',
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - 
@@ -330,7 +397,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return data;
     }
-
     async getDetailLedgerData(req: VoucherIDResDTo) {
         const query = await this.createQueryBuilder('ve')
             .select([
@@ -904,5 +970,5 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
 
 }
-    
-    
+
+

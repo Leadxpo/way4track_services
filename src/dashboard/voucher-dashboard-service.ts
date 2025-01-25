@@ -201,11 +201,24 @@ export class VoucherDashboardService {
         }
     }
 
-    async getLedgerData(req: {
+    async getLedgerDataTable(req: {
         voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
         unitCode?: string
     }): Promise<CommonResponse> {
-        const VoucherData = await this.voucherRepository.getLedgerData(req)
+        const VoucherData = await this.voucherRepository.getLedgerDataTable(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getLedgerDataById(req: {
+        voucherId?: number; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getLedgerDataById(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

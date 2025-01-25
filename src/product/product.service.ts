@@ -132,62 +132,43 @@ export class ProductService {
 
     async bulkUploadProducts(file: Express.Multer.File): Promise<CommonResponse> {
 
+
         const getCellValue = (cell: ExcelJS.Cell) => {
-            if (cell.value && typeof cell.value === 'object') {
+            if (cell.value === null || cell.value === undefined) {
+                return null;
+            }
+            if (typeof cell.value === 'object') {
                 return (cell.value as any).text || cell.value.toString();
             }
-            return cell.value ? cell.value.toString() : null;
+            return cell.value.toString();
         };
+
+        // Function to validate and parse the date
+        const parseDate = (dateString: string) => {
+            const parsedDate = new Date(dateString);
+            if (isNaN(parsedDate.getTime())) {
+                return null; // Return null if the date is invalid
+            }
+            return parsedDate;
+        };
+
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
+
         try {
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.worksheets[0];
 
             const data = [];
-            // worksheet.eachRow((row, rowIndex) => {
-            //     if (rowIndex > 1) {
-            //         const voucherId = row.getCell(14).value;
-
-            //         data.push({
-            //             productName: row.getCell(1).value,
-            //             dateOfPurchase: row.getCell(2).value,
-            //             vendorName: row.getCell(3).value,
-            //             vendorEmailId: row.getCell(4).value,
-            //             vendorAddress: row.getCell(5).value,
-            //             imeiNumber: row.getCell(6).value,
-            //             supplierName: row.getCell(7).value,
-            //             serialNumber: row.getCell(8).value,
-            //             primaryNo: row.getCell(9).value,
-            //             secondaryNo: row.getCell(10).value,
-            //             primaryNetwork: row.getCell(11).value,
-            //             secondaryNetwork: row.getCell(12).value,
-            //             categoryName: row.getCell(13).value,
-            //             voucherId: voucherId,
-            //             price: parseFloat(row.getCell(15).value as string),
-            //             productDescription: row.getCell(16).value,
-            //             companyCode: row.getCell(17).value,
-            //             vendorPhoneNumber: row.getCell(18)?.value,
-            //             deviceModel: row.getCell(19)?.value,
-            //             unitCode: row.getCell(20).value,
-            //             simStatus: row.getCell(21).value,
-            //             planName: row.getCell(22).value,
-            //             remarks1: row.getCell(23).value,
-            //             remarks2: row.getCell(24).value,
-            //             quantity: row.getCell(25).value,
-
-            //         });
-            //     }
-            // });
             worksheet.eachRow((row, rowIndex) => {
                 if (rowIndex > 1) {
                     const voucherId = getCellValue(row.getCell(14));
 
                     data.push({
                         productName: getCellValue(row.getCell(1)),
-                        dateOfPurchase: getCellValue(row.getCell(2)),
+                        dateOfPurchase: parseDate(getCellValue(row.getCell(2))),
                         vendorName: getCellValue(row.getCell(3)),
                         vendorEmailId: getCellValue(row.getCell(4)),
                         vendorAddress: getCellValue(row.getCell(5)),
@@ -214,21 +195,23 @@ export class ProductService {
                     });
                 }
             });
+
             const productEntities = await Promise.all(
                 data.map(async (productDto) => {
                     return this.handleProductData(productDto);
                 })
             );
+
             await queryRunner.manager.save(productEntities);
             await queryRunner.commitTransaction();
             return new CommonResponse(true, 201, 'Products uploaded successfully');
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw new ErrorResponse(500, 'Bulk upload failed');
-        }
-        finally {
+        } finally {
             await queryRunner.release();
         }
+
     }
 
 

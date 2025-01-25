@@ -62,7 +62,7 @@ export class VoucherEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @Column({ name: 'purpose', type: 'varchar', length: 255 })
+    @Column({ name: 'purpose', type: 'varchar', length: 255, nullable: true })
     purpose: string;
 
     @Column({
@@ -101,13 +101,13 @@ export class VoucherEntity {
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;
 
-    @Column({ name: 'amount', type: 'float' })
+    @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
 
     @Column({ name: 'credit_amount', type: 'float', nullable: true, default: null })
     creditAmount: number;
 
-    @Column({ name: 'remining_amount', type: 'float' })
+    @Column({ name: 'remining_amount', type: 'float', nullable: true })
     remainingAmount: number;
 
     @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.voucherId, { nullable: true })

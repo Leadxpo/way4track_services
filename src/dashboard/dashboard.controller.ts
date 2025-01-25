@@ -427,13 +427,27 @@ export class DashboardController {
         }
     }
 
-    @Post('getLedgerData')
-    async getLedgerData(@Body() req: {
+    @Post('getLedgerDataTable')
+    async getLedgerDataTable(@Body() req: {
         voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
         unitCode?: string
     }): Promise<CommonResponse> {
         try {
-            return await this.voucherDashboardService.getLedgerData(req)
+            return await this.voucherDashboardService.getLedgerDataTable(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getLedgerDataById')
+    async getLedgerDataById(@Body() req: {
+        voucherId?: number; companyCode?: string;
+        unitCode?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getLedgerDataById(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);
