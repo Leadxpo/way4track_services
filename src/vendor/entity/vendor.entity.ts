@@ -52,10 +52,10 @@ export class VendorEntity {
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 
-  @Column('varchar', { name: 'company_code', length: 20, nullable: false, default: 'WAY4TRACK' })
+  @Column('varchar', { name: 'company_code', length: 20, nullable: true, default: 'WAY4TRACK' })
   companyCode: string;
 
-  @Column('varchar', { name: 'unit_code', length: 20, nullable: false, default: 'WAY4' })
+  @Column('varchar', { name: 'unit_code', length: 20, nullable: true, default: 'WAY4' })
   unitCode: string;
 
   @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })

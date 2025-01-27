@@ -27,6 +27,8 @@ export class ProductDto {
   remarks1: string;
   remarks2: string;
   deviceModel: string;
+  SNO: number;
+  ICCIDNo: string;
 }
 
 

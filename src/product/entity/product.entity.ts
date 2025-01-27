@@ -34,6 +34,9 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'quantity', type: 'int', nullable: true })
   quantity: number;
 
+  @Column({ name: 'sno', type: 'int', nullable: true })
+  SNO: number;
+
   @Column({ name: 'product_description', type: 'text', nullable: true })
   productDescription: string;
 
@@ -71,6 +74,9 @@ export class ProductEntity extends BaseEntity {
   // New columns
   @Column({ name: 'supplier_name', type: 'varchar', length: 100, nullable: true })
   supplierName: string;
+
+  @Column({ name: 'ICCID_No', type: 'varchar', length: 100, nullable: true })
+  ICCIDNo: string;
 
   @Column({ name: 'serial_number', type: 'varchar', length: 50, nullable: true })
   serialNumber: string;
