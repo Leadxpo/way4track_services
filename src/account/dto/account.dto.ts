@@ -6,7 +6,7 @@ export class AccountDto extends CommonReq {
     name: string;
     accountType: AccountType;
     accountNumber: string;
-    branchId: number;
+    branchId?: number;
     ifscCode: string;
     phoneNumber: string;
     address: string;

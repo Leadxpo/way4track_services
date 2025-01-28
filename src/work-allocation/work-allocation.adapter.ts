@@ -6,6 +6,7 @@ import { ClientEntity } from 'src/client/entity/client.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 
 @Injectable()
 export class WorkAllocationAdapter {
@@ -38,6 +39,10 @@ export class WorkAllocationAdapter {
         vendor.id = dto.vendorId;
         entity.vendorId = vendor;
 
+        const voucher = new VoucherEntity();
+        voucher.voucherId = dto.voucherId
+        entity.voucherId = voucher;
+
         return entity;
     }
 
@@ -47,6 +52,7 @@ export class WorkAllocationAdapter {
             const staff = entity.staffId;
             const product = entity.productId;
             const vendor = entity.vendorId;
+            const voucher = entity.voucherId;
             return new WorkAllocationResDto(
                 entity.id,
                 entity.workAllocationNumber,
@@ -73,7 +79,9 @@ export class WorkAllocationAdapter {
                 product?.vendorName || '',
                 product?.vendorAddress || '',
                 product?.vendorEmailId || '',
-                entity.install
+                entity.install,
+                voucher.voucherId,
+                voucher.name
             );
         });
     }

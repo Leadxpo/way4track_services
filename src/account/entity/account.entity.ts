@@ -29,7 +29,7 @@ export class AccountEntity {
   @Column({ unique: true, name: 'account_number', type: 'varchar' })
   accountNumber: string;
 
-  @ManyToOne(() => BranchEntity, (branch) => branch.accounts)
+  @ManyToOne(() => BranchEntity, (branch) => branch.accounts,{nullable:true})
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 

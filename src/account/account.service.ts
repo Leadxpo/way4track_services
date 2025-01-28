@@ -23,10 +23,6 @@ export class AccountService {
     async createAccount(dto: AccountDto): Promise<CommonResponse> {
         try {
             let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully"
-            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
-            if (!branchEntity) {
-                throw new Error('Branch not found');
-            }
             const convertDto = this.adapter.toEntity(dto);
             await this.accountRepository.save(convertDto);
             return new CommonResponse(true, 65152, internalMessage)
