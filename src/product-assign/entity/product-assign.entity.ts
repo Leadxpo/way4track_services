@@ -17,7 +17,7 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'branch_id' })
   branchId: BranchEntity;
 
-  @ManyToOne(() => ProductEntity, (productEntity) => productEntity.productAssign)
+  @ManyToOne(() => ProductEntity, (productEntity) => productEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'product_id' })
   productId: ProductEntity;
 

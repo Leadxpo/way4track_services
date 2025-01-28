@@ -25,6 +25,7 @@ export class ProductAssignService {
             if (photoPath) {
                 entity.productAssignPhoto = photoPath;
             }
+            console.log(entity, "___________")
             await this.productAssignRepository.insert(entity);
             return new CommonResponse(true, 201, 'Product details created successfully');
         } catch (error) {
@@ -87,12 +88,15 @@ export class ProductAssignService {
         try {
             const productAssign = await this.productAssignRepository.findOne({
                 where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
-                relations: ['branchId', 'staffId', 'productId'],
+                relations: ['branchId', 'staffId', 'productId', 'requestId'],  // Ensure `requestId` is loaded
             });
 
             if (!productAssign) {
                 throw new Error('Product assignment not found');
             }
+
+            // Make sure that request is assigned from the RequestRaiseEntity
+            // const request = productAssign.requestId ? productAssign.requestId.description : '';
 
             // const responseDto = new ProductAssignResDto(
             //     productAssign.id,
@@ -107,7 +111,9 @@ export class ProductAssignService {
             //     productAssign.numberOfProducts,
             //     productAssign.productAssignPhoto,
             //     productAssign.companyCode,
-            //     productAssign.unitCode
+            //     productAssign.unitCode,
+            //     productAssign.requestId?.id,  // Ensure requestId is included if available
+            //     request  // Assign the request name
             // );
 
             return new CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
@@ -115,6 +121,7 @@ export class ProductAssignService {
             throw new ErrorResponse(500, error.message);
         }
     }
+
 
     async deleteProductAssign(dto: ProductAssignIdDto): Promise<CommonResponse> {
         try {

@@ -38,7 +38,7 @@ export class AccountService {
 
     async getAccountsDetails(req: CommonReq): Promise<CommonResponse> {
         const entities = await this.accountRepository.find({
-            relations: ['branch'],
+            relations: ['branch', 'vouchersTo', 'vouchersFrom'],
             where: {
                 companyCode: req.companyCode,
                 unitCode: req.unitCode,
@@ -49,7 +49,7 @@ export class AccountService {
             return new CommonResponse(false, 8754, "There Is No account");
         } else {
             const dtoData = this.adapter.convertEntityToDto(entities);
-            return new CommonResponse(true, 6541, "Data Retrieved Successfully", dtoData);
+            return new CommonResponse(true, 6541, "Data Retrieved Successfully", [dtoData]);
         }
     }
 

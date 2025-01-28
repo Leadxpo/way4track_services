@@ -16,8 +16,32 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
     constructor(private dataSource: DataSource) {
         super(ProductAssignEntity, dataSource.createEntityManager());
     }
-    async productAssignDetails(req: CommonReq): Promise<any> {
-        const query = await this.createQueryBuilder('pa')
+
+    async productAssignDetails(req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<any> {
+        // Grouped branches query (modified to check if branchName is provided)
+        const groupedBranchesQuery = this.createQueryBuilder('pa')
+            .select([
+                'br.name AS branchName',
+                'COUNT(pa.id) AS totalpas',
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
+            .where('pa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // If a branch name is provided, filter by that branch
+        if (req.branchName) {
+            groupedBranchesQuery.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Execute the grouped branches query
+        const result = await groupedBranchesQuery.groupBy('br.name').getRawMany();
+
+        // Detailed assignment query (modified to check if branchName is provided)
+        const detailedAssignQuery = this.createQueryBuilder('pa')
             .select([
                 're.request_id AS requestId',
                 'pa.branch_person AS branchOrPerson',
@@ -26,29 +50,30 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pa.number_of_products AS numberOfProducts',
                 'sa.name AS staffName',
                 'br.name AS branchName',
-                'pr.product_name as productName',
-                'pr.product_photo as productPhoto'
+                'pr.product_name AS productName',
+                'pr.product_photo AS productPhoto',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id')
             .leftJoin(StaffEntity, 'sa', 'sa.id = pa.staff_id')
             .leftJoin(RequestRaiseEntity, 're', 're.id = pa.request_id')
-            .where(`pa.company_code = "${req.companyCode}"`)
-            .andWhere(`pa.unit_code = "${req.unitCode}"`)
-            .getRawMany();
+            .where('pa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pa.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        return query.map((item) => ({
-            requestId: item.requestId,
-            branchOrPerson: item.branchOrPerson,
-            imeiNumberFrom: item.imeiNumberFrom,
-            imeiNumberTo: item.imeiNumberTo,
-            numberOfProducts: item.numberOfProducts,
-            staffName: item.staffName,
-            branchName: item.branchName,
-            productName: item.productName,
-            productPhoto: item.productPhoto
-        }));
+        // If a branch name is provided, filter the detailed assignment by that branch
+        if (req.branchName) {
+            detailedAssignQuery.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Execute the detailed assignment query
+        const rawResults = await detailedAssignQuery.orderBy('br.name', 'ASC').getRawMany();
+
+        // Return the grouped and detailed results
+        return { result, rawResults };
     }
+
+
+
 
     async totalProducts(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('pa')

@@ -12,6 +12,8 @@ export class ProductAssignResDto {
     productAssignPhoto: string;
     companyCode: string;
     unitCode: string
+    requestId: number
+    request: string
     constructor(
         id: number,
         staffId: string,
@@ -25,7 +27,9 @@ export class ProductAssignResDto {
         numberOfProducts: number,
         productAssignPhoto: string,
         companyCode: string,
-        unitCode: string
+        unitCode: string,
+        requestId: number,
+        request: string
     ) {
         this.id = id;
         this.staffId = staffId;
@@ -40,5 +44,7 @@ export class ProductAssignResDto {
         this.productAssignPhoto = productAssignPhoto
         this.companyCode = companyCode
         this.unitCode = unitCode
+        this.request = request
+        this.requestId = requestId
     }
 }
