@@ -3,7 +3,9 @@ import { ClientEntity } from 'src/client/entity/client.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { InstallationEnum } from '../enum/installation.enum';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -22,8 +24,8 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'date', type: 'date' })
     date: Date;
 
-    @Column({ name: 'install', type: 'boolean', default: false })
-    install: boolean
+    @Column({ name: 'install', type: 'enum', enum: InstallationEnum, default: InstallationEnum.assigned })
+    install: InstallationEnum
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation)
     @JoinColumn({ name: 'staff_id' })
@@ -44,6 +46,10 @@ export class WorkAllocationEntity extends BaseEntity {
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation)
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
+
+    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.workAllocation)
+    @JoinColumn({ name: 'voucher_id' })
+    voucherId: VoucherEntity;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

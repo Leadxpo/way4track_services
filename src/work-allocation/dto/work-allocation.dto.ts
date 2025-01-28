@@ -1,3 +1,4 @@
+import { InstallationEnum } from "../enum/installation.enum";
 
 export class WorkAllocationDto {
     id?: number;
@@ -9,7 +10,8 @@ export class WorkAllocationDto {
     companyCode?: string;
     unitCode?: string
     workAllocationNumber?: string
-    install: boolean
+    install: InstallationEnum
     productId?: number
     vendorId?: number
+    voucherId?:string
 }

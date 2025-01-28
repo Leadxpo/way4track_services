@@ -13,6 +13,7 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { AccountEntity } from 'src/account/entity/account.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 
 export enum GSTORTDSEnum {
     GST = "GST",
@@ -154,6 +155,9 @@ export class VoucherEntity {
 
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
+
+    @OneToMany(() => WorkAllocationEntity, (voucher) => voucher.voucherId)
+    workAllocation: WorkAllocationEntity[];
 
     @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })

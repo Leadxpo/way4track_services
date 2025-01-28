@@ -1,3 +1,5 @@
+import { InstallationEnum } from "../enum/installation.enum";
+
 export class WorkAllocationResDto {
     id: number;
     workAllocationNumber: string;
@@ -24,7 +26,9 @@ export class WorkAllocationResDto {
     vendorName?: string;
     vendorAddress?: string;
     vendorEmailId?: string;
-    install?: boolean
+    install?: InstallationEnum
+    voucherId?: string
+    voucherName?: string
     constructor(
         id: number,
         workAllocationNumber: string,
@@ -51,7 +55,9 @@ export class WorkAllocationResDto {
         vendorName?: string,
         vendorAddress?: string,
         vendorEmailId?: string,
-        install?: boolean
+        install?: InstallationEnum,
+        voucherId?: string,
+        voucherName?: string
 
     ) {
         this.id = id;
@@ -80,5 +86,7 @@ export class WorkAllocationResDto {
         this.vendorAddress = vendorAddress;
         this.vendorEmailId = vendorEmailId;
         this.install = install
+        this.voucherId = voucherId
+        this.voucherName = this.voucherName
     }
 }

@@ -1,9 +1,8 @@
-import { Controller, Post, Body, Get, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
-import { WorkAllocationService } from './work-allocation.service';
-import { WorkAllocationDto } from './dto/work-allocation.dto';
-import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
+import { Body, Controller, Post } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
-import { WorkAllocationEntity } from './entity/work-allocation.entity';
+import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
+import { WorkAllocationDto } from './dto/work-allocation.dto';
+import { WorkAllocationService } from './work-allocation.service';
 
 @Controller('work-allocations')
 export class WorkAllocationController {
@@ -53,12 +52,12 @@ export class WorkAllocationController {
         }
     }
 
-    @Post('markInstall')
-    async markInstall(@Body() productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
-        try {
-            return await this.workAllocationService.markInstall(productId, companyCode, unitCode);
-        } catch (error) {
-            throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-        }
-    }
+    // @Post('markInstall')
+    // async markInstall(@Body() productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
+    //     try {
+    //         return await this.workAllocationService.markInstall(productId, companyCode, unitCode);
+    //     } catch (error) {
+    //         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    //     }
+    // }
 }

@@ -39,8 +39,6 @@ export class WorkAllocationService {
         }
     }
 
-
-
     async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         let successResponse: CommonResponse;
         let newWorkAllocation: WorkAllocationEntity;
@@ -79,7 +77,6 @@ export class WorkAllocationService {
         }
     }
 
-
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         if (dto.id || dto.workAllocationNumber) {
             // If an ID is provided, update the work allocation details
@@ -104,24 +101,24 @@ export class WorkAllocationService {
         }
     }
 
-    async markInstall(productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
-        const product = await this.workAllocationRepository.findOne({ where: { id: productId, companyCode: companyCode, unitCode: unitCode } });
+    // async markInstall(productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
+    //     const product = await this.workAllocationRepository.findOne({ where: { id: productId, companyCode: companyCode, unitCode: unitCode } });
 
-        if (!product) {
-            throw new Error('Product ment not found');
-        }
+    //     if (!product) {
+    //         throw new Error('Product ment not found');
+    //     }
 
-        product.install = true;
-        await this.workAllocationRepository.save(product);
+    //     product.install = true;
+    //     await this.workAllocationRepository.save(product);
 
-        return product;
-    }
+    //     return product;
+    // }
 
     async getWorkAllocationDetails(req: WorkAllocationIdDto): Promise<CommonResponse> {
         try {
             const allocation = await this.workAllocationRepository.find({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
-                relations: ['staffId', 'clientId']
+                relations: ['staffId', 'clientId', 'voucherId']
             });
             if (!allocation) {
                 return new CommonResponse(false, 404, 'Work Allocation not found');
