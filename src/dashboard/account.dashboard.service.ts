@@ -23,8 +23,8 @@ export class AccountDashboardService {
 
     }
 
-    async addVoucher(req: AccountIdDto): Promise<CommonResponse> {
-        const data = await this.repo.addVoucher(req)
+    async addVoucherAmount(req: AccountIdDto): Promise<CommonResponse> {
+        const data = await this.repo.addVoucherAmount(req)
         if (!data) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

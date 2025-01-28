@@ -626,10 +626,10 @@ export class DashboardController {
         }
     }
 
-    @Post('addVoucher')
-    async addVoucher(@Body() req: AccountIdDto): Promise<CommonResponse> {
+    @Post('addVoucherAmount')
+    async addVoucherAmount(@Body() req: AccountIdDto): Promise<CommonResponse> {
         try {
-            return await this.accountDashboardService.addVoucher(req)
+            return await this.accountDashboardService.addVoucherAmount(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

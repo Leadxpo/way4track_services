@@ -17,7 +17,7 @@ export class AccountEntity {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ name: 'account_name', type: 'varchar', length: 255, unique: true })
+  @Column({ name: 'account_name', type: 'varchar', length: 255 })
   accountName: string;
 
   @Column('decimal', { name: 'total_amount', precision: 10, scale: 2, nullable: true })
@@ -26,10 +26,10 @@ export class AccountEntity {
   @Column({ type: 'enum', enum: AccountType, name: 'account_type' })
   accountType: AccountType;
 
-  @Column({ unique: true, name: 'account_number', type: 'varchar' })
+  @Column({ name: 'account_number', type: 'varchar' })
   accountNumber: string;
 
-  @ManyToOne(() => BranchEntity, (branch) => branch.accounts,{nullable:true})
+  @ManyToOne(() => BranchEntity, (branch) => branch.accounts, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 

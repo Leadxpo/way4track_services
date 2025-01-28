@@ -16,7 +16,7 @@ export class AccountRepository extends Repository<AccountEntity> {
         super(AccountEntity, dataSource.createEntityManager());
     }
 
-    async addVoucher(req: AccountIdDto) {
+    async addVoucherAmount(req: AccountIdDto) {
         const accountRepository = this.dataSource.getRepository(AccountEntity);
         const voucherRepository = this.dataSource.getRepository(VoucherEntity);
 
@@ -83,7 +83,7 @@ export class AccountRepository extends Repository<AccountEntity> {
             case VoucherTypeEnum.PAYMENT:
             case VoucherTypeEnum.JOURNAL:
             case VoucherTypeEnum.PURCHASE:
-            // case VoucherTypeEnum.INVOICE:
+                // case VoucherTypeEnum.INVOICE:
                 updatedTotal -= voucherAmount;
                 break;
             case VoucherTypeEnum.CONTRA:
