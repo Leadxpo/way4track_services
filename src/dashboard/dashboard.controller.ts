@@ -106,7 +106,11 @@ export class DashboardController {
     }
 
     @Post('productAssignDetails')
-    async productAssignDetails(@Body() req: CommonReq): Promise<CommonResponse> {
+    async productAssignDetails(@Body() req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
         try {
             return await this.productAssignDashboardService.productAssignDetails(req)
         }

@@ -51,8 +51,11 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .leftJoin('appointment.staffId', 'staff')
             .where(`appointment.company_code = "${req.companyCode}"`)
             .andWhere(`appointment.unit_code = "${req.unitCode}"`)
-            .orderBy('branch.name', 'ASC')
-            .getRawMany();
+        if (branch) {
+            appointments.andWhere('br.name = :branchName', { branchName: branch });
+        }
+        await appointments.orderBy('branch.name', 'ASC').getRawMany();
+
 
         return { result, appointments };
     }

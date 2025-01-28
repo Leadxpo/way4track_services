@@ -9,7 +9,11 @@ export class ProductAssignDashboardService {
     constructor(
         private productAssignRepo: ProductAssignRepository,
     ) { }
-    async productAssignDetails(req: CommonReq): Promise<CommonResponse> {
+    async productAssignDetails(req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.productAssignDetails(req)
         if (!productData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
