@@ -45,10 +45,10 @@ export class AccountService {
             },
         });
 
+        const dtoData = this.adapter.convertEntityToDto(entities);
         if (!entities.length) {
-            return new CommonResponse(false, 8754, "There Is No account");
+            return new CommonResponse(false, 8754, "There Is No account",dtoData);
         } else {
-            const dtoData = this.adapter.convertEntityToDto(entities);
             return new CommonResponse(true, 6541, "Data Retrieved Successfully", dtoData);
         }
     }
@@ -59,7 +59,7 @@ export class AccountService {
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {
-            return new CommonResponse(false, 4579, "There Is No branch names")
+            return new CommonResponse(false, 4579, "There Is No bank a/c",data)
         }
     }
 
