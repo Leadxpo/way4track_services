@@ -47,7 +47,7 @@ export class AccountService {
         } else {
             // return new CommonResponse(true, 6541, "Data Retrieved Successfully", dtoData);
             const dtoData = this.adapter.convertEntityToDto(entities);
-            return new CommonResponse(true, 6541, "Data Retrieved Successfully", [dtoData]);
+            return new CommonResponse(true, 6541, "Data Retrieved Successfully", dtoData);
         }
     }
 

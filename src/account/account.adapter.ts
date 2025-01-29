@@ -2,6 +2,7 @@ import { BranchEntity } from "src/branch/entity/branch.entity";
 import { AccountEntity } from "./entity/account.entity";
 import { AccountDto } from "./dto/account.dto";
 import { AccountResDto } from "./dto/account.res.dto";
+import { Entity } from "typeorm";
 
 export class AccountAdapter {
     toEntity(dto: AccountDto): AccountEntity {
@@ -22,6 +23,9 @@ export class AccountAdapter {
         account.unitCode = dto.unitCode;
         account.accountName = dto.accountName;
         account.totalAmount = dto.totalAmount;
+        if (dto.id) {
+            account.id = dto.id
+        }
         return account;
     }
 
