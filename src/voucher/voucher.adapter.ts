@@ -23,13 +23,18 @@ export class VoucherAdapter {
     entity.branchId = branch;
 
     // Accounts
-    const toAccount = new AccountEntity();
-    toAccount.id = dto.toAccount;
-    entity.toAccount = toAccount;
+    if (dto.toAccount) {
+      const toAccount = new AccountEntity();
+      toAccount.id = dto.toAccount;
+      entity.toAccount = toAccount;
+    }
 
-    const fromAccount = new AccountEntity();
-    fromAccount.id = dto.fromAccount;
-    entity.fromAccount = fromAccount;
+    if (dto.fromAccount) {
+      const fromAccount = new AccountEntity();
+      fromAccount.id = dto.fromAccount;
+      entity.fromAccount = fromAccount;
+    }
+
 
     // Client
     const client = new ClientEntity();
@@ -39,6 +44,10 @@ export class VoucherAdapter {
     const staff = new StaffEntity();
     staff.id = dto.staffId;
     entity.staffId = staff;
+
+    const payment = new StaffEntity();
+    staff.id = dto.staffId;
+    entity.staffId = payment;
 
     const product = new ProductEntity();
     product.id = dto.product;
@@ -154,7 +163,8 @@ export class VoucherAdapter {
           voucher.product?.id || null,
           voucher.product?.productName || "",
           voucher.estimate?.id || null,
-          voucher.estimate?.invoiceId
+          voucher.estimate?.invoiceId,
+          voucher.staffId?.name || "",
         );
       });
     } else {
@@ -208,7 +218,8 @@ export class VoucherAdapter {
           voucher.product?.id || null,
           voucher.product?.productName || "",
           voucher.estimate?.id || null,
-          voucher.estimate?.invoiceId
+          voucher.estimate?.invoiceId,
+          voucher.staffId?.name || "",
         )
       ];
     }

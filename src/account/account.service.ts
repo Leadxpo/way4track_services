@@ -34,7 +34,7 @@ export class AccountService {
 
     async getAccountsDetails(req: CommonReq): Promise<CommonResponse> {
         const entities = await this.accountRepository.find({
-            relations: ['branch', 'vouchersTo', 'vouchersFrom'],
+            relations: [ 'vouchersTo', 'vouchersFrom'],
             where: {
                 companyCode: req.companyCode,
                 unitCode: req.unitCode,
@@ -63,7 +63,7 @@ export class AccountService {
 
     async getAccountsDetailsById(req: AccountIdDto): Promise<CommonResponse> {
         const entities = await this.accountRepository.findOne({
-            relations: ['branch'],
+            // relations: ['branch'],
             where: {
                 accountNumber: req.fromAccountNumber,
                 companyCode: req.companyCode,

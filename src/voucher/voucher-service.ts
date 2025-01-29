@@ -13,15 +13,17 @@ import { VoucherEntity } from "./entity/voucher.entity";
 import { VoucherTypeEnum } from "./enum/voucher-type-enum";
 import { VoucherRepository } from "./repo/voucher.repo";
 import { VoucherAdapter } from "./voucher.adapter";
+import { AccountEntity } from "src/account/entity/account.entity";
 
 @Injectable()
 export class VoucherService {
-  
+
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly voucherAdapter: VoucherAdapter,
         private readonly accountRepo: AccountRepository,
-        private readonly estimateRepo: EstimateRepository
+        private readonly estimateRepo: EstimateRepository,
+        private readonly accountRepository: AccountRepository
 
     ) { }
 
@@ -84,22 +86,86 @@ export class VoucherService {
         try {
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
-            const toAccount = await this.accountRepo.findOne({
-                where: { id: voucherDto.toAccount },
-            });
-            if (!toAccount) {
-                throw new ErrorResponse(4001, 'To Account not found.');
-            }
-            voucherEntity.toAccount = toAccount;
-            voucherEntity.voucherId = generatedVoucherId;
-            if (voucherDto.invoice) {
 
-                const estimate = this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
-                if (!estimate) {
-                    throw new ErrorResponse(4001, 'estimate not found.');
+            // Fetch From Account (Mandatory for all transactions)
+            const fromAccount = await this.accountRepository.findOne({
+                where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.fromAccount },
+            });
+
+            if (!fromAccount) {
+                throw new Error('From account not found.');
+            }
+
+            let toAccount: AccountEntity | null = null;
+
+            // For CONTRA transactions, To Account is mandatory
+            if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
+                if (!voucherDto.toAccount) {
+                    throw new Error('To account is required for CONTRA transactions.');
+                }
+
+                toAccount = await this.accountRepository.findOne({
+                    where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.toAccount },
+                });
+
+                if (!toAccount) {
+                    throw new Error('To account not found for CONTRA transaction.');
                 }
             }
+
+            const voucherAmount = voucherDto.amount; // Corrected to use DTO amount
+
+            // Check for sufficient funds before deducting
+            if (
+                [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
+                && fromAccount.totalAmount < voucherAmount
+            ) {
+                throw new Error('Insufficient funds in the from account.');
+            }
+
+            switch (voucherEntity.voucherType) {
+                case VoucherTypeEnum.RECEIPT:
+                    fromAccount.totalAmount += voucherAmount; // Adding money, no validation needed
+                    break;
+                case VoucherTypeEnum.PAYMENT:
+                case VoucherTypeEnum.JOURNAL:
+                case VoucherTypeEnum.PURCHASE:
+                    fromAccount.totalAmount -= voucherAmount; // Deducting money
+                    break;
+                case VoucherTypeEnum.CONTRA:
+                    if (!toAccount) {
+                        throw new Error('To account is required for bank-to-bank transfers.');
+                    }
+
+                    // Check if sufficient funds exist in the from account
+                    if (fromAccount.totalAmount < voucherAmount) {
+                        throw new Error('Insufficient funds in the from account for CONTRA transaction.');
+                    }
+
+                    fromAccount.totalAmount -= voucherAmount; // Debit from source
+                    toAccount.totalAmount += voucherAmount; // Credit to destination
+                    break;
+                default:
+                    throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
+            }
+
+            // Save updated accounts
+            await this.accountRepository.save(toAccount ? [fromAccount, toAccount] : [fromAccount]);
+
+            // Set Voucher ID
+            voucherEntity.voucherId = generatedVoucherId;
+
+            // Handle Invoice Payment
+            if (voucherDto.invoice) {
+                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
+                if (!estimate) {
+                    throw new ErrorResponse(4001, 'Estimate not found.');
+                }
+            }
+
+            // Insert the voucher record
             await this.voucherRepository.insert(voucherEntity);
+
             return new CommonResponse(
                 true,
                 65152,
@@ -113,6 +179,7 @@ export class VoucherService {
             );
         }
     }
+
 
     private calculateEmiAmount(amount: number, numberOfEmi: number): number {
         if (numberOfEmi <= 0) throw new Error('Number of EMIs must be greater than 0.');

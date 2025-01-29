@@ -626,14 +626,14 @@ export class DashboardController {
         }
     }
 
-    @Post('addVoucherAmount')
-    async addVoucherAmount(@Body() req: AccountIdDto): Promise<CommonResponse> {
-        try {
-            return await this.accountDashboardService.addVoucherAmount(req)
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
-        }
-    }
+    // @Post('addVoucherAmount')
+    // async addVoucherAmount(@Body() req: AccountIdDto): Promise<CommonResponse> {
+    //     try {
+    //         return await this.accountDashboardService.addVoucherAmount(req)
+    //     }
+    //     catch (error) {
+    //         console.log("Error in details in service..", error);
+    //         return new CommonResponse(false, 500, 'Error details');
+    //     }
+    // }
 }

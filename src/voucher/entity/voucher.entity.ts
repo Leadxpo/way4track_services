@@ -54,7 +54,7 @@ export class VoucherEntity {
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 
-    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT })
+    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT,nullable:true })
     role: RoleEnum;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
@@ -120,6 +120,7 @@ export class VoucherEntity {
         enum: PaymentStatus,
         name: 'payment_status',
         default: PaymentStatus.ACCEPTED,
+        nullable: true
     })
     paymentStatus: PaymentStatus;
 
@@ -128,6 +129,7 @@ export class VoucherEntity {
         enum: ProductType,
         name: 'product_type',
         default: ProductType.product,
+        nullable: true
     })
     productType: ProductType;
 
@@ -143,6 +145,10 @@ export class VoucherEntity {
     @ManyToOne(() => StaffEntity, (StaffEntity) => StaffEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
+
+    @ManyToOne(() => StaffEntity, (StaffEntity) => StaffEntity.voucher, { nullable: true })
+    @JoinColumn({ name: 'payment_to' })
+    paymentTo: StaffEntity;
 
     @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
     initialPayment: number;

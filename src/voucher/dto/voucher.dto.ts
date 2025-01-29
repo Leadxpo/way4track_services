@@ -19,6 +19,7 @@ export class VoucherDto {
     paymentType: PaymentType;
     clientId: string;
     staffId: number;
+    paymentTo: number;
     accountNumber?: number; // assuming this is the account number from the account entity
     voucherType: VoucherTypeEnum;
     generationDate?: Date;

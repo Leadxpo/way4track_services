@@ -23,13 +23,13 @@ export class AccountDashboardService {
 
     }
 
-    async addVoucherAmount(req: AccountIdDto): Promise<CommonResponse> {
-        const data = await this.repo.addVoucherAmount(req)
-        if (!data) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", data)
-        }
+    // async addVoucherAmount(req: AccountIdDto): Promise<CommonResponse> {
+    //     const data = await this.repo.addVoucherAmount(req)
+    //     if (!data) {
+    //         return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+    //     } else {
+    //         return new CommonResponse(true, 200, "Data retrieved successfully", data)
+    //     }
 
-    }
+    // }
 }
