@@ -16,7 +16,9 @@ export class EstimateResDto {
     companyCode: string;
     unitCode: string;
     hsnCode: string;
-    products?: { name: string; quantity: number; amount: number }[];  // Modified to include name, quantity, and amount
+    products?: {
+        name: string; quantity: number; amount: number, costPerUnit: number, totalCost: number, hsnCode: string
+    }[];  // Modified to include name, quantity, and amount
     estimateId?: string;
     invoiceId?: string;
     GSTORTDS?: GSTORTDSEnum;
@@ -38,7 +40,7 @@ export class EstimateResDto {
         totalAmount: number,
         companyCode: string,
         unitCode: string,
-        products?: { name: string; quantity: number; amount: number }[],  // Modified to match the structure
+        products?: { name: string; quantity: number; amount: number, costPerUnit: number, totalCost: number, hsnCode: string }[],  // Modified to match the structure
         estimateId?: string,
         invoiceId?: string,
         GSTORTDS?: GSTORTDSEnum,

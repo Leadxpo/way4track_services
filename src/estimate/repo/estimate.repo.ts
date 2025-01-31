@@ -52,9 +52,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
         const result = await query.getRawMany();
         return result;
     }
-
-
-
+    
     async getEstimatesForReport(req: {
         estimateId?: string; companyCode?: string;
         unitCode?: string

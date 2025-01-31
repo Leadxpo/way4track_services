@@ -70,7 +70,10 @@ export class EstimateAdapter {
             entity.productDetails?.map(product => ({
                 name: product.productName,
                 quantity: product.quantity,
-                amount: product.quantity > 0 ? product.totalCost / product.quantity : 0, // Avoid division by zero
+                amount: product.quantity > 0 ? product.totalCost / product.quantity : 0,
+                costPerUnit: product.costPerUnit,
+                totalCost: product.totalCost,
+                hsnCode: product.hsnCode                 // Avoid division by zero
             })),
             entity.estimateId,
             entity.invoiceId,
