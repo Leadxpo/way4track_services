@@ -120,8 +120,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.amount AS amount',
                 'branch.name AS branchName',
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)
@@ -145,8 +145,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.amount AS amount',
                 'branch.name AS branchName',
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)
@@ -182,8 +182,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
-            .leftJoin(AccountEntity, 'ac', 'ac.id=ve.to_account_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(AccountEntity, 'ac', 'ac.id=ve.to_account_id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PAYMENT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)
@@ -221,9 +221,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
-            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
-            .leftJoin(VendorEntity, 'vn', 've.vendor_id=vn.id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .leftJoinAndSelect(VendorEntity, 'vn', 've.vendor_id=vn.id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -255,10 +255,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
-            .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
-            .leftJoin(VendorEntity, 'vr', 've.vendor_id = vr.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
+            .leftJoinAndSelect(VendorEntity, 'vr', 've.vendor_id = vr.id')
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -371,8 +371,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.purpose AS purpose',
                 'branch.name AS branchName',
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
             })
@@ -417,8 +417,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.purpose AS purpose',
                 'branch.name AS branchName',
             ])
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where(`ve.voucher_id = "${req.voucherId}"`)
             .andWhere('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
@@ -457,8 +457,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`,
                 've.voucher_type AS voucherType',
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
         if (req.voucherId) {
@@ -566,7 +566,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `branch.name AS branchName`,
                 `SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END) AS serviceSales`,
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate })
             .andWhere('ve.generation_date <= :toDate', { toDate: req.toDate || new Date() })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
@@ -651,7 +651,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END
             ) AS balanceAmount`
             ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
             })
