@@ -5,6 +5,7 @@ import { AssertsDto } from "./dto/asserts.dto";
 import { GetAssertsResDto } from "./dto/get-asserts-res.dto";
 import { AssertsEntity } from "./entity/asserts-entity";
 import { PaymentType } from "./enum/payment-type.enum";
+import { VoucherTypeEnum } from "src/voucher/enum/voucher-type-enum";
 
 
 @Injectable()
@@ -44,25 +45,25 @@ export class AssertsAdapter {
             }
 
             entity.voucherId = voucherEntity;
-            entity.assertsName = voucherEntity.name; 
-            entity.assetPhoto = dto.assetPhoto; 
+            entity.assertsName = voucherEntity.name;
+            entity.assetPhoto = dto.assetPhoto;
             entity.assertsAmount = voucherEntity.amount;
-            entity.assetType = dto.assetType; 
+            entity.assetType = dto.assetType;
             entity.quantity = voucherEntity.quantity;
-            entity.description = dto.description 
+            entity.description = dto.description
             entity.purchaseDate = voucherEntity.generationDate;
             entity.paymentType = voucherEntity.paymentType;
             entity.companyCode = dto.companyCode;
             entity.unitCode = dto.unitCode;
 
-          
+
             if (dto.branchId) {
                 const branchEntity = new BranchEntity();
                 branchEntity.id = dto.branchId;
                 entity.branchId = branchEntity;
             }
 
-            if (voucherEntity.paymentType === PaymentType.EMI) {
+            if (voucherEntity.voucherType === VoucherTypeEnum.EMI) {
                 entity.emiNumber = voucherEntity.emiNumber;
             }
         } else {

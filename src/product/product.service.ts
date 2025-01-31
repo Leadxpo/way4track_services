@@ -353,6 +353,8 @@ export class ProductService {
                         quantity: parseInt(getCellValueByHeader('quantity') || '0', 10),
                         SNO: parseInt(getCellValueByHeader('sno') || '0', 10),
                         ICCIDNo: getCellValueByHeader('ICCID No'),
+                        hsnCode: getCellValueByHeader('hsn Code'),
+
                     });
                 }
             });
@@ -412,7 +414,8 @@ export class ProductService {
             vendorPhoneNumber: productDto.vendorPhoneNumber ?? productEntity.vendorPhoneNumber,
             vendorAddress: productDto.vendorAddress ?? productEntity.vendorAddress,
             vendorEmailId: productDto.vendorEmailId ?? productEntity.vendorEmailId,
-            ICCIDNo: productDto.ICCIDNo ?? productEntity.ICCIDNo
+            ICCIDNo: productDto.ICCIDNo ?? productEntity.ICCIDNo,
+            hsnCode: productDto.hsnCode ?? productEntity.hsnCode
         });
 
         if (productDto.vendorEmailId) {

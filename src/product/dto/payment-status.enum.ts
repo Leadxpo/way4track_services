@@ -2,5 +2,7 @@ export enum PaymentStatus {
     ACCEPTED = "ACCEPTED",
     Declained = "Declained",
     SENT = "SENT",
-    Expired = "Expired"
+    PARTIALLY_PAID = "PARTIALLY_PAID",
+    Expired = "Expired",
+    COMPLETED = "COMPLETED"
 }

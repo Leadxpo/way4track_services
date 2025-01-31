@@ -54,7 +54,7 @@ export class VoucherEntity {
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 
-    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT,nullable:true })
+    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT, nullable: true })
     role: RoleEnum;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
@@ -80,6 +80,12 @@ export class VoucherEntity {
 
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     generationDate: Date;
+
+    @Column({ name: 'next_due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    nextDueDate: Date;
+
+    @Column({ name: 'last_paid_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    lastPaidDate: Date;
 
     @Column({ name: 'expire_date', type: 'timestamp', nullable: true })
     expireDate: Date;
@@ -110,6 +116,9 @@ export class VoucherEntity {
 
     @Column({ name: 'remining_amount', type: 'float', nullable: true })
     remainingAmount: number;
+
+    @Column({ name: 'emi_mount', type: 'float', nullable: true })
+    emiAmount: number;
 
     @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'product_id' })
@@ -178,4 +187,7 @@ export class VoucherEntity {
     @ManyToOne(() => EstimateEntity, (EstimateEntity) => EstimateEntity.invoice, { nullable: true })
     @JoinColumn({ name: 'invoice_id' })
     estimate: EstimateEntity;
+
+    @Column('decimal', { name: 'paid_amount',nullable:true })
+    paidAmount: number;
 }

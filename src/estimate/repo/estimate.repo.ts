@@ -3,6 +3,7 @@ import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { DataSource, Repository } from "typeorm";
 import { EstimateEntity } from "../entity/estimate.entity";
+import { VendorEntity } from "src/vendor/entity/vendor.entity";
 @Injectable()
 
 export class EstimateRepository extends Repository<EstimateEntity> {
@@ -29,8 +30,11 @@ export class EstimateRepository extends Repository<EstimateEntity> {
                 'estimate.estimate_date AS estimateDate',
                 'estimate.expire_date AS expiryDate',
                 'estimate.amount AS estimateAmount',
+                'estimate.product_details as productDetails'
             ])
-            .leftJoin(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .leftJoinAndSelect(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .leftJoinAndSelect(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
+            .leftJoinAndSelect('products', 'pa')
             .where('estimate.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('estimate.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -64,7 +68,9 @@ export class EstimateRepository extends Repository<EstimateEntity> {
                 'estimate.expire_date AS expiryDate',
                 'estimate.amount AS amount',
             ])
-            .leftJoin(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .leftJoinAndSelect(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .leftJoinAndSelect(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
+            .leftJoinAndSelect('products', 'pa')
             .andWhere(`estimate.company_code = "${req.companyCode}"`)
             .andWhere(`estimate.unit_code = "${req.unitCode}"`)
         query.andWhere('estimate.estimate_id = :estimateId', { estimateId: req.estimateId });

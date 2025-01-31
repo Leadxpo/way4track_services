@@ -108,4 +108,7 @@ export class ProductEntity extends BaseEntity {
   @ManyToOne(() => EstimateEntity, (estimate) => estimate.products, { nullable: true })
   estimate: EstimateEntity;
 
+  @Column({ type: 'float', name: 'hsn_code', nullable: true })
+  hsnCode: string;
+
 }

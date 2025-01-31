@@ -1,4 +1,5 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
@@ -47,6 +48,9 @@ export class VendorEntity {
 
   @OneToMany(() => VoucherEntity, (product) => product.vendorId, { nullable: true })
   voucherId: VoucherEntity[];
+
+  @OneToMany(() => EstimateEntity, (product) => product.vendorId, { nullable: true })
+  estimate: EstimateEntity[];
 
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.vendor, { nullable: true })
   @JoinColumn({ name: 'branch_id' })

@@ -1,6 +1,7 @@
 import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
+import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export enum GSTORTDSEnum {
@@ -15,6 +16,10 @@ export class EstimateEntity extends BaseEntity {
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation, { eager: true })
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
+
+    @ManyToOne(() => VendorEntity, (VendorEntity) => VendorEntity.estimate, { eager: true })
+    @JoinColumn({ name: 'vendor_id' })
+    vendorId: VendorEntity;
 
     @Column({ type: 'varchar', length: 255, name: 'building_address', nullable: true })
     buildingAddress: string;
@@ -59,6 +64,7 @@ export class EstimateEntity extends BaseEntity {
         quantity: number;
         costPerUnit: number;
         totalCost: number;
+        hsnCode: string;
     }[];
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })

@@ -11,11 +11,8 @@ export class AttendanceEntity {
     @Column({ name: 'day', type: 'date' })
     day: Date;
 
-    @Column({ name: 'in_time', type: 'datetime', nullable: true })
-    inTime: Date;
-
-    @Column({ name: 'out_time', type: 'datetime', nullable: true })
-    outTime: Date;
+    @Column({ type: 'json', nullable: true })
+    timeRecords: { inTime: Date; outTime: Date }[];
 
     @Column({
         name: 'status',

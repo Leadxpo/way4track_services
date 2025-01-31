@@ -29,6 +29,7 @@ export class ProductDto {
   deviceModel: string;
   SNO: number;
   ICCIDNo: string;
+  hsnCode: string;
 }
 
 

@@ -8,10 +8,10 @@ import { VoucherService } from './voucher-service';
 export class VoucherController {
     constructor(private readonly voucherService: VoucherService) { }
 
-    @Post('save')
+    @Post('saveVoucher')
     async saveVoucher(@Body() dto: VoucherDto): Promise<CommonResponse> {
         try {
-            const savedVoucher = await this.voucherService.createVoucher(dto);
+            const savedVoucher = await this.voucherService.handleVoucher(dto);
             return new CommonResponse(true, 200, 'Voucher saved successfully', savedVoucher);
         } catch (error) {
             console.error('Error in save voucher details:', error);

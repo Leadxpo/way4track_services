@@ -11,7 +11,6 @@ export class CreateAttendanceDto {
     outTime?: Date;
     status: AttendanceStatus;
     remarks?: string;
-
 }
 
 
@@ -20,8 +19,9 @@ export class GetAttendanceDto {
     // staffUniqueId?: string;
     branchId: number;
     day: Date;
-    inTime: Date;
-    outTime: Date;
+    // inTime: Date;
+    // outTime: Date;
+    timeRecords: { inTime: Date; outTime: Date }[]
     status: AttendanceStatus;
     staffName: string;
     branchName: string;

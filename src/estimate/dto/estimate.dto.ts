@@ -31,4 +31,5 @@ export class ProductDetailDto {
     quantity: number;
     costPerUnit: number;
     totalCost: number;
+    hsnCode: string;
 }

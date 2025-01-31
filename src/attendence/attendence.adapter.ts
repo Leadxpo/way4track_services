@@ -10,11 +10,13 @@ export class AttendanceAdapter {
         entity.staffId = { staffId: dto.staffId } as StaffEntity;
         entity.branchId = { id: dto.branchId } as BranchEntity;
         entity.day = dto.day;
-        entity.inTime = dto.inTime;
-        entity.outTime = dto.outTime;
         entity.status = dto.status;
-        entity.companyCode = dto.companyCode
-        entity.unitCode = dto.unitCode
+        entity.companyCode = dto.companyCode;
+        entity.unitCode = dto.unitCode;
+
+        // Initialize timeRecords array properly
+        entity.timeRecords = dto.inTime && dto.outTime ? [{ inTime: dto.inTime, outTime: dto.outTime }] : [];
+
         return entity;
     }
 
@@ -24,8 +26,7 @@ export class AttendanceAdapter {
             staffId: attendance.staffId.staffId,
             branchId: attendance.branchId.id,
             day: attendance.day,
-            inTime: attendance.inTime,
-            outTime: attendance.outTime,
+            timeRecords: attendance.timeRecords,
             status: attendance.status,
             staffName: attendance.staffId.name,
             branchName: attendance.branchId.branchName,

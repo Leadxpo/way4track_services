@@ -42,6 +42,7 @@ export class EstimateAdapter {
                     quantity: productDetail.quantity,
                     costPerUnit: productDetail.costPerUnit,
                     totalCost: totalCost || 0,
+                    hsnCode: productDetail.hsnCode
                 };
             });
         }

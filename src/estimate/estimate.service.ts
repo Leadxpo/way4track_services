@@ -54,6 +54,7 @@ export class EstimateService {
                     quantity: productDetail.quantity,
                     costPerUnit: product.price,
                     totalCost: totalCost,
+                    hsnCode: product.hsnCode
                 };
             });
 
@@ -121,7 +122,8 @@ export class EstimateService {
                         productName: product.productName,
                         quantity: quantity,
                         costPerUnit: costPerUnit,
-                        totalCost: totalCost || 0, // Ensure totalCost is a valid number
+                        totalCost: totalCost || 0,
+                        hsnCode: product.hsnCode // Ensure totalCost is a valid number
                     };
                 })
             );
@@ -167,12 +169,12 @@ export class EstimateService {
 
     async deleteEstimateDetails(dto: EstimateIdDto): Promise<CommonResponse> {
         try {
-            const estimate = await this.estimateRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            const estimate = await this.estimateRepository.findOne({ where: { estimateId: dto.estimateId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!estimate) {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
 
-            await this.estimateRepository.delete(dto.id);
+            await this.estimateRepository.delete(dto.estimateId);
             return new CommonResponse(true, 200, 'Estimate details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
@@ -183,7 +185,7 @@ export class EstimateService {
         try {
             const estimate = await this.estimateRepository.findOne({
                 relations: ['clientId', 'products'],
-                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
+                where: { estimateId: req.estimateId, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
             if (!estimate) {

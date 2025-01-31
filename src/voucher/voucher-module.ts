@@ -11,6 +11,8 @@ import { SubDealerModule } from 'src/sub-dealer/sub-dealer.module';
 import { ClientModule } from 'src/client/client.module';
 import { AccountModule } from 'src/account/account.module';
 import { EstimateModule } from 'src/estimate/estimate.module';
+import { EmiPaymentRepository } from './repo/emi-payment-repo';
+import { EmiPaymentEntity } from './entity/emi-payments';
 
 @Module({
     imports: [
@@ -23,7 +25,7 @@ import { EstimateModule } from 'src/estimate/estimate.module';
         forwardRef(() => EstimateModule)
     ],
     controllers: [VoucherController],
-    providers: [VoucherService, VoucherAdapter, VoucherRepository],
+    providers: [VoucherService, VoucherAdapter, VoucherRepository, EmiPaymentRepository],
     exports: [VoucherRepository, VoucherService],
 })
 export class VoucherModule { }

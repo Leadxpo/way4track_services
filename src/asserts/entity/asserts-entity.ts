@@ -57,7 +57,6 @@ export class AssertsEntity {
         type: 'enum',
         name: 'payment_type',
         enum: PaymentType,
-        default: PaymentType.CASH,
     })
     paymentType: PaymentType;
     @Column('int', { name: 'emi_number', nullable: true })
