@@ -25,7 +25,7 @@ export class AssertsEntity {
     @Column({ name: 'asserts_photo', type: 'text', nullable: true })
     assetPhoto: string;
 
-    @Column({ name: 'asserts_amount', type: 'float' })
+    @Column({ name: 'asserts_amount', type: 'float', nullable: true })
     assertsAmount: number;
 
     @Column({
@@ -36,7 +36,7 @@ export class AssertsEntity {
     })
     assetType: AssetType;
 
-    @Column({ name: 'quantity', type: 'int' })
+    @Column({ name: 'quantity', type: 'int', nullable: true })
     quantity: number;
 
     @ManyToOne(() => BranchEntity, (branch) => branch.asserts)
@@ -46,7 +46,7 @@ export class AssertsEntity {
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
 
-    @Column({ name: 'purchase_date', type: 'timestamp' })
+    @Column({ name: 'purchase_date', type: 'timestamp', nullable: true })
     purchaseDate: Date;
 
     @ManyToOne(() => VoucherEntity, (voucher) => voucher.assert)

@@ -5,5 +5,4 @@ export enum VoucherTypeEnum {
     CONTRA = 'contra',
     PURCHASE = 'purchase',
     EMI = "emi"
-    // INVOICE = 'invoice',
 }

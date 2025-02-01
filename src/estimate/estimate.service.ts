@@ -25,7 +25,7 @@ export class EstimateService {
         try {
             const existingEstimate = await this.estimateRepository.findOne({
                 where: { id: dto.id },
-                relations: ['productDetails'],
+                relations: ['products'],
             });
 
             if (!existingEstimate) {

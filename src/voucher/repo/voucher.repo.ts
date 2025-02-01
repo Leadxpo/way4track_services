@@ -221,9 +221,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
-            .leftJoinAndSelect(BranchEntity, 'br', 'br.id = ve.branch_id')
-            .leftJoinAndSelect(VendorEntity, 'vn', 've.vendor_id=vn.id')
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .leftJoin(VendorEntity, 'vn', 've.vendor_id=vn.id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -706,6 +706,38 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             last30DaysPurchases: last30DaysPurchases,
             percentageChange: percentageChange.toFixed(2),
         };
+    }
+
+    async getExpansesTableData(req: InvoiceDto) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS expansesId',
+                've.name AS name',
+                'cl.name AS clientName',
+                've.generation_date AS generationDate',
+                've.payment_status AS paymentStatus',
+                've.amount AS amount',
+                'branch.name as branchName',
+                've.payment_type as paymentMode'
+            ])
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .andWhere(`ve.company_code = "${req.companyCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+        if (req.fromDate && req.toDate) {
+            query.andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
+                fromDate: req.fromDate,
+                toDate: req.toDate,
+            });
+        }
+        if (req.paymentStatus) {
+            query.andWhere('ve.payment_status = :paymentStatus', {
+                paymentStatus: req.paymentStatus,
+            });
+        }
+
+        const result = await query.getRawMany();
+        return result;
     }
 
     async getExpenseData(req: CommonReq): Promise<any> {

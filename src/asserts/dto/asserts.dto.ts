@@ -10,4 +10,5 @@ export class AssertsDto {
     voucherId: string;
     companyCode: string;
     unitCode: string
+    quantity: number
 }

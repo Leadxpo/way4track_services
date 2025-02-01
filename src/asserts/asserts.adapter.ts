@@ -49,7 +49,7 @@ export class AssertsAdapter {
             entity.assetPhoto = dto.assetPhoto;
             entity.assertsAmount = voucherEntity.amount;
             entity.assetType = dto.assetType;
-            entity.quantity = voucherEntity.quantity;
+            entity.quantity =  dto.quantity;
             entity.description = dto.description
             entity.purchaseDate = voucherEntity.generationDate;
             entity.paymentType = voucherEntity.paymentType;

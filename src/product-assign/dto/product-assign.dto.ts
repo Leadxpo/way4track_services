@@ -11,10 +11,10 @@ export class ProductAssignDto {
     productAssignPhoto?: string
     companyCode: string;
     unitCode: string
-    assignedQty: number;
-    isAssign: boolean;
+    // assignedQty: number;
+    isAssign: string;
     assignTime: Date;
     assignTo: string;
     productType: string;
-    inHands: boolean;
+    inHands: string;
 }

@@ -107,8 +107,10 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
     async getTotalAssignedAndStockLast30Days(req: CommonReq): Promise<any> {
         const result = await this.createQueryBuilder('pa')
-            .select('SUM(pa.assigned_qty)', 'totalAssigned')
+            .select('SUM(pa.number_of_products)', 'totalAssigned')
             .leftJoin(ProductEntity, 'p', 'p.id = pa.product_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = pa.branch_id')
+            // .leftJoin(StaffEntity, 'sf', 'sf.id = pa.staff_id')
             .where('DATE(pa.assign_time) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()')
             .groupBy('pa.product_id')
             .where(`pa.company_code = "${req.companyCode}"`)
@@ -134,24 +136,55 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         return finalResult;
     }
 
-    async getAssignedQtyLast30Days(req: CommonReq) {
-        const result = await
-            this.createQueryBuilder('productAssign')
-                .innerJoinAndSelect('productAssign.product_id', 'product')
-                .innerJoinAndSelect('productAssign.branch_id', 'branch')
-                .select('branch.id', 'branchId')
-                .addSelect('branch.name', 'branchName')
-                .addSelect('product.product_name', 'productName')
-                .addSelect('SUM(productAssign.assigned_qty)', 'totalAssignedQty')
-                .where('productAssign.is_assign = :isAssign', { isAssign: true })
-                .andWhere('productAssign.assign_time >= :startDate', { startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) })
-                .andWhere(`productAssign.company_code = "${req.companyCode}"`)
-                .andWhere(`productAssign.unit_code = "${req.unitCode}"`)
-                .groupBy('branch.id')
-                .addGroupBy('product.product_name')
-                .getRawMany();
+    async getAssignedQty(req: CommonReq) {
+        const result = await this.createQueryBuilder('productAssign')
+            .leftJoinAndSelect(ProductEntity, 'product', 'product.id = productAssign.product_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = productAssign.branch_id')
+            .select('branch.id', 'branchId')
+            .addSelect('branch.name', 'branchName')
+            .addSelect('SUM(productAssign.number_of_products)', 'totalAssignedQty')
+            .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('branch.id') // Grouping by branch only
+            .getRawMany();
 
         return result;
     }
+
+    async getTotalInHandsQty(req: CommonReq) {
+        const result = await this.createQueryBuilder('productAssign')
+            .leftJoinAndSelect(ProductEntity, 'product', 'product.id = productAssign.product_id')
+            .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = productAssign.staff_id')
+            .select('sf.staff_id', 'staffID')
+            .addSelect('sf.name', 'staffName')
+            .addSelect('SUM(CASE WHEN productAssign.in_hands = :inHands THEN productAssign.number_of_products ELSE 0 END)', 'totalInHandsQty')
+            .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('productAssign.in_hands = :inHands', { inHands: 'true' })
+            .groupBy('sf.id')
+            .getRawMany();
+
+        return result;
+    }
+
+    async getTotalBranchAssignedQty(req: CommonReq) {
+        const result = await this.createQueryBuilder('productAssign')
+            .leftJoinAndSelect(ProductEntity, 'product', 'product.id = productAssign.product_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = productAssign.branch_id')
+            .select('branch.id', 'branchId')
+            .addSelect('branch.name', 'branchName')
+            .addSelect('SUM(CASE WHEN productAssign.is_assign = :isAssign THEN productAssign.number_of_products ELSE 0 END)', 'totalAssignedQty')
+            .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('productAssign.is_assign = :isAssign', { isAssign: 'true' })  // Condition for is_assign
+            .groupBy('branch.id')
+            .setParameters({ isAssign: true, companyCode: req.companyCode, unitCode: req.unitCode })
+            .getRawMany();
+
+        return result;
+    }
+
+
+
 }
 

@@ -75,7 +75,7 @@ export class VoucherEntity {
     })
     paymentType: PaymentType;
 
-    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.PAYMENT })
+    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.EMI })
     voucherType: VoucherTypeEnum;
 
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
@@ -188,6 +188,6 @@ export class VoucherEntity {
     @JoinColumn({ name: 'invoice_id' })
     estimate: EstimateEntity;
 
-    @Column('decimal', { name: 'paid_amount',nullable:true })
+    @Column('decimal', { name: 'paid_amount', nullable: true })
     paidAmount: number;
 }

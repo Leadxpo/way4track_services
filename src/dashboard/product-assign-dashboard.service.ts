@@ -31,8 +31,26 @@ export class ProductAssignDashboardService {
         }
     }
 
-    async getAssignedQtyLast30Days(req: CommonReq): Promise<CommonResponse> {
-        const productData = await this.productAssignRepo.getAssignedQtyLast30Days(req)
+    async getAssignedQty(req: CommonReq): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getAssignedQty(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
+    async getTotalInHandsQty(req: CommonReq): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getTotalInHandsQty(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
+    async getTotalBranchAssignedQty(req: CommonReq): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getTotalBranchAssignedQty(req)
         if (!productData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

@@ -46,6 +46,14 @@ export class ProductAssignAdapter {
     entity.imeiNumberTo = dto.imeiNumberTo || null;
     entity.branchOrPerson = dto.branchOrPerson || null;
     entity.productAssignPhoto = dto.productAssignPhoto || null;
+    entity.isAssign = dto.isAssign
+    // entity.assignedQty = dto.assignedQty
+    entity.inHands = dto.inHands
+    entity.assignTime = dto.assignTime
+    entity.assignTo = dto.assignTo
+
+
+
 
     entity.companyCode = dto.companyCode;
     entity.unitCode = dto.unitCode;

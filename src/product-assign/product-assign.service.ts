@@ -21,7 +21,7 @@ export class ProductAssignService {
     async saveProductAssign(dto: ProductAssignDto, photoPath: string | null): Promise<CommonResponse> {
         try {
             const entity = this.productAssignAdapter.convertDtoToEntity(dto);
-
+            console.log(dto, "{{{{{{{")
             if (photoPath) {
                 entity.productAssignPhoto = photoPath;
             }
@@ -137,43 +137,52 @@ export class ProductAssignService {
         }
     }
 
-    async assignProduct(assignData: any): Promise<ProductAssignEntity> {
-        const { productId, staffId, assignedQty, productType, assignTo, companyCode, unitCode } = assignData;
+    // async assignProduct(assignData: any): Promise<ProductAssignEntity> {
+    //     const { productId, staffId, assignedQty, productType, assignTo, companyCode, unitCode } = assignData;
 
-        const productAssign = await this.productAssignRepository.findOne({ where: { productId } });
+    //     const productAssign = await this.productAssignRepository.findOne({ where: { productId } });
 
-        if (!productAssign) {
-            throw new Error('Product assignment not found');
-        }
-        if (productAssign.numberOfProducts < assignedQty) {
-            throw new Error('Not enough products to assign');
-        }
-        productAssign.isAssign = true;
-        productAssign.assignedQty = assignedQty;
-        productAssign.companyCode = companyCode;
-        productAssign.unitCode = unitCode;
-        productAssign.assignTime = new Date();
-        productAssign.assignTo = assignTo;
-        productAssign.productType = productType;
-        productAssign.inHands = false;
-        productAssign.numberOfProducts -= assignedQty;
-        await this.productAssignRepository.save(productAssign);
+    //     if (!productAssign) {
+    //         throw new Error('Product assignment not found');
+    //     }
+    //     if (productAssign.numberOfProducts < assignedQty) {
+    //         throw new Error('Not enough products to assign');
+    //     }
+    //     productAssign.isAssign = true;
+    //     productAssign.assignedQty = assignedQty;
+    //     productAssign.companyCode = companyCode;
+    //     productAssign.unitCode = unitCode;
+    //     productAssign.assignTime = new Date();
+    //     productAssign.assignTo = assignTo;
+    //     productAssign.productType = productType;
+    //     productAssign.inHands = false;
+    //     productAssign.numberOfProducts -= assignedQty;
+    //     await this.productAssignRepository.save(productAssign);
 
-        return productAssign;
-    }
+    //     return productAssign;
+    // }
 
-    async markInHands(productAssignId: number, companyCode: string, unitCode: string): Promise<ProductAssignEntity> {
-        const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId, companyCode: companyCode, unitCode: unitCode } });
+    // async markIsAssign(productAssignId: number): Promise<CommonResponse> {
+    //     const status = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
+    //     if (status) {
+    //         await this.productAssignRepository.update({ id: productAssignId }, { isAssign: !status.isAssign })
+    //         let message = status.isAssign ? "  Deactivated Successfully" : " Activated Successfully"
+    //         return await new CommonResponse(true, 65152, message)
+    //     } else {
+    //         return await new CommonResponse(false, 6541, "No Data Found")
+    //     }
+    // }
 
-        if (!productAssign) {
-            throw new Error('Product assignment not found');
-        }
-
-        productAssign.inHands = true;
-        await this.productAssignRepository.save(productAssign);
-
-        return productAssign;
-    }
+    // async markInHands(productAssignId: number): Promise<CommonResponse> {
+    //     const status = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
+    //     if (status) {
+    //         await this.productAssignRepository.update({ id: productAssignId }, { inHands: !status.inHands })
+    //         let message = status.inHands ? "  Deactivated Successfully" : " Activated Successfully"
+    //         return await new CommonResponse(true, 65152, message)
+    //     } else {
+    //         return await new CommonResponse(false, 6541, "No Data Found")
+    //     }
+    // }
 
     async uploadproductAssignPhoto(photo: Express.Multer.File): Promise<string> {
         try {

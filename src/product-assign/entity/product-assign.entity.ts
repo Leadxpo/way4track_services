@@ -40,11 +40,11 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'branch_person', type: 'varchar', length: 20 })
   branchOrPerson: string;
 
-  @Column({ name: 'assigned_qty', type: 'int', nullable: true })
-  assignedQty: number;
+  // @Column({ name: 'assigned_qty', type: 'int', nullable: true })
+  // assignedQty: number;
 
-  @Column({ name: 'is_assign', type: 'boolean', default: false })
-  isAssign: boolean;
+  @Column({ name: 'is_assign', type: 'varchar', default: false })
+  isAssign: string;
 
   @Column({ name: 'assign_time', type: 'timestamp', nullable: true })
   assignTime: Date;
@@ -55,8 +55,8 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'product_type', type: 'varchar', length: 50, nullable: true })
   productType: string;
 
-  @Column({ name: 'in_hands', type: 'boolean', default: false })
-  inHands: boolean;
+  @Column({ name: 'in_hands', type: 'varchar', default: false })
+  inHands: string;
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;

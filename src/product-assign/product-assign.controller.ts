@@ -41,21 +41,30 @@ export class ProductAssignController {
         }
     }
 
-    @Post('assignProduct')
-    async assignProduct(@Body() assignData: any): Promise<ProductAssignEntity> {
-        try {
-            return await this.productAssignService.assignProduct(assignData);
-        } catch (error) {
-            throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-        }
-    }
+    // @Post('assignProduct')
+    // async assignProduct(@Body() assignData: any): Promise<ProductAssignEntity> {
+    //     try {
+    //         return await this.productAssignService.assignProduct(assignData);
+    //     } catch (error) {
+    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    //     }
+    // }
 
-    @Post('markInHands')
-    async markInHands(@Body() productAssignId: number, companyCode: string, unitCode: string): Promise<ProductAssignEntity> {
-        try {
-            return await this.productAssignService.markInHands(productAssignId, companyCode, unitCode);
-        } catch (error) {
-            throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-        }
-    }
+    // @Post('markInHands')
+    // async markInHands(@Body() productAssignId: number): Promise<CommonResponse> {
+    //     try {
+    //         return await this.productAssignService.markInHands(productAssignId);
+    //     } catch (error) {
+    //         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    //     }
+    // }
+
+    // @Post('markIsAssign')
+    // async markIsAssign(@Body() productAssignId: number): Promise<CommonResponse> {
+    //     try {
+    //         return await this.productAssignService.markIsAssign(productAssignId);
+    //     } catch (error) {
+    //         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+    //     }
+    // }
 }
