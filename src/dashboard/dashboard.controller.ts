@@ -455,7 +455,7 @@ export class DashboardController {
 
     @Post('getLedgerDataTable')
     async getLedgerDataTable(@Body() req: {
-        voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
+        clientId?: number; branchName?: string; clientName?: string; companyCode?: string;
         unitCode?: string
     }): Promise<CommonResponse> {
         try {

@@ -202,7 +202,7 @@ export class VoucherDashboardService {
     }
 
     async getLedgerDataTable(req: {
-        voucherId?: number; branchName?: string; paymentStatus?: string; companyCode?: string;
+        clientId?: number; branchName?: string; clientName?: string; companyCode?: string;
         unitCode?: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getLedgerDataTable(req)

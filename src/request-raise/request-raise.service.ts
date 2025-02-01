@@ -9,6 +9,9 @@ import { NotificationEnum } from 'src/notifications/entity/notification.entity';
 import { NotificationService } from 'src/notifications/notification.service';
 import { RequestRaiseEntity } from './entity/request-raise.entity';
 import { CommonReq } from 'src/models/common-req';
+import { ClientEntity } from 'src/client/entity/client.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 @Injectable()
 export class RequestRaiseService {
@@ -150,34 +153,38 @@ export class RequestRaiseService {
     }
 
     async getRequests(filter: {
-        fromDate?: Date; toDate?: Date; status?: string, companyCode?: string,
+        // fromDate?: Date; toDate?: Date; 
+        branchName?: string, companyCode?: string,
         unitCode?: string
     }) {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
                 'req.request_id AS requestNumber',
                 'client.name AS client',
+                'branch.name AS branchName',
                 'req.created_date AS paymentDate',
                 'req.request_type AS amount',
                 'req.status AS status',
-                'req.request_to as RequestTo'
+                'sf.name as RequestTo'
             ])
-            .leftJoin('req.client_id', 'client')
+            .leftJoin(ClientEntity, 'client', 'req.client_id=client.id',)
+            .leftJoin(BranchEntity, 'branch', 'req.branch_id=branch.id',)
+            .leftJoin(StaffEntity, 'sf', 'req.request_to=sf.id',)
             .where(`req.company_code = "${filter.companyCode}"`)
             .andWhere(`req.unit_code = "${filter.unitCode}"`)
             .groupBy('req.id, client.id, req.created_date')
             .orderBy('req.created_date', 'DESC');
 
-        if (filter.fromDate) {
-            query.andWhere('req.created_date >= :fromDate', { fromDate: filter.fromDate });
-        }
+        // if (filter.fromDate) {
+        //     query.andWhere('req.created_date >= :fromDate', { fromDate: filter.fromDate });
+        // }
 
-        if (filter.toDate) {
-            query.andWhere('req.created_date <= :toDate', { toDate: filter.toDate });
-        }
+        // if (filter.toDate) {
+        //     query.andWhere('req.created_date <= :toDate', { toDate: filter.toDate });
+        // }
 
-        if (filter.status) {
-            query.andWhere('req.status = :status', { status: filter.status });
+        if (filter.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: filter.branchName });
         }
 
         const result = await query.getRawMany();
