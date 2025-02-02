@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from "@nestjs/common"
+import { Body, Controller, Get, Post } from "@nestjs/common"
 import { CommonResponse } from "src/models/common-response"
 import { AssertDashboardService } from "./assert-dashboard.service";
 import { StaffDashboardService } from "./staff-dashboard.service";
@@ -44,6 +44,39 @@ export class DashboardController {
         private readonly accountDashboardService: AccountDashboardService,
 
     ) { }
+    @Get('sendReciept')
+    async sendReciept(): Promise<CommonResponse> {
+        try {
+            return await this.estimateDashboardService.sendReceipt()
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Get('sendInvoice')
+    async sendInvoice(): Promise<CommonResponse> {
+        try {
+            return await this.estimateDashboardService.sendInvoice()
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Get('sendEstimate')
+    async sendEstimate(): Promise<CommonResponse> {
+        try {
+            return await this.estimateDashboardService.sendEstimate()
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Post('assertsCardData')
     async assertsCardData(@Body() req: {
         unitCode: string;
