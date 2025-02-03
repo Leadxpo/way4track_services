@@ -29,6 +29,7 @@ export class WorkAllocationResDto {
     install?: boolean
     voucherId?: string
     voucherName?: string
+
     constructor(
         id: number,
         workAllocationNumber: string,
