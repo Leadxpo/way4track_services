@@ -1,4 +1,5 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
@@ -42,6 +43,9 @@ export class SubDealerEntity {
 
   @OneToMany(() => VoucherEntity, (product) => product.subDealer)
   voucherId: VoucherEntity[];
+
+  @OneToMany(() => RequestRaiseEntity, (product) => product.subDealerId)
+  request: RequestRaiseEntity[];
 
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.subDealer, { nullable: true })
   @JoinColumn({ name: 'branch_id' })

@@ -4,6 +4,7 @@ import { ClientStatusEnum } from 'src/client/enum/client-status.enum';
 import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, BeforeInsert, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('requests')
@@ -32,9 +33,9 @@ export class RequestRaiseEntity extends BaseEntity {
     @JoinColumn({ name: 'request_to' })
     requestTo: StaffEntity;
 
-    @ManyToOne(() => ClientEntity, (staffEntity) => staffEntity.request)
-    @JoinColumn({ name: 'client_id' })
-    clientID: ClientEntity;
+    @ManyToOne(() => SubDealerEntity, (staffEntity) => staffEntity.request)
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealerId: SubDealerEntity;
 
     @Column({ name: 'description', type: 'text' })
     description: string;

@@ -13,7 +13,8 @@ export class RequestResDto {
     status: ClientStatusEnum
     companyCode: string;
     unitCode: string
-
+    subDealerId?: number
+    subDealerName?: string
     constructor(
         id: number,
         requestType: string,
@@ -27,7 +28,9 @@ export class RequestResDto {
         branchName: string,
         status: ClientStatusEnum,
         companyCode: string,
-        unitCode: string
+        unitCode: string,
+        subDealerId?: number,
+        subDealerName?: string
     ) {
         this.id = id;
         this.requestType = requestType;
@@ -41,5 +44,7 @@ export class RequestResDto {
         this.status = status
         this.companyCode = companyCode
         this.unitCode = unitCode
+        this.subDealerId = subDealerId
+        this.subDealerName = subDealerName
     }
 }

@@ -26,7 +26,7 @@ export class WorkAllocationResDto {
     vendorName?: string;
     vendorAddress?: string;
     vendorEmailId?: string;
-    install?: InstallationEnum
+    install?: boolean
     voucherId?: string
     voucherName?: string
     constructor(
@@ -55,7 +55,7 @@ export class WorkAllocationResDto {
         vendorName?: string,
         vendorAddress?: string,
         vendorEmailId?: string,
-        install?: InstallationEnum,
+        install?: boolean,
         voucherId?: string,
         voucherName?: string
 

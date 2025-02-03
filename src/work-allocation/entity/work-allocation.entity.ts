@@ -24,8 +24,9 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'date', type: 'date' })
     date: Date;
 
-    @Column({ name: 'install', type: 'enum', enum: InstallationEnum, default: InstallationEnum.assigned })
-    install: InstallationEnum
+    @Column({ name: 'install', type: 'boolean', default: false })
+    install: boolean;
+
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation)
     @JoinColumn({ name: 'staff_id' })
@@ -56,4 +57,8 @@ export class WorkAllocationEntity extends BaseEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
+
+    @Column({ name: 'imei_number', type: 'varchar', length: 20 })
+    imeiNumber: string;
+
 }

@@ -4,6 +4,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { RequestRaiseDto } from './dto/request-raise.dto';
 import { RequestResDto } from './dto/request-res.dto';
 import { RequestRaiseEntity } from './entity/request-raise.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Injectable()
 export class RequestRaiseAdapter {
@@ -28,9 +29,9 @@ export class RequestRaiseAdapter {
         branch.id = dto.branchId;
         entity.branchId = branch;
 
-        // const client = new ClientEntity();
-        // client.id = dto.clientID;
-        // entity.clientID = client;
+        const subDealer = new SubDealerEntity();
+        subDealer.id = dto.subDealerId;
+        entity.subDealerId = subDealer;
 
         entity.description = dto.description;
         entity.createdDate = dto.createdDate;
@@ -40,7 +41,7 @@ export class RequestRaiseAdapter {
         return entity;
     }
     convertEntityToResDto(entity: RequestRaiseEntity): RequestResDto {
-        const { staffId, branchId, clientID, requestFrom, requestTo, ...rest } = entity;
+        const { staffId, branchId, subDealerId, requestFrom, requestTo, ...rest } = entity;
         return new RequestResDto(
             entity.id,
             entity.requestType,
@@ -53,7 +54,7 @@ export class RequestRaiseAdapter {
             branchId.branchName,
             entity.status,
             entity.companyCode,
-            entity.unitCode
+            entity.unitCode,
         );
     }
 }

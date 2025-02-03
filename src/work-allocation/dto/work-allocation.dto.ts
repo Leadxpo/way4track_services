@@ -10,8 +10,9 @@ export class WorkAllocationDto {
     companyCode?: string;
     unitCode?: string
     workAllocationNumber?: string
-    install: InstallationEnum
+    install?: boolean
     productId?: number
     vendorId?: number
-    voucherId?:string
+    voucherId?: string
+    imeiNumber?: string
 }

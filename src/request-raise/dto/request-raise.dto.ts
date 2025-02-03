@@ -10,7 +10,7 @@ export class RequestRaiseDto {
     description: string;
     createdDate: Date;
     status: ClientStatusEnum
-    // clientID: number
+    subDealerId: number
     companyCode: string;
     unitCode: string;
     requestId?: string
