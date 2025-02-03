@@ -6,12 +6,14 @@ import { GetAssertsResDto } from "./dto/get-asserts-res.dto";
 import { AssertsEntity } from "./entity/asserts-entity";
 import { PaymentType } from "./enum/payment-type.enum";
 import { VoucherTypeEnum } from "src/voucher/enum/voucher-type-enum";
+import { BranchRepository } from "src/branch/repo/branch.repo";
 
 
 @Injectable()
 export class AssertsAdapter {
     constructor(
         private readonly voucherRepository: VoucherRepository,
+        private readonly branchRepository: BranchRepository
     ) { }
     convertEntityToDto(entity: AssertsEntity): GetAssertsResDto {
         return new GetAssertsResDto(
@@ -49,18 +51,21 @@ export class AssertsAdapter {
             entity.assetPhoto = dto.assetPhoto;
             entity.assertsAmount = voucherEntity.amount;
             entity.assetType = dto.assetType;
-            entity.quantity =  dto.quantity;
-            entity.description = dto.description
+            entity.quantity = dto.quantity;
+            entity.description = dto.description;
             entity.purchaseDate = voucherEntity.generationDate;
             entity.paymentType = voucherEntity.paymentType;
             entity.companyCode = dto.companyCode;
             entity.unitCode = dto.unitCode;
 
-
             if (dto.branchId) {
-                const branchEntity = new BranchEntity();
-                branchEntity.id = dto.branchId;
-                entity.branchId = branchEntity;
+                const branchEntity = await this.branchRepository.findOne({ where: { id: dto.branchId } });
+
+                if (!branchEntity) {
+                    throw new Error(`Branch with ID ${dto.branchId} not found`);
+                }
+
+                entity.branchId = branchEntity; // ✅ Assign full entity instead of number
             }
 
             if (voucherEntity.voucherType === VoucherTypeEnum.EMI) {
@@ -70,13 +75,13 @@ export class AssertsAdapter {
             throw new Error('Voucher ID is required');
         }
 
-
         if (dto.id) {
             entity.id = dto.id;
         }
 
         return entity;
     }
+
 
 }
 

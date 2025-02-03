@@ -24,6 +24,9 @@ export class EstimateResDto {
     GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
+    vendorId?: number;
+    vendorName?: string;
+    vendorPhoneNumber?: string
 
     constructor(
         id: number,
@@ -46,7 +49,11 @@ export class EstimateResDto {
         GSTORTDS?: GSTORTDSEnum,
         SCST?: number,
         CGST?: number,
-        hsnCode?: string
+        hsnCode?: string,
+        vendorId?: number,
+        vendorName?: string,
+        vendorPhoneNumber?: string
+
     ) {
         this.id = id;
         this.clientId = clientId;
@@ -69,5 +76,8 @@ export class EstimateResDto {
         this.SCST = SCST;
         this.CGST = CGST;
         this.hsnCode = hsnCode;
+        this.vendorId = vendorId
+        this.vendorName = vendorName;
+        this.vendorPhoneNumber = vendorPhoneNumber
     }
 }

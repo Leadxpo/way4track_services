@@ -5,6 +5,7 @@ import { ProductAssignIdDto } from './dto/product-assign-id.dto';
 import { ProductAssignService } from './product-assign.service';
 import { ProductAssignEntity } from './entity/product-assign.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CommonReq } from 'src/models/common-req';
 
 @Controller('product-assign')
 export class ProductAssignController {
@@ -41,30 +42,13 @@ export class ProductAssignController {
         }
     }
 
-    // @Post('assignProduct')
-    // async assignProduct(@Body() assignData: any): Promise<ProductAssignEntity> {
-    //     try {
-    //         return await this.productAssignService.assignProduct(assignData);
-    //     } catch (error) {
-    //         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    //     }
-    // }
-
-    // @Post('markInHands')
-    // async markInHands(@Body() productAssignId: number): Promise<CommonResponse> {
-    //     try {
-    //         return await this.productAssignService.markInHands(productAssignId);
-    //     } catch (error) {
-    //         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-    //     }
-    // }
-
-    // @Post('markIsAssign')
-    // async markIsAssign(@Body() productAssignId: number): Promise<CommonResponse> {
-    //     try {
-    //         return await this.productAssignService.markIsAssign(productAssignId);
-    //     } catch (error) {
-    //         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-    //     }
-    // }
+    @Post('getAllProductAssign')
+    async getAllProductAssign(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.productAssignService.getAllProductAssign(req);
+        } catch (error) {
+            console.error('Error in get product assignment in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching product assignment');
+        }
+    }
 }

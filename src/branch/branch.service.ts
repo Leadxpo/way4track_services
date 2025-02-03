@@ -1,15 +1,13 @@
+import { Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
-import { BranchRepository } from './repo/branch.repo';
-import { BranchAdapter } from './branch.adapter';
-import { BranchDto } from './dto/branch.dto';
-import { BranchIdDto } from './dto/branch-id.dto';
+import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
-import { join } from 'path';
-import { promises as fs } from 'fs';
-import { CommonReq } from 'src/models/common-req';
+import { BranchAdapter } from './branch.adapter';
+import { BranchIdDto } from './dto/branch-id.dto';
+import { BranchDto } from './dto/branch.dto';
 import { BranchEntity } from './entity/branch.entity';
-import { Storage } from '@google-cloud/storage';
+import { BranchRepository } from './repo/branch.repo';
 
 @Injectable()
 export class BranchService {

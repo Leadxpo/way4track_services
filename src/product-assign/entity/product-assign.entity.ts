@@ -40,7 +40,7 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'branch_person', type: 'varchar', length: 20 })
   branchOrPerson: string;
 
-  // @Column({ name: 'assigned_qty', type: 'int', nullable: true })
+  // @Column({ name: 'assigned_qty', type: 'int', nullable: true, default: null })
   // assignedQty: number;
 
   @Column({ name: 'is_assign', type: 'varchar', default: false })

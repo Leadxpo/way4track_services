@@ -12,10 +12,10 @@ import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn, BaseEntity } from 'typeorm';
 
 @Entity('branches')
-export class BranchEntity {
+export class BranchEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

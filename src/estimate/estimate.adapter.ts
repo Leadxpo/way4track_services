@@ -3,6 +3,7 @@ import { ClientEntity } from 'src/client/entity/client.entity';
 import { EstimateResDto } from './dto/estimate-res.dto';
 import { EstimateDto } from './dto/estimate.dto';
 import { EstimateEntity } from './entity/estimate.entity';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 
 @Injectable()
 @Injectable()
@@ -24,6 +25,10 @@ export class EstimateAdapter {
         clientEntity.clientId = dto.clientId;
         entity.clientId = clientEntity;
         entity.quantity = dto.quantity
+
+        const vendorEntity = new VendorEntity();
+        vendorEntity.id = dto.vendorId;
+        entity.vendorId = vendorEntity;
 
         entity.quantity = dto.quantity;
         if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
@@ -80,7 +85,10 @@ export class EstimateAdapter {
             entity.GSTORTDS,
             entity.SCST,
             entity.CGST,
-            entity.hsnCode
+            entity.hsnCode,
+            entity.vendorId.id,
+            entity.vendorId.name,
+            entity.vendorId.vendorPhoneNumber
         ));
     }
 

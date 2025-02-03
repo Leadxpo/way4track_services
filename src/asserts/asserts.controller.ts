@@ -5,13 +5,19 @@ import { CommonResponse } from 'src/models/common-response';
 import { AssertsService } from './asserts.service';
 import { AssertsIdDto } from './dto/asserts-id.dto';
 import { AssertsDto } from './dto/asserts.dto';
+import * as multer from 'multer';
 
-
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('asserts')
 export class AssertsController {
     constructor(private readonly assertsService: AssertsService) { }
 
-    @UseInterceptors(FileInterceptor('photo'))
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('create')
     async createAssert(
         @Body() createAssertsDto: AssertsDto,

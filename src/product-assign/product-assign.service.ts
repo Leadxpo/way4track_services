@@ -1,32 +1,110 @@
 import { Injectable } from '@nestjs/common';
-import { ProductAssignDto } from './dto/product-assign.dto';
+import { promises as fs } from 'fs';
+import { join } from 'path';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { BranchRepository } from 'src/branch/repo/branch.repo';
 import { CommonResponse } from 'src/models/common-response';
+import { ErrorResponse } from 'src/models/error-response';
+import { ProductEntity } from 'src/product/entity/product.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { DataSource } from 'typeorm';
+import { ProductAssignIdDto } from './dto/product-assign-id.dto';
+import { ProductAssignDto } from './dto/product-assign.dto';
 import { ProductAssignAdapter } from './product-assign.adapter';
 import { ProductAssignRepository } from './repo/product-assign.repo';
-import { ErrorResponse } from 'src/models/error-response';
-import { ProductAssignIdDto } from './dto/product-assign-id.dto';
-import { ProductAssignResDto } from './dto/product-assign-res.dto';
-import { ProductAssignEntity } from './entity/product-assign.entity';
-import { join } from 'path';
-import { promises as fs } from 'fs';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class ProductAssignService {
     constructor(
         private readonly productAssignRepository: ProductAssignRepository,
         private readonly productAssignAdapter: ProductAssignAdapter,
+        private readonly branchRepo: BranchRepository,
+        private dataSource: DataSource
     ) { }
 
+
+    async assignProductsByImei(
+        imeiNumberFrom: string,
+        imeiNumberTo: string,
+        branchId?: number,
+        staffId?: number
+    ): Promise<void> {
+        const imeiFrom = parseInt(imeiNumberFrom, 10);
+        const imeiTo = parseInt(imeiNumberTo, 10);
+
+        if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
+            throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+        }
+
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.startTransaction();
+
+        try {
+            const products = await queryRunner.manager
+                .getRepository(ProductEntity)
+                .createQueryBuilder("product")
+                .where("CAST(product.imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                .getMany();
+
+            if (!products.length) {
+                throw new Error(`No products found in the IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+            }
+
+            let status = "not_assigned";
+            let location = "warehouse";
+
+            if (branchId) {
+                const branch = await queryRunner.manager.findOne(BranchEntity, { where: { id: branchId } });
+                if (branch) {
+                    location = branch.branchName;
+                    status = "isAssign";
+                }
+            } else if (staffId) {
+                const staff = await queryRunner.manager.findOne(StaffEntity, { where: { id: staffId } });
+                if (staff) {
+                    location = staff.name;
+                    status = "inHand";
+                }
+            }
+
+            // Bulk update products
+            await queryRunner.manager
+                .createQueryBuilder()
+                .update(ProductEntity)
+                .set({ status, location })
+                .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                .execute();
+
+            await queryRunner.commitTransaction();
+
+            console.log(`Updated ${products.length} products successfully.`);
+        } catch (error) {
+            await queryRunner.rollbackTransaction();
+            console.error("Error assigning products:", error);
+            throw new Error(`Failed to assign products: ${error.message}`);
+        } finally {
+            await queryRunner.release();
+        }
+    }
 
     async saveProductAssign(dto: ProductAssignDto, photoPath: string | null): Promise<CommonResponse> {
         try {
             const entity = this.productAssignAdapter.convertDtoToEntity(dto);
-            console.log(dto, "{{{{{{{")
+
             if (photoPath) {
                 entity.productAssignPhoto = photoPath;
             }
-            console.log(entity, "___________")
+
             await this.productAssignRepository.insert(entity);
+
+            await this.assignProductsByImei(
+                dto.imeiNumberFrom,
+                dto.imeiNumberTo,
+                dto.branchId,
+                dto.staffId
+            );
+
             return new CommonResponse(true, 201, 'Product details created successfully');
         } catch (error) {
             console.error(`Error creating Product details: ${error.message}`, error.stack);
@@ -41,23 +119,76 @@ export class ProductAssignService {
                 throw new Error('Product not found');
             }
 
+            // Convert DTO to entity
             const entity = this.productAssignAdapter.convertDtoToEntity(dto);
 
-            // Merge existing Product details with new data
+            // Update the existing product details with new values, including the photo if provided
             const updatedProduct = {
                 ...existingProduct,
                 ...entity,
                 productAssignPhoto: photoPath || existingProduct.productAssignPhoto,
             };
 
-            await this.productAssignRepository.save(updatedProduct);
+            // Check for changes in IMEI range and update status/location accordingly
+            const imeiFrom = parseInt(dto.imeiNumberFrom, 10);
+            const imeiTo = parseInt(dto.imeiNumberTo, 10);
 
+            if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
+                throw new Error(`Invalid IMEI range: ${dto.imeiNumberFrom} - ${dto.imeiNumberTo}`);
+            }
+
+            const queryRunner = this.dataSource.createQueryRunner();
+            await queryRunner.startTransaction();
+
+            try {
+                // Fetch the current products that are assigned in the given range
+                const currentProducts = await queryRunner.manager
+                    .getRepository(ProductEntity)
+                    .createQueryBuilder("product")
+                    .where("CAST(product.imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                    .getMany();
+
+                // Handle product status updates for removal or reassignment
+                if (currentProducts.length) {
+                    const productIds = currentProducts.map(p => p.id);
+
+                    // Mark products as removed (or any other status) if not part of the new IMEI range
+                    await queryRunner.manager
+                        .createQueryBuilder()
+                        .update(ProductEntity)
+                        .set({ status: "not_assigned", location: "warehouse" })
+                        .where("product.id IN (:...productIds)", { productIds })
+                        .execute();
+                }
+
+                // Handle new products being added to the IMEI range
+                await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(ProductEntity)
+                    .set({ status: "isAssign", location: "warehouse" }) // Change this depending on the status and location
+                    .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                    .execute();
+
+                await queryRunner.commitTransaction();
+
+                console.log(`Updated product assignments successfully.`);
+            } catch (error) {
+                await queryRunner.rollbackTransaction();
+                console.error("Error handling product assignment:", error);
+                throw new Error(`Failed to handle product assignment: ${error.message}`);
+            } finally {
+                await queryRunner.release();
+            }
+
+            await this.productAssignRepository.save(updatedProduct);
             return new CommonResponse(true, 200, 'Product details updated successfully');
         } catch (error) {
             console.error(`Error updating Product details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update Product details: ${error.message}`);
         }
     }
+
+
     async handleProductDetails(dto: ProductAssignDto, file?: Express.Multer.File): Promise<CommonResponse> {
         try {
             let photoPath: string | null = null;
@@ -122,6 +253,21 @@ export class ProductAssignService {
         }
     }
 
+    async getAllProductAssign(dto: CommonReq): Promise<CommonResponse> {
+        try {
+            const productAssign = await this.productAssignRepository.find({
+                where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['branchId', 'staffId', 'productId', 'requestId'],  // Ensure `requestId` is loaded
+            });
+
+            if (!productAssign) {
+                throw new Error('Product assignment not found');
+            }
+            return new CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
 
     async deleteProductAssign(dto: ProductAssignIdDto): Promise<CommonResponse> {
         try {
@@ -136,53 +282,6 @@ export class ProductAssignService {
             throw new Error('Error deleting product assignment');
         }
     }
-
-    // async assignProduct(assignData: any): Promise<ProductAssignEntity> {
-    //     const { productId, staffId, assignedQty, productType, assignTo, companyCode, unitCode } = assignData;
-
-    //     const productAssign = await this.productAssignRepository.findOne({ where: { productId } });
-
-    //     if (!productAssign) {
-    //         throw new Error('Product assignment not found');
-    //     }
-    //     if (productAssign.numberOfProducts < assignedQty) {
-    //         throw new Error('Not enough products to assign');
-    //     }
-    //     productAssign.isAssign = true;
-    //     productAssign.assignedQty = assignedQty;
-    //     productAssign.companyCode = companyCode;
-    //     productAssign.unitCode = unitCode;
-    //     productAssign.assignTime = new Date();
-    //     productAssign.assignTo = assignTo;
-    //     productAssign.productType = productType;
-    //     productAssign.inHands = false;
-    //     productAssign.numberOfProducts -= assignedQty;
-    //     await this.productAssignRepository.save(productAssign);
-
-    //     return productAssign;
-    // }
-
-    // async markIsAssign(productAssignId: number): Promise<CommonResponse> {
-    //     const status = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
-    //     if (status) {
-    //         await this.productAssignRepository.update({ id: productAssignId }, { isAssign: !status.isAssign })
-    //         let message = status.isAssign ? "  Deactivated Successfully" : " Activated Successfully"
-    //         return await new CommonResponse(true, 65152, message)
-    //     } else {
-    //         return await new CommonResponse(false, 6541, "No Data Found")
-    //     }
-    // }
-
-    // async markInHands(productAssignId: number): Promise<CommonResponse> {
-    //     const status = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
-    //     if (status) {
-    //         await this.productAssignRepository.update({ id: productAssignId }, { inHands: !status.inHands })
-    //         let message = status.inHands ? "  Deactivated Successfully" : " Activated Successfully"
-    //         return await new CommonResponse(true, 65152, message)
-    //     } else {
-    //         return await new CommonResponse(false, 6541, "No Data Found")
-    //     }
-    // }
 
     async uploadproductAssignPhoto(photo: Express.Multer.File): Promise<string> {
         try {

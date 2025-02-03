@@ -111,4 +111,10 @@ export class ProductEntity extends BaseEntity {
   @Column({ type: 'float', name: 'hsn_code', nullable: true })
   hsnCode: string;
 
+  @Column({ name: 'location', type: 'varchar', length: 50, default: 'warehouse' }) // Default to warehouse
+  location: string;
+
+  @Column({ name: 'status', type: 'varchar', length: 50, default: 'not_assigned' }) // Default to not_assigned
+  status: string;
+
 }

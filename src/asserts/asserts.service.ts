@@ -1,6 +1,5 @@
+import { Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
-import { promises as fs } from 'fs';
-import { join } from 'path';
 import { BranchRepository } from 'src/branch/repo/branch.repo';
 import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
@@ -9,16 +8,27 @@ import { VoucherRepository } from 'src/voucher/repo/voucher.repo';
 import { AssertsAdapter } from './asserts.adapter';
 import { AssertsIdDto } from './dto/asserts-id.dto';
 import { AssertsDto } from './dto/asserts.dto';
+import { AssertsEntity } from './entity/asserts-entity';
 import { AssertsRepository } from './repo/asserts.repo';
 @Injectable()
 export class AssertsService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private adapter: AssertsAdapter,
         private assertsRepository: AssertsRepository,
         private voucherRepo: VoucherRepository,
         private readonly branchRepo: BranchRepository
 
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
 
     async getAssertDetails(req: AssertsIdDto): Promise<CommonResponse> {
         try {
@@ -64,18 +74,74 @@ export class AssertsService {
                 throw new Error('Voucher not found');
             }
 
-            let filePath: string | null = null;
-            if (photo) {
-                filePath = join(__dirname, '../../uploads/assert_photos', `${Date.now()}-${photo.originalname}`);
-                await fs.writeFile(filePath, photo.buffer);
+            let entity: AssertsEntity | null = null;
+
+            if (createAssertsDto.id) {
+                // Fetch existing entity if updating
+                entity = await this.assertsRepository.findOneBy({ id: createAssertsDto.id });
+                if (!entity) {
+                    throw new ErrorResponse(404, 'Asset not found');
+                }
+
+                // Merge new data into the existing entity, EXCLUDING branchId
+                const { branchId, voucherId, ...rest } = createAssertsDto;
+
+                entity = this.assertsRepository.merge(entity, rest);
+
+                // ✅ Fetch and assign BranchEntity properly
+                if (branchId) {
+                    const branchEntity = await this.branchRepo.findOne({ where: { id: branchId } });
+                    if (!branchEntity) {
+                        throw new Error(`Branch with ID ${branchId} not found`);
+                    }
+                    entity.branchId = branchEntity; // ✅ Assign full entity instead of number
+                }
+
+                // ✅ Fetch and assign VoucherEntity properly
+                if (voucherId) {
+                    const voucherEntity = await this.voucherRepo.findOne({ where: { voucherId } });
+                    if (!voucherEntity) {
+                        throw new Error(`Voucher with ID ${voucherId} not found`);
+                    }
+                    entity.voucherId = voucherEntity; // ✅ Assign full entity instead of string
+                }
+
+
+                // If a new photo is uploaded, delete the existing file from GCS
+                if (photo && entity.assetPhoto) {
+                    const existingFilePath = entity.assetPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                    try {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } catch (error) {
+                        console.error(`Error deleting old file from GCS: ${error.message}`);
+                    }
+                }
+            } else {
+                // Create a new entity if ID does not exist
+                entity = await this.adapter.convertDtoToEntity(createAssertsDto);
             }
 
-            const entity = await this.adapter.convertDtoToEntity(createAssertsDto);
+            // Upload new file if provided
+            let filePath: string | null = null;
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `assert_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
 
-            if (filePath) {
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
                 entity.assetPhoto = filePath;
             }
 
+            // Save the entity
             await this.assertsRepository.save(entity);
 
             const message = createAssertsDto.id
@@ -85,9 +151,13 @@ export class AssertsService {
             return new CommonResponse(true, 200, message, { photoPath: filePath });
 
         } catch (error) {
+            console.error('Error saving asset details:', error);
             throw new ErrorResponse(500, error.message);
         }
     }
+
+
+
 
 
     async deleteAssertDetails(dto: AssertsIdDto): Promise<CommonResponse> {

@@ -9,16 +9,25 @@ import { VoucherModule } from 'src/voucher/voucher-module';
 import { BranchModule } from 'src/branch/branch.module';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { VoucherRepository } from 'src/voucher/repo/voucher.repo';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AssertsEntity, VoucherEntity]),
-  forwardRef(() => VoucherModule),
-  forwardRef(() => BranchModule)],
+  imports: [
+    TypeOrmModule.forFeature([AssertsEntity, VoucherEntity]),
+    MulterModule.register({ dest: './uploads' }),
+    forwardRef(() => VoucherModule),
+    forwardRef(() => BranchModule) // 🔥 Correctly placed
+  ],
   controllers: [AssertsController],
-  providers: [AssertsService, AssertsAdapter, VoucherRepository,  {
-    provide: AssertsRepository,
-    useClass: AssertsRepository,
-  },],
-  exports: [AssertsRepository, AssertsService]
+  providers: [
+    AssertsService,
+    AssertsAdapter,
+    VoucherRepository,
+    {
+      provide: AssertsRepository,
+      useClass: AssertsRepository,
+    },
+  ],
+  exports: [AssertsRepository, AssertsService],
 })
 export class AssertModule { }

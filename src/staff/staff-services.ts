@@ -11,14 +11,26 @@ import { StaffDto } from './dto/staff.dto';
 import { StaffEntity } from './entity/staff.entity';
 import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
+import { Storage } from '@google-cloud/storage';
+
 
 @Injectable()
 export class StaffService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private adapter: StaffAdapter,
         private staffRepository: StaffRepository,
         private attendanceRepo: AttendenceRepository
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
 
     async handleStaffDetails(req: StaffDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
@@ -26,11 +38,22 @@ export class StaffService {
 
             // Handle photo upload
             if (photo) {
-                filePath = join(__dirname, '../../uploads/staff_photos', `${Date.now()}-${photo.originalname}`);
-                await fs.writeFile(filePath, photo.fieldname); // Save the photo
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `staff_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
+
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
 
             if (req.id || req.staffId) {
+
+
                 // If an ID is provided, update the staff details
                 return await this.updateStaffDetails(req, filePath);
             } else {
@@ -50,6 +73,7 @@ export class StaffService {
             if (filePath) {
                 newStaff.staffPhoto = filePath;
             }
+            console.log(newStaff, "new")
             await this.staffRepository.insert(newStaff);
             // await this.staffRepository.save(newStaff);
             return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
@@ -61,22 +85,43 @@ export class StaffService {
 
     async updateStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
-
             let existingStaff: StaffEntity | null = null;
+
             if (req.id) {
-                existingStaff = await this.staffRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+                existingStaff = await this.staffRepository.findOne({
+                    where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
+                });
             } else if (req.staffId) {
-                existingStaff = await this.staffRepository.findOne({ where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode } });
+                existingStaff = await this.staffRepository.findOne({
+                    where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode }
+                });
             }
+
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
+
+            // ✅ Delete old file only if a new one is uploaded
+            if (filePath && existingStaff.staffPhoto) {
+                const existingFilePath = existingStaff.staffPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                } catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
+
+            // ✅ Merge the updates, keeping the old photo if none is provided
             const staffEntity = this.adapter.convertDtoToEntity(req);
             const updatedStaff = {
                 ...existingStaff,
                 ...staffEntity,
-                staffPhoto: filePath || existingStaff.staffPhoto,
+                staffPhoto: filePath || existingStaff.staffPhoto, // ✅ Keep old photo if no new one is uploaded
             };
+
             await this.staffRepository.save(updatedStaff);
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
@@ -84,6 +129,7 @@ export class StaffService {
             throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
         }
     }
+
     async deleteStaffDetails(dto: StaffIdDto): Promise<CommonResponse> {
         try {
             const staffExists = await this.staffRepository.findOne({ where: { staffId: dto.staffId, companyCode: dto.companyCode, unitCode: dto.unitCode } });

@@ -6,11 +6,19 @@ import { StaffService } from './staff-services';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AttendanceDto } from './dto/attenace-to-staff';
 import { CommonReq } from 'src/models/common-req';
+import * as multer from 'multer';
+
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('staff')
 export class StaffController {
     constructor(private readonly staffService: StaffService) { }
 
-    @UseInterceptors(FileInterceptor('photo'))
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('handleStaffDetails')
     async handleStaffDetails(
         @Body() dto: StaffDto,
