@@ -25,6 +25,7 @@ import { CommonReq } from "src/models/common-req";
 import { AccountDashboardService } from "./account.dashboard.service";
 import { AccountIdDto } from "src/account/dto/account.id.dto";
 import { ClientSearchDto } from "src/client/dto/client-search.dto";
+import { EstimateSendDto } from "src/estimate/dto/estimate.send.dto";
 
 
 
@@ -45,9 +46,9 @@ export class DashboardController {
 
     ) { }
     @Get('sendReciept')
-    async sendReciept(): Promise<CommonResponse> {
+    async sendReciept(@Body() dto: EstimateSendDto): Promise<CommonResponse> {
         try {
-            return await this.estimateDashboardService.sendReceipt()
+            return await this.estimateDashboardService.sendReceipt(dto)
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
@@ -56,9 +57,9 @@ export class DashboardController {
     }
 
     @Get('sendInvoice')
-    async sendInvoice(): Promise<CommonResponse> {
+    async sendInvoice(@Body() dto: EstimateSendDto): Promise<CommonResponse> {
         try {
-            return await this.estimateDashboardService.sendInvoice()
+            return await this.estimateDashboardService.sendInvoice(dto)
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
@@ -67,9 +68,9 @@ export class DashboardController {
     }
 
     @Get('sendEstimate')
-    async sendEstimate(): Promise<CommonResponse> {
+    async sendEstimate(@Body() dto: EstimateSendDto): Promise<CommonResponse> {
         try {
-            return await this.estimateDashboardService.sendEstimate()
+            return await this.estimateDashboardService.sendEstimate(dto)
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);

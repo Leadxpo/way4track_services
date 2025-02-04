@@ -1,17 +1,23 @@
 import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import * as multer from 'multer';
 import { ClientIdDto } from './dto/client-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { ClientDto } from './dto/client.dto';
 import { ClientService } from './client.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
-
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('client')
 export class ClientController {
     constructor(private readonly clientService: ClientService) { }
 
     @Post('handleClientDetails')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     async handleClientDetails(
         @Body() dto: ClientDto,
         @UploadedFile() file: Express.Multer.File

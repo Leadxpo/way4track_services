@@ -5,7 +5,13 @@ import { CommonResponse } from 'src/models/common-response';
 import { ProductDto } from './dto/product.dto';
 import { ProductIdDto } from './dto/product.id.dto';
 import { CommonReq } from 'src/models/common-req';
-
+import * as multer from 'multer';
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 1000000000,
+  },
+};
 @Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
@@ -17,7 +23,7 @@ export class ProductController {
   }
 
   @Post('createOrUpdateProduct')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   async createOrUpdateProduct(
     @Body() productDto: ProductDto,
     @UploadedFile() file: Express.Multer.File

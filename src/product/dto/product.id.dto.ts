@@ -3,4 +3,5 @@ export class ProductIdDto {
     companyCode: string;
     unitCode: string
     productName?: string
+    location: string;
 }

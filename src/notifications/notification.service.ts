@@ -42,7 +42,7 @@ export class NotificationService {
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         } else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
-            if (entity.staffId?.designation === 'Technician' && entity.install) {
+            if (entity.staffId?.designation === 'Technician') {
                 message = `Technician allocated for ${entity.serviceOrProduct}`;
                 createdAt = entity.date;
                 user = entity.staffId; // Assuming staffId is a number
@@ -55,7 +55,7 @@ export class NotificationService {
         } else {
             throw new Error('Invalid entity type or notification type.');
         }
-
+        //&& entity.install
         const notificationEntity = this.notificationAdapter.convertDtoToEntity({
             message,
             createdAt,

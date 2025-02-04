@@ -18,7 +18,7 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'request_type', type: 'varchar', length: 50 })
     requestType: string;
 
-    @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.ACCEPTED })
+    @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.pending })
     status: ClientStatusEnum
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.request)
@@ -40,8 +40,14 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'description', type: 'text' })
     description: string;
 
-    @Column({ name: 'created_date', type: 'date' })
+    @Column({ name: 'created_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdDate: Date;
+
+    @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 
     @OneToMany(() => ProductAssignEntity, (ProductAssignEntity) => ProductAssignEntity.requestId)
     productAssign: ProductAssignEntity[];

@@ -5,13 +5,19 @@ import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
-
+import * as multer from 'multer';
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 
 @Controller('subdealer')
 export class SubDealerController {
     constructor(private readonly subDealerService: SubDealerService) { }
 
-    @UseInterceptors(FileInterceptor('photo'))
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('handleSubDealerDetails')
     async handleSubDealerDetails(@Body() dto: SubDealerDto, @UploadedFile() photo?: Express.Multer.File) {
         try {

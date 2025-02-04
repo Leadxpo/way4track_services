@@ -12,7 +12,7 @@ export class ClientAdapter {
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         const branchEntity = new BranchEntity();
-        branchEntity.id = dto.branchId;
+        branchEntity.id = dto.branch;
         entity.branch = branchEntity;
         entity.clientPhoto = dto.clientPhoto
         // entity.dob = dto.dob;

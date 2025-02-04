@@ -13,15 +13,26 @@ import { ProductAssignDto } from './dto/product-assign.dto';
 import { ProductAssignAdapter } from './product-assign.adapter';
 import { ProductAssignRepository } from './repo/product-assign.repo';
 import { CommonReq } from 'src/models/common-req';
+import { Storage } from '@google-cloud/storage';
 
 @Injectable()
 export class ProductAssignService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private readonly productAssignRepository: ProductAssignRepository,
         private readonly productAssignAdapter: ProductAssignAdapter,
         private readonly branchRepo: BranchRepository,
         private dataSource: DataSource
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
 
 
     async assignProductsByImei(
@@ -118,7 +129,17 @@ export class ProductAssignService {
             if (!existingProduct) {
                 throw new Error('Product not found');
             }
+            if (photoPath && existingProduct.productAssignPhoto) {
+                const existingFilePath = existingProduct.productAssignPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                } catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
             // Convert DTO to entity
             const entity = this.productAssignAdapter.convertDtoToEntity(dto);
 
@@ -189,16 +210,26 @@ export class ProductAssignService {
     }
 
 
-    async handleProductDetails(dto: ProductAssignDto, file?: Express.Multer.File): Promise<CommonResponse> {
+    async handleProductDetails(dto: ProductAssignDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
             let photoPath: string | null = null;
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `productAssign_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
 
-            // Handle photo upload
-            if (file) {
-                photoPath = await this.uploadproductAssignPhoto(file);
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
+            // Handle photo upload
 
-            if (dto.id) {
+
+            if (dto.id && dto.id !== null) {
                 // If ID exists, validate it before updating
                 const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
                 if (!existingProduct) {
@@ -283,15 +314,6 @@ export class ProductAssignService {
         }
     }
 
-    async uploadproductAssignPhoto(photo: Express.Multer.File): Promise<string> {
-        try {
-            const filePath = join(__dirname, '../../uploads/productAssign_photos', `$${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.fieldname);
-            return filePath
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
 
 
 }

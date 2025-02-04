@@ -52,5 +52,6 @@ export class VoucherDto {
     cardNumber?: string;
     product?: number;
     invoice?: string
-    amountPaid?:number
+    amountPaid?: number
+    receiptPdfUrl?: string
 }

@@ -11,25 +11,42 @@ import { ClientIdDto } from './dto/client-id.dto';
 import { ClientDto } from './dto/client.dto';
 import { ClientRepository } from './repo/client.repo';
 import { ClientEntity } from './entity/client.entity';
+import { Storage } from '@google-cloud/storage';
 
 @Injectable()
 export class ClientService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private readonly clientAdapter: ClientAdapter,
         private readonly clientRepository: ClientRepository,
         private readonly branchRepo: BranchRepository
-    ) { }
-    async handleClientDetails(dto: ClientDto, file?: Express.Multer.File): Promise<CommonResponse> {
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
+    async handleClientDetails(dto: ClientDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
-            let photoPath: string | null = null;
+            let photoPath: string | null = null
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `client_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
 
-            // Handle photo upload
-            if (file) {
-                photoPath = await this.uploadClientPhoto(file);
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
-
-            if (dto.id || dto.clientId) {
-
+            if (dto.id && dto.id !== null && dto.clientId && dto.clientId.trim() !== '') {
                 return await this.updateClientDetails(dto, photoPath);
             } else {
                 // Create a new client
@@ -43,7 +60,8 @@ export class ClientService {
 
     async createClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
         try {
-            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
+            console.log(dto, "KKKKKKKKKKKKKK")
+            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
             if (!branchEntity) {
                 throw new Error('Branch not found');
             }
@@ -56,9 +74,9 @@ export class ClientService {
 
 
             const branch = new BranchEntity();
-            branch.id = dto.branchId;
+            branch.id = dto.branch;
             entity.branch = branch;
-
+            console.log(entity, "entity")
             await this.clientRepository.insert(entity);
 
             return new CommonResponse(true, 201, 'Client details created successfully');
@@ -83,6 +101,18 @@ export class ClientService {
                 throw new Error('Client not found');
             }
 
+            if (photoPath && existingClient.clientPhoto) {
+                const existingFilePath = existingClient.clientPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                } catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
+
             const entity = this.clientAdapter.convertDtoToEntity(dto);
 
             // Merge existing client details with new data
@@ -98,18 +128,6 @@ export class ClientService {
         } catch (error) {
             console.error(`Error updating client details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update client details: ${error.message}`);
-        }
-    }
-
-
-    async uploadClientPhoto(photo: Express.Multer.File): Promise<string> {
-        try {
-            const filePath = join(__dirname, '../../uploads/client_photos', `${Date.now()}.jpg`);
-            await fs.writeFile(filePath, photo.buffer);
-            return filePath;
-        } catch (error) {
-            console.error(`Error uploading client photo: ${error.message}`, error.stack);
-            throw new ErrorResponse(500, `Failed to upload client photo: ${error.message}`);
         }
     }
 

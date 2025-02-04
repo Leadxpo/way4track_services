@@ -5,12 +5,18 @@ import { VendorIdDto } from './dto/vendor-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
-
+import * as multer from 'multer';
+const multerOptions = {
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 1000000000,
+  },
+};
 @Controller('vendor')
 export class VendorController {
   constructor(private readonly vendorService: VendorService) { }
 
-  @UseInterceptors(FileInterceptor('photo'))
+  @UseInterceptors(FileInterceptor('photo', multerOptions))
   @Post('handleVendorDetails')
   async handleVendorDetails(@Body() dto: VendorDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
     try {

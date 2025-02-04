@@ -84,4 +84,13 @@ export class EstimateEntity extends BaseEntity {
 
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;
+
+    @Column({ nullable: true })
+    estimatePdfUrl: string;
+
+    @Column({ nullable: true })
+    invoicePdfUrl: string
+
+    @Column({ nullable: true })
+    receiptPdfUrl: string
 }

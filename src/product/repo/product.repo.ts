@@ -27,6 +27,9 @@ export class ProductRepository extends Repository<ProductEntity> {
             query.andWhere('pr.productName LIKE :productName', { productName: `%${req.productName}%` });
         }
 
+        if (req.location) {
+            query.andWhere('pr.location LIKE :location', { location: `%${req.location}%` });
+        }
         const result = await query.getMany();
         return result;
     }

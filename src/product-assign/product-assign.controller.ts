@@ -6,13 +6,19 @@ import { ProductAssignService } from './product-assign.service';
 import { ProductAssignEntity } from './entity/product-assign.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
-
+import * as multer from 'multer';
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('product-assign')
 export class ProductAssignController {
     constructor(private readonly productAssignService: ProductAssignService) { }
 
     @Post('handleProductDetails')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     async handleProductDetails(@Body() dto: ProductAssignDto, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
         try {
             return await this.productAssignService.handleProductDetails(dto, file);

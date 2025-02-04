@@ -6,10 +6,14 @@ import { ClientService } from './client.service';
 import { ClientRepository } from './repo/client.repo';
 import { ClientAdapter } from './client.adapter';
 import { BranchModule } from 'src/branch/branch.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
     imports: [TypeOrmModule.forFeature([ClientEntity]),
-    forwardRef(() => BranchModule)],
+    forwardRef(() => BranchModule),
+    MulterModule.register({
+        dest: './uploads',
+    }),],
     controllers: [ClientController],
     providers: [ClientService, ClientRepository, ClientAdapter],
     exports: [ClientRepository, ClientService]

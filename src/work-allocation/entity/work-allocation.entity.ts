@@ -4,8 +4,7 @@ import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
-import { InstallationEnum } from '../enum/installation.enum';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -24,9 +23,8 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'date', type: 'date' })
     date: Date;
 
-    @Column({ name: 'install', type: 'boolean', default: false })
-    install: boolean;
-
+    // @Column({ name: 'install', type: 'boolean', default: false })
+    // install: boolean;
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation)
     @JoinColumn({ name: 'staff_id' })
@@ -58,7 +56,21 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @Column({ name: 'imei_number', type: 'varchar', length: 20 })
-    imeiNumber: string;
+    // @Column({ name: 'imei_number', type: 'varchar', length: 20 })
+    // imeiNumber: string;
+
+    @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
+
+    @Column({ type: 'json', name: 'product_details', nullable: true })
+    productDetails: {
+        productId: number;
+        productName: string
+        imeiNumber: string;
+        install: boolean;
+    }[];
 
 }

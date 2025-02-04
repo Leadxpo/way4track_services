@@ -10,18 +10,27 @@ import { join } from 'path';
 import * as fs from 'fs';
 import { HiringFilterDto } from './dto/hiring-filter.dto';
 import { CommonReq } from 'src/models/common-req';
+import { Storage } from '@google-cloud/storage';
+
 @Injectable()
 export class HiringService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(private readonly hiringAdapter: HiringAdapter,
         private readonly hiringRepository: HiringRepository
-    ) { }
-    async saveHiringDetails(dto: HiringDto, file?: Express.Multer.File): Promise<CommonResponse> {
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
+    
+    async saveHiringDetails(dto: HiringDto, resumeFile?: Express.Multer.File): Promise<CommonResponse> {
         try {
             let resumePath: string | undefined;
-
-            if (file) {
-                resumePath = await this.uploadResume(file);
-            }
             let entity: HiringEntity;
 
             if (dto.id) {
@@ -32,14 +41,40 @@ export class HiringService {
                 }
                 // Merge updated details
                 entity = this.hiringRepository.merge(entity, dto);
+                // If a new photo is uploaded, delete the existing file from GCS
+                if (resumeFile && entity.resumePath) {
+                    const existingFilePath = entity.resumePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                    try {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } catch (error) {
+                        console.error(`Error deleting old file from GCS: ${error.message}`);
+                    }
+                }
 
             } else {
                 // For new branches, convert DTO to Entity
                 entity = this.hiringAdapter.convertDtoToEntity(dto);
             }
-            if (resumePath) {
-                entity.resumePath = resumePath; // Set the file path in the entity
+
+
+            if (resumeFile) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `resumes/${Date.now()}-${resumeFile.originalname}`;
+                const file = bucket.file(uniqueFileName);
+
+                await file.save(resumeFile.buffer, {
+                    contentType: resumeFile.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                resumePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                entity.resumePath = resumePath;
             }
+
             await this.hiringRepository.save(entity);
 
             const internalMessage = dto.id
@@ -88,7 +123,6 @@ export class HiringService {
         }
     }
 
-
     async deleteHiringDetails(req: HiringIdDto): Promise<CommonResponse> {
         const hiring = await HiringEntity.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
         try {
@@ -102,9 +136,6 @@ export class HiringService {
             throw new ErrorResponse(500, error.message);
         }
     }
-
-
-
 
     async getHiringSearchDetails(req: HiringFilterDto) {
         const query = this.hiringRepository.createQueryBuilder('hiring')

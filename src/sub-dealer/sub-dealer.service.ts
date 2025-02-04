@@ -1,22 +1,30 @@
+import { Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
+import { LoginDto } from 'src/login/dto/login.dto';
+import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
-import { SubDealerAdapter } from './sub-dealer.adapter';
-import { SubDealerRepository } from './repo/sub-dealer.repo';
-import { SubDealerDto } from './dto/sub-dealer.dto';
 import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
-import { join } from 'path';
-import { promises as fs } from 'fs';
-import { CommonReq } from 'src/models/common-req';
-import { LoginDto } from 'src/login/dto/login.dto';
-import { DesignationEnum } from 'src/staff/entity/staff.entity';
+import { SubDealerDto } from './dto/sub-dealer.dto';
+import { SubDealerRepository } from './repo/sub-dealer.repo';
+import { SubDealerAdapter } from './sub-dealer.adapter';
 
 @Injectable()
 export class SubDealerService {
+  private storage: Storage;
+  private bucketName: string;
   constructor(
     private readonly subDealerAdapter: SubDealerAdapter,
     private readonly subDealerRepository: SubDealerRepository,
-  ) { }
+  ) {
+    this.storage = new Storage({
+      projectId: process.env.GCLOUD_PROJECT_ID ||
+        'sharontelematics-1530044111318',
+      keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+    });
+
+    this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+  }
 
 
 
@@ -34,8 +42,16 @@ export class SubDealerService {
       if (!existingSubDealer) {
         return new CommonResponse(false, 4002, 'SubDealer not found for the provided ID.');
       }
-      if (filePath) {
-        existingSubDealer.subDealerPhoto = filePath;
+      if (filePath && existingSubDealer.subDealerPhoto) {
+        const existingFilePath = existingSubDealer.subDealerPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+        const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+        try {
+          await file.delete();
+          console.log(`Deleted old file from GCS: ${existingFilePath}`);
+        } catch (error) {
+          console.error(`Error deleting old file from GCS: ${error.message}`);
+        }
       }
       Object.assign(existingSubDealer, this.subDealerAdapter.convertDtoToEntity(dto));
       await this.subDealerRepository.save(existingSubDealer);
@@ -69,10 +85,20 @@ export class SubDealerService {
     try {
       let filePath: string | null = null;
       if (photo) {
-        filePath = join(__dirname, '../.../uploads/subDealer_photos', `${Date.now()}-${photo.originalname}`);
-        await fs.writeFile(filePath, photo.fieldname)
+        const bucket = this.storage.bucket(this.bucketName);
+        const uniqueFileName = `subDealer_photos/${Date.now()}-${photo.originalname}`;
+        const file = bucket.file(uniqueFileName);
+
+        await file.save(photo.buffer, {
+          contentType: photo.mimetype,
+          resumable: false,
+        });
+
+        console.log(`File uploaded to GCS: ${uniqueFileName}`);
+        filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
-      if (dto.id || dto.subDealerId) {
+
+      if (dto.id && dto.id !== null && dto.subDealerId && dto.subDealerId.trim() !== '') {
         return await this.updateSubDealerDetails(dto, filePath);
       } else {
         return await this.createSubDealerDetails(dto, filePath);

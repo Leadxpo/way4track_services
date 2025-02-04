@@ -32,9 +32,9 @@ export class EstimateRepository extends Repository<EstimateEntity> {
                 'estimate.amount AS estimateAmount',
                 'estimate.product_details as productDetails'
             ])
-            .leftJoinAndSelect(ClientEntity, 'client', 'client.id = estimate.client_id')
-            .leftJoinAndSelect(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
-            .leftJoinAndSelect('products', 'pa')
+            .leftJoin(ClientEntity, 'client', 'client.id = estimate.client_id')
+            .leftJoin(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
+            .leftJoin('estimate.products', 'pa') 
             .where('estimate.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('estimate.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -68,7 +68,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
             ])
             .leftJoinAndSelect(ClientEntity, 'client', 'client.id = estimate.client_id')
             .leftJoinAndSelect(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
-            .leftJoinAndSelect('products', 'pa')
+            .leftJoinAndSelect('estimate.products', 'pa') 
             .andWhere(`estimate.company_code = "${req.companyCode}"`)
             .andWhere(`estimate.unit_code = "${req.unitCode}"`)
         query.andWhere('estimate.estimate_id = :estimateId', { estimateId: req.estimateId });

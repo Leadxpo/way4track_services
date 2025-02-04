@@ -64,4 +64,10 @@ export class VendorEntity {
 
   @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
   GSTNumber: string;
+
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

@@ -1,12 +1,11 @@
 import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { CommonResponse } from 'src/models/common-response';
-import { StaffDto } from './dto/staff.dto';
-import { StaffIdDto } from './dto/staff-id.dto';
-import { StaffService } from './staff-services';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AttendanceDto } from './dto/attenace-to-staff';
-import { CommonReq } from 'src/models/common-req';
 import * as multer from 'multer';
+import { CommonReq } from 'src/models/common-req';
+import { CommonResponse } from 'src/models/common-response';
+import { StaffIdDto } from './dto/staff-id.dto';
+import { StaffDto } from './dto/staff.dto';
+import { StaffService } from './staff-services';
 
 const multerOptions = {
     storage: multer.memoryStorage(),

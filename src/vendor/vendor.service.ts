@@ -8,12 +8,24 @@ import { VendorRepository } from './repo/vendor.repo';
 import { join } from 'path';
 import { promises as fs } from 'fs';
 import { CommonReq } from 'src/models/common-req';
+import { Storage } from '@google-cloud/storage';
+
 @Injectable()
 export class VendorService {
+  private storage: Storage;
+  private bucketName: string;
   constructor(
     private readonly vendorAdapter: VendorAdapter,
     private readonly vendorRepository: VendorRepository,
-  ) { }
+  ) {
+    this.storage = new Storage({
+      projectId: process.env.GCLOUD_PROJECT_ID ||
+        'sharontelematics-1530044111318',
+      keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+    });
+
+    this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+  }
 
   private generateVendorId(sequenceNumber: number): string {
     const paddedNumber = sequenceNumber.toString().padStart(3, '0');
@@ -28,11 +40,20 @@ export class VendorService {
       if (!existingVendor) {
         return new CommonResponse(false, 4002, 'Vendor not found for the provided ID.');
       }
+      if (filePath && existingVendor.vendorPhoto) {
+        const existingFilePath = existingVendor.vendorPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+        const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+        try {
+          await file.delete();
+          console.log(`Deleted old file from GCS: ${existingFilePath}`);
+        } catch (error) {
+          console.error(`Error deleting old file from GCS: ${error.message}`);
+        }
+      }
 
       Object.assign(existingVendor, this.vendorAdapter.convertDtoToEntity(dto));
-      if (filePath) {
-        existingVendor.vendorPhoto = filePath;
-      }
+
       await this.vendorRepository.save(existingVendor);
 
       return new CommonResponse(true, 200, 'Vendor details updated successfully');
@@ -63,10 +84,20 @@ export class VendorService {
     try {
       let filePath: string | null = null;
       if (photo) {
-        filePath = join(__dirname, '../../uploads/vendor_photos', `${Date.now()}-${photo.originalname}`);
-        await fs.writeFile(filePath, photo.fieldname)
+        const bucket = this.storage.bucket(this.bucketName);
+        const uniqueFileName = `vendor_photos/${Date.now()}-${photo.originalname}`;
+        const file = bucket.file(uniqueFileName);
+
+        await file.save(photo.buffer, {
+          contentType: photo.mimetype,
+          resumable: false,
+        });
+
+        console.log(`File uploaded to GCS: ${uniqueFileName}`);
+        filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
-      if (dto.id || dto.vendorId) {
+
+      if (dto.id && dto.id !== null && dto.vendorId && dto.vendorId.trim() !== '') {
         // If an ID or vendorId is provided, update the vendor details
         return await this.updateVendorDetails(dto, filePath);
       } else {
@@ -117,7 +148,7 @@ export class VendorService {
     try {
       const vendor = await this.vendorRepository.find({
         where: { companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['branch','voucherId'],
+        relations: ['branch', 'voucherId'],
       });
 
       if (!vendor) {

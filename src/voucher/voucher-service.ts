@@ -16,10 +16,12 @@ import { VoucherAdapter } from "./voucher.adapter";
 import { AccountEntity } from "src/account/entity/account.entity";
 import { EmiPaymentEntity } from "./entity/emi-payments";
 import { EmiPaymentRepository } from "./repo/emi-payment-repo";
+import { Storage } from '@google-cloud/storage';
 
 @Injectable()
 export class VoucherService {
-
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly voucherAdapter: VoucherAdapter,
@@ -28,7 +30,15 @@ export class VoucherService {
         private readonly accountRepository: AccountRepository,
         private readonly emiPaymentRepository: EmiPaymentRepository
 
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
 
 
     private async generateVoucherNumber(voucherType: string): Promise<string> {
@@ -165,12 +175,38 @@ export class VoucherService {
 
             // Set Voucher ID
             voucherEntity.voucherId = generatedVoucherId;
+            let receiptPdfUrl: string | null = null;
 
             // Handle Invoice Payment
-            if (voucherDto.invoice) {
+            if (voucherDto.invoice && VoucherTypeEnum.RECEIPT) {
                 const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
                 if (!estimate) {
                     throw new ErrorResponse(4001, 'Estimate not found.');
+                }
+                if (voucherDto.receiptPdfUrl) {
+                    if (voucherDto.receiptPdfUrl.startsWith('data:application/pdf;base64,')) {
+                        const base64Data = voucherDto.receiptPdfUrl.split(',')[1];
+                        const fileBuffer = Buffer.from(base64Data, 'base64');
+
+                        const bucket = this.storage.bucket(this.bucketName);
+                        const uniqueFileName = `receipt_pdfs/${Date.now()}-receipt.pdf`;  // Changed to reflect receipt PDF
+                        const gcsFile = bucket.file(uniqueFileName);
+
+                        await gcsFile.save(fileBuffer, {
+                            contentType: 'application/pdf',
+                            resumable: false,
+                        });
+
+                        await gcsFile.makePublic();
+                        receiptPdfUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                        console.log(`PDF uploaded to GCS: ${receiptPdfUrl}`);
+                    } else {
+                        receiptPdfUrl = voucherDto.receiptPdfUrl;
+                    }
+
+                    // Store receiptPdfUrl in the estimate entity against the invoiceId
+                    estimate.receiptPdfUrl = receiptPdfUrl;
+                    await this.estimateRepo.save(estimate); // Save the updated estimate with the receipt PDF URL
                 }
             }
 

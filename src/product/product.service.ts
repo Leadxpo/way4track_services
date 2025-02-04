@@ -13,14 +13,26 @@ import { ProductDto } from './dto/product.dto';
 import { ProductIdDto } from './dto/product.id.dto';
 import { DataSource } from "typeorm";
 import { CommonReq } from 'src/models/common-req';
+import { Storage } from '@google-cloud/storage';
+
 @Injectable()
 export class ProductService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
         private readonly productRepository: ProductRepository,
         private readonly vendorRepository: VendorRepository,
         private readonly voucherRepository: VoucherRepository,
         private dataSource: DataSource
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
 
 
     // async handleProductData(
@@ -458,6 +470,21 @@ export class ProductService {
     }
     async createOrUpdateProduct(productDto: ProductDto, photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
+            let photoPath: string | null = null
+
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `client_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
+
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+            }
             const productEntity = await this.handleProductData(productDto, photo);
             console.log(productEntity, productDto, "{{{{{{{{{{{{{{{{{{{{")
             await this.productRepository.save(productEntity);

@@ -6,13 +6,19 @@ import { HiringIdDto } from './dto/hiring-id.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { HiringFilterDto } from './dto/hiring-filter.dto';
 import { CommonReq } from 'src/models/common-req';
-
+import * as multer from 'multer';
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('hiring')
 export class HiringController {
     constructor(private readonly hiringService: HiringService) { }
 
     @Post('saveHiringDetailsWithResume')
-    @UseInterceptors(FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     async saveHiringDetailsWithResume(
         @Body() dto: HiringDto,
         @UploadedFile() file: Express.Multer.File

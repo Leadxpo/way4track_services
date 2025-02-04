@@ -3,7 +3,7 @@ import { ClientStatusEnum } from "../enum/client-status.enum";
 export class ClientDto {
     id?: number;
     name: string;
-    branchId: number;
+    branch: number;
     phoneNumber: string;
     dob: string;
     email: string;

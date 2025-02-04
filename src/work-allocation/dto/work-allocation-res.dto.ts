@@ -18,7 +18,7 @@ export class WorkAllocationResDto {
     productName?: string;
     dateOfPurchase?: Date;
     vendorId?: number;
-    imeiNumber?: string;
+    // imeiNumber?: string;
     categoryName?: string;
     price?: number;
     productDescription?: string;
@@ -26,9 +26,12 @@ export class WorkAllocationResDto {
     vendorName?: string;
     vendorAddress?: string;
     vendorEmailId?: string;
-    install?: boolean
+    // install?: boolean
     voucherId?: string
     voucherName?: string
+    products?: {
+        productId: number; productName: string; imeiNumber: string, install: boolean
+    }[];
 
     constructor(
         id: number,
@@ -48,7 +51,7 @@ export class WorkAllocationResDto {
         productName?: string,
         dateOfPurchase?: Date,
         vendorId?: number,
-        imeiNumber?: string,
+        // imeiNumber?: string,
         categoryName?: string,
         price?: number,
         productDescription?: string,
@@ -56,9 +59,12 @@ export class WorkAllocationResDto {
         vendorName?: string,
         vendorAddress?: string,
         vendorEmailId?: string,
-        install?: boolean,
+        // install?: boolean,
         voucherId?: string,
-        voucherName?: string
+        voucherName?: string,
+        products?: {
+            productId: number; productName: string; imeiNumber: string, install: boolean
+        }[]
 
     ) {
         this.id = id;
@@ -78,7 +84,7 @@ export class WorkAllocationResDto {
         this.productName = productName;
         this.dateOfPurchase = dateOfPurchase;
         this.vendorId = vendorId;
-        this.imeiNumber = imeiNumber;
+        // this.imeiNumber = imeiNumber;
         this.categoryName = categoryName;
         this.price = price;
         this.productDescription = productDescription;
@@ -86,8 +92,10 @@ export class WorkAllocationResDto {
         this.vendorName = vendorName;
         this.vendorAddress = vendorAddress;
         this.vendorEmailId = vendorEmailId;
-        this.install = install
+        // this.install = install
         this.voucherId = voucherId
         this.voucherName = this.voucherName
+        this.products = products;
+
     }
 }

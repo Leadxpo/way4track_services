@@ -29,7 +29,7 @@ export class WorkAllocationAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.workAllocationNumber = dto.workAllocationNumber;
-        entity.install = dto.install;
+        // entity.install = dto.install;
 
         const product = new ProductEntity();
         product.id = dto.productId;
@@ -43,6 +43,20 @@ export class WorkAllocationAdapter {
         voucher.voucherId = dto.voucherId
         entity.voucherId = voucher;
 
+        entity.productDetails = dto.productDetails
+        if (!dto.productDetails || dto.productDetails.length === 0) {
+            entity.productDetails = [];
+        } else {
+            entity.productDetails = dto.productDetails.map((productDetail) => {
+                return {
+                    productId: productDetail.productId,
+                    productName: productDetail.productName,
+                    imeiNumber: productDetail.imeiNumber,
+                    install: productDetail.install,
+
+                };
+            });
+        }
         return entity;
     }
 
@@ -53,6 +67,7 @@ export class WorkAllocationAdapter {
             const product = entity.productId;
             const vendor = entity.vendorId;
             const voucher = entity.voucherId;
+
             return new WorkAllocationResDto(
                 entity.id,
                 entity.workAllocationNumber,
@@ -70,8 +85,7 @@ export class WorkAllocationAdapter {
                 product?.id || 0,
                 product?.productName || '',
                 product?.dateOfPurchase || null,
-                product?.vendorId.id || null,
-                product?.imeiNumber || '',
+                product?.vendorId?.id || null, // Accessing vendorId from product
                 product?.categoryName || '',
                 product?.price || 0,
                 product?.productDescription || '',
@@ -79,10 +93,17 @@ export class WorkAllocationAdapter {
                 product?.vendorName || '',
                 product?.vendorAddress || '',
                 product?.vendorEmailId || '',
-                entity.install,
-                voucher.voucherId,
-                voucher.name
+                voucher?.voucherId || '',
+                voucher?.name || '',
+                // Mapping productDetails array
+                entity.productDetails?.map(productDetail => ({
+                    productId: productDetail.productId,
+                    productName: productDetail.productName,
+                    imeiNumber: productDetail.imeiNumber,
+                    install: productDetail.install
+                })) || []
             );
         });
     }
+
 }

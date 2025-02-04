@@ -3,7 +3,7 @@ import { GSTORTDSEnum } from "src/voucher/entity/voucher.entity";
 export class EstimateDto {
     id: number;
     clientId: string;
-    vendorId:number;
+    vendorId: number;
     buildingAddress: string;
     estimateDate: Date;
     expireDate: string;
@@ -22,7 +22,10 @@ export class EstimateDto {
     productDetails?: ProductDetailDto[];
     cgstPercentage: number; // For temporary use
     scstPercentage: number; // For temporary use
-    convertToInvoice: boolean;  // Modified to use ProductDetailDto
+    convertToInvoice: boolean;
+    estimatePdfUrl: string;
+    invoicePdfUrl: string
+    // Modified to use ProductDetailDto
 }
 
 

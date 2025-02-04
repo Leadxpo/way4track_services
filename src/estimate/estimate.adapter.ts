@@ -36,6 +36,9 @@ export class EstimateAdapter {
         if (dto.CGST) entity.CGST = dto.CGST;
         entity.hsnCode = dto.hsnCode;
 
+        entity.estimatePdfUrl = dto.estimatePdfUrl
+        entity.invoicePdfUrl = dto.invoicePdfUrl
+
         if (!dto.productDetails || dto.productDetails.length === 0) {
             entity.productDetails = [];
         } else {
@@ -78,7 +81,7 @@ export class EstimateAdapter {
                 amount: product.quantity > 0 ? product.totalCost / product.quantity : 0,
                 costPerUnit: product.costPerUnit,
                 totalCost: product.totalCost,
-                hsnCode: product.hsnCode                 // Avoid division by zero
+                hsnCode: product.hsnCode
             })),
             entity.estimateId,
             entity.invoiceId,

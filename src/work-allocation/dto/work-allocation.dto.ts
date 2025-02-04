@@ -15,4 +15,11 @@ export class WorkAllocationDto {
     vendorId?: number
     voucherId?: string
     imeiNumber?: string
+    productDetails?: ProductDetail[];
+}
+export class ProductDetail {
+    productId: number;
+    productName: string;
+    imeiNumber: string;
+    install: boolean;
 }

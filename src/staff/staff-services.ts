@@ -1,6 +1,5 @@
+import { Storage } from '@google-cloud/storage';
 import { Injectable } from '@nestjs/common';
-import { promises as fs } from 'fs';
-import { join } from 'path';
 import { AttendenceRepository } from 'src/attendence/repo/attendence.repo';
 import { LoginDto } from 'src/login/dto/login.dto';
 import { CommonReq } from 'src/models/common-req';
@@ -11,7 +10,6 @@ import { StaffDto } from './dto/staff.dto';
 import { StaffEntity } from './entity/staff.entity';
 import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
-import { Storage } from '@google-cloud/storage';
 
 
 @Injectable()
@@ -51,13 +49,12 @@ export class StaffService {
                 filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
 
-            if (req.id || req.staffId) {
-
-
-                // If an ID is provided, update the staff details
+            // ✅ Ensure `id` and `staffId` are properly validated before deciding between update and create
+            if (req.id && req.id !== null && req.staffId && req.staffId.trim() !== '') {
+                // If valid `id` or `staffId` is provided, update the staff details
                 return await this.updateStaffDetails(req, filePath);
             } else {
-                // If no ID is provided, create a new staff record
+                // If no valid ID is provided, create a new staff record
                 return await this.createStaffDetails(req, filePath);
             }
         } catch (error) {
@@ -66,8 +63,10 @@ export class StaffService {
         }
     }
 
+
     async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
+            console.log(req, "req")
             const newStaff = this.adapter.convertDtoToEntity(req);
             newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
             if (filePath) {

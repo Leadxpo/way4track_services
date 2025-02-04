@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { WorkAllocationRepository } from './repo/work-allocation.repo';
-import { WorkAllocationDto } from './dto/work-allocation.dto';
-import { WorkAllocationAdapter } from './work-allocation.adapter';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { NotificationService } from 'src/notifications/notification.service';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { CommonResponse } from '../models/common-response';
 import { ErrorResponse } from '../models/error-response';
 import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
-import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { WorkAllocationDto } from './dto/work-allocation.dto';
 import { WorkAllocationEntity } from './entity/work-allocation.entity';
-import { NotificationService } from 'src/notifications/notification.service';
-import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
-import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { WorkAllocationRepository } from './repo/work-allocation.repo';
+import { WorkAllocationAdapter } from './work-allocation.adapter';
 
 @Injectable()
 export class WorkAllocationService {
@@ -19,60 +18,62 @@ export class WorkAllocationService {
         private readonly notificationService: NotificationService
     ) { }
 
-    async assignProductByImei(
-        staff: StaffEntity,  // Now accepting the full StaffEntity
-        install: boolean,
-        imeiNumber: string
-    ): Promise<void> {
-        const productAssigns = await ProductAssignEntity.find({
-            where: { imeiNumberFrom: imeiNumber },
-            relations: ['productId'],
-        });
+    // async assignProductByImei(
+    //     staff: StaffEntity,  // Now accepting the full StaffEntity
+    //     install: boolean,
+    //     imeiNumber: string
+    // ): Promise<void> {
+    //     const productAssigns = await ProductAssignEntity.find({
+    //         where: { imeiNumberFrom: imeiNumber },
+    //         relations: ['productId'],
+    //     });
 
-        for (const productAssign of productAssigns) {
-            const product = productAssign.productId;
+    //     for (const productAssign of productAssigns) {
+    //         const product = productAssign.productId;
 
-            let status = 'not_assigned';
-            let location = 'warehouse';
+    //         let status = 'not_assigned';
+    //         let location = 'warehouse';
 
-            if (install) {
-                status = 'install';
-                location = staff.name;  // Using the staff name as location
-            }
+    //         if (install) {
+    //             status = 'install';
+    //             location = staff.name;  // Using the staff name as location
+    //         }
 
-            product.status = status;
-            product.location = location;  // Now using the staff name as the location
+    //         product.status = status;
+    //         product.location = location;  // Now using the staff name as the location
 
-            await product.save();
-        }
-    }
+    //         await product.save();
+    //     }
+    // }
 
     async updateWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         try {
-            // Find the work allocation by its ID
             const workAllocation = await this.workAllocationRepository.findOne({
-                where: { id: dto.id },  // Correct way to pass conditions
-                relations: ['staffId'],  // Make sure to load the staff relation
+                where: { id: dto.id },
+                relations: ['staffId', 'productDetails'],
             });
 
             if (!workAllocation) {
                 throw new Error('Work Allocation not found');
             }
 
-            // Set the install status based on input
-            workAllocation.install = dto.install;
+            if (dto.productDetails) {
+                for (const productDetail of dto.productDetails) {
+                    if (productDetail.install) {
+                        const product = await ProductEntity.findOne({
+                            where: { imeiNumber: productDetail.imeiNumber },
+                        });
 
-            // Save the updated work allocation
-            await this.workAllocationRepository.save(workAllocation);
+                        if (product) {
+                            product.status = 'install';
+                            product.location = workAllocation.staffId?.name;
 
-            // Update the product status if imeiNumber exists
-            if (workAllocation.staffId && workAllocation.imeiNumber) {
-                await this.assignProductByImei(
-                    workAllocation.staffId,  // Now passing the full StaffEntity
-                    dto.install,
-                    workAllocation.imeiNumber
-                );
+                            await product.save();
+                        }
+                    }
+                }
             }
+            await this.workAllocationRepository.save(workAllocation);
 
             return new CommonResponse(true, 200, 'Work allocation updated and product status reflected successfully');
         } catch (error) {
@@ -85,31 +86,38 @@ export class WorkAllocationService {
         let successResponse: CommonResponse;
         let newWorkAllocation: WorkAllocationEntity;
         try {
-            // Convert DTO to entity
+            const updatedProductDetails = dto.productDetails?.map(product => ({
+                ...product,
+                install: false,
+            }));
+
+            dto.productDetails = updatedProductDetails;
+
             newWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
 
-            // Generate a unique work allocation number
             const allocationCount = await this.workAllocationRepository.count({});
             newWorkAllocation.workAllocationNumber = this.generateWorkAllocationNumber(allocationCount + 1);
 
-            // Save the work allocation data to the database
             const savedWorkAllocation = await this.workAllocationRepository.save(newWorkAllocation);
 
             if (!savedWorkAllocation) {
                 throw new Error('Failed to save work allocation details');
             }
 
-            // Send a success response after successfully saving the data
             successResponse = new CommonResponse(true, 201, 'Work Allocation created successfully', newWorkAllocation.workAllocationNumber);
 
-            // Send the notification after the successful creation of the work allocation
+            const productDetailsForNotification = savedWorkAllocation.productDetails.map(product => ({
+                imei: product.imeiNumber,
+                description: product.productName,
+                install: product.install,
+            }));
+
             try {
-                if (savedWorkAllocation.install) {
+                if (productDetailsForNotification.length > 0) {
                     await this.notificationService.createNotification(savedWorkAllocation, NotificationEnum.Technician);
                 }
             } catch (notificationError) {
                 console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
-                // Log the notification failure but don't affect the main operation
             }
 
             return successResponse;
@@ -118,6 +126,10 @@ export class WorkAllocationService {
             throw new ErrorResponse(500, `Failed to create work allocation details: ${error.message}`);
         }
     }
+
+
+
+
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         if (dto.id || dto.workAllocationNumber) {

@@ -6,7 +6,7 @@ export class StaffDto {
     id?: number;
     name: string;
     phoneNumber: string;
-    branchId: number;
+    branch: number;
     designation: DesignationEnum;
     dob: Date;
     email: string;
