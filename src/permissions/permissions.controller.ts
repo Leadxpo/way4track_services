@@ -11,9 +11,9 @@ export class PermissionsController {
     }
 
     @Post('handlePermissionDetails')
-    async handlePermissionDetails(@Body() dto: PermissionsDto): Promise<CommonResponse> {
+    async updatePermissionDetails(@Body() dto: PermissionsDto): Promise<CommonResponse> {
         try {
-            return this.service.handlePermissionDetails(dto);
+            return this.service.updatePermissionDetails(dto);
         } catch (error) {
             console.log("Error in create Permission in services..", error)
         }

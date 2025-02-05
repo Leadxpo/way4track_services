@@ -80,7 +80,7 @@ export class PermissionEntity {
     @Column({
         type: 'json',
         name: 'permissions',
-        nullable: false,
+        nullable: true,
         comment: 'Array of permissions with add, edit, view, and delete flags',
     })
     permissions: Permission[];
@@ -98,9 +98,7 @@ export class PermissionEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.permissions, {
-        cascade: true,
-    })
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.permissions)
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 }

@@ -10,6 +10,8 @@ import { StaffDto } from './dto/staff.dto';
 import { StaffEntity } from './entity/staff.entity';
 import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
+import { PermissionsDto } from 'src/permissions/dto/permissions.dto';
+import { PermissionsService } from 'src/permissions/permissions.services';
 
 
 @Injectable()
@@ -19,7 +21,8 @@ export class StaffService {
     constructor(
         private adapter: StaffAdapter,
         private staffRepository: StaffRepository,
-        private attendanceRepo: AttendenceRepository
+        private attendanceRepo: AttendenceRepository,
+        private service: PermissionsService
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -64,23 +67,61 @@ export class StaffService {
     }
 
 
+    // async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
+    //     try {
+    //         console.log(req, "req")
+    //         const newStaff = this.adapter.convertDtoToEntity(req);
+    //         newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+    //         if (filePath) {
+    //             newStaff.staffPhoto = filePath;
+    //         }
+    //         console.log(newStaff, "new")
+    //         await this.staffRepository.insert(newStaff);
+    //         // await this.staffRepository.save(newStaff);
+    //         return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
+    //     } catch (error) {
+    //         console.error(`Error creating staff details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
+    //     }
+    // }
+
     async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
-            console.log(req, "req")
+            console.log(req, "req");
+
+            // Convert DTO to entity
             const newStaff = this.adapter.convertDtoToEntity(req);
+
+            // Generate staffId
             newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+
+            // Assign staff photo if provided
             if (filePath) {
                 newStaff.staffPhoto = filePath;
             }
-            console.log(newStaff, "new")
+
+            console.log(newStaff, "new");
+
+            // Save new staff
             await this.staffRepository.insert(newStaff);
-            // await this.staffRepository.save(newStaff);
-            return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
+
+            // **Create default permissions for the new staff**
+            const permissionsDto: PermissionsDto = {
+                staffId: newStaff.staffId,
+                // permissions: this.getDefaultPermissions(req.designation),
+                companyCode: req.companyCode,
+                unitCode: req.unitCode // Fetch default permissions
+            };
+
+            await this.service.savePermissionDetails(permissionsDto);
+
+            return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
         } catch (error) {
             console.error(`Error creating staff details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
         }
     }
+
 
     async updateStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {

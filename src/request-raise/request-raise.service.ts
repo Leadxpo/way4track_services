@@ -160,19 +160,19 @@ export class RequestRaiseService {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
                 'req.request_id AS requestNumber',
-                'client.name AS client',
+                // 'client.name AS client',
                 'branch.name AS branchName',
                 'req.created_date AS paymentDate',
                 'req.request_type AS amount',
                 'req.status AS status',
                 'sf.name as RequestTo'
             ])
-            .leftJoin(ClientEntity, 'client', 'req.client_id=client.id',)
+            // .leftJoin(ClientEntity, 'client', 'req.client_id=client.id',)
             .leftJoin(BranchEntity, 'branch', 'req.branch_id=branch.id',)
             .leftJoin(StaffEntity, 'sf', 'req.request_to=sf.id',)
             .where(`req.company_code = "${filter.companyCode}"`)
             .andWhere(`req.unit_code = "${filter.unitCode}"`)
-            .groupBy('req.id, client.id, req.created_date')
+            .groupBy('req.id, req.created_date')
             .orderBy('req.created_date', 'DESC');
 
         // if (filter.fromDate) {

@@ -5,7 +5,7 @@ import { CommonResponse } from "src/models/common-response";
 import { PermissionsDto } from "./dto/permissions.dto";
 import { ErrorResponse } from "src/models/error-response";
 import { PermissionIdDto } from "./dto/permission-id.dto";
-import { DesignationEnum } from "src/staff/entity/staff.entity";
+import { DesignationEnum, StaffEntity } from "src/staff/entity/staff.entity";
 import { Permission, PermissionEntity } from "./entity/permissions.entity";
 import { Roles } from "./dto/role.enum";
 import { StaffRepository } from "src/staff/repo/staff-repo";
@@ -204,7 +204,6 @@ export class PermissionsService {
         }
     }
 
-
     async savePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
             // Fetch the staff entity based on the staffId provided in the DTO
@@ -214,8 +213,19 @@ export class PermissionsService {
                 throw new ErrorResponse(5417, 'Staff not found');
             }
 
+            // Debugging: Check if permissions are received or default is needed
+            console.log("Incoming Permissions:", dto.permissions);
+
             // Set default permissions if not provided
-            dto.permissions = dto.permissions || this.getDefaultPermissions(staff.designation);
+            dto.permissions = dto.permissions ?? this.getDefaultPermissions(staff.designation);
+
+            // Debugging: Check default permissions
+            console.log("Default Permissions Applied:", dto.permissions);
+
+            // Ensure permissions are not null
+            if (!dto.permissions) {
+                throw new ErrorResponse(5418, 'Default permissions not found');
+            }
 
             // Convert DTO to entity
             const entity = this.adapter.convertPermissionDtoToEntity(dto);
@@ -223,7 +233,11 @@ export class PermissionsService {
             // Associate the existing staff entity with the permission entity
             entity.staffId = staff; // Use the full staff entity instead of just the ID
 
-            // Debugging logs
+            // Store permissions directly as an array (without JSON.stringify)
+            entity.permissions = dto.permissions;
+
+            // Debugging: Check entity before saving
+            console.log("Entity Before Save:", entity);
 
             // Save the permission entity
             await this.repo.save(entity);
@@ -235,24 +249,28 @@ export class PermissionsService {
         }
     }
 
-
-
-
-
     async updatePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
+            // Ensure the staff entity exists
             const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } });
-
             if (!staff) {
-                throw new ErrorResponse(5417, 'Permission record not found');
+                throw new ErrorResponse(5417, 'Staff not found');
             }
 
-            const updatedEntity = this.repo.merge(this.adapter.convertPermissionDtoToEntity(dto));
+            // Ensure the permission entity exists
+            const permission = await this.repo.findOne({ where: { staffId: staff } });
+            if (!permission) {
+                throw new ErrorResponse(5417, 'Permission not found');
+            }
 
-            // Set staffId to the existing staff reference
-            updatedEntity.staffId = staff;
+            // Merge updated values
+            const permissionEntity = this.adapter.convertPermissionDtoToEntity(dto);
+            const updatedEntity = this.repo.merge(permission, permissionEntity);
 
+            // Debugging: Check if the entity is valid before saving
+            console.log("Updated Permission Entity:", updatedEntity);
 
+            // Save changes
             await this.repo.save(updatedEntity);
 
             return new CommonResponse(true, 65152, 'Permission Details Updated Successfully');
@@ -262,14 +280,6 @@ export class PermissionsService {
         }
     }
 
-
-    async handlePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
-        if (dto.staffId) {
-            return this.updatePermissionDetails(dto);
-        } else {
-            return this.savePermissionDetails(dto);
-        }
-    }
 
     async getPermissionDetails(req: PermissionIdDto): Promise<CommonResponse> {
         try {

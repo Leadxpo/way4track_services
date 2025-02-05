@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { NotificationEntity, NotificationEnum } from './entity/notification.entity';
 import { GetNotificationDto, UpdateNotificationDto } from './dto/notification.dto';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
@@ -8,6 +8,7 @@ import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation
 import { NotificationAdapter } from './notification.adapter';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
+import { In } from 'typeorm';
 
 @Injectable()
 export class NotificationService {
@@ -71,28 +72,21 @@ export class NotificationService {
     }
 
     async markAsRead(ids: number[], updateNotificationDto: UpdateNotificationDto) {
-        // If only a single id is provided, convert it to an array
-        if (typeof ids === 'number') {
-            ids = [ids];
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            throw new BadRequestException('No valid notification IDs provided');
         }
 
-        const notifications = await this.notificationRepository.findByIds(ids);
-        if (!notifications || notifications.length === 0) {
+        const result = await this.notificationRepository.update(
+            { id: In(ids) },  // Ensure correct field mapping
+            { isRead: updateNotificationDto.isRead }
+        );
+
+        if (result.affected === 0) {
             throw new NotFoundException('Notifications not found');
         }
 
-        // Update the 'isRead' field for all matching notifications
-        notifications.forEach(notification => {
-            notification.isRead = updateNotificationDto.isRead;
-        });
-
-        // Save the updated notifications
-        return await this.notificationRepository.save(notifications);
+        return { message: `${result.affected} notifications marked as read` };
     }
-
-
-
-
     async getAllNotifications(req: {
         branch?: string, companyCode?: string
         , unitCode?: string

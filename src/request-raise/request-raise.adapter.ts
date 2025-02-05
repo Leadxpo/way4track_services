@@ -26,7 +26,7 @@ export class RequestRaiseAdapter {
         entity.requestTo = staffTo;
 
         const branch = new BranchEntity();
-        branch.id = dto.branchId;
+        branch.id = dto.branch;
         entity.branchId = branch;
 
         const subDealer = new SubDealerEntity();
@@ -55,6 +55,8 @@ export class RequestRaiseAdapter {
             entity.status,
             entity.companyCode,
             entity.unitCode,
+            entity.subDealerId.id,
+            entity.subDealerId.name
         );
     }
 }

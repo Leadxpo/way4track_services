@@ -6,7 +6,7 @@ export class RequestRaiseDto {
     // staffID: number;
     requestTo: number;
     requestFrom: number;
-    branchId: number;
+    branch: number;
     description: string;
     createdDate: Date;
     status: ClientStatusEnum
