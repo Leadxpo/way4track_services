@@ -20,10 +20,10 @@ export class WorkAllocationAdapter {
         entity.clientId = client;
 
         const staff = new StaffEntity();
-        staff.id = dto.staffId;
+        staff.staffId = dto.staffId;
         entity.staffId = staff;
 
-        entity.serviceOrProduct = dto.serviceOrProduct;
+        // entity.serviceOrProduct = dto.serviceOrProduct;
         entity.otherInformation = dto.otherInformation;
         entity.date = dto.date;
         entity.companyCode = dto.companyCode;
@@ -71,7 +71,7 @@ export class WorkAllocationAdapter {
             return new WorkAllocationResDto(
                 entity.id,
                 entity.workAllocationNumber,
-                entity.serviceOrProduct,
+                // entity.serviceOrProduct,
                 entity.otherInformation,
                 entity.date,
                 client?.id || 0,
@@ -87,7 +87,7 @@ export class WorkAllocationAdapter {
                 product?.dateOfPurchase || null,
                 product?.vendorId?.id || null, // Accessing vendorId from product
                 product?.categoryName || '',
-                product?.price || 0,
+                // product?.price || 0,
                 product?.productDescription || '',
                 product?.vendorPhoneNumber || '',
                 product?.vendorName || '',

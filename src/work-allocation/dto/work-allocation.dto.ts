@@ -1,10 +1,11 @@
 import { InstallationEnum } from "../enum/installation.enum";
+import { WorkStatusEnum } from "../enum/work-status-enum";
 
 export class WorkAllocationDto {
     id?: number;
-    staffId: number;
+    staffId: string;
     clientId: number;
-    serviceOrProduct: string;
+    // serviceOrProduct: string;
     otherInformation?: string;
     date: Date;
     companyCode?: string;
@@ -14,8 +15,11 @@ export class WorkAllocationDto {
     productId?: number
     vendorId?: number
     voucherId?: string
-    imeiNumber?: string
+    // imeiNumber?: string
     productDetails?: ProductDetail[];
+    workStatus: WorkStatusEnum;
+    description: string;
+
 }
 export class ProductDetail {
     productId: number;

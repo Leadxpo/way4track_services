@@ -42,7 +42,7 @@ export class HiringEntity extends BaseEntity {
     @Column({ name: 'resume_path', type: 'varchar', nullable: true })
     resumePath: string;
 
-    @Column({ name: 'date_of_upload', type: 'timestamp' })
+    @Column({ name: 'date_of_upload', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateOfUpload: Date;
 
     @Column({ name: 'status', type: 'enum', enum: HiringStatus, default: HiringStatus.INTERVIEWED })

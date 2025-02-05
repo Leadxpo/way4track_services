@@ -19,6 +19,8 @@ export class GetStaffResDto {
     staffPhoto: string;
     companyCode: string;
     unitCode: string;
+    latitude?: string;
+    longitude?: string;
     constructor(
         id: number,
         name: string,
@@ -37,6 +39,8 @@ export class GetStaffResDto {
         staffPhoto: string,
         companyCode: string,
         unitCode: string,
+        latitude?: string,
+        longitude?: string
     ) {
         this.id = id;
         this.name = name;
@@ -55,5 +59,7 @@ export class GetStaffResDto {
         this.staffPhoto = staffPhoto
         this.companyCode = companyCode
         this.unitCode = unitCode
+        this.latitude = latitude
+        this.longitude = longitude
     }
 }

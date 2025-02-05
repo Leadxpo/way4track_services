@@ -22,4 +22,8 @@ export class StaffDto {
     unitCode: string;
     password: string;
     staffId?: string;
+    latitude?: string;
+    longitude?: string;
+
+
 }

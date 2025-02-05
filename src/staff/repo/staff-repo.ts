@@ -39,20 +39,95 @@ export class StaffRepository extends Repository<StaffEntity> {
         const payRollData = query.getRawMany();
         return payRollData;
     }
-   
+
+
+    // async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
+    //     const { date, staffId, companyCode, unitCode } = req;
+
+    //     // Ensure the date parameter is in a valid format
+    //     const selectedDate = new Date(date);
+    //     const year = selectedDate.getFullYear();
+    //     const month = selectedDate.getMonth() + 1;
+
+    //     // Calculate the first and last day of the month
+    //     const firstDayOfMonth = new Date(year, selectedDate.getMonth(), 1);
+    //     const lastDayOfMonth = new Date(year, selectedDate.getMonth() + 1, 0); // Last day of the month
+
+    //     const query = await this.createQueryBuilder('sf')
+    //         .select(`
+    //             DATE_FORMAT(a.day, "%Y-%m-%d") AS day,
+    //             sf.name AS name,
+    //             sf.phone_number AS phoneNumber,
+    //             sf.designation AS designation,
+    //             sf.dob AS dob,
+    //             sf.email AS email,
+    //             sf.aadhar_number AS aadharNumber,
+    //             sf.address AS address,
+    //             br.name AS branchName,
+    //             MIN(a.in_time) AS inTime,
+    //             MAX(a.out_time) AS outTime,
+    //             TIMESTAMPDIFF(HOUR, MIN(a.in_time), MAX(a.out_time)) AS totalHours,
+    //             GROUP_CONCAT(DISTINCT a.status) AS status
+    //         `)
+    //         .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
+    //         .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
+    //         .where('sf.staff_id = :staffId', { staffId })
+    //         .andWhere('sf.company_code = :companyCode', { companyCode })
+    //         .andWhere('sf.unit_code = :unitCode', { unitCode })
+    //         .andWhere('a.day BETWEEN :startDate AND :endDate', {
+    //             startDate: firstDayOfMonth,
+    //             endDate: lastDayOfMonth,
+    //         })
+    //         .groupBy(`
+    //             a.day,
+    //             sf.name,
+    //             sf.phone_number,
+    //             sf.designation,
+    //             sf.dob,
+    //             sf.email,
+    //             sf.aadhar_number,
+    //             sf.address,
+    //             br.name
+    //         `)
+    //         .orderBy('a.day')
+    //         .getRawMany();
+
+    //     // Create a response structure for all days of the month
+    //     const daysInMonth = new Date(year, month, 0).getDate();
+    //     const allDaysOfMonth = Array.from({ length: daysInMonth }, (_, i) => {
+    //         const currentDate = new Date(year, month - 1, i + 1);
+    //         const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+    //         const attendance = query.find((q) => q.day === formattedDate);
+
+    //         return {
+    //             day: formattedDate,
+    //             name: attendance?.name || null,
+    //             phoneNumber: attendance?.phoneNumber || null,
+    //             designation: attendance?.designation || null,
+    //             dob: attendance?.dob || null,
+    //             email: attendance?.email || null,
+    //             aadharNumber: attendance?.aadharNumber || null,
+    //             address: attendance?.address || null,
+    //             branchName: attendance?.branchName || null,
+    //             inTime: attendance?.inTime || null,
+    //             outTime: attendance?.outTime || null,
+    //             totalHours: attendance?.totalHours || 0,
+    //             status: attendance?.status || 'Absent', // Default to 'Absent' if no record is found
+    //         };
+    //     });
+
+    //     return allDaysOfMonth;
+    // }
 
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
         const { date, staffId, companyCode, unitCode } = req;
-    
-        // Ensure the date parameter is in a valid format
+
         const selectedDate = new Date(date);
         const year = selectedDate.getFullYear();
         const month = selectedDate.getMonth() + 1;
-    
-        // Calculate the first and last day of the month
         const firstDayOfMonth = new Date(year, selectedDate.getMonth(), 1);
-        const lastDayOfMonth = new Date(year, selectedDate.getMonth() + 1, 0); // Last day of the month
-    
+        const lastDayOfMonth = new Date(year, selectedDate.getMonth() + 1, 0);
+
         const query = await this.createQueryBuilder('sf')
             .select(`
                 DATE_FORMAT(a.day, "%Y-%m-%d") AS day,
@@ -64,9 +139,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 sf.aadhar_number AS aadharNumber,
                 sf.address AS address,
                 br.name AS branchName,
-                MIN(a.in_time) AS inTime,
-                MAX(a.out_time) AS outTime,
-                TIMESTAMPDIFF(HOUR, MIN(a.in_time), MAX(a.out_time)) AS totalHours,
+                a.time_records AS timeRecords,
                 GROUP_CONCAT(DISTINCT a.status) AS status
             `)
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
@@ -87,18 +160,40 @@ export class StaffRepository extends Repository<StaffEntity> {
                 sf.email,
                 sf.aadhar_number,
                 sf.address,
-                br.name
+                br.name,
+                a.time_records
             `)
             .orderBy('a.day')
             .getRawMany();
-    
-        // Create a response structure for all days of the month
+
         const daysInMonth = new Date(year, month, 0).getDate();
-        const allDaysOfMonth = Array.from({ length: daysInMonth }, (_, i) => {
+
+        const allDaysOfMonth = Array.from({ length: daysInMonth }).map(async (_, i) => {
             const currentDate = new Date(year, month - 1, i + 1);
-            const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-            const attendance = query.find((q) => q.day === formattedDate);
-    
+            const formattedDate = currentDate.toISOString().split('T')[0];
+            const attendance = query.find(q => q.day === formattedDate);
+
+            let timeRecords = [];
+            let totalHours = 0;
+
+            if (attendance?.timeRecords) {
+                try {
+                    // Ensure `timeRecords` is parsed only if it is a string
+                    timeRecords = typeof attendance.timeRecords === 'string'
+                        ? JSON.parse(attendance.timeRecords)
+                        : attendance.timeRecords;
+
+                    if (Array.isArray(timeRecords)) {
+                        totalHours = await this.calculateTotalHours(timeRecords);
+                    }
+                } catch (error) {
+                    console.error("Invalid JSON in timeRecords:", attendance?.timeRecords);
+                    timeRecords = [];
+                }
+            }
+
+            console.log(timeRecords, "timeRecords");
+
             return {
                 day: formattedDate,
                 name: attendance?.name || null,
@@ -109,16 +204,26 @@ export class StaffRepository extends Repository<StaffEntity> {
                 aadharNumber: attendance?.aadharNumber || null,
                 address: attendance?.address || null,
                 branchName: attendance?.branchName || null,
-                inTime: attendance?.inTime || null,
-                outTime: attendance?.outTime || null,
-                totalHours: attendance?.totalHours || 0,
-                status: attendance?.status || 'Absent', // Default to 'Absent' if no record is found
+                inTime: timeRecords.map(r => r.inTime) || null,
+                outTime: timeRecords.map(r => r.outTime) || null,
+                totalHours: totalHours,
+                status: attendance?.status || 'Absent',
+                timeRecords: timeRecords
             };
         });
-    
-        return allDaysOfMonth;
+
+        return Promise.all(allDaysOfMonth);
     }
-    
+
+
+    async calculateTotalHours(timeRecords: { inTime: Date; outTime: Date }[]): Promise<number> {
+        return timeRecords.reduce((total, record) => {
+            const inTime = new Date(record.inTime).getTime();
+            const outTime = new Date(record.outTime).getTime();
+            return total + (outTime - inTime) / (1000 * 60 * 60);
+        }, 0);
+    }
+
 
 
     async LoginDetails(req: LoginDto) {

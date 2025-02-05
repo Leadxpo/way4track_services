@@ -5,6 +5,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { WorkStatusEnum } from '../enum/work-status-enum';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -14,11 +15,17 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'work_allocation_number', type: 'varchar', unique: true })
     workAllocationNumber: string;
 
-    @Column({ name: 'service_or_product', type: 'varchar', length: 100 })
-    serviceOrProduct: string;
+    // @Column({ name: 'service_or_product', type: 'varchar', length: 100 })
+    // serviceOrProduct: string;
 
     @Column({ name: 'other_information', type: 'text' })
     otherInformation: string;
+
+    @Column({ name: 'description', type: 'text', nullable: true })
+    description: string;
+
+    @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
+    workStatus: WorkStatusEnum;
 
     @Column({ name: 'date', type: 'date' })
     date: Date;

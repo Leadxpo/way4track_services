@@ -1,9 +1,10 @@
 import { InstallationEnum } from "../enum/installation.enum";
+import { WorkStatusEnum } from "../enum/work-status-enum";
 
 export class WorkAllocationResDto {
     id: number;
     workAllocationNumber: string;
-    serviceOrProduct: string;
+    // serviceOrProduct: string;
     otherInformation: string;
     date: Date;
     clientId: number;
@@ -20,7 +21,7 @@ export class WorkAllocationResDto {
     vendorId?: number;
     // imeiNumber?: string;
     categoryName?: string;
-    price?: number;
+    // price?: number;
     productDescription?: string;
     vendorPhoneNumber?: string;
     vendorName?: string;
@@ -32,11 +33,12 @@ export class WorkAllocationResDto {
     products?: {
         productId: number; productName: string; imeiNumber: string, install: boolean
     }[];
-
+    workStatus?: WorkStatusEnum;
+    description?: string;
     constructor(
         id: number,
         workAllocationNumber: string,
-        serviceOrProduct: string,
+        // serviceOrProduct: string,
         otherInformation: string,
         date: Date,
         clientId: number,
@@ -53,7 +55,7 @@ export class WorkAllocationResDto {
         vendorId?: number,
         // imeiNumber?: string,
         categoryName?: string,
-        price?: number,
+        // price?: number,
         productDescription?: string,
         vendorPhoneNumber?: string,
         vendorName?: string,
@@ -64,12 +66,14 @@ export class WorkAllocationResDto {
         voucherName?: string,
         products?: {
             productId: number; productName: string; imeiNumber: string, install: boolean
-        }[]
+        }[],
+        workStatus?: WorkStatusEnum,
+        description?: string
 
     ) {
         this.id = id;
         this.workAllocationNumber = workAllocationNumber;
-        this.serviceOrProduct = serviceOrProduct;
+        // this.serviceOrProduct = serviceOrProduct;
         this.otherInformation = otherInformation;
         this.date = date;
         this.clientId = clientId;
@@ -86,7 +90,7 @@ export class WorkAllocationResDto {
         this.vendorId = vendorId;
         // this.imeiNumber = imeiNumber;
         this.categoryName = categoryName;
-        this.price = price;
+        // this.price = price;
         this.productDescription = productDescription;
         this.vendorPhoneNumber = vendorPhoneNumber;
         this.vendorName = vendorName;
@@ -96,6 +100,8 @@ export class WorkAllocationResDto {
         this.voucherId = voucherId
         this.voucherName = this.voucherName
         this.products = products;
+        this.workStatus = workStatus
+        this.description = description
 
     }
 }
