@@ -26,7 +26,7 @@ export class TicketsEntity {
     @Column({ name: 'problem', type: 'text' })
     problem: string;
 
-    @Column({ name: 'date', type: 'date' })
+    @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     date: Date;
 
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.tickets)
