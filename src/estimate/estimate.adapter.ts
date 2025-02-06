@@ -34,7 +34,7 @@ export class EstimateAdapter {
         if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
         if (dto.SCST) entity.SCST = dto.SCST;
         if (dto.CGST) entity.CGST = dto.CGST;
-        entity.hsnCode = dto.hsnCode;
+        // entity.hsnCode = dto.hsnCode;
 
         entity.estimatePdfUrl = dto.estimatePdfUrl
         entity.invoicePdfUrl = dto.invoicePdfUrl
@@ -124,7 +124,7 @@ export class EstimateAdapter {
             entity.GSTORTDS,
             entity.SCST,
             entity.CGST,
-            entity.hsnCode,
+            // entity.hsnCode,
             entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
             entity.vendorId ? entity.vendorId.name : null,  // ✅ Null check added
             entity.vendorId ? entity.vendorId.vendorPhoneNumber : null  // ✅ Null check added

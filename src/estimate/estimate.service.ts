@@ -172,8 +172,8 @@ export class EstimateService {
 
 
     async createEstimateDetails(dto: EstimateDto): Promise<CommonResponse> {
-        const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.startTransaction();
+        // const queryRunner = this.dataSource.createQueryRunner();
+        // await queryRunner.startTransaction();
 
         try {
             let estimatePdfUrl: string | null = null;
@@ -251,16 +251,14 @@ export class EstimateService {
 
             console.log(newEstimate, "___________");
 
-            await queryRunner.manager.save(newEstimate);
+            await this.estimateRepository.insert(newEstimate);
 
-            await queryRunner.commitTransaction();
+            // await queryRunner.commitTransaction();
             return new CommonResponse(true, 201, 'Estimate details created successfully');
         } catch (error) {
-            await queryRunner.rollbackTransaction();
+            // await queryRunner.rollbackTransaction();
             console.error(`Error creating estimate details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create estimate details: ${error.message}`);
-        } finally {
-            await queryRunner.release();
         }
     }
 

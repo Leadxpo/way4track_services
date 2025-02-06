@@ -13,11 +13,11 @@ export class EstimateEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation, { eager: true })
+    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation, { nullable: true })
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
 
-    @ManyToOne(() => VendorEntity, (VendorEntity) => VendorEntity.estimate, { eager: true })
+    @ManyToOne(() => VendorEntity, (VendorEntity) => VendorEntity.estimate, { nullable: true })
     @JoinColumn({ name: 'vendor_id' })
     vendorId: VendorEntity;
 
@@ -48,13 +48,13 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'float', name: 'quantity', nullable: true })
     quantity: number;
 
-    @Column({ type: 'float', name: 'hsn_code', nullable: true })
-    hsnCode: string;
+    // @Column({ type: 'float', name: 'hsn_code', nullable: true })
+    // hsnCode: string;
 
-    @OneToMany(() => ProductEntity, (product) => product.estimate, { eager: true })
+    @OneToMany(() => ProductEntity, (product) => product.estimate)
     products: ProductEntity[];
 
-    @OneToMany(() => VoucherEntity, (product) => product.estimate, { eager: true })
+    @OneToMany(() => VoucherEntity, (product) => product.estimate)
     invoice: VoucherEntity[];
 
     @Column({ type: 'json', name: 'product_details', nullable: true })

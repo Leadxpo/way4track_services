@@ -15,7 +15,7 @@ export class EstimateResDto {
     totalAmount: number;
     companyCode: string;
     unitCode: string;
-    hsnCode: string;
+    // hsnCode: string;
     products?: {
         name: string; quantity: number; amount: number, costPerUnit: number, totalCost: number, hsnCode: string
     }[];  // Modified to include name, quantity, and amount
@@ -49,7 +49,7 @@ export class EstimateResDto {
         GSTORTDS?: GSTORTDSEnum,
         SCST?: number,
         CGST?: number,
-        hsnCode?: string,
+        // hsnCode?: string,
         vendorId?: number,
         vendorName?: string,
         vendorPhoneNumber?: string
@@ -75,7 +75,7 @@ export class EstimateResDto {
         this.GSTORTDS = GSTORTDS;
         this.SCST = SCST;
         this.CGST = CGST;
-        this.hsnCode = hsnCode;
+        // this.hsnCode = hsnCode;
         this.vendorId = vendorId
         this.vendorName = vendorName;
         this.vendorPhoneNumber = vendorPhoneNumber
