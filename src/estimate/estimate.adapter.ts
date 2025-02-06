@@ -59,14 +59,50 @@ export class EstimateAdapter {
         return entity;
     }
 
+    // convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
+    //     return entities.map(entity => new EstimateResDto(
+    //         entity.id,
+    //         entity.clientId.clientId||'',
+    //         entity.clientId.name||'',
+    //         entity.clientId.address,
+    //         entity.clientId.email,
+    //         entity.clientId.phoneNumber,
+    //         entity.buildingAddress,
+    //         entity.estimateDate,
+    //         entity.expireDate,
+    //         entity.productOrService,
+    //         entity.description,
+    //         entity.amount,
+    //         entity.companyCode,
+    //         entity.unitCode,
+    //         entity.productDetails?.map(product => ({
+    //             name: product.productName,
+    //             quantity: product.quantity,
+    //             amount: product.quantity > 0 ? product.totalCost / product.quantity : 0,
+    //             costPerUnit: product.costPerUnit,
+    //             totalCost: product.totalCost,
+    //             hsnCode: product.hsnCode
+    //         })),
+    //         entity.estimateId,
+    //         entity.invoiceId,
+    //         entity.GSTORTDS,
+    //         entity.SCST,
+    //         entity.CGST,
+    //         entity.hsnCode,
+    //         entity.vendorId.id,
+    //         entity.vendorId.name,
+    //         entity.vendorId.vendorPhoneNumber
+    //     ));
+    // }
+
     convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
         return entities.map(entity => new EstimateResDto(
             entity.id,
-            entity.clientId.clientId,
-            entity.clientId.name,
-            entity.clientId.address,
-            entity.clientId.email,
-            entity.clientId.phoneNumber,
+            entity.clientId ? entity.clientId.clientId : '',  // ✅ Null check added
+            entity.clientId ? entity.clientId.name : '',  // ✅ Null check added
+            entity.clientId ? entity.clientId.address : '',
+            entity.clientId ? entity.clientId.email : '',
+            entity.clientId ? entity.clientId.phoneNumber : '',
             entity.buildingAddress,
             entity.estimateDate,
             entity.expireDate,
@@ -82,18 +118,19 @@ export class EstimateAdapter {
                 costPerUnit: product.costPerUnit,
                 totalCost: product.totalCost,
                 hsnCode: product.hsnCode
-            })),
+            })) ?? [],  // ✅ Default empty array
             entity.estimateId,
             entity.invoiceId,
             entity.GSTORTDS,
             entity.SCST,
             entity.CGST,
             entity.hsnCode,
-            entity.vendorId.id,
-            entity.vendorId.name,
-            entity.vendorId.vendorPhoneNumber
+            entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
+            entity.vendorId ? entity.vendorId.name : null,  // ✅ Null check added
+            entity.vendorId ? entity.vendorId.vendorPhoneNumber : null  // ✅ Null check added
         ));
     }
+
 
 }
 

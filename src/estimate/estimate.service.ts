@@ -298,10 +298,11 @@ export class EstimateService {
         }
     }
 
+
     async getEstimateDetails(req: EstimateIdDto): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.findOne({
-                relations: ['clientId', 'products'],
+                relations: ['clientId', 'products', 'vendorId'],  // ✅ Add 'vendorId' if needed
                 where: { estimateId: req.estimateId, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
@@ -309,9 +310,15 @@ export class EstimateService {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
 
-            const data: EstimateResDto[] = this.estimateAdapter.convertEntityToResDto([estimate]);
+            console.log(estimate, "<<< Raw Estimate Data");
+
+            const data = this.estimateAdapter.convertEntityToResDto([estimate]);
+
+            console.log(data, "<<< Converted DTO Data");
+
             return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
         } catch (error) {
+            console.error('Error fetching estimate details:', error);
             throw new ErrorResponse(500, error.message);
         }
     }
@@ -319,17 +326,23 @@ export class EstimateService {
     async getAllEstimateDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.find({
-                relations: ['clientId', 'products'],
-                where: { companyCode: req.companyCode, unitCode: req.unitCode }
+                relations: ['clientId', 'products', 'vendorId'],  // ✅ Add 'vendorId' if needed
+                where: {  companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
             if (!estimate) {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
 
-            const data: EstimateResDto[] = this.estimateAdapter.convertEntityToResDto(estimate);
+            console.log(estimate, "<<< Raw Estimate Data");
+
+            const data = this.estimateAdapter.convertEntityToResDto(estimate);
+
+            console.log(data, "<<< Converted DTO Data");
+
             return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
         } catch (error) {
+            console.error('Error fetching estimate details:', error);
             throw new ErrorResponse(500, error.message);
         }
     }
