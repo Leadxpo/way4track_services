@@ -259,7 +259,7 @@ export class EstimateService {
             // await queryRunner.rollbackTransaction();
             console.error(`Error creating estimate details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create estimate details: ${error.message}`);
-        }
+        } 
     }
 
 
