@@ -21,8 +21,14 @@ export class TicketsAdapter {
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branch = branch;
-        entity.companyCode=dto.companyCode
-        entity.unitCode=dto.unitCode
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
+        entity.workStatus = dto.workStatus
+        entity.description = dto.description
+        if (dto.id) {
+            entity.id = dto.id;  // This might not be necessary for a new ticket
+        }
+        
         return entity;
     }
 
@@ -30,7 +36,7 @@ export class TicketsAdapter {
     convertEntityToDto(entities: TicketsEntity[]): GetTicketsResDto[] {
         return entities.map((entity) => {
             return new GetTicketsResDto(
-                entity.staff?.id || 0,
+                entity.staff?.id || null,
                 entity.staff?.name || '',
                 entity.staff?.phoneNumber || '',
                 entity.problem,
@@ -40,7 +46,9 @@ export class TicketsAdapter {
                 entity.ticketNumber,
                 entity.addressingDepartment,
                 entity.companyCode,
-                entity.unitCode
+                entity.unitCode,
+                entity.workStatus,
+                entity.description
             );
         });
     }

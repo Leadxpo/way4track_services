@@ -39,35 +39,23 @@ export class TicketsService {
     }
 
     async createTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
-        let successResponse: CommonResponse;
-        let newTicket: TicketsEntity;
         try {
-            // Convert DTO to entity
-            newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
+            console.error('Ticket DTO:', dto);
 
-            // Generate a unique ticket number
-            const count = await this.ticketsRepository.count();
-            newTicket.ticketNumber = `Tickets-${(count + 1).toString().padStart(5, '0')}`;
 
-            // Save the ticket data to the database
-            const savedTicket = await this.ticketsRepository.save(newTicket);
+            const newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
 
-            if (!savedTicket) {
-                throw new Error('Failed to save ticket details');
-            }
 
-            // Send a success response after successfully saving the data
-            successResponse = new CommonResponse(true, 201, 'Ticket details created successfully', newTicket.ticketNumber);
+            newTicket.ticketNumber = `Tickets-${(await this.ticketsRepository.count() + 1).toString().padStart(5, '0')}`;
+            console.log('New Ticket Data:', newTicket);
+            await this.ticketsRepository.insert(newTicket); // 
 
-            // Send the notification after the successful creation of the ticket
-            try {
-                await this.notificationService.createNotification(savedTicket, NotificationEnum.Ticket);
-            } catch (notificationError) {
-                console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
-                // Log the notification failure but don't affect the main operation
-            }
+            // Handle notifications after the ticket is saved
 
-            return successResponse;
+            await this.notificationService.createNotification(newTicket, NotificationEnum.Ticket);
+
+            return new CommonResponse(true, 65152, ' Details and Permissions Created Successfully');
+
         } catch (error) {
             console.error(`Error creating ticket details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create ticket details: ${error.message}`);
@@ -75,8 +63,12 @@ export class TicketsService {
     }
 
 
+
+
+
+
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
-        if (dto.id) {
+        if (dto.id && dto.id !== null) {
             // If an ID is provided, update the ticket details
             return await this.updateTicketDetails(dto);
         } else {

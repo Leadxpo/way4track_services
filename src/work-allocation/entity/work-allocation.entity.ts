@@ -15,8 +15,8 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'work_allocation_number', type: 'varchar', unique: true })
     workAllocationNumber: string;
 
-    // @Column({ name: 'service_or_product', type: 'varchar', length: 100 })
-    // serviceOrProduct: string;
+    @Column({ name: 'service_or_product', type: 'varchar', length: 100 })
+    serviceOrProduct: string;
 
     @Column({ name: 'other_information', type: 'text' })
     otherInformation: string;

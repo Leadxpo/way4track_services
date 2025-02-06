@@ -25,7 +25,8 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'staff.name AS staffName',
                 'client.name AS clientName',
                 'wa.company_code AS companyCode',
-                'wa.unit_code AS unitCode'
+                'wa.unit_code AS unitCode',
+                'wa.work_status as workStatus'
             ])
             .leftJoin('wa.staffId', 'staff')
             .leftJoin('wa.clientId', 'client');

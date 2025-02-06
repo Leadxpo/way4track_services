@@ -5,13 +5,12 @@ export class WorkAllocationDto {
     id?: number;
     staffId: string;
     clientId: number;
-    // serviceOrProduct: string;
+    serviceOrProduct: string;
     otherInformation?: string;
     date: Date;
     companyCode?: string;
     unitCode?: string
     workAllocationNumber?: string
-    install?: boolean
     productId?: number
     vendorId?: number
     voucherId?: string

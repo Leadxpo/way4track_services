@@ -1,5 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 export enum AddressingDepartment {
@@ -19,11 +20,11 @@ export class TicketsEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => StaffEntity, { eager: true })
+    @ManyToOne(() => StaffEntity, (branchEntity) => branchEntity.tickets, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staff: StaffEntity;
 
-    @Column({ name: 'problem', type: 'text' })
+    @Column({ name: 'problem', type: 'text', nullable: true })
     problem: string;
 
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -35,6 +36,12 @@ export class TicketsEntity {
 
     @Column({ name: 'ticket_number', type: 'varchar', length: 50, unique: true })
     ticketNumber: string;
+
+    @Column({ name: 'description', type: 'text', nullable: true })
+    description: string;
+
+    @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
+    workStatus: WorkStatusEnum;
 
     @Column({
         name: 'addressing_department',

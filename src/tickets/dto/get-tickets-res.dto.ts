@@ -1,3 +1,4 @@
+import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { AddressingDepartment } from "../entity/tickets.entity";
 
 export class GetTicketsResDto {
@@ -12,6 +13,8 @@ export class GetTicketsResDto {
     addressingDepartment: AddressingDepartment;
     companyCode: string;
     unitCOde: string;
+    workStatus?: WorkStatusEnum;
+    description?: string;
     constructor(
         staffId: number,
         staffName: string,
@@ -23,7 +26,9 @@ export class GetTicketsResDto {
         ticketNumber: string,
         addressingDepartment: AddressingDepartment,
         companyCode: string,
-        unitCOde: string
+        unitCOde: string,
+        workStatus?: WorkStatusEnum,
+        description?: string
     ) {
         this.staffId = staffId;
         this.staffName = staffName;
@@ -36,5 +41,7 @@ export class GetTicketsResDto {
         this.addressingDepartment = addressingDepartment;
         this.companyCode = companyCode;
         this.unitCOde = unitCOde
+        this.workStatus = workStatus
+        this.description = description
     }
 }
