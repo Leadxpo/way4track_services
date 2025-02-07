@@ -31,8 +31,8 @@ export class ProductAssignDashboardService {
         }
     }
 
-    async getAssignedQty(req: CommonReq): Promise<CommonResponse> {
-        const productData = await this.productAssignRepo.getAssignedQty(req)
+    async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getProductAssignmentSummary(req)
         if (!productData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
@@ -40,23 +40,7 @@ export class ProductAssignDashboardService {
         }
     }
 
-    async getTotalInHandsQty(req: CommonReq): Promise<CommonResponse> {
-        const productData = await this.productAssignRepo.getTotalInHandsQty(req)
-        if (!productData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
-        }
-    }
 
-    async getTotalBranchAssignedQty(req: CommonReq): Promise<CommonResponse> {
-        const productData = await this.productAssignRepo.getTotalBranchAssignedQty(req)
-        if (!productData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
-        } else {
-            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
-        }
-    }
 
     async totalProducts(req: CommonReq): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.totalProducts(req)

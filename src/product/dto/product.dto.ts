@@ -30,6 +30,11 @@ export class ProductDto {
   SNO: number;
   ICCIDNo: string;
   hsnCode: string;
+  remarks3: string;
+  BASKET_NAME: string;
+  SIM_IMSI: string;
+  SIM_NO: string;
+  MOBILE_NUMBER: string;
 }
 
 

@@ -203,10 +203,12 @@ export class DashboardController {
         }
     }
 
-    @Post('getTotalInHandsQty')
-    async getTotalInHandsQty(@Body() req: CommonReq): Promise<CommonResponse> {
+
+
+    @Post('getProductAssignmentSummary')
+    async getProductAssignmentSummary(@Body() req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
         try {
-            return await this.productAssignDashboardService.getTotalInHandsQty(req)
+            return await this.productAssignDashboardService.getProductAssignmentSummary(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);
@@ -214,27 +216,7 @@ export class DashboardController {
         }
     }
 
-    @Post('getTotalBranchAssignedQty')
-    async getTotalBranchAssignedQty(@Body() req: CommonReq): Promise<CommonResponse> {
-        try {
-            return await this.productAssignDashboardService.getTotalBranchAssignedQty(req)
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
-        }
-    }
 
-    @Post('getAssignedQty')
-    async getAssignedQty(@Body() req: CommonReq): Promise<CommonResponse> {
-        try {
-            return await this.productAssignDashboardService.getAssignedQty(req)
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
-        }
-    }
 
 
     @Post('getDetailVendorData')

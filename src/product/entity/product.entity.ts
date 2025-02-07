@@ -105,6 +105,9 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'remarks_2', type: 'text', nullable: true })
   remarks2: string;
 
+  @Column({ name: 'remarks_3', type: 'text', nullable: true })
+  remarks3: string;
+
   @ManyToOne(() => EstimateEntity, (estimate) => estimate.products, { nullable: true })
   estimate: EstimateEntity;
 
@@ -116,5 +119,18 @@ export class ProductEntity extends BaseEntity {
 
   @Column({ name: 'status', type: 'varchar', length: 50, default: 'not_assigned' }) // Default to not_assigned
   status: string;
+
+  @Column({ name: 'mobile_number', type: 'varchar', length: 50, nullable: true })
+  mobileNumber: string;
+
+  @Column({ name: 'sim_no', type: 'varchar', length: 50, nullable: true })
+  simNo: string;
+
+  @Column({ name: 'sim_imsi', type: 'varchar', length: 50, nullable: true })
+  simImsi: string;
+
+  @Column({ name: 'basket_name', type: 'varchar', length: 50, nullable: true })
+  basketName: string;
+
 
 }
