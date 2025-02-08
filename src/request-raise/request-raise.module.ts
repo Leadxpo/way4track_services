@@ -6,11 +6,13 @@ import { RequestRaiseService } from './request-raise.service';
 import { RequestRaiseRepository } from './repo/request-raise.repo';
 import { RequestRaiseAdapter } from './request-raise.adapter';
 import { NotificationModule } from 'src/notifications/notification.module';
+import { BranchModule } from 'src/branch/branch.module';
 
 
 @Module({
     imports: [TypeOrmModule.forFeature([RequestRaiseEntity]),
-    forwardRef(() => NotificationModule)],
+    forwardRef(() => NotificationModule),
+    forwardRef(() => BranchModule)],
     controllers: [RequestRaiseController],
     providers: [RequestRaiseService, RequestRaiseRepository, RequestRaiseAdapter],
     exports: [RequestRaiseRepository, RequestRaiseService]

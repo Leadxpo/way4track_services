@@ -213,10 +213,64 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         }
     }
 
+    async getProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string }) {
+        try {
+            // Base query for grouping products by branch
+            const groupedProductQuery = this.createQueryBuilder('productAssign')
+                .select([
+                    'pa.id AS productId',
+                    'pa.product_name AS productName',
+                    'productAssign.product_type AS productType',
+                    'br.name AS branchName',
+                    'SUM(productAssign.number_of_products) AS totalProducts'
+                ])
+                .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+                .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
+                .groupBy('productAssign.product_id, pa.product_name, productAssign.product_type, br.name');
 
+            // If a specific branch is selected, filter for that branch
+            if (req.branch) {
+                groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
 
+            // Execute query to fetch products grouped by branch
+            const productDetails = await groupedProductQuery.getRawMany();
 
+            // Transform data into the required format
+            const branchesMap = new Map<string, any>();
 
+            productDetails.forEach((product) => {
+                // For each product, we are grouping by branch name
+                const { productId, productName, productType, branchName, totalProducts, productImg } = product;
 
+                // If the branch is not yet added in the map, initialize it
+                if (!branchesMap.has(branchName)) {
+                    branchesMap.set(branchName, {
+                        branchName: branchName || 'N/A',
+                        products: []
+                    });
+                }
+
+                // Push the product details into the respective branch
+                branchesMap.get(branchName)?.products.push({
+                    id: Number(productId) || 0,
+                    name: productName || 'N/A',
+                    type: productType || 'N/A',
+                    count: Number(totalProducts) || 0
+                });
+            });
+
+            // Convert the map to an array of branch objects
+            const results = Array.from(branchesMap.values());
+
+            return results;
+
+        } catch (error) {
+            console.error('Error fetching product details by branch:', error);
+            throw new Error('Failed to fetch product details by branch');
+        }
+    }
 }
 

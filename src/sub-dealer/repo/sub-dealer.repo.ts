@@ -87,10 +87,9 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 sf.sub_dealer_id AS staffId,
                 sf.password AS staffPassword
             `)
-            .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword AND sf.designation = :designation`, {
+            .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword`, {
                 staffId: req.staffId,
-                staffPassword: req.password,
-                designation: DesignationEnum.SubDealer
+                staffPassword: req.password
             })
             .andWhere(`sf.company_code = :companyCode AND sf.unit_code = :unitCode`, {
                 companyCode: req.companyCode,

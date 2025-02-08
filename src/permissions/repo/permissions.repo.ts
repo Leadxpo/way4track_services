@@ -26,6 +26,7 @@ export class PermissionRepository extends Repository<PermissionEntity> {
                 'staff.phone_number AS phoneNumber',
                 'staff.dob AS dob',
                 'staff.address AS address',
+                'staff.email AS email',
                 'staff.aadhar_number AS aadharNumber',
                 'permission.role AS role',
                 'permission.permissions AS permissions',

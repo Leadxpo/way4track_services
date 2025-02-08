@@ -73,4 +73,15 @@ export class RequestRaiseController {
             return new CommonResponse(false, 500, 'Error deleting vendor details');
         }
     }
+
+    @Post('getTodayRequestBranchWise')
+    async getTodayRequestBranchWise(@Body() req: { companyCode: string, unitCode: string, branch?: string }) {
+        try {
+            return await this.requestService.getTodayRequestBranchWise(req);
+        } catch (error) {
+            console.error('Error in getTodayRequestBranchWise:', error);
+            return new CommonResponse(false, 500, "Error fetching today's requests");
+        }
+    }
+    
 }

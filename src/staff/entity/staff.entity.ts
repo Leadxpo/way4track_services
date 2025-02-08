@@ -22,7 +22,7 @@ export enum DesignationEnum {
   CEO = 'CEO',
   HR = 'HR',
   Accountant = 'Accountant',
-  Operator = 'Operator',
+  // Operator = 'Operator',
   WarehouseManager = 'Warehouse Manager',
   BranchManager = 'Branch Manager',
   SubDealer = 'Sub Dealer',
