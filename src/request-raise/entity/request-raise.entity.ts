@@ -33,7 +33,7 @@ export class RequestRaiseEntity extends BaseEntity {
     @JoinColumn({ name: 'request_to' })
     requestTo: StaffEntity;
 
-    @ManyToOne(() => SubDealerEntity, (staffEntity) => staffEntity.request)
+    @ManyToOne(() => SubDealerEntity, (staffEntity) => staffEntity.request, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
 

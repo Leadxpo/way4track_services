@@ -94,7 +94,7 @@ export class RequestRaiseService {
 
 
     async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
-        if (dto.id || dto.requestId) {
+        if (dto.id && dto.id != null || dto.requestId) {
             // Update if id or requestId is present
             return await this.updateRequestDetails(dto);
         } else {

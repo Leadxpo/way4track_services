@@ -2,7 +2,7 @@ import { GSTORTDSEnum } from "src/voucher/entity/voucher.entity";
 
 export class EstimateResDto {
     id: number;
-    clientId: string;
+    clientId: number;
     clientName: string;
     clientAddress: string;
     clientEmail: string;
@@ -30,7 +30,7 @@ export class EstimateResDto {
 
     constructor(
         id: number,
-        clientId: string,
+        clientId: number,
         clientName: string,
         clientAddress: string,
         clientEmail: string,

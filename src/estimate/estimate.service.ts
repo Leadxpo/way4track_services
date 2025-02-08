@@ -7,7 +7,7 @@ import { ProductRepository } from 'src/product/repo/product.repo';
 import { In, IsNull, Not } from 'typeorm';
 import { EstimateIdDto } from './dto/estimate-id.dto';
 import { EstimateResDto } from './dto/estimate-res.dto';
-import { EstimateDto } from './dto/estimate.dto';
+import { EstimateDto, ProductDetailDto } from './dto/estimate.dto';
 import { EstimateAdapter } from './estimate.adapter';
 import { EstimateRepository } from './repo/estimate.repo';
 import { CommonReq } from 'src/models/common-req';
@@ -15,6 +15,7 @@ import { Storage } from '@google-cloud/storage';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DataSource } from 'typeorm';
+import { EstimateEntity } from './entity/estimate.entity';
 @Injectable()
 export class EstimateService {
     private storage: Storage;
@@ -35,178 +36,45 @@ export class EstimateService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    // async updateEstimateDetails(dto: EstimateDto, estimatePdf: string | null, invoicePath: string | null): Promise<CommonResponse> {
-    //     try {
-    //         const existingEstimate = await this.estimateRepository.findOne({
-    //             where: { id: dto.id },
-    //             relations: ['products'],
-    //         });
-
-    //         if (!existingEstimate) {
-    //             return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
-    //         }
-
-    //         const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
-    //         if (!client) {
-    //             return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
-    //         }
-
-    //         const productIds = dto.productDetails.map((p) => p.productId);
-    //         const products = await this.productRepository.find({ where: { id: In(productIds) } });
-
-    //         if (products.length !== productIds.length) {
-    //             throw new Error('Some products in the provided details do not exist');
-    //         }
-
-    //         const productDetails = dto.productDetails.map((productDetail) => {
-    //             const product = products.find((p) => p.id === productDetail.productId);
-    //             const totalCost = product.price * productDetail.quantity;
-
-    //             return {
-    //                 productId: product.id,
-    //                 productName: product.productName,
-    //                 quantity: productDetail.quantity,
-    //                 costPerUnit: product.price,
-    //                 totalCost: totalCost,
-    //                 hsnCode: product.hsnCode
-    //             };
-    //         });
-
-    //         Object.assign(existingEstimate, this.estimateAdapter.convertDtoToEntity(dto));
-    //         existingEstimate.clientId = client;
-    //         existingEstimate.productDetails = productDetails;
-
-    //         let estimatePdfUrl: string | null = existingEstimate.estimatePdfUrl;
-
-    //         if (estimatePdf && existingEstimate.estimatePdfUrl) {
-    //             if (estimatePdf !== existingEstimate.estimatePdfUrl) {
-    //                 const existingFilePath = existingEstimate.estimatePdfUrl.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-    //                 const file = this.storage.bucket(this.bucketName).file(existingFilePath);
-
-    //                 try {
-    //                     await file.delete();
-    //                     console.log(`Deleted old file from GCS: ${existingFilePath}`);
-    //                 } catch (error) {
-    //                     console.error(`Error deleting old file from GCS: ${error.message}`);
-    //                 }
-    //             }
-
-    //             // Upload new PDF
-    //             if (existingEstimate.estimatePdfUrl.startsWith('data:application/pdf;base64,')) {
-    //                 // If the PDF is in base64 format
-    //                 const base64Data = dto.estimatePdfUrl.split(',')[1];
-    //                 const fileBuffer = Buffer.from(base64Data, 'base64');
-
-    //                 // Save the file to Google Cloud Storage
-    //                 const bucket = this.storage.bucket(this.bucketName);
-    //                 const uniqueFileName = `estimate_pdfs/${Date.now()}-estimate.pdf`;
-    //                 const gcsFile = bucket.file(uniqueFileName);
-
-    //                 await gcsFile.save(fileBuffer, {
-    //                     contentType: 'application/pdf',
-    //                     resumable: false,
-    //                 });
-
-    //                 await gcsFile.makePublic(); // Make the file publicly accessible
-    //                 estimatePdfUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-
-    //                 console.log(`PDF uploaded to GCS: ${estimatePdfUrl}`);
-    //             } else {
-    //                 // If the file is already a URL, store it directly
-    //                 estimatePdfUrl = estimatePdf;
-    //             }
-    //         }
-
-    //         // If converting to invoice, handle invoice PDF URL as well
-    //         if (dto.convertToInvoice) {
-    //             if (invoicePath && existingEstimate.invoicePdfUrl) {
-    //                 if (invoicePath !== existingEstimate.invoicePdfUrl) {
-    //                     const existingFilePath = existingEstimate.invoicePdfUrl.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-    //                     const file = this.storage.bucket(this.bucketName).file(existingFilePath);
-
-    //                     try {
-    //                         await file.delete();
-    //                         console.log(`Deleted old file from GCS: ${existingFilePath}`);
-    //                     } catch (error) {
-    //                         console.error(`Error deleting old file from GCS: ${error.message}`);
-    //                     }
-    //                 }
-
-
-    //             if (invoicePath.startsWith('data:application/pdf;base64,')) {
-    //                 const base64Data = invoicePath.split(',')[1];
-    //                 const fileBuffer = Buffer.from(base64Data, 'base64');
-
-    //                 // Save the invoice PDF to Google Cloud Storage
-    //                 const bucket = this.storage.bucket(this.bucketName);
-    //                 const uniqueInvoiceFileName = `invoices_pdfs/${Date.now()}-invoice.pdf`;
-    //                 const gcsFile = bucket.file(uniqueInvoiceFileName);
-
-    //                 await gcsFile.save(fileBuffer, {
-    //                     contentType: 'application/pdf',
-    //                     resumable: false,
-    //                 });
-
-    //                 await gcsFile.makePublic(); // Make the file publicly accessible
-    //                 invoicePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueInvoiceFileName}`;
-
-    //                 console.log(`Invoice PDF uploaded to GCS: ${invoicePath}`);
-    //             } else {
-    //                 // If the file is already a URL, store it directly
-    //                 invoicePdfUrl = dto.invoicePdfUrl;
-    //             }
-
-    //             // Save the invoice PDF URL to the estimate
-    //             existingEstimate.invoicePdfUrl = invoicePdfUrl;
-    //         }
-
-    //         // Calculate total amount
-    //         const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
-    //         existingEstimate.amount = totalAmount;
-
-    //         // Generate Invoice ID if converting to invoice
-    //         if (dto.convertToInvoice) {
-    //             existingEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(client));
-    //             existingEstimate.CGST = (totalAmount * dto.cgstPercentage) / 100;
-    //             existingEstimate.SCST = (totalAmount * dto.scstPercentage) / 100;
-    //         }
-
-    //         // Save the updated estimate
-    //         await this.estimateRepository.save(existingEstimate);
-
-    //         return new CommonResponse(true, 200, 'Estimate details updated successfully');
-    //     } catch (error) {
-    //         console.error(`Error updating estimate details: ${error.message}`, error.stack);
-    //         throw new ErrorResponse(500, `Failed to update estimate details: ${error.message}`);
-    //     }
-    // }
     async updateEstimateDetails(
         dto: EstimateDto,
         estimatePdf: string | null,
         invoicePath: string | null
     ): Promise<CommonResponse> {
         try {
-            const existingEstimate = await this.estimateRepository.findOne({
-                where: { id: dto.id },
-                relations: ['products'],
-            });
-    
+
+            let existingEstimate: EstimateEntity | null = null;
+
+            if (!dto.id && !dto.estimateId) {
+                return new CommonResponse(false, 400, 'Either Estimate ID or Estimate ID must be provided');
+            }
+            if (dto.id) {
+                existingEstimate = await this.estimateRepository.findOne({ where: { id: dto.id } });
+            } else if (dto.clientId) {
+                existingEstimate = await this.estimateRepository.findOne({ where: { estimateId: dto.estimateId } });
+            }
+
+            if (!existingEstimate) {
+                return new CommonResponse(false, 404, `Estimate with ID ${dto.id || dto.estimateId} not found`);
+            }
+
+
             if (!existingEstimate) {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
             }
-    
-            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
+
+            const client = await this.clientRepository.findOne({ where: { id: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
-    
+
             const productIds = dto.productDetails.map((p) => p.productId);
             const products = await this.productRepository.find({ where: { id: In(productIds) } });
-    
+
             if (products.length !== productIds.length) {
                 throw new Error('Some products in the provided details do not exist');
             }
-    
+
             const productDetails = dto.productDetails.map((productDetail) => {
                 const product = products.find((p) => p.id === productDetail.productId);
                 return {
@@ -218,44 +86,62 @@ export class EstimateService {
                     hsnCode: product.hsnCode,
                 };
             });
-    
+
             const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
-            Object.assign(existingEstimate, this.estimateAdapter.convertDtoToEntity(dto));
+
+
             existingEstimate.clientId = client;
             existingEstimate.productDetails = productDetails;
             existingEstimate.amount = totalAmount;
-    
+
+
             // Handle Estimate PDF Upload
+
+            const updatedValues = this.estimateAdapter.convertDtoToEntity(dto);
+            updatedValues.clientId = client
             if (estimatePdf) {
                 existingEstimate.estimatePdfUrl = await this.handleFileUpload(
                     estimatePdf,
                     existingEstimate.estimatePdfUrl,
                     'estimate_pdfs'
                 );
+                dto.estimatePdfUrl = existingEstimate.estimatePdfUrl
+                updatedValues.estimatePdfUrl = existingEstimate.estimatePdfUrl;
+
             }
-    
+            updatedValues.productDetails = productDetails
+            updatedValues.amount = totalAmount
             if (dto.convertToInvoice) {
-                existingEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(client));
-                existingEstimate.CGST = (totalAmount * dto.cgstPercentage) / 100;
-                existingEstimate.SCST = (totalAmount * dto.scstPercentage) / 100;
-    
+                const invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
+                dto.invoiceId = invoiceId
+                updatedValues.invoiceId = invoiceId;
+
+                // existingEstimate.CGST = (totalAmount * dto.cgstPercentage) / 100;
+                // existingEstimate.SCST = (totalAmount * dto.scstPercentage) / 100;
                 if (invoicePath) {
                     existingEstimate.invoicePdfUrl = await this.handleFileUpload(
                         invoicePath,
                         existingEstimate.invoicePdfUrl,
                         'invoices_pdfs'
                     );
+                    dto.invoicePdfUrl = existingEstimate.invoicePdfUrl
+                    updatedValues.invoicePdfUrl = existingEstimate.invoicePdfUrl;
+
                 }
             }
-    
-            await this.estimateRepository.save(existingEstimate);
+            updatedValues.CGST = (totalAmount * dto.cgstPercentage) / 100;
+            updatedValues.SCST = (totalAmount * dto.scstPercentage) / 100;
+            Object.assign(existingEstimate, updatedValues);
+            await this.estimateRepository.update({ estimateId: existingEstimate.estimateId }, updatedValues);
+
+            // await this.estimateRepository.save(existingEstimate);
             return new CommonResponse(true, 200, 'Estimate details updated successfully');
         } catch (error) {
             console.error(`Error updating estimate details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update estimate details: ${error.message}`);
         }
     }
-    
+
     private async handleFileUpload(newFile: string, existingFileUrl: string | null, folder: string): Promise<string> {
         if (existingFileUrl && newFile !== existingFileUrl) {
             const existingFilePath = existingFileUrl.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
@@ -267,65 +153,66 @@ export class EstimateService {
                 console.error(`Error deleting old file: ${error.message}`);
             }
         }
-    
+
         if (newFile.startsWith('data:application/pdf;base64,')) {
             const base64Data = newFile.split(',')[1];
             const fileBuffer = Buffer.from(base64Data, 'base64');
-    
+
             const uniqueFileName = `${folder}/${Date.now()}.pdf`;
             const gcsFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
-    
+
             await gcsFile.save(fileBuffer, {
                 contentType: 'application/pdf',
                 resumable: false,
             });
-    
+
             await gcsFile.makePublic();
             return `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
         return newFile;
     }
- 
+
+    private async uploadFileToGCS(file: Express.Multer.File, folder: string): Promise<string> {
+        let url: string | null = null
+        const bucket = this.storage.bucket(this.bucketName);
+        const uniqueFileName = `${folder}/${Date.now()}-${file.originalname}`;
+        const gcsFile = bucket.file(uniqueFileName);
+
+        await gcsFile.save(file.buffer, {
+            contentType: file.mimetype,
+            resumable: false,
+        });
+
+        console.log(`File uploaded to GCS: ${uniqueFileName}`);
+        url = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        return url;
+    }
+
+
     async createEstimateDetails(dto: EstimateDto, estimatePdf: string | null): Promise<CommonResponse> {
-        // const queryRunner = this.dataSource.createQueryRunner();
-        // await queryRunner.startTransaction();
-
         try {
-            // let estimatePdfUrl: string | null = null;
-
-            // if (dto.estimatePdfUrl) {
-            //     if (dto.estimatePdfUrl.startsWith('data:application/pdf;base64,')) {
-            //         const base64Data = dto.estimatePdfUrl.split(',')[1];
-            //         const fileBuffer = Buffer.from(base64Data, 'base64');
-
-            //         const bucket = this.storage.bucket(this.bucketName);
-            //         const uniqueFileName = `estimate_pdfs/${Date.now()}-estimate.pdf`;
-            //         const gcsFile = bucket.file(uniqueFileName);
-
-            //         await gcsFile.save(fileBuffer, {
-            //             contentType: 'application/pdf',
-            //             resumable: false,
-            //         });
-
-            //         await gcsFile.makePublic();
-            //         estimatePdfUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-            //         console.log(`PDF uploaded to GCS: ${estimatePdfUrl}`);
-            //     } else {
-            //         estimatePdfUrl = dto.estimatePdfUrl;
-            //     }
-            // }
-
+            console.log(dto, "{{{{{{{{{{{{{{{");
 
             const client = await this.clientRepository.findOne({
-                where: { clientId: dto.clientId },
+                where: { id: dto.clientId },
             });
 
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
 
+            // Ensure productDetails is always an array
+            const productDetailsArray: ProductDetailDto[] =
+                typeof dto.productDetails === "string"
+                    ? JSON.parse(dto.productDetails)
+                    : dto.productDetails;
+
+            if (!Array.isArray(productDetailsArray)) {
+                throw new Error("Invalid productDetails format. Expected an array.");
+            }
+            console.log(productDetailsArray, "productDetailsArray")
             const productDetails = await Promise.all(
-                dto.productDetails.map(async (productDetail) => {
+                productDetailsArray.map(async (productDetail) => {
                     const product = await this.productRepository.findOne({
                         where: { id: productDetail.productId },
                     });
@@ -363,67 +250,57 @@ export class EstimateService {
             newEstimate.productDetails = productDetails;
             newEstimate.amount = totalAmount || 0;
             newEstimate.estimateId = `EST-${(await this.estimateRepository.count() + 1).toString().padStart(4, '0')}`;
-            // newEstimate.estimatePdfUrl = estimatePdfUrl;
+
+
             if (estimatePdf) {
-                newEstimate.estimatePdfUrl = estimatePdf;
+                newEstimate.estimatePdfUrl = await this.handleFileUpload(
+                    estimatePdf,
+                    newEstimate.estimatePdfUrl,
+                    'estimate_pdfs'
+                );
+                dto.estimatePdfUrl = newEstimate.estimatePdfUrl
             }
             console.log(newEstimate, "___________");
 
             await this.estimateRepository.insert(newEstimate);
 
-            // await queryRunner.commitTransaction();
             return new CommonResponse(true, 201, 'Estimate details created successfully');
         } catch (error) {
-            // await queryRunner.rollbackTransaction();
             console.error(`Error creating estimate details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create estimate details: ${error.message}`);
         }
     }
 
 
-    private async getInvoiceCount(client: ClientEntity): Promise<number> {
-        return this.estimateRepository.count({ where: { clientId: client, invoiceId: Not(IsNull()) } });
-    }
+    async uploadAndHandleEstimateDetails(
+        dto: EstimateDto,
+        files: { estimatePdf?: Express.Multer.File[], invoicePDF?: Express.Multer.File[] }
+    ): Promise<CommonResponse> {
+        try {
+            let estimatePath: string | null = null;
+            let invoicePath: string | null = null;
 
-    async handleEstimateDetails(dto: EstimateDto, estimatePdf?: Express.Multer.File, invoicePDF?: Express.Multer.File): Promise<CommonResponse> {
-        let estimatePath: string | null = null;
-        let invoicePath: string | null = null;
+            if (files?.estimatePdf?.length) {
+                estimatePath = await this.uploadFileToGCS(files.estimatePdf[0], 'estimate_Pdfs');
+            }
 
-        if (invoicePDF) {
-            const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `invoice_Pdfs/${Date.now()}-${invoicePDF.originalname}`;
-            const file = bucket.file(uniqueFileName);
-
-            await file.save(invoicePDF.buffer, {
-                contentType: invoicePDF.mimetype,
-                resumable: false,
-            });
-
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            estimatePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-        }
-        if (estimatePdf) {
-            const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `estimate_Pdfs/${Date.now()}-${estimatePdf.originalname}`;
-            const file = bucket.file(uniqueFileName);
-
-            await file.save(estimatePdf.buffer, {
-                contentType: estimatePdf.mimetype,
-                resumable: false,
-            });
-
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            estimatePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-        }
-
-        if (dto.id && dto.id !== null && dto.estimateId && dto.estimateId.trim() !== '') {
-            return await this.updateEstimateDetails(dto, estimatePath, invoicePath);  // Pass estimatePath (string) instead of estimatePdf (File)
-        } else {
-            return await this.createEstimateDetails(dto, estimatePath);  // Pass estimatePath (string) instead of estimatePdf (File)
+            if (files?.invoicePDF?.length) {
+                invoicePath = await this.uploadFileToGCS(files.invoicePDF[0], 'invoice_Pdfs');
+            }
+            return (dto.id && dto.id !== null) || (dto.estimateId && dto.estimateId.trim() !== '')
+                ? await this.updateEstimateDetails(dto, estimatePath, invoicePath)
+                : await this.createEstimateDetails(dto, estimatePath);
+        } catch (error) {
+            console.error('Error in uploadAndHandleEstimateDetails:', error);
+            return new CommonResponse(false, 500, 'Error processing estimate details');
         }
     }
 
 
+
+    private async getInvoiceCount(id: number): Promise<number> {
+        return this.estimateRepository.count({ where: { id: id, invoiceId: Not(IsNull()) } });
+    }
 
     private generateInvoiceId(sequenceNumber: number): string {
         const paddedNumber = sequenceNumber.toString().padStart(4, '0');

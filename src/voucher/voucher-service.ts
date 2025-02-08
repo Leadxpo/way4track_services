@@ -97,7 +97,7 @@ export class VoucherService {
         }
     }
 
-    async createVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
+    async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
         try {
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
@@ -175,7 +175,6 @@ export class VoucherService {
 
             // Set Voucher ID
             voucherEntity.voucherId = generatedVoucherId;
-            let receiptPdfUrl: string | null = null;
 
             // Handle Invoice Payment
             if (voucherDto.invoice && VoucherTypeEnum.RECEIPT) {
@@ -183,31 +182,12 @@ export class VoucherService {
                 if (!estimate) {
                     throw new ErrorResponse(4001, 'Estimate not found.');
                 }
-                if (voucherDto.receiptPdfUrl) {
-                    if (voucherDto.receiptPdfUrl.startsWith('data:application/pdf;base64,')) {
-                        const base64Data = voucherDto.receiptPdfUrl.split(',')[1];
-                        const fileBuffer = Buffer.from(base64Data, 'base64');
 
-                        const bucket = this.storage.bucket(this.bucketName);
-                        const uniqueFileName = `receipt_pdfs/${Date.now()}-receipt.pdf`;  // Changed to reflect receipt PDF
-                        const gcsFile = bucket.file(uniqueFileName);
-
-                        await gcsFile.save(fileBuffer, {
-                            contentType: 'application/pdf',
-                            resumable: false,
-                        });
-
-                        await gcsFile.makePublic();
-                        receiptPdfUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-                        console.log(`PDF uploaded to GCS: ${receiptPdfUrl}`);
-                    } else {
-                        receiptPdfUrl = voucherDto.receiptPdfUrl;
-                    }
-
-                    // Store receiptPdfUrl in the estimate entity against the invoiceId
-                    estimate.receiptPdfUrl = receiptPdfUrl;
-                    await this.estimateRepo.save(estimate); // Save the updated estimate with the receipt PDF URL
+                if (receiptPdf) {
+                    estimate.receiptPdfUrl = receiptPdf;
+                    await this.estimateRepo.save(estimate);
                 }
+
             }
 
             // Insert the voucher record
@@ -226,8 +206,6 @@ export class VoucherService {
             );
         }
     }
-
-
 
     private calculateNextDueDate(lastPaidDate: Date): Date {
         const nextDueDate = new Date(lastPaidDate);
@@ -364,8 +342,22 @@ export class VoucherService {
         }
     }
 
-    async handleVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
+    async handleVoucher(voucherDto: VoucherDto, pdf?: Express.Multer.File): Promise<CommonResponse> {
         try {
+            let filePath: string | null = null;
+            if (pdf) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `receipt_pdfs/${Date.now()}-${pdf.originalname}`;
+                const file = bucket.file(uniqueFileName);
+
+                await file.save(pdf.buffer, {
+                    contentType: pdf.mimetype,
+                    resumable: false,
+                });
+
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+            }
             if (voucherDto.voucherId && voucherDto.id) {
                 return await this.updateVoucher(voucherDto);
             }
@@ -373,7 +365,7 @@ export class VoucherService {
                 return await this.createOrPayEmi(voucherDto);
             }
             else {
-                return await this.createVoucher(voucherDto);
+                return await this.createVoucher(voucherDto, filePath);
             }
         } catch (error) {
             console.error(`Error in handleVoucher: ${error.message}`, error.stack);

@@ -22,7 +22,7 @@ export class EstimateAdapter {
         entity.unitCode = dto.unitCode;
 
         const clientEntity = new ClientEntity();
-        clientEntity.clientId = dto.clientId;
+        clientEntity.id = dto.clientId;
         entity.clientId = clientEntity;
         entity.quantity = dto.quantity
 
@@ -98,7 +98,7 @@ export class EstimateAdapter {
     convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
         return entities.map(entity => new EstimateResDto(
             entity.id,
-            entity.clientId ? entity.clientId.clientId : '',  // ✅ Null check added
+            entity.clientId ? entity.clientId.id : null,  // ✅ Null check added
             entity.clientId ? entity.clientId.name : '',  // ✅ Null check added
             entity.clientId ? entity.clientId.address : '',
             entity.clientId ? entity.clientId.email : '',

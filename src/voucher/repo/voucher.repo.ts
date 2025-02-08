@@ -238,10 +238,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
-                've.voucher_id AS ledgerId',
+                // 'cl.client_id AS clientId',
                 'cl.name AS clientName',
                 'sb.name AS subDealerName',
+                'sb.sub_dealer_id AS subDealerId',
                 'vr.name AS vendorName',
+                'vr.vendor_id AS vendorId',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
                 'cl.phone_number AS phoneNumber',
@@ -510,6 +512,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
     async getYearWiseCreditAndDebitPercentages(req: BranchChartDto) {
+        // Ensure that req.date is treated as a number
+        const year = Number(req.date); // Convert to number
+
+        // Check if the conversion is successful
+        if (isNaN(year)) {
+            throw new Error('Invalid year provided');
+        }
+
         const query = this.createQueryBuilder('ve')
             .select([
                 `YEAR(ve.generation_date) AS year`,
@@ -522,15 +532,21 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
-            .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
-            .andWhere(`ve.company_code = "${req.companyCode}"`)
-            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+            // Include data for the selected year and the previous 4 years
+            .andWhere('YEAR(ve.generation_date) BETWEEN :startYear AND :endYear', {
+                startYear: year - 4,  // 4 years before the selected year
+                endYear: year,        // Selected year
+            })
+            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
             .groupBy('YEAR(ve.generation_date), ve.product_type')
             .orderBy('YEAR(ve.generation_date), ve.product_type')
             .getRawMany();
 
         return query;
     }
+
+
 
     async getTotalProductAndServiceSales(req: CommonReq) {
         const query = await this.createQueryBuilder('ve')

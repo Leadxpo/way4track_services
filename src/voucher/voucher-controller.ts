@@ -1,17 +1,25 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VoucherDto } from './dto/voucher.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { VoucherIdDto } from './dto/voucher-id.dto';
 import { VoucherService } from './voucher-service';
-
+import * as multer from 'multer';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('voucher')
 export class VoucherController {
     constructor(private readonly voucherService: VoucherService) { }
-
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     @Post('saveVoucher')
-    async saveVoucher(@Body() dto: VoucherDto): Promise<CommonResponse> {
+    async saveVoucher(@Body() dto: VoucherDto,
+        @UploadedFile() file?: Express.Multer.File,): Promise<CommonResponse> {
         try {
-            const savedVoucher = await this.voucherService.handleVoucher(dto);
+            const savedVoucher = await this.voucherService.handleVoucher(dto, file);
             return new CommonResponse(true, 200, 'Voucher saved successfully', savedVoucher);
         } catch (error) {
             console.error('Error in save voucher details:', error);
