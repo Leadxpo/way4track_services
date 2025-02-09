@@ -132,7 +132,11 @@ export class WorkAllocationService {
 
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
-        if (dto.id || dto.workAllocationNumber) {
+        const workAllocation = await this.workAllocationRepository.findOne({
+            where: { id: dto.id },
+            relations: ['staffId', 'productDetails'],
+        });
+        if (workAllocation) {
             // If an ID is provided, update the work allocation details
             return await this.updateWorkAllocationDetails(dto);
         } else {

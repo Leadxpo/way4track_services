@@ -496,8 +496,7 @@ export class DashboardController {
 
     @Post('getLedgerDataById')
     async getLedgerDataById(@Body() req: {
-        voucherId?: number; companyCode?: string;
-        unitCode?: string
+        subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getLedgerDataById(req)

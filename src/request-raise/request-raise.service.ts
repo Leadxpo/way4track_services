@@ -94,7 +94,10 @@ export class RequestRaiseService {
 
 
     async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
-        if (dto.id && dto.id != null || dto.requestId) {
+        const existingRequest = await this.requestRepository.findOne({
+            where: { id: dto.id, requestId: dto.requestId }
+        });
+        if (existingRequest) {
             // Update if id or requestId is present
             return await this.updateRequestDetails(dto);
         } else {

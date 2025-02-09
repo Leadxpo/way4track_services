@@ -227,14 +227,8 @@ export class ProductAssignService {
                 photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
             // Handle photo upload
-
-
-            if (dto.id && dto.id !== null) {
-                // If ID exists, validate it before updating
-                const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
-                if (!existingProduct) {
-                    throw new ErrorResponse(404, `Product with ID ${dto.id} not found`);
-                }
+            const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+            if (existingProduct) {
                 return await this.updateProductAssign(dto, photoPath);
             } else {
                 // Create a new Product

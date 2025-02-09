@@ -54,7 +54,10 @@ export class AppointmentService {
     }
 
     async handleAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
-        if (dto.id) {
+        const existingAppointment = await this.appointmentRepository.findOne({
+            where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
+        });
+        if (existingAppointment) {
             // If an ID is provided, update the appointment details
             return await this.updateAppointmentDetails(dto);
         } else {

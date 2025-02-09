@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PermissionEntity } from "./entity/permissions.entity";
 import { PermissionsDto } from "./dto/permissions.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
+import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 @Injectable()
 export class PermissionAdapter {
     convertPermissionDtoToEntity(dto: PermissionsDto): PermissionEntity {
@@ -12,6 +13,9 @@ export class PermissionAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.permissions = dto.permissions;
+        const sub = new SubDealerEntity()
+        sub.id = dto.subDealerId
+        entity.subDealerId = sub
         // entity.designation = dto.designation;
         // entity.role = dto.role
         const staff = new StaffEntity();

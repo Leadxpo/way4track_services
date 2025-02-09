@@ -85,8 +85,11 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
         const query = this.createQueryBuilder('sf')
             .select(`
                 sf.sub_dealer_id AS staffId,
-                sf.password AS staffPassword
+                sf.password AS staffPassword,
+                sf.name as staffName,
+                pa.permissions AS staffPermissions
             `)
+            .leftJoin('sf.permissions', 'pa')
             .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword`, {
                 staffId: req.staffId,
                 staffPassword: req.password

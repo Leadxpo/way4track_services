@@ -215,8 +215,7 @@ export class VoucherDashboardService {
     }
 
     async getLedgerDataById(req: {
-        voucherId?: number; companyCode?: string;
-        unitCode?: string
+        subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getLedgerDataById(req)
         if (!VoucherData) {

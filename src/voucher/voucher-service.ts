@@ -345,33 +345,55 @@ export class VoucherService {
     async handleVoucher(voucherDto: VoucherDto, pdf?: Express.Multer.File): Promise<CommonResponse> {
         try {
             let filePath: string | null = null;
+
+            // 🔹 Upload file to Google Cloud Storage if provided
             if (pdf) {
-                const bucket = this.storage.bucket(this.bucketName);
-                const uniqueFileName = `receipt_pdfs/${Date.now()}-${pdf.originalname}`;
-                const file = bucket.file(uniqueFileName);
+                try {
+                    const bucket = this.storage.bucket(this.bucketName);
+                    const uniqueFileName = `receipt_pdfs/${Date.now()}-${pdf.originalname}`;
+                    const file = bucket.file(uniqueFileName);
 
-                await file.save(pdf.buffer, {
-                    contentType: pdf.mimetype,
-                    resumable: false,
-                });
+                    await file.save(pdf.buffer, {
+                        contentType: pdf.mimetype,
+                        resumable: false,
+                    });
 
-                console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                    console.log(`✅ File uploaded to GCS: ${uniqueFileName}`);
+                    filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                } catch (fileError) {
+                    console.error(`❌ File upload failed: ${fileError.message}`, fileError.stack);
+                    throw new ErrorResponse(5418, `Failed to upload file: ${fileError.message}`);
+                }
             }
-            if (voucherDto.voucherId && voucherDto.id) {
+
+            // 🔹 Check if voucher already exists
+            const existingVoucher = await this.voucherRepository.findOne({
+                where: {
+                    voucherId: voucherDto.voucherId,
+                    companyCode: voucherDto.companyCode,
+                    unitCode: voucherDto.unitCode,
+                },
+            });
+
+            if (existingVoucher) {
+                console.log(`🔄 Updating existing voucher with ID: ${voucherDto.voucherId}`);
                 return await this.updateVoucher(voucherDto);
             }
-            else if (voucherDto.voucherType === VoucherTypeEnum.EMI) {
+
+            if (voucherDto.voucherType === VoucherTypeEnum.EMI) {
+                console.log(`💳 Handling EMI voucher for ID: ${voucherDto.voucherId}`);
                 return await this.createOrPayEmi(voucherDto);
             }
-            else {
-                return await this.createVoucher(voucherDto, filePath);
-            }
+
+            console.log(`🆕 Creating new voucher with ID: ${voucherDto.voucherId}`);
+            return await this.createVoucher(voucherDto, filePath);
+
         } catch (error) {
-            console.error(`Error in handleVoucher: ${error.message}`, error.stack);
+            console.error(`❌ Error in handleVoucher: ${error.message}`, error.stack);
             throw new ErrorResponse(5417, `Failed to handle voucher: ${error.message}`);
         }
     }
+
 
     async getAllVouchers(): Promise<VoucherResDto[]> {
         const vouchers = await this.voucherRepository.find();

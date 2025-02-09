@@ -54,6 +54,8 @@ export class VoucherResDto {
     invoice?: number
     invoiceId?: string
     paymentTo?: string
+    receiptPdfUrl?: string
+
     constructor(
         id: number,
         name: string,
@@ -103,6 +105,8 @@ export class VoucherResDto {
         invoice?: number,
         invoiceId?: string,
         paymentTo?: string,
+        receiptPdfUrl?: string
+
     ) {
         this.id = id;
         this.name = name;
@@ -152,5 +156,7 @@ export class VoucherResDto {
         this.invoice = invoice;
         this.invoiceId = invoiceId;
         this.paymentTo = paymentTo
+        this.receiptPdfUrl = receiptPdfUrl
+
     }
 }

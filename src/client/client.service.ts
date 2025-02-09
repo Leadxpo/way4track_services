@@ -46,7 +46,11 @@ export class ClientService {
                 console.log(`File uploaded to GCS: ${uniqueFileName}`);
                 photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
-            if (dto.id && dto.id !== null && dto.clientId && dto.clientId.trim() !== '') {
+
+            const existingStaff = await this.clientRepository.findOne({
+                where: [{ id: dto.id }, { clientId: dto.clientId }],
+            });
+            if (existingStaff) {
                 return await this.updateClientDetails(dto, photoPath);
             } else {
                 // Create a new client

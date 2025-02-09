@@ -71,6 +71,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Roles } from '../dto/role.enum';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Entity('permissions')
 export class PermissionEntity {
@@ -101,6 +102,10 @@ export class PermissionEntity {
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.permissions)
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
+
+    @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.permissions)
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealerId: SubDealerEntity;
 }
 
 export class Permission {

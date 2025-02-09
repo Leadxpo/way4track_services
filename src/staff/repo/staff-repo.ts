@@ -7,6 +7,7 @@ import { StaffAttendanceQueryDto } from "../dto/staff-date.dto";
 import { LoginDto } from "src/login/dto/login.dto";
 import { StaffSearchDto } from "../dto/staff-search.dto";
 import { CommonReq } from "src/models/common-req";
+import { PermissionEntity } from "src/permissions/entity/permissions.entity";
 
 
 @Injectable()
@@ -153,8 +154,11 @@ export class StaffRepository extends Repository<StaffEntity> {
             .select(`
                 sf.staff_id AS staffId,
                 sf.password AS staffPassword,
-                sf.designation AS staffDesignation
+                sf.designation AS staffDesignation,
+                sf.name AS staffName,
+                pa.permissions as staffPermissions
             `)
+            .leftJoin('sf.permissions', 'pa')
             .where(
                 `sf.staff_id = :staffId AND sf.password = :password AND sf.designation = :designation`,
                 {
@@ -174,7 +178,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         return query;
     }
 
-    async getStaffSearchDetails(req: StaffSearchDto) {
+       async getStaffSearchDetails(req: StaffSearchDto) {
         const query = this.createQueryBuilder('staff')
             .select([
                 'branch.name AS branchName',

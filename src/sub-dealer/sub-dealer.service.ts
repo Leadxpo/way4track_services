@@ -97,8 +97,11 @@ export class SubDealerService {
         console.log(`File uploaded to GCS: ${uniqueFileName}`);
         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
+      const existingSubDealer = await this.subDealerRepository.findOne({
+        where: { id: dto.id, subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode },
+      });
 
-      if (dto.id && dto.id !== null && dto.subDealerId && dto.subDealerId.trim() !== '') {
+      if (existingSubDealer) {
         return await this.updateSubDealerDetails(dto, filePath);
       } else {
         return await this.createSubDealerDetails(dto, filePath);
@@ -162,7 +165,7 @@ export class SubDealerService {
 
   async getSubDealerProfileDetails(req: LoginDto): Promise<CommonResponse> {
     try {
-      const subDealer = await this.subDealerRepository.find({ where: { subDealerId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
+      const subDealer = await this.subDealerRepository.find({ where: { subDealerId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch', 'permissions'] });
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }

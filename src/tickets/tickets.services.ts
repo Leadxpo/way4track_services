@@ -68,7 +68,11 @@ export class TicketsService {
 
 
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
-        if (dto.id && dto.id !== null) {
+        const existingTicket = await this.ticketsRepository.findOne({
+            where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
+        });
+
+        if (existingTicket) {
             // If an ID is provided, update the ticket details
             return await this.updateTicketDetails(dto);
         } else {

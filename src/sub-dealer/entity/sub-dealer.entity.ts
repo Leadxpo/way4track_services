@@ -1,4 +1,5 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -62,4 +63,7 @@ export class SubDealerEntity {
 
   @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.subDealerId)
+  permissions: PermissionEntity[];
 }

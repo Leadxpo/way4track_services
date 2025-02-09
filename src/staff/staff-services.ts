@@ -12,6 +12,7 @@ import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
 import { PermissionsDto } from 'src/permissions/dto/permissions.dto';
 import { PermissionsService } from 'src/permissions/permissions.services';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 
 @Injectable()
@@ -52,38 +53,24 @@ export class StaffService {
                 filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
 
-            // ✅ Ensure `id` and `staffId` are properly validated before deciding between update and create
-            if (req.id && req.id !== null && req.staffId && req.staffId.trim() !== '') {
-                // If valid `id` or `staffId` is provided, update the staff details
+            // 🔍 Step 1: Check if staff record already exists
+            const existingStaff = await this.staffRepository.findOne({
+                where: [{ id: req.id }, { staffId: req.staffId }],
+            });
+
+            if (existingStaff) {
+                console.log("🔄 Updating existing staff record...");
                 return await this.updateStaffDetails(req, filePath);
             } else {
-                // If no valid ID is provided, create a new staff record
+                console.log("🆕 Creating a new staff record...");
                 return await this.createStaffDetails(req, filePath);
             }
         } catch (error) {
-            console.error(`Error handling staff details: ${error.message}`, error.stack);
+            console.error(`❌ Error handling staff details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
         }
     }
 
-
-    // async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
-    //     try {
-    //         console.log(req, "req")
-    //         const newStaff = this.adapter.convertDtoToEntity(req);
-    //         newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
-    //         if (filePath) {
-    //             newStaff.staffPhoto = filePath;
-    //         }
-    //         console.log(newStaff, "new")
-    //         await this.staffRepository.insert(newStaff);
-    //         // await this.staffRepository.save(newStaff);
-    //         return new CommonResponse(true, 65152, 'Staff Details Created Successfully');
-    //     } catch (error) {
-    //         console.error(`Error creating staff details: ${error.message}`, error.stack);
-    //         throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
-    //     }
-    // }
 
     async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
         try {
@@ -153,16 +140,19 @@ export class StaffService {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-
-            // ✅ Merge the updates, keeping the old photo if none is provided
             const staffEntity = this.adapter.convertDtoToEntity(req);
             const updatedStaff = {
                 ...existingStaff,
                 ...staffEntity,
+                id: existingStaff.id,  // 🔴 Ensure ID is retained to prevent insert!
                 staffPhoto: filePath || existingStaff.staffPhoto, // ✅ Keep old photo if no new one is uploaded
             };
 
-            await this.staffRepository.save(updatedStaff);
+            await this.staffRepository.update(existingStaff.id, updatedStaff);
+            // ✅ Merge the updates, keeping the old photo if none is provided
+
+
+            // await this.staffRepository.save(updatedStaff);
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
             console.error(`Error updating staff details: ${error.message}`, error.stack);
@@ -197,27 +187,38 @@ export class StaffService {
 
     async getStaffDetailsById(req: StaffIdDto): Promise<CommonResponse> {
         try {
-            const staff = await this.staffRepository.find({
-                relations: ['branch', 'voucherId'],
-                where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
-            });
+            const staff = await this.staffRepository.createQueryBuilder('staff')
+                .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .leftJoinAndSelect('staff.voucherId', 'voucher')
+                .leftJoinAndSelect('staff.staffFrom', 'staffFrom')
+                .leftJoinAndSelect('staff.staffTo', 'staffTo')
+                .leftJoinAndSelect('staff.request', 'request')
+                .leftJoinAndSelect('staff.productAssign', 'productAssign')
+                .where('staff.staffId = :staffId', { staffId: req.staffId })
+                .andWhere('staff.companyCode = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.unitCode = :unitCode', { unitCode: req.unitCode })
+                .getOne();
 
-            if (!staff.length) {
-                return new CommonResponse(false, 404, 'staff not found');
-            } else {
-                const data = this.adapter.convertEntityToDto(staff)
-                return new CommonResponse(true, 200, 'staff details fetched successfully', data);
+            if (!staff) {
+                return new CommonResponse(false, 404, 'Staff not found');
             }
+            console.log(staff);  // Log the result before conversion to DTO
+
+            // const data = this.adapter.convertEntityToDto([staff]);
+            // console.log(data);  // Log the result before conversion to DTO
+
+            return new CommonResponse(true, 200, 'Staff details fetched successfully', staff);
         } catch (error) {
-            console.error("Error in getstaffDetails service:", error);
+            console.error("Error in getStaffDetailsById service:", error);
             return new CommonResponse(false, 500, 'Error fetching staff details');
         }
     }
 
+
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
             const staff = await this.staffRepository.find({
-                relations: ['branch', 'voucherId', 'notifications'],
+                relations: ['branch', 'voucherId', 'notifications', 'permissions'],
                 where: {
                     staffId: req.staffId, password: req.password,
                     designation: req.designation, companyCode: req.companyCode, unitCode: req.unitCode

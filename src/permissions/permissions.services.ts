@@ -240,7 +240,7 @@ export class PermissionsService {
             console.log("Entity Before Save:", entity);
 
             // Save the permission entity
-            await this.repo.save(entity);
+            await this.repo.insert(entity);
 
             return new CommonResponse(true, 65152, 'Permission Details Created Successfully');
         } catch (error) {
@@ -285,6 +285,7 @@ export class PermissionsService {
         try {
             const permissions = await this.repo.findOne({
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                relations: ['subDealerId', 'staffId']
             });
 
             if (!permissions) {

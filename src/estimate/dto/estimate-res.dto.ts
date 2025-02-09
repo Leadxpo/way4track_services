@@ -27,7 +27,8 @@ export class EstimateResDto {
     vendorId?: number;
     vendorName?: string;
     vendorPhoneNumber?: string
-
+    estimatePdfUrl: string;
+    invoicePdfUrl: string
     constructor(
         id: number,
         clientId: number,
@@ -52,7 +53,9 @@ export class EstimateResDto {
         // hsnCode?: string,
         vendorId?: number,
         vendorName?: string,
-        vendorPhoneNumber?: string
+        vendorPhoneNumber?: string,
+        estimatePdfUrl?: string,
+        invoicePdfUrl?: string
 
     ) {
         this.id = id;
@@ -79,5 +82,8 @@ export class EstimateResDto {
         this.vendorId = vendorId
         this.vendorName = vendorName;
         this.vendorPhoneNumber = vendorPhoneNumber
+        this.estimatePdfUrl = estimatePdfUrl
+        this.invoicePdfUrl = invoicePdfUrl
+
     }
 }

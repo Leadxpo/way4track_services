@@ -8,38 +8,38 @@ import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 @Injectable()
 export class StaffAdapter {
     convertDtoToEntity(dto: StaffDto): StaffEntity {
-    const entity = new StaffEntity();
-    entity.name = dto.name;
-    entity.phoneNumber = dto.phoneNumber;
-    entity.staffPhoto = dto.staffPhoto;
-    entity.designation = dto.designation;
-    entity.dob = dto.dob;
-    entity.email = dto.email;
-    entity.aadharNumber = dto.aadharNumber;
-    entity.address = dto.address;
-    entity.joiningDate = dto.joiningDate;
-    entity.basicSalary = dto.basicSalary;
-    entity.companyCode = dto.companyCode;
-    entity.unitCode = dto.unitCode;
-    entity.password = dto.password;
-    entity.beforeExperience = dto.beforeExperience;
+        const entity = new StaffEntity();
+        entity.name = dto.name;
+        entity.phoneNumber = dto.phoneNumber;
+        entity.staffPhoto = dto.staffPhoto;
+        entity.designation = dto.designation;
+        entity.dob = dto.dob;
+        entity.email = dto.email;
+        entity.aadharNumber = dto.aadharNumber;
+        entity.address = dto.address;
+        entity.joiningDate = dto.joiningDate;
+        entity.basicSalary = dto.basicSalary;
+        entity.companyCode = dto.companyCode;
+        entity.unitCode = dto.unitCode;
+        entity.password = dto.password;
+        entity.beforeExperience = dto.beforeExperience;
 
-    if (dto.id) {
-        entity.id = dto.id;
+        if (dto.id) {
+            entity.id = dto.id;
+        }
+
+        if (dto.staffId) {
+            entity.staffId = dto.staffId;
+        }
+
+        if (dto.branch) { // Ensure `branch` is set
+            const branchEntity = new BranchEntity();
+            branchEntity.id = dto.branch; // Make sure `dto.branch` contains the ID
+            entity.branch = branchEntity;
+        }
+
+        return entity;
     }
-
-    if (dto.staffId) {
-        entity.staffId = dto.staffId;
-    }
-
-    if (dto.branch) { // Ensure `branch` is set
-        const branchEntity = new BranchEntity();
-        branchEntity.id = dto.branch; // Make sure `dto.branch` contains the ID
-        entity.branch = branchEntity;
-    }
-
-    return entity;
-}
 
 
     convertEntityToDto(entity: StaffEntity[]): GetStaffResDto[] {
@@ -61,7 +61,9 @@ export class StaffAdapter {
                 staffMember.beforeExperience,
                 staffMember.staffPhoto,
                 staffMember.companyCode,
-                staffMember.unitCode
+                staffMember.unitCode,
+                staffMember.latitude,
+                staffMember.longitude
             );
         });
     }

@@ -127,7 +127,9 @@ export class EstimateAdapter {
             // entity.hsnCode,
             entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
             entity.vendorId ? entity.vendorId.name : null,  // ✅ Null check added
-            entity.vendorId ? entity.vendorId.vendorPhoneNumber : null  // ✅ Null check added
+            entity.vendorId ? entity.vendorId.vendorPhoneNumber : null ,
+            entity.estimatePdfUrl,
+            entity.invoicePdfUrl // ✅ Null check added
         ));
     }
 
