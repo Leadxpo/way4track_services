@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
 import { UpdateNotificationDto } from './dto/notification.dto';
 import { NotificationService } from './notification.service';
@@ -7,17 +7,15 @@ import { NotificationService } from './notification.service';
 @Controller('notifications')
 export class NotificationController {
     constructor(private readonly notificationService: NotificationService) { }
-    @Post('markAsRead')
-    async markAsRead(@Body() updateNotificationDto: UpdateNotificationDto) {
-        await this.notificationService.markAsRead([updateNotificationDto.id], updateNotificationDto);
-        return { status: 'success' };
-    }
 
-    // Mark multiple notifications as read
+
     @Post('markAllAsRead')
     async markAllAsRead(@Body() updateNotificationDto: UpdateNotificationDto) {
-        const ids = updateNotificationDto.ids;  // Assuming `ids` is an array of notification ids
-        await this.notificationService.markAsRead(ids, updateNotificationDto);
+        if (!updateNotificationDto.ids || updateNotificationDto.ids.length === 0) {
+            throw new BadRequestException('No valid notification IDs provided');
+        }
+
+        await this.notificationService.markAsRead(updateNotificationDto);
         return { status: 'success' };
     }
 

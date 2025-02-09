@@ -71,13 +71,15 @@ export class NotificationService {
         await this.notificationRepository.insert(notificationEntity);
     }
 
-    async markAsRead(ids: number[], updateNotificationDto: UpdateNotificationDto) {
-        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    async markAsRead(updateNotificationDto: UpdateNotificationDto) {
+        const ids = updateNotificationDto.ids ?? (updateNotificationDto.id ? [updateNotificationDto.id] : []);
+
+        if (!ids.length) {
             throw new BadRequestException('No valid notification IDs provided');
         }
 
         const result = await this.notificationRepository.update(
-            { id: In(ids) },  // Ensure correct field mapping
+            { id: In(ids) },
             { isRead: updateNotificationDto.isRead }
         );
 
@@ -87,6 +89,11 @@ export class NotificationService {
 
         return { message: `${result.affected} notifications marked as read` };
     }
+
+
+
+
+
     async getAllNotifications(req: {
         branch?: string, companyCode?: string
         , unitCode?: string
