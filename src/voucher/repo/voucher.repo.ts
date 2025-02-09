@@ -289,72 +289,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-    // async getLedgerDataById(req: {
-    //     subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string;
-    //     unitCode?: string
-    // }) {
-    //     const query = this.createQueryBuilder('ve')
-    //         .select([
-    //             've.voucher_id AS ledgerId',
-    //             'cl.name AS clientName',
-    //             'sb.name AS subDealerName',
-    //             'vr.name AS vendorName',
-    //             've.generation_date AS generationDate',
-    //             've.purpose AS purpose',
-    //             'cl.phone_number AS phoneNumber',
-    //             'cl.email AS email',
-    //             'cl.address AS address',
-    //             'cl.client_photo as clientPhoto',
-    //             'cl.GST_number as GSTNumber',
-    //             'sb.sub_dealer_phone_number AS subDealerPhoneNumber',
-    //             'sb.gst_number AS gstNumber',
-    //             'sb.address AS sbAddress',
-    // 'sb.sub_dealer_id AS subDealerId',
-    // 'cl.client_id  as clientId',
-    // 'vr.vendor_id AS vendorId',
-    //             'sb.sub_dealer_photo as subDealerPhoto',
-    //             'sb.email as emailId',
-    //             'vr.vendor_phone_number AS vendorPhoneNumber',
-    //             'vr.GST_number AS gstNumber',
-    //             'vr.address AS vrAddress',
-    //             'vr.vendor_photo as vendorPhoto',
-    //             'vr.email as emailId',
-    //             've.payment_status AS paymentStatus',
-    //             've.amount AS amount',
-    //             'branch.name AS branchName',
-    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
-    //             `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
-    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
-    //         ])
-    //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-    //         .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
-    //         .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
-    //         .leftJoin(VendorEntity, 'vr', 've.vendor_id = vr.id')
-    //         .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
-    //         .andWhere(`ve.company_code = "${req.companyCode}"`)
-    //         .andWhere(`ve.unit_code = "${req.unitCode}"`)
-    //     if (req.vendorId) {
-    //         query.andWhere('ve.vendor_id = :vendorId', { vendorId: req.vendorId });
-    //     }
-    //     if (req.subDealerId) {
-    //         query.andWhere('ve.sub_dealer_id = :subDealerId', { subDealerId: req.subDealerId });
-    //     }
-    //     if (req.clientId) {
-    //         query.andWhere('ve.client_id = :clientId', { clientId: req.clientId });
-    //     }
-
-    //     query.groupBy('ve.voucher_id')
-    //         .addGroupBy('cl.name')
-    //         .addGroupBy('branch.name')
-    //         .addGroupBy('ve.generation_date')
-    //         .addGroupBy('ve.purpose')
-    //         .addGroupBy('ve.payment_status')
-    //         .addGroupBy('ve.amount');
-
-    //     const result = await query.getRawMany();
-    //     return result;
-    // }
-
     async getLedgerDataById(req: {
         subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     }) {
@@ -414,7 +348,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const result = await query.getRawMany();
         return result;
     }
-
 
     async getLedgerDataForReport(req: {
         fromDate?: string;
@@ -618,8 +551,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query;
     }
 
-
-
     async getTotalProductAndServiceSales(req: CommonReq) {
         const query = await this.createQueryBuilder('ve')
             .select([
@@ -776,8 +707,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const data = await query.getRawMany();
         return data;
     }
-
-
 
     async getPurchaseCount(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('ve')
@@ -1044,64 +973,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         }));
     }
 
-
-    // async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
-    //     const query = this.createQueryBuilder('ve')
-    //         .select([
-    //             `DATE(ve.generation_date) AS date`,
-    //             `branch.id AS branchId`,
-    //             `branch.name AS branchName`,
-    //             `branch.branch_number AS branchNumber`,
-    //             `branch.branch_address AS branchAddress`,
-    //             // Credit Amount
-    //             `COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) AS creditAmount`,
-    //             // Debit Amount
-    //             `COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) AS debitAmount`,
-    //             // Percentages for Credit Types
-    //             `ROUND(
-    //                 COALESCE(SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END), 0) / 
-    //                 NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
-    //             ) AS serviceCreditPercentage`,
-    //             `ROUND(
-    //                 COALESCE(SUM(CASE WHEN ve.product_type = 'product' THEN ve.amount ELSE 0 END), 0) / 
-    //                 NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
-    //             ) AS productCreditPercentage`,
-    //             `ROUND(
-    //                 COALESCE(SUM(CASE WHEN ve.product_type = 'sales' THEN ve.amount ELSE 0 END), 0) / 
-    //                 NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
-    //             ) AS salesCreditPercentage`,
-    //             // Percentages for Debit Types
-    //             `ROUND(
-    //                 COALESCE(SUM(CASE WHEN ve.product_type = 'expanses' THEN ve.amount ELSE 0 END), 0) / 
-    //                 NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
-    //             ) AS expansesDebitPercentage`,
-    //             `ROUND(
-    //                 COALESCE(SUM(CASE WHEN ve.product_type = 'salaries' THEN ve.amount ELSE 0 END), 0) / 
-    //                 NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
-    //             ) AS salariesDebitPercentage`
-    //         ])
-    //         .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
-    //         .where('ve.voucher_type IN (:...types)', {
-    //             types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
-    //         })
-    //         .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
-    //         .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-    //         .groupBy(`
-    //             DATE(ve.generation_date), 
-    //             branch.id, 
-    //             branch.name, 
-    //             branch.branch_number, 
-    //             branch.branch_address
-    //         `)
-    //         .orderBy(`DATE(ve.generation_date)`, 'ASC')
-    //         .addOrderBy('branch.name', 'ASC')
-    //         .addOrderBy('branch.branch_number', 'ASC')
-    //         .getRawMany();
-
-    //     return query;
-    // }
-
     async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -1172,8 +1043,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query;
     }
-
-
 
 }
 
