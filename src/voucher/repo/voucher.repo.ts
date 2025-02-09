@@ -384,9 +384,15 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             })
             .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
             .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode });
-        query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
-        query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
-        query.andWhere('cl.name = :clientName', { clientName: req.clientName });
+        if (req.fromDate) {
+            query.andWhere(`ve.generation_date >= :fromDate`, { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere(`ve.generation_date<= :toDate`, { toDate: req.toDate });
+        }
+        if (req.clientName) {
+            query.andWhere('cl.name = :clientName', { clientName: req.clientName });
+        }
         query.groupBy('ve.voucher_id')
             .addGroupBy('ve.name')
             .addGroupBy('cl.name')
@@ -401,7 +407,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .orderBy('YEAR(ve.generation_date)', 'ASC')
             .addOrderBy('MONTH(ve.generation_date)', 'ASC');
         const data = await query.getRawMany();
-
 
         return data;
     }
@@ -586,14 +591,22 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `branch.name AS branchName`,
                 `SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END) AS serviceSales`,
             ])
-            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate })
-            .andWhere('ve.generation_date <= :toDate', { toDate: req.toDate || new Date() })
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            // .where('ve.generation_date >= :fromDate', { fromDate: req.fromDate })
+            // .andWhere('ve.generation_date <= :toDate', { toDate: req.toDate })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+        if (req.fromDate) {
+            query.andWhere(`ve.generation_date >= :fromDate`, { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere(`ve.generation_date<= :toDate`, { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
 
-
-        query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        // query.andWhere('branch.name = :branchName', { branchName: req.branchName });
 
 
         const data = await query
@@ -663,7 +676,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
-                `ve.generation_date as generationDate`,
+                `ve.generation_date AS generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
                 `ve.voucher_id AS voucherId`,
                 `ve.product_type AS productType`,
@@ -671,10 +684,11 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `ve.purpose AS purpose`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
-                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) -
-                SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - 
+             SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`,
+                `branch.name AS branchName`
             ])
-            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
             })
@@ -682,30 +696,32 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.fromDate) {
-            query.andWhere(`DATE_FORMAT(ve.generation_date, '%Y-%m') >= :fromDate`, { fromDate: req.fromDate });
+            query.andWhere(`ve.generation_date >= :fromDate`, { fromDate: req.fromDate });
         }
         if (req.toDate) {
-            query.andWhere(`DATE_FORMAT(ve.generation_date, '%Y-%m') <= :toDate`, { toDate: req.toDate });
+            query.andWhere(`ve.generation_date <= :toDate`, { toDate: req.toDate });
         }
         if (req.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: req.branchName });
         }
 
-        query.groupBy(
-            `YEAR(ve.generation_date), 
-            MONTH(ve.generation_date), 
-            ve.product_type, 
-            DATE(ve.generation_date), 
-            ve.voucher_id, 
-            ve.voucher_type, 
-            ve.purpose`
-        )
+        query.groupBy(`
+        YEAR(ve.generation_date), 
+        MONTH(ve.generation_date), 
+        ve.product_type, 
+        DATE(ve.generation_date), 
+        ve.voucher_id, 
+        ve.voucher_type, 
+        ve.purpose,
+        branch.name
+    `)
             .orderBy('YEAR(ve.generation_date)', 'ASC')
             .addOrderBy('MONTH(ve.generation_date)', 'ASC')
             .addOrderBy('ve.product_type', 'ASC');
 
         const data = await query.getRawMany();
         return data;
+
     }
 
     async getPurchaseCount(req: CommonReq): Promise<any> {
