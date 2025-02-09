@@ -377,8 +377,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.purpose AS purpose',
                 'branch.name AS branchName',
             ])
-            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
             })
