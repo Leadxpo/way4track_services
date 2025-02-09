@@ -76,8 +76,8 @@ export class VoucherDashboardService {
     }
 
     async getTotalSalesForReport(req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         branchName?: string;
         companyCode?: string;
         unitCode?: string;
@@ -123,8 +123,8 @@ export class VoucherDashboardService {
     }
 
     async getLedgerDataForReport(req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         clientName?: string;
         companyCode?: string;
         unitCode?: string;
@@ -172,8 +172,8 @@ export class VoucherDashboardService {
     }
 
     async getDayBookDataForReport(req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         branchName?: string;
         companyCode?: string;
         unitCode?: string;

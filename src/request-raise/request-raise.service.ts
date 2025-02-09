@@ -174,7 +174,7 @@ export class RequestRaiseService {
                 // 'client.name AS client',
                 'branch.name AS branchName',
                 'req.created_date AS paymentDate',
-                'req.request_type AS amount',
+                'req.request_type AS requestType',
                 'req.status AS status',
                 'sf.name as RequestTo'
             ])

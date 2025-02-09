@@ -63,7 +63,7 @@ export class EstimateService {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
             }
 
-            const client = await this.clientRepository.findOne({ where: { id: dto.clientId } });
+            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
@@ -194,7 +194,7 @@ export class EstimateService {
             console.log(dto, "{{{{{{{{{{{{{{{");
 
             const client = await this.clientRepository.findOne({
-                where: { id: dto.clientId },
+                where: { clientId: dto.clientId },
             });
 
             if (!client) {

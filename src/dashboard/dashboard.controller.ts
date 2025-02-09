@@ -440,8 +440,8 @@ export class DashboardController {
 
     @Post('getTotalSalesForReport')
     async getTotalSalesForReport(@Body() req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         branchName?: string;
         companyCode?: string;
         unitCode?: string;
@@ -557,8 +557,8 @@ export class DashboardController {
 
     @Post('getDayBookDataForReport')
     async getDayBookDataForReport(@Body() req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         branchName?: string;
         companyCode?: string;
         unitCode?: string;
@@ -574,8 +574,8 @@ export class DashboardController {
 
     @Post('getLedgerDataForReport')
     async getLedgerDataForReport(@Body() req: {
-        fromDate?: Date;
-        toDate?: Date;
+        fromDate?: string;
+        toDate?: string;
         clientName?: string;
         companyCode?: string;
         unitCode?: string;
