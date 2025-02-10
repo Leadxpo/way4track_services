@@ -24,6 +24,16 @@ export class VoucherDashboardService {
 
     }
 
+    async getExpansesTableData(req: InvoiceDto): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getExpansesTableData(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getDetailInVoiceData(req: VoucherIDResDTo): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getDetailInVoiceData(req)
         if (!VoucherData) {
@@ -313,6 +323,26 @@ export class VoucherDashboardService {
 
     async getProductTypeCreditAndDebitPercentages(req: CommonReq): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getProductTypeCreditAndDebitPercentages(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getPurchaseOrderDataTable(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getPurchaseOrderDataTable(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getPaymentDataTable(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getPaymentDataTable(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

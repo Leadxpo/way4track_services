@@ -49,6 +49,15 @@ export class ProductAssignDashboardService {
         }
     }
 
+    async getProductWareHouseDetails(req: { unitCode: string; companyCode: string;}): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getProductWareHouseDetails(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
 
 
     async totalProducts(req: CommonReq): Promise<CommonResponse> {

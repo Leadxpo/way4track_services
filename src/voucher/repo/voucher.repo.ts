@@ -825,6 +825,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PAYMENT]
+            })
         if (req.fromDate && req.toDate) {
             query.andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
                 fromDate: req.fromDate,
@@ -1115,6 +1118,64 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query;
     }
+
+
+    async getPurchaseOrderDataTable(req: CommonReq) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS voucherId',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                've.name AS name',
+                've.quantity AS quantity',
+                've.payment_status AS paymentStatus',
+                'pa.product_name AS productName',
+                'SUM(ve.amount) AS totalAmount' // Aggregating total amount
+            ])
+            .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
+            .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
+            .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.PURCHASE] })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('ve.voucher_id')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.name')
+            .addGroupBy('pa.product_name')
+            .addGroupBy('ve.quantity');
+
+        return await query.getRawMany();
+    }
+
+    async getPaymentDataTable(req: CommonReq) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS voucherId',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                've.name AS name',
+                've.quantity AS quantity',
+                've.payment_status AS paymentStatus',
+                'pa.product_name AS productName',
+                'SUM(ve.amount) AS totalAmount' // Aggregating total amount
+            ])
+            .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
+            .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
+            .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.PAYMENT] })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('ve.voucher_id')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.name')
+            .addGroupBy('pa.product_name')
+            .addGroupBy('ve.quantity');
+
+        return await query.getRawMany();
+    }
+
 
 }
 

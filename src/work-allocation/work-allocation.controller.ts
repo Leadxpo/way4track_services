@@ -52,6 +52,35 @@ export class WorkAllocationController {
         }
     }
 
+    @Post('getTotalWorkAllocation')
+    async getTotalWorkAllocation(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }) {
+        try {
+            return this.workAllocationService.getTotalWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getMonthTotalWorkAllocation')
+    async getMonthTotalWorkAllocation(@Body() req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string; // Logged-in staff ID
+        year: number;
+    }) {
+        try {
+            return this.workAllocationService.getMonthTotalWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     // @Post('markInstall')
     // async markInstall(@Body() productId: number, companyCode: string, unitCode: string): Promise<WorkAllocationEntity> {
     //     try {

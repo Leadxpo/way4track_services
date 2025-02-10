@@ -282,5 +282,72 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         }
     }
 
+
+
+    async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }) {
+        try {
+            // Base query for grouping products by product name only
+            const groupedProductQuery = this.createQueryBuilder('productAssign')
+                .select([
+                    'pa.id AS productId',
+                    'pa.product_name AS productName',
+                    'productAssign.product_type AS productType',
+                    'productAssign.status AS status',
+                    'SUM(productAssign.number_of_products) AS totalProducts',
+                    'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty'
+                ])
+                .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+
+            // Group by product name, product type, and status
+            groupedProductQuery.groupBy('pa.id, pa.product_name, productAssign.product_type, productAssign.status');
+
+            // Execute query to fetch products with the total and in-hands quantity
+            const productDetails = await groupedProductQuery.getRawMany();
+
+            // Transform data into the required format (aggregating per product name)
+            const productsMap = new Map<string, any>();
+
+            productDetails.forEach((product) => {
+                const { productId, productName, productType, status, totalProducts, totalInHandsQty } = product;
+
+                // If the product is not yet added in the map, initialize it
+                if (!productsMap.has(productName)) {
+                    productsMap.set(productName, {
+                        productName: productName || 'N/A',
+                        productType: productType || 'N/A',
+                        status: status || 'N/A',
+                        totalProducts: 0,
+                        totalInHandsQty: 0
+                    });
+                }
+
+                // Accumulate the total products and in-hands quantity for each product
+                const existingProduct = productsMap.get(productName);
+                if (existingProduct) {
+                    existingProduct.totalProducts += Number(totalProducts) || 0;
+                    existingProduct.totalInHandsQty += Number(totalInHandsQty) || 0;
+                }
+            });
+
+            // Convert the map to an array of product objects
+            const results = Array.from(productsMap.values());
+
+            return {
+                status: true,
+                errorCode: 200,
+                internalMessage: "Data retrieved successfully",
+                data: results
+            };
+
+        } catch (error) {
+            console.error('Error fetching product details:', error);
+            throw new Error('Failed to fetch product details');
+        }
+    }
+
+
+
 }
 

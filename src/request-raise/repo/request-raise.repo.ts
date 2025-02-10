@@ -16,33 +16,83 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
         super(RequestRaiseEntity, dataSource.createEntityManager());
     }
 
+    // async getTodayRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }) {
+    //     const today = new Date();
+    //     const todayStr = today.toISOString().split('T')[0]; // Extract YYYY-MM-DD
+
+    //     const query = this.createQueryBuilder('re')
+    //         .select([
+    //             'br.name AS branch',
+    //             'pr.product_name AS productName',
+    //             'SUM(pa.number_of_products) AS totalProducts' // Sum of products per product name
+    //         ])
+    //         .leftJoin(BranchEntity, 'br', 'br.id = re.branch_id')
+    //         .leftJoin(ProductAssignEntity, 'pa', 'pa.request_id = re.id') // Proper join
+    //         .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id') // Proper join
+
+    //         .where('re.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('re.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('re.status = :status', { status: ClientStatusEnum.pending }) // Status filter
+    //         .andWhere('DATE(re.created_at) = :today', { today: todayStr }); // Only today’s records
+
+    //     // if (req.branch) {
+    //     //     query.andWhere('br.name = :branchName', { branchName: req.branch });
+    //     // }
+
+    //     query.groupBy('br.name, pr.product_name');
+
+    //     return query.getRawMany();
+    // }
     async getTodayRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }) {
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0]; // Extract YYYY-MM-DD
 
         const query = this.createQueryBuilder('re')
             .select([
-                'br.name AS branch',
+                'br.name AS branch',  // 'branch' is the alias for 'br.name'
                 'pr.product_name AS productName',
                 'SUM(pa.number_of_products) AS totalProducts' // Sum of products per product name
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = re.branch_id')
             .leftJoin(ProductAssignEntity, 'pa', 'pa.request_id = re.id') // Proper join
             .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id') // Proper join
-
             .where('re.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('re.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('re.status = :status', { status: ClientStatusEnum.pending }) // Status filter
             .andWhere('DATE(re.created_at) = :today', { today: todayStr }); // Only today’s records
 
-        // if (req.branch) {
-        //     query.andWhere('br.name = :branchName', { branchName: req.branch });
-        // }
-
         query.groupBy('br.name, pr.product_name');
 
-        return query.getRawMany();
+        const result = await query.getRawMany();
+
+        // Transforming the result to match the desired structure
+        const transformedResult = [];
+
+        result.forEach((item) => {
+            // Find if the branch already exists based on 'branch' (the alias for 'br.name')
+            const existingBranch = transformedResult.find(branch => branch.location === item.branch);
+
+            // If branch exists, push the product request to that branch
+            if (existingBranch) {
+                existingBranch.requests.push({
+                    name: item.productName,
+                    count: Number(item.totalProducts),
+                });
+            } else {
+                // If branch doesn't exist, create a new branch object with 'location' as 'branch'
+                transformedResult.push({
+                    location: item.branch,  // The 'branch' is the alias for 'br.name'
+                    requests: [{
+                        name: item.productName,
+                        count: Number(item.totalProducts),
+                    }],
+                });
+            }
+        });
+
+        return transformedResult;
     }
+
 
 
 }

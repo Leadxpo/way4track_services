@@ -189,6 +189,35 @@ export class WorkAllocationService {
 
     }
 
+    async getTotalWorkAllocation(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.workAllocationRepository.getTotalWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getMonthTotalWorkAllocation(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string; // Logged-in staff ID
+        year: number;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.workAllocationRepository.getMonthTotalWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
 
     /**
      * Generates a work allocation number in the format #VOU-001.

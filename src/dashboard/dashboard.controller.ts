@@ -260,6 +260,17 @@ export class DashboardController {
         }
     }
 
+    @Post('getProductWareHouseDetails')
+    async getProductWareHouseDetails(@Body() req: { unitCode: string; companyCode: string; }): Promise<CommonResponse> {
+        try {
+            return await this.productAssignDashboardService.getProductWareHouseDetails(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
 
 
 
@@ -420,6 +431,17 @@ export class DashboardController {
     async getVoucherData(@Body() req: InvoiceDto): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getVoucherData(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getExpansesTableData')
+    async getExpansesTableData(@Body() req: InvoiceDto): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getExpansesTableData(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);
@@ -686,6 +708,28 @@ export class DashboardController {
     async getProductTypeCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getProductTypeCreditAndDebitPercentages(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getPaymentDataTable')
+    async getPaymentDataTable(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getPaymentDataTable(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getPurchaseOrderDataTable')
+    async getPurchaseOrderDataTable(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getPurchaseOrderDataTable(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);
