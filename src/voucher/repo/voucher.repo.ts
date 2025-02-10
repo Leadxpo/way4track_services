@@ -75,6 +75,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'pr.product_name AS productName',
                 'pr.product_description AS productDescription',
                 'pr.price AS productPrice',
+                'es.invoicePdfUrl'
+
             ])
             .leftJoinAndSelect(ClientEntity, 'cl', 'cl.client_id = ve.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
@@ -119,9 +121,11 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
                 'branch.name AS branchName',
+                'es.receiptPdfUrl'
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)

@@ -54,11 +54,11 @@ export class StaffService {
             }
 
             // 🔍 Step 1: Check if staff record already exists
-            const existingStaff = await this.staffRepository.findOne({
-                where: [{ id: req.id }, { staffId: req.staffId }],
-            });
+            // const existingStaff = await this.staffRepository.findOne({
+            //     where: [{ id: req.id }, { staffId: req.staffId }],
+            // });
 
-            if (existingStaff) {
+            if (req.id) {
                 console.log("🔄 Updating existing staff record...");
                 return await this.updateStaffDetails(req, filePath);
             } else {
