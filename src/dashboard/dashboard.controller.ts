@@ -150,6 +150,17 @@ export class DashboardController {
         }
     }
 
+    @Post('getBranchStaffDetails')
+    async getBranchStaffDetails(@Body() req: StaffSearchDto): Promise<CommonResponse> {
+        try {
+            return await this.staffDashboardService.getBranchStaffDetails(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('payRoll')
     async payRoll(@Body() req: CommonReq, branch?: string): Promise<CommonResponse> {
         try {
