@@ -5,6 +5,7 @@ import { TicketsDto } from "../dto/tickets.dto";
 import { CommonResponse } from "src/models/common-response";
 import { ErrorResponse } from "src/models/error-response";
 import { CommonReq } from "src/models/common-req";
+import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 
 
 
@@ -41,6 +42,37 @@ export class TicketsRepository extends Repository<TicketsEntity> {
             percentageChange: percentageChange.toFixed(2),
         }
     }
+
+
+    async totalTicketsBranchWise(req: CommonReq): Promise<any> {
+        const query = this.createQueryBuilder('tc')
+            .select([
+                'COUNT(tc.ticket_number) AS totalTickets',
+                'tc.branch_id AS branchId',
+                'SUM(CASE WHEN tc.work_status = :pending THEN 1 ELSE 0 END) AS pendingTickets',
+            ])
+            .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('tc.branch_id');
+
+        const branchWiseTickets = await query.setParameter('pending', WorkStatusEnum.PENDING).getRawMany();
+
+        // Query to get overall total tickets
+        const totalQuery = this.createQueryBuilder('tc')
+            .select(['COUNT(tc.ticket_number) AS totalTickets'])
+            .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const totalResult = await totalQuery.getRawOne();
+        const totalTickets = totalResult?.totalTickets || 0;
+
+        return {
+            totalTickets, // Overall total tickets
+            branchWiseTickets, // Total tickets and pending tickets per branch
+        };
+    }
+
+
 
     async getTicketDetails(req: {
         ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,

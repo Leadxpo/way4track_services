@@ -23,6 +23,16 @@ export class TicketsDashboardService {
 
     }
 
+    async totalTicketsBranchWise(req: CommonReq): Promise<CommonResponse> {
+        const data = await this.ticketsRepositort.totalTicketsBranchWise(req)
+        if (!data) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", data)
+        }
+
+    }
+
     async getTicketDetailsAgainstSearch(req: TicketsSearchDto): Promise<any> {
         try {
             const queryBuilder = this.ticketsRepositort.createQueryBuilder('ticket')

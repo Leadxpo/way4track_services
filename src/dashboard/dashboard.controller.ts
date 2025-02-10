@@ -393,6 +393,17 @@ export class DashboardController {
         }
     }
 
+    @Post('totalTicketsBranchWise')
+    async totalTicketsBranchWise(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.ticketsDashboardService.totalTicketsBranchWise(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getDayBookData')
     async getDayBookData(@Body() req: BranchChartDto): Promise<CommonResponse> {
         try {
