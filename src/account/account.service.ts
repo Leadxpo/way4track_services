@@ -22,15 +22,24 @@ export class AccountService {
 
     async createAccount(dto: AccountDto): Promise<CommonResponse> {
         try {
-            let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully"
+            console.log(dto, ">>>>>>>>>>>>>>>>");
+
+            let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully";
             const convertDto = this.adapter.toEntity(dto);
-            await this.accountRepository.save(convertDto);
-            return new CommonResponse(true, 65152, internalMessage)
-        }
-        catch (error) {
-            throw new ErrorResponse(5416, error.message)
+
+            if (dto.id) {
+                // Ensure that update values are provided
+                await this.accountRepository.update(dto.id, convertDto);
+            } else {
+                await this.accountRepository.insert(convertDto);
+            }
+
+            return new CommonResponse(true, 65152, internalMessage);
+        } catch (error) {
+            throw new ErrorResponse(5416, error.message);
         }
     }
+
 
     async getAccountsDetails(req: CommonReq): Promise<CommonResponse> {
         const entities = await this.accountRepository.find({
