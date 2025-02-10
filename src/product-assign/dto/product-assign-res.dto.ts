@@ -1,3 +1,5 @@
+import { ProductStatusEnum } from "src/product/enum/product-status.enum";
+
 export class ProductAssignResDto {
     id: number;
     staffId: string;
@@ -14,6 +16,8 @@ export class ProductAssignResDto {
     unitCode: string
     requestId: number
     request: string
+    status?: ProductStatusEnum
+
     constructor(
         id: number,
         staffId: string,
@@ -29,7 +33,9 @@ export class ProductAssignResDto {
         companyCode: string,
         unitCode: string,
         requestId: number,
-        request: string
+        request: string,
+        status?: ProductStatusEnum
+
     ) {
         this.id = id;
         this.staffId = staffId;
@@ -46,5 +52,7 @@ export class ProductAssignResDto {
         this.unitCode = unitCode
         this.request = request
         this.requestId = requestId
+        this.status = status
+
     }
 }

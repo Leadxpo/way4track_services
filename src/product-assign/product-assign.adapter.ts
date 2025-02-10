@@ -53,7 +53,7 @@ export class ProductAssignAdapter {
     entity.assignTo = dto.assignTo
 
 
-
+    entity.status = dto.status
 
     entity.companyCode = dto.companyCode;
     entity.unitCode = dto.unitCode;

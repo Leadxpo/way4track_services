@@ -3,6 +3,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { ProductStatusEnum } from 'src/product/enum/product-status.enum';
 
 @Entity('product_assignments')
 export class ProductAssignEntity extends BaseEntity {
@@ -63,4 +64,7 @@ export class ProductAssignEntity extends BaseEntity {
 
   @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
   unitCode: string;
+
+  @Column({ name: 'status', type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.available })
+  status: ProductStatusEnum
 }

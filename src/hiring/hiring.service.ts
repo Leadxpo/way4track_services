@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import { HiringFilterDto } from './dto/hiring-filter.dto';
 import { CommonReq } from 'src/models/common-req';
 import { Storage } from '@google-cloud/storage';
+import { HiringStatus } from './enum/hiring-status.enum';
 
 @Injectable()
 export class HiringService {
@@ -27,7 +28,7 @@ export class HiringService {
 
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
-    
+
     async saveHiringDetails(dto: HiringDto, resumeFile?: Express.Multer.File): Promise<CommonResponse> {
         try {
             let resumePath: string | undefined;
@@ -151,6 +152,7 @@ export class HiringService {
                 'hiring.status AS status',
                 'hiring.company_code AS companyCode',
                 'hiring.unit_code AS unitCode',
+                'hiring.hiring_level AS hiringLevel',
             ])
             .where(`hiring.company_code = "${req.companyCode}"`)
             .andWhere(`hiring.unit_code = "${req.unitCode}"`)
@@ -171,5 +173,32 @@ export class HiringService {
 
         const result = await query.getRawMany();
         return result;
+    }
+
+    async getCandidatesStatsLast30Days(req: CommonReq): Promise<{ totalAttended: number, totalQualified: number }> {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        // Query to get total candidates attended and total qualified candidates
+        const result = await this.hiringRepository
+            .createQueryBuilder('hiring')
+            .select('COUNT(*) AS totalAttended')
+            .addSelect('SUM(CASE WHEN hiring.status = :qualifiedStatus THEN 1 ELSE 0 END) AS totalQualified')
+            .where('hiring.date_of_upload > :thirtyDaysAgo')
+            .andWhere('hiring.companyCode = :companyCode')
+            .andWhere('hiring.unitCode = :unitCode')
+            .setParameters({
+                thirtyDaysAgo: thirtyDaysAgo.toISOString(),
+                companyCode: req.companyCode,
+                unitCode: req.unitCode,
+                qualifiedStatus: HiringStatus.QUALIFIED,
+            })
+            .getRawOne();
+
+        // Parsing the results to ensure they are returned as numbers
+        return {
+            totalAttended: parseInt(result.totalAttended, 10) || 0,
+            totalQualified: parseInt(result.totalQualified, 10) || 0,
+        };
     }
 }

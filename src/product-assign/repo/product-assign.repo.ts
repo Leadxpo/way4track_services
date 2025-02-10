@@ -26,7 +26,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         const groupedBranchesQuery = this.createQueryBuilder('pa')
             .select([
                 'br.name AS branchName',
-                'COUNT(pa.id) AS totalpas',
+                // 'COUNT(pa.id) AS totalpas',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .where('pa.company_code = :companyCode', { companyCode: req.companyCode })
@@ -222,18 +222,22 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     'pa.product_name AS productName',
                     'productAssign.product_type AS productType',
                     'br.name AS branchName',
-                    'SUM(productAssign.number_of_products) AS totalProducts'
+                    'SUM(productAssign.number_of_products) AS totalProducts',
+                    'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty',
+                    'productAssign.status AS status'
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
-                .groupBy('productAssign.product_id, pa.product_name, productAssign.product_type, br.name');
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
             // If a specific branch is selected, filter for that branch
             if (req.branch) {
                 groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
+
+            // Group by all selected non-aggregated fields
+            groupedProductQuery.groupBy('pa.id, pa.product_name, productAssign.product_type, br.name, productAssign.status');
 
             // Execute query to fetch products grouped by branch
             const productDetails = await groupedProductQuery.getRawMany();
@@ -242,8 +246,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             const branchesMap = new Map<string, any>();
 
             productDetails.forEach((product) => {
-                // For each product, we are grouping by branch name
-                const { productId, productName, productType, branchName, totalProducts, productImg } = product;
+                const { productId, productName, productType, branchName, totalProducts, totalInHandsQty } = product;
 
                 // If the branch is not yet added in the map, initialize it
                 if (!branchesMap.has(branchName)) {
@@ -258,19 +261,26 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     id: Number(productId) || 0,
                     name: productName || 'N/A',
                     type: productType || 'N/A',
-                    count: Number(totalProducts) || 0
+                    totalProducts: Number(totalProducts) || 0,
+                    totalInHandsQty: Number(totalInHandsQty) || 0 // Add in-hands quantity
                 });
             });
 
             // Convert the map to an array of branch objects
             const results = Array.from(branchesMap.values());
 
-            return results;
+            return {
+                status: true,
+                errorCode: 200,
+                internalMessage: "Data retrieved successfully",
+                data: results
+            };
 
         } catch (error) {
             console.error('Error fetching product details by branch:', error);
             throw new Error('Failed to fetch product details by branch');
         }
     }
+
 }
 

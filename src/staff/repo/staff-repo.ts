@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
-import { StaffEntity } from "../entity/staff.entity";
+import { DesignationEnum, StaffEntity } from "../entity/staff.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { AttendanceEntity } from "src/attendence/entity/attendence.entity";
 import { StaffAttendanceQueryDto } from "../dto/staff-date.dto";
@@ -178,7 +178,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         return query;
     }
 
-       async getStaffSearchDetails(req: StaffSearchDto) {
+    async getStaffSearchDetails(req: StaffSearchDto) {
         const query = this.createQueryBuilder('staff')
             .select([
                 'branch.name AS branchName',
@@ -205,6 +205,75 @@ export class StaffRepository extends Repository<StaffEntity> {
         const staffDetails = await query.getRawMany();
         return staffDetails;
     }
+
+
+    async getStaffCardsDetails(req: StaffSearchDto) {
+        const query = this.createQueryBuilder('staff')
+            .select([
+                'COUNT(staff.staff_id) AS totalStaff',
+                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
+                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+            ])
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const staffDetails = await query.getRawOne();
+        return staffDetails;
+    }
+
+    async getTotalStaffDetails(req: StaffSearchDto, branch?: string) {
+        // Main query for aggregate data
+        const query = this.createQueryBuilder('staff')
+            .select([
+                'branch.name AS branchName',
+                'COUNT(staff.staff_id) AS totalStaff',
+                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
+                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+            .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (branch) {
+            query.andWhere('branch.name = :branchName', { branchName: branch });
+        }
+
+        const result = await query.groupBy('branch.name').getRawMany();
+
+        // Fetching individual staff details and associating with the branch manager
+        const staffDetailsQuery = this.createQueryBuilder('staff')
+            .select([
+                'staff.staff_id AS staffId',
+                'staff.name AS staffName',
+                'staff.designation AS staffDesignation',
+                'branch.name AS branchName',
+                // Branch manager information
+                'branchManager.name AS branchManagerName',
+                'branchManager.phone_number AS branchManagerPhoneNumber',
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+            .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (branch) {
+            staffDetailsQuery.andWhere('branch.name = :branchName', { branchName: branch });
+        }
+
+        const staffResult = await staffDetailsQuery.getRawMany();
+
+        return { result, staff: staffResult };
+    }
+
+
+
+
+
+
+
 
 }
 

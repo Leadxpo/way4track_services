@@ -31,6 +31,11 @@ export class HiringController {
         }
     }
 
+    @Post('getCandidatesStatsLast30Days')
+    async getCandidatesStatsLast30Days(@Body() req: CommonReq) {
+        return await this.hiringService.getCandidatesStatsLast30Days(req);
+    }
+
     @Post('deleteHiringDetails')
     async deleteHiringDetails(@Body() dto: HiringIdDto): Promise<CommonResponse> {
         try {

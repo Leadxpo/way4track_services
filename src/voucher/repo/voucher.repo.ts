@@ -499,12 +499,35 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
+    // async getMonthWiseBalance(req: BranchChartDto) {
+    //     const query = this.createQueryBuilder('ve')
+    //         .select([
+    //             `YEAR(ve.generation_date) AS year`,
+    //             `MONTH(ve.generation_date) AS month`,
+    //             `MONTHNAME(ve.generation_date) AS monthName`,
+    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
+    //             `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
+    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+    //         .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
+    //         .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
+    //         .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+    //         .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
+    //         .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date),branch.name');  // Added MONTHNAME to GROUP BY
+
+    //     const result = await query.getRawMany();
+    //     return result;
+
+    // }
+
     async getMonthWiseBalance(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')
             .select([
                 `YEAR(ve.generation_date) AS year`,
                 `MONTH(ve.generation_date) AS month`,
                 `MONTHNAME(ve.generation_date) AS monthName`,
+                `branch.name AS branchName`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
@@ -514,12 +537,41 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
             .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
             .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date)');  // Added MONTHNAME to GROUP BY
+            .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date), branch.name');
 
-        const result = await query.getRawMany();
-        return result;
+        const rawData = await query.getRawMany();
 
+        // Organizing the data by branch
+        const groupedData = rawData.reduce((acc, item) => {
+            const branchName = item.branchName || "Unknown Branch"; // Default if branch name is null
+            if (!acc[branchName]) {
+                acc[branchName] = [];
+            }
+            acc[branchName].push({
+                year: item.year,
+                month: item.month,
+                monthName: item.monthName,
+                creditAmount: item.creditAmount,
+                debitAmount: item.debitAmount,
+                balanceAmount: item.balanceAmount,
+            });
+            return acc;
+        }, {});
+
+        // Transform grouped data into an array format
+        const formattedResponse = Object.keys(groupedData).map(branchName => ({
+            branchName,
+            data: groupedData[branchName],
+        }));
+
+        return {
+            status: true,
+            errorCode: 200,
+            internalMessage: "Data retrieved successfully",
+            data: formattedResponse,
+        };
     }
+
 
     async getYearWiseCreditAndDebitPercentages(req: BranchChartDto) {
         // Ensure that req.date is treated as a number

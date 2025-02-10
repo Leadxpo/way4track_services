@@ -128,6 +128,28 @@ export class DashboardController {
         }
     }
 
+    @Post('getStaffCardsDetails')
+    async getStaffCardsDetails(@Body() req: StaffSearchDto): Promise<CommonResponse> {
+        try {
+            return await this.staffDashboardService.getStaffCardsDetails(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getTotalStaffDetails')
+    async getTotalStaffDetails(@Body() req: StaffSearchDto): Promise<CommonResponse> {
+        try {
+            return await this.staffDashboardService.getTotalStaffDetails(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('payRoll')
     async payRoll(@Body() req: CommonReq, branch?: string): Promise<CommonResponse> {
         try {

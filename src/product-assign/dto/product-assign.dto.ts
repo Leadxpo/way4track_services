@@ -1,3 +1,5 @@
+import { ProductStatusEnum } from "src/product/enum/product-status.enum";
+
 export class ProductAssignDto {
     id: number;
     staffId: number;
@@ -17,4 +19,6 @@ export class ProductAssignDto {
     assignTo: string;
     productType: string;
     inHands: string;
+    status?: ProductStatusEnum
+
 }

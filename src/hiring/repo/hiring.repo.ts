@@ -11,4 +11,6 @@ export class HiringRepository extends Repository<HiringEntity> {
     constructor(private dataSource: DataSource) {
         super(HiringEntity, dataSource.createEntityManager());
     }
+
+   
 }

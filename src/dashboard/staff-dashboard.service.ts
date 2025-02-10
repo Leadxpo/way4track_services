@@ -40,4 +40,22 @@ export class StaffDashboardService {
             return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
         }
     }
+
+    async getStaffCardsDetails(req: StaffSearchDto) {
+        const staffData = await this.staffRepository.getStaffCardsDetails(req)
+        if (!staffData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
+
+    async getTotalStaffDetails(req: StaffSearchDto) {
+        const staffData = await this.staffRepository.getTotalStaffDetails(req)
+        if (!staffData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
 }
