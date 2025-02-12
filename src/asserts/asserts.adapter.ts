@@ -40,7 +40,7 @@ export class AssertsAdapter {
         const entity = new AssertsEntity();
 
         if (dto.voucherId) {
-            const voucherEntity = await this.voucherRepository.findOne({ where: { voucherId: dto.voucherId } });
+            const voucherEntity = await this.voucherRepository.findOne({ where: { id: Number(dto.voucherId) } });
 
             if (!voucherEntity) {
                 throw new Error(`Voucher with ID ${dto.voucherId} not found`);

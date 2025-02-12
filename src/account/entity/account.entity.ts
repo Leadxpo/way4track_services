@@ -33,7 +33,7 @@ export class AccountEntity {
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 
-  @Column({ name: 'ifsc_code', type: 'varchar', length: 11 })
+  @Column({ name: 'ifsc_code', type: 'varchar', length: 20 })
   ifscCode: string;
 
   @Column({ name: 'phone_number', type: 'varchar', length: 15 })

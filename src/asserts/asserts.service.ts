@@ -65,10 +65,17 @@ export class AssertsService {
         }
     }
 
-
     async create(createAssertsDto: AssertsDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-            const voucher = await this.voucherRepo.findOne({ where: { voucherId: createAssertsDto.voucherId } });
+            console.log(createAssertsDto, "+========");
+
+            // Ensure voucherId is an integer
+            const voucherId = Number(createAssertsDto.voucherId);
+            if (isNaN(voucherId)) {
+                throw new Error('Invalid voucher ID');
+            }
+
+            const voucher = await this.voucherRepo.findOne({ where: { id: voucherId } });
 
             if (!voucher) {
                 throw new Error('Voucher not found');
@@ -88,24 +95,21 @@ export class AssertsService {
 
                 entity = this.assertsRepository.merge(entity, rest);
 
-                // ✅ Fetch and assign BranchEntity properly
+                // Fetch and assign BranchEntity properly
                 if (branchId) {
                     const branchEntity = await this.branchRepo.findOne({ where: { id: branchId } });
                     if (!branchEntity) {
                         throw new Error(`Branch with ID ${branchId} not found`);
                     }
-                    entity.branchId = branchEntity; // ✅ Assign full entity instead of number
+                    entity.branchId = branchEntity; // Assign full entity instead of number
                 }
 
-                // ✅ Fetch and assign VoucherEntity properly
-                if (voucherId) {
-                    const voucherEntity = await this.voucherRepo.findOne({ where: { voucherId } });
-                    if (!voucherEntity) {
-                        throw new Error(`Voucher with ID ${voucherId} not found`);
-                    }
-                    entity.voucherId = voucherEntity; // ✅ Assign full entity instead of string
+                // Fetch and assign VoucherEntity properly
+                const voucherEntity = await this.voucherRepo.findOne({ where: { id:createAssertsDto.voucherId } });
+                if (!voucherEntity) {
+                    throw new Error(`Voucher with ID ${voucherId} not found`);
                 }
-
+                entity.voucherId = voucherEntity; // Assign full entity instead of string
 
                 // If a new photo is uploaded, delete the existing file from GCS
                 if (photo && entity.assetPhoto) {
@@ -160,9 +164,13 @@ export class AssertsService {
 
 
 
+
     async deleteAssertDetails(dto: AssertsIdDto): Promise<CommonResponse> {
         try {
+            console.log(dto, "++++")
             const assertExists = await this.assertsRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            console.log(assertExists, "++++")
+
             if (!assertExists) {
                 throw new ErrorResponse(404, `assert with ID ${dto.id} does not exist`);
             }

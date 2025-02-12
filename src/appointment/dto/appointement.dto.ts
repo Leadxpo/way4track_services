@@ -10,10 +10,10 @@ export class AppointmentDto {
   slot: string;
   period: TimePeriodEnum;
   branchId: number;
-  clientId: string;
+  clientId: number;
   description?: string;
   status?: AppointmentStatus;
   companyCode: string;
   unitCode: string
-  voucherId?:string
+  voucherId?:number
 }

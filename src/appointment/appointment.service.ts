@@ -5,6 +5,8 @@ import { ErrorResponse } from 'src/models/error-response';
 import { AppointmentRepository } from './repo/appointement.repo';
 import { AppointmentAdapter } from './appointement.adapter';
 import { AppointmentDto } from './dto/appointement.dto';
+import { AppointmentEntity } from './entity/appointement.entity';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class AppointmentService {
@@ -38,6 +40,8 @@ export class AppointmentService {
         }
     }
 
+
+
     async createAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         try {
             const entity = this.appointmentAdapter.convertDtoToEntity(dto);
@@ -45,7 +49,7 @@ export class AppointmentService {
             const count = await this.appointmentRepository.count();
             entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
 
-            await this.appointmentRepository.save(entity);
+            await this.appointmentRepository.insert(entity);
             return new CommonResponse(true, 201, 'Appointment details created successfully');
         } catch (error) {
             console.error(`Error creating appointment details: ${error.message}`, error.stack);
@@ -54,32 +58,62 @@ export class AppointmentService {
     }
 
     async handleAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
-        const existingAppointment = await this.appointmentRepository.findOne({
-            where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
-        });
-        if (existingAppointment) {
-            // If an ID is provided, update the appointment details
-            return await this.updateAppointmentDetails(dto);
-        } else {
-            // If no ID is provided, create a new appointment
-            return await this.createAppointmentDetails(dto);
+        if (dto.id && dto.id !== null && dto.id !== undefined) {
+            // Convert ID to a number if it's a valid value
+            dto.id = Number(dto.id);
+
+            // Check if the appointment actually exists
+            const existingAppointment = await this.appointmentRepository.findOne({
+                where: { id: dto.id }
+            });
+
+            if (existingAppointment) {
+                console.log(existingAppointment, "{{{{{{{{{{{");
+                return await this.updateAppointmentDetails(dto);
+            }
         }
+
+        // If no valid ID is provided or no matching appointment is found, create a new one
+        return await this.createAppointmentDetails(dto);
     }
+
 
     /**
      * Get Appointment Details by ID
      */
     async getAppointmentDetails(dto: AppointmentIdDto): Promise<CommonResponse> {
         try {
-            const entity = await this.appointmentRepository.find({
-                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }, relations: ['branchId', 'staffId', 'clientId']
+            const appointments = await this.appointmentRepository.findOne({
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['voucherId', 'clientId', 'staffId', 'branchId']
             });
 
-            if (!entity) {
+
+            if (!appointments) {
                 throw new ErrorResponse(404, 'Appointment not found');
             }
 
-            const result = this.appointmentAdapter.convertEntityToDto(entity);
+            const result = this.appointmentAdapter.convertEntityToDto([appointments]);
+            return new CommonResponse(true, 200, 'Details fetched successfully', result);
+        } catch (error) {
+            console.error('Error in getAppointmentDetails service:', error);
+            throw new ErrorResponse(500, 'Error fetching appointment details');
+        }
+    }
+
+    async getAllAppointmentDetails(dto: CommonReq): Promise<CommonResponse> {
+        try {
+            const appointments = await this.appointmentRepository.find({
+                where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['voucherId', 'clientId', 'staffId', 'branchId']
+            });
+
+
+            if (!appointments) {
+                throw new ErrorResponse(404, 'Appointment not found');
+            }
+
+            const result = this.appointmentAdapter.convertEntityToDto(appointments);
             return new CommonResponse(true, 200, 'Details fetched successfully', result);
         } catch (error) {
             console.error('Error in getAppointmentDetails service:', error);

@@ -7,7 +7,7 @@ export class AssertsDto {
     assetType: AssetType;
     branchId?: number;
     description?: string;
-    voucherId: string;
+    voucherId: number;
     companyCode: string;
     unitCode: string
     quantity: number

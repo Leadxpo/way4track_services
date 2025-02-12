@@ -23,16 +23,21 @@ export class AppointmentAdapter {
         const staff = new StaffEntity();
         staff.id = dto.assignedToId;
         entity.staffId = staff;
-        const voucher = new VoucherEntity()
-        voucher.voucherId = dto.voucherId
-        entity.voucherId = voucher
+        if (dto.voucherId) {
+            const voucher = new VoucherEntity();
+            voucher.id = dto.voucherId;
+            entity.voucherId = voucher;
+        } else {
+            entity.voucherId = null;
+        }
+
 
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branchId = branch;
 
         const client = new ClientEntity();
-        client.clientId = dto.clientId;
+        client.id = dto.clientId;
         entity.clientId = client;
         entity.appointmentId = dto.appointmentId;
 
@@ -49,7 +54,7 @@ export class AppointmentAdapter {
                 entity.clientId?.phoneNumber || '',
                 entity.clientId?.clientId || null,
                 entity.clientId?.address || '',
-                entity.clientId?.name,
+                entity.clientId?.name || '',
                 entity.branchId?.id || 0,
                 entity.branchId?.branchName || '',
                 entity.appointmentType,
@@ -63,10 +68,11 @@ export class AppointmentAdapter {
                 entity.appointmentId,
                 entity.companyCode,
                 entity.unitCode,
-                entity.voucherId.voucherId || ''
+                entity.voucherId ? entity.voucherId.voucherId : ''
             );
         });
     }
+
 
 
 

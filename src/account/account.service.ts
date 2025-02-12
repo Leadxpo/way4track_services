@@ -88,6 +88,7 @@ export class AccountService {
     }
     async deleteAccountDetails(dto: AccountIdDto): Promise<CommonResponse> {
         try {
+            
             const accountExists = await this.accountRepository.findOne({
                 where: { accountNumber: dto.fromAccountNumber, companyCode: dto.companyCode, unitCode: dto.unitCode },
             });
