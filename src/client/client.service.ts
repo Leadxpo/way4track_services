@@ -137,26 +137,42 @@ export class ClientService {
 
     async deleteClientDetails(dto: ClientIdDto): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            // Find the client by client_id, companyCode, and unitCode
+            const client = await this.clientRepository.findOne({
+                where: {
+                    clientId: String(dto.clientId), // Ensure clientId is treated as a string
+                    companyCode: dto.companyCode,
+                    unitCode: dto.unitCode
+                }
+            });
+
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
-            await this.clientRepository.delete(dto.clientId);
+
+            // Now delete using clientId (not id)
+            await this.clientRepository.delete({ clientId: String(dto.clientId) }); // Correct column is clientId
+
             return new CommonResponse(true, 200, 'Client details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
 
+
     async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
         try {
+            console.log(req, "+++++++++++")
+
             const client = await this.clientRepository.findOne({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            console.log(client, "+++++++++++")
+
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
             else {
-                const data = this.clientAdapter.convertEntityToDto([client])
-                return new CommonResponse(true, 200, 'Client details fetched successfully', data);
+                // const data = this.clientAdapter.convertEntityToDto([client])
+                return new CommonResponse(true, 200, 'Client details fetched successfully', client);
             }
         } catch (error) {
             throw new ErrorResponse(500, error.message);

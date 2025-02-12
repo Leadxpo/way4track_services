@@ -42,7 +42,6 @@ export class EstimateService {
         invoicePath: string | null
     ): Promise<CommonResponse> {
         try {
-
             let existingEstimate: EstimateEntity | null = null;
 
             if (!dto.id && !dto.estimateId) {
@@ -57,84 +56,142 @@ export class EstimateService {
             if (!existingEstimate) {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id || dto.estimateId} not found`);
             }
+            console.log(dto, estimatePdf, invoicePath, "======updated valueds=====")
+            let productDetailsArray: ProductDetailDto[] = [];
 
+            if (dto.productDetails !== undefined) {  // Ensure it is not undefined
+                if (typeof dto.productDetails === 'string') {
+                    try {
+                        // Parse the productDetails string into an array
+                        productDetailsArray = JSON.parse(dto.productDetails);
 
-            if (!existingEstimate) {
-                return new CommonResponse(false, 404, `Estimate with ID ${dto.id} not found`);
+                        // Check if the result is actually an array after parsing
+                        if (!Array.isArray(productDetailsArray)) {
+                            throw new Error('Invalid format for productDetails. Expected an array after parsing JSON.');
+                        }
+                    } catch (error) {
+                        console.error('Failed to parse productDetails as JSON:', error);
+                        throw new Error('Failed to parse productDetails as JSON');
+                    }
+                } else if (Array.isArray(dto.productDetails)) {
+                    // If it's already an array, just use it
+                    productDetailsArray = dto.productDetails;
+                } else {
+                    console.error('Invalid format for productDetails. Expected an array or string');
+                    throw new Error('Invalid format for productDetails. Expected an array or string');
+                }
+
+                // Ensure the parsed productDetailsArray is not empty
+                if (productDetailsArray.length === 0) {
+                    if (!existingEstimate.productDetails || existingEstimate.productDetails.length === 0) {
+                        throw new Error('Product details are empty or missing');
+                    }
+                }
             }
+
+
+
+            console.log(productDetailsArray, "+++++")
+            // Proceed with existing logic for updating the estimate
+
 
             const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
 
-            const productIds = dto.productDetails.map((p) => p.productId);
+            const productIds = productDetailsArray.map((p) => p.productId);
             const products = await this.productRepository.find({ where: { id: In(productIds) } });
 
             if (products.length !== productIds.length) {
                 throw new Error('Some products in the provided details do not exist');
             }
 
-            const productDetails = dto.productDetails.map((productDetail) => {
+            // Retrieve existing product details linked to the estimate
+            const existingProductDetails = existingEstimate.productDetails || [];
+
+            // Flag to check if there are any changes to product details
+            let isProductDetailsUpdated = false;
+
+            // Update or add new products to the existing estimate
+            const updatedProductDetails = productDetailsArray.map((productDetail) => {
+                const existingProductDetail = existingProductDetails.find(
+                    (existingProduct) => existingProduct.productId === productDetail.productId
+                );
+
                 const product = products.find((p) => p.id === productDetail.productId);
-                return {
-                    productId: product.id,
-                    productName: product.productName,
-                    quantity: productDetail.quantity,
-                    costPerUnit: product.price,
-                    totalCost: product.price * productDetail.quantity,
-                    hsnCode: product.hsnCode,
-                };
+
+                if (existingProductDetail) {
+                    // Update existing product detail (e.g., updating quantity and total cost)
+                    existingProductDetail.quantity = productDetail.quantity;
+                    existingProductDetail.totalCost = product.price * productDetail.quantity;
+                    existingProductDetail.productName = product.productName;
+                    existingProductDetail.hsnCode = product.hsnCode;
+                    existingProductDetail.costPerUnit = product.price;
+                    isProductDetailsUpdated = true; // Mark that product details were updated
+                    return existingProductDetail;
+                } else {
+                    // Add new product to the details if it doesn't already exist
+                    isProductDetailsUpdated = true; // Mark that new products were added
+                    return {
+                        productId: product.id,
+                        productName: product.productName,
+                        quantity: productDetail.quantity,
+                        costPerUnit: product.price,
+                        totalCost: product.price * productDetail.quantity,
+                        hsnCode: product.hsnCode,
+                    };
+                }
             });
 
-            const totalAmount = productDetails.reduce((sum, product) => sum + product.totalCost, 0);
+            const totalAmount = updatedProductDetails.reduce((sum, product) => sum + product.totalCost, 0);
 
+            // If product details are updated, update the productDetails field
+            if (isProductDetailsUpdated) {
+                existingEstimate.productDetails = updatedProductDetails;
+            }
 
             existingEstimate.clientId = client;
-            existingEstimate.productDetails = productDetails;
             existingEstimate.amount = totalAmount;
 
-
             // Handle Estimate PDF Upload
-
             const updatedValues = this.estimateAdapter.convertDtoToEntity(dto);
-            updatedValues.clientId = client
+            updatedValues.clientId = client;
+
             if (estimatePdf) {
                 existingEstimate.estimatePdfUrl = await this.handleFileUpload(
                     estimatePdf,
                     existingEstimate.estimatePdfUrl,
                     'estimate_pdfs'
                 );
-                dto.estimatePdfUrl = existingEstimate.estimatePdfUrl
+                dto.estimatePdfUrl = existingEstimate.estimatePdfUrl;
                 updatedValues.estimatePdfUrl = existingEstimate.estimatePdfUrl;
-
             }
-            updatedValues.productDetails = productDetails
-            updatedValues.amount = totalAmount
+
+            updatedValues.amount = totalAmount;
+
             if (dto.convertToInvoice) {
                 const invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
-                dto.invoiceId = invoiceId
+                dto.invoiceId = invoiceId;
                 updatedValues.invoiceId = invoiceId;
 
-                // existingEstimate.CGST = (totalAmount * dto.cgstPercentage) / 100;
-                // existingEstimate.SCST = (totalAmount * dto.scstPercentage) / 100;
                 if (invoicePath) {
                     existingEstimate.invoicePdfUrl = await this.handleFileUpload(
                         invoicePath,
                         existingEstimate.invoicePdfUrl,
                         'invoices_pdfs'
                     );
-                    dto.invoicePdfUrl = existingEstimate.invoicePdfUrl
+                    dto.invoicePdfUrl = existingEstimate.invoicePdfUrl;
                     updatedValues.invoicePdfUrl = existingEstimate.invoicePdfUrl;
-
                 }
             }
-            updatedValues.CGST = (totalAmount * dto.cgstPercentage) / 100;
-            updatedValues.SCST = (totalAmount * dto.scstPercentage) / 100;
+
+            updatedValues.CGST = (totalAmount * dto.cgstPercentage) / 100 || 0;
+            updatedValues.SCST = (totalAmount * dto.scstPercentage) / 100 || 0;
+
             Object.assign(existingEstimate, updatedValues);
             await this.estimateRepository.update({ estimateId: existingEstimate.estimateId }, updatedValues);
 
-            // await this.estimateRepository.save(existingEstimate);
             return new CommonResponse(true, 200, 'Estimate details updated successfully');
         } catch (error) {
             console.error(`Error updating estimate details: ${error.message}`, error.stack);
@@ -188,11 +245,8 @@ export class EstimateService {
         return url;
     }
 
-
     async createEstimateDetails(dto: EstimateDto, estimatePdf: string | null): Promise<CommonResponse> {
         try {
-            console.log(dto, "{{{{{{{{{{{{{{{");
-
             const client = await this.clientRepository.findOne({
                 where: { clientId: dto.clientId },
             });
@@ -310,13 +364,23 @@ export class EstimateService {
 
     async deleteEstimateDetails(dto: EstimateIdDto): Promise<CommonResponse> {
         try {
-            const estimate = await this.estimateRepository.findOne({ where: { estimateId: dto.estimateId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
-            if (!estimate) {
-                return new CommonResponse(false, 404, 'Estimate not found');
+            // Find the client by client_id, companyCode, and unitCode
+            const client = await this.estimateRepository.findOne({
+                where: {
+                    estimateId: String(dto.estimateId), // Ensure clientId is treated as a string
+                    companyCode: dto.companyCode,
+                    unitCode: dto.unitCode
+                }
+            });
+
+            if (!client) {
+                return new CommonResponse(false, 404, 'estimateId not found');
             }
 
-            await this.estimateRepository.delete(dto.estimateId);
-            return new CommonResponse(true, 200, 'Estimate details deleted successfully');
+            // Now delete using clientId (not id)
+            await this.estimateRepository.delete({ estimateId: String(dto.estimateId) }); // Correct column is clientId
+
+            return new CommonResponse(true, 200, 'estimateId details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
