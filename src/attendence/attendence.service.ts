@@ -6,6 +6,8 @@ import { CreateAttendanceDto } from './dto/attendence.dto';
 import { AttendanceEntity } from './entity/attendence.entity';
 import { AttendanceAdapter } from './attendence.adapter';
 import { CommonResponse } from 'src/models/common-response';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 @Injectable()
 export class AttendanceService {
@@ -73,24 +75,24 @@ export class AttendanceService {
         }, 0);
     }
 
-    async getAttendance(staffId?: number, branchId?: number, dateRange?: { start: string, end: string }, companyCode?: string, unitCode?: string): Promise<AttendanceEntity[]> {
+    async getAttendance(req: { staffId?: string, branchId?: number, dateRange?: { start: string, end: string }, companyCode?: string, unitCode?: string }): Promise<AttendanceEntity[]> {
         const query = this.attendanceRepository.createQueryBuilder('attendance')
-            .leftJoinAndSelect('attendance.staffId', 'staff')
-            .leftJoinAndSelect('attendance.branchId', 'branch');
-        if (staffId) {
-            query.andWhere('attendance.staffId = :staffId', { staffId });
+            .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id=attendance.staff_id')
+            .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id=attendance.branch_id');
+        if (req.staffId) {
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
-        if (branchId) {
-            query.andWhere('attendance.branchId = :branchId', { branchId });
+        if (req.branchId) {
+            query.andWhere('branch.id = :branchId', { branchId: req.branchId });
         }
-        if (companyCode) {
-            query.andWhere('attendance.company_code = :companyCode', { companyCode });
+        if (req.companyCode) {
+            query.andWhere('attendance.company_code = :companyCode', { companyCode: req.companyCode });
         }
-        if (unitCode) {
-            query.andWhere('attendance.unit_code = :unitCode', { unitCode });
+        if (req.unitCode) {
+            query.andWhere('attendance.unit_code = :unitCode', { unitCode: req.unitCode });
         }
-        if (dateRange) {
-            query.andWhere('attendance.day BETWEEN :start AND :end', { start: dateRange.start, end: dateRange.end });
+        if (req.dateRange) {
+            query.andWhere('attendance.day BETWEEN :start AND :end', { start: req.dateRange.start, end: req.dateRange.end });
         }
 
         return query.getMany();

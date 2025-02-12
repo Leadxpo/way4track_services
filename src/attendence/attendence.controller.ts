@@ -21,13 +21,12 @@ export class AttendanceController {
         }
     }
 
-    @Post()
+    @Post('getAttendance')
     async getAttendance(
-        @Query('staffId') staffId?: number,
-        @Query('branchId') branchId?: number,
+        @Body() req: { staffId?: string, branchId?: number, dateRange?: { start: string, end: string }, companyCode?: string, unitCode?: string }
     ) {
         try {
-            return this.attendanceService.getAttendance(staffId, branchId);
+            return this.attendanceService.getAttendance(req);
 
         } catch (error) {
             console.error('Error in get attendance details:', error);
