@@ -20,6 +20,9 @@ export class VendorController {
   @Post('handleVendorDetails')
   async handleVendorDetails(@Body() dto: VendorDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
     try {
+      if (dto.id) {
+        dto.id = Number(dto.id);
+      }
       return await this.vendorService.handleVendorDetails(dto, photo);
     } catch (error) {
       console.error('Error in save vendor details:', error);

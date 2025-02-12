@@ -14,6 +14,7 @@ import { AccountEntity } from 'src/account/entity/account.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
+import { AppointmentEntity, AppointmentStatus } from 'src/appointment/entity/appointement.entity';
 
 export enum GSTORTDSEnum {
     GST = "GST",
@@ -170,6 +171,10 @@ export class VoucherEntity {
 
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
+
+
+    @OneToMany(() => AppointmentEntity, (voucher) => voucher.voucherId)
+    appointments: AppointmentEntity[];
 
     @OneToMany(() => WorkAllocationEntity, (voucher) => voucher.voucherId)
     workAllocation: WorkAllocationEntity[];

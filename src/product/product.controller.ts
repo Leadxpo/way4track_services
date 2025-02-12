@@ -29,6 +29,9 @@ export class ProductController {
     @UploadedFile() file: Express.Multer.File
   ): Promise<CommonResponse> {
     try {
+      if (productDto.id) {
+        productDto.id = Number(productDto.id);
+      }
       return await this.productService.createOrUpdateProduct(productDto, file);
     } catch (error) {
       console.error('Error in save details with resume in service:', error);
@@ -80,6 +83,16 @@ export class ProductController {
   async getProductNamesDropDown(): Promise<CommonResponse> {
     try {
       return this.productService.getProductNamesDropDown();
+    } catch (error) {
+      return new CommonResponse(false, 500, 'Error fetching branch type details');
+    }
+  }
+
+
+  @Post('getDetailProduct')
+  async getDetailProduct(req: CommonReq): Promise<CommonResponse> {
+    try {
+      return this.productService.getDetailProduct(req);
     } catch (error) {
       return new CommonResponse(false, 500, 'Error fetching branch type details');
     }

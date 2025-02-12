@@ -337,6 +337,20 @@ export class ProductService {
         }
     }
 
+    async getDetailProduct(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const product = await this.productRepository.getDetailProduct(req)
+            if (!product) {
+                return new CommonResponse(false, 404, 'product not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'product details fetched successfully', product);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
     async getSearchDetailProduct(req: ProductIdDto): Promise<CommonResponse> {
         try {
             const product = await this.productRepository.getSearchDetailProduct(req)

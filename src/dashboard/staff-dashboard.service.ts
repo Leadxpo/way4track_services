@@ -14,8 +14,12 @@ export class StaffDashboardService {
         @InjectRepository(StaffRepository)
         private staffRepository: StaffRepository,
     ) { }
-    async payRoll(req: CommonReq, branch?: string): Promise<CommonResponse> {
-        const staffData = await this.staffRepository.payRoll(req, branch)
+    async payRoll(req: {
+        branch?: string;
+        companyCode: string;
+        unitCode: string;
+    }): Promise<CommonResponse> {
+        const staffData = await this.staffRepository.payRoll(req)
         if (!staffData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
@@ -34,6 +38,15 @@ export class StaffDashboardService {
 
     async getStaffSearchDetails(req: StaffSearchDto) {
         const staffData = await this.staffRepository.getStaffSearchDetails(req)
+        if (!staffData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
+
+    async getStaff(req: CommonReq) {
+        const staffData = await this.staffRepository.getStaff(req)
         if (!staffData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

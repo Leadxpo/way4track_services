@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 
@@ -77,6 +78,10 @@ export class AppointmentEntity {
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.appiontment)
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
+
+    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.appointments)
+    @JoinColumn({ name: 'voucher_id' })
+    voucherId: VoucherEntity;
 
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.appointment)
     @JoinColumn({ name: 'branch_id' })

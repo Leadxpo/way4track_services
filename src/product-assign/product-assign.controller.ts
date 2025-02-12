@@ -21,6 +21,9 @@ export class ProductAssignController {
     @UseInterceptors(FileInterceptor('file', multerOptions))
     async handleProductDetails(@Body() dto: ProductAssignDto, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.productAssignService.handleProductDetails(dto, file);
         } catch (error) {
             console.error('Error in save product assignment in service:', error);

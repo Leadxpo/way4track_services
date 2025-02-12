@@ -15,4 +15,5 @@ export class AppointmentDto {
   status?: AppointmentStatus;
   companyCode: string;
   unitCode: string
+  voucherId?:string
 }

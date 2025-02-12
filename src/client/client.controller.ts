@@ -23,6 +23,9 @@ export class ClientController {
         @UploadedFile() file: Express.Multer.File
     ): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.clientService.handleClientDetails(dto, file);
         } catch (error) {
             console.error('Error in save hiring details with resume in service:', error);

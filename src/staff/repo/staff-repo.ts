@@ -18,12 +18,17 @@ export class StaffRepository extends Repository<StaffEntity> {
         super(StaffEntity, dataSource.createEntityManager());
     }
 
-    async payRoll(req: CommonReq, branch?: string) {
+    async payRoll(req: {
+        branch?: string;
+        companyCode: string;
+        unitCode: string;
+    }) {
         const query = this.createQueryBuilder('sf')
             .select(`
                 sf.staff_id AS staffId,
                 sf.name AS staffName,
                 br.name AS branch,
+                sf.staff_photo as staffPhoto,
                 ROUND(DATEDIFF(CURDATE(), sf.joining_date) / 365.25, 2) AS inExperience,
                 ROUND(
                     IFNULL(DATEDIFF(sf.joining_date, sf.before_experience) / 365.25, 0) + 
@@ -34,8 +39,8 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .where(`sf.company_code = "${req.companyCode}"`)
             .andWhere(`sf.unit_code = "${req.unitCode}"`)
-        if (branch) {
-            query.andWhere('br.name LIKE :branchName', { branchName: `%${branch}%` });
+        if (req.branch) {
+            query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
         }
         const payRollData = query.getRawMany();
         return payRollData;
@@ -207,6 +212,33 @@ export class StaffRepository extends Repository<StaffEntity> {
         return staffDetails;
     }
 
+    async getStaff(req: CommonReq) {
+        const query = this.createQueryBuilder('staff')
+            .select([
+                'staff.id as id',
+                'staff.staff_id AS staffId',
+                'staff.name AS staffName',
+                'staff.designation AS designation',
+                'staff.phone_number AS phoneNumber',
+                'staff.email AS email',
+                'staff.basic_salary as salary'
+
+            ])
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('staff.designation IN (:...designations)', {
+                designations: [
+                    DesignationEnum.Accountant,
+                    DesignationEnum.WarehouseManager,
+                    DesignationEnum.HR,
+                ],
+            });
+
+        const staffDetails = await query.getRawMany();
+        return staffDetails;
+    }
+
+
 
     async getStaffCardsDetails(req: StaffSearchDto) {
         const query = this.createQueryBuilder('staff')
@@ -269,108 +301,243 @@ export class StaffRepository extends Repository<StaffEntity> {
         return { result, staff: staffResult };
     }
 
+    // async getBranchStaffDetails(req: StaffSearchDto) {
+    //     // Main query for branch aggregate data
+    //     const query = this.createQueryBuilder('staff')
+    //         .select([
+    //             'branch.name AS branchName',
+    //             'branchManager.name AS branchManagerName',
+    //             'branchManager.phone_number AS branchManagerPhoneNumber',
+    //             'branchManager.basic_salary AS branchManagerSalary',
+    //             'COUNT(staff.staff_id) AS totalStaff',
+    //             `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
+    //             `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
+    //             `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+    //         .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
+    //         .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .groupBy('branch.name, branchManager.name, branchManager.phone_number, branchManager.basic_salary');
+
+
+    //     if (req.branchName) {
+    //         query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+    //     }
+
+    //     // Get aggregate branch data
+    //     const result = await query.getRawOne();
+
+    //     // Query to fetch all technical staff
+    //     const technicalStaffQuery = this.createQueryBuilder('staff')
+    //         .select([
+    //             'staff.staff_id AS staffId',
+    //             'staff.name AS staffName',
+    //             'staff.designation AS staffDesignation',
+    //             'branch.name AS branchName',
+    //             'staff.phone_number as phoneNumber',
+    //             'staff.email as email',
+    //             'staff.basic_salary as basicSalary'
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+    //         .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.Technician.toLowerCase() });
+
+    //     if (req.branchName) {
+    //         technicalStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
+    //     }
+
+    //     const technicalStaff = await technicalStaffQuery.getRawMany();
+
+    //     // Query to fetch all sales staff
+    //     const salesStaffQuery = this.createQueryBuilder('staff')
+    //         .select([
+    //             'staff.staff_id AS staffId',
+    //             'staff.name AS staffName',
+    //             'staff.designation AS staffDesignation',
+    //             'branch.name AS branchName',
+    //             'staff.phone_number as phoneNumber',
+    //             'staff.email as email',
+    //             'staff.basic_salary as basicSalary'
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+    //         .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.SalesMan.toLowerCase() });
+
+    //     if (req.branchName) {
+    //         salesStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
+    //     }
+
+    //     const salesStaff = await salesStaffQuery.getRawMany();
+
+    //     // Query to fetch all non-technical staff
+    //     const nonTechnicalStaffQuery = this.createQueryBuilder('staff')
+    //         .select([
+    //             'staff.staff_id AS staffId',
+    //             'staff.name AS staffName',
+    //             'staff.designation AS staffDesignation',
+    //             'branch.name AS branchName',
+    //             'staff.phone_number as phoneNumber',
+    //             'staff.email as email',
+    //             'staff.basic_salary as basicSalary'
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+    //         .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('LOWER(staff.designation) NOT IN (:...designations)', { designations: [DesignationEnum.Technician.toLowerCase(), DesignationEnum.SalesMan.toLowerCase()] });
+
+    //     if (req.branchName) {
+    //         nonTechnicalStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
+    //     }
+
+    //     const nonTechnicalStaff = await nonTechnicalStaffQuery.getRawMany();
+
+    //     return {
+    //         branch: result,
+    //         technicalStaff,
+    //         salesStaff,
+    //         nonTechnicalStaff,
+    //     };
+    // }
+
     async getBranchStaffDetails(req: StaffSearchDto) {
-        // Main query for branch aggregate data
-        const query = this.createQueryBuilder('staff')
-            .select([
-                'branch.name AS branchName',
-                'branchManager.name AS branchManagerName',
-                'branchManager.phone_number AS branchManagerPhoneNumber',
-                'branchManager.basic_salary AS branchManagerSalary',
-                'COUNT(staff.staff_id) AS totalStaff',
-                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
-                `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
-                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
-            ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
-            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('branch.name, branchManager.name, branchManager.phone_number, branchManager.basic_salary');
+        try {
+            // Main query for staff data grouped by branch, including branch manager details
+            const query = this.createQueryBuilder('staff')
+                .select([
+                    'branch.name AS branchName',
+                    'branchManager.name AS branchManagerName',
+                    'branchManager.phone_number AS branchManagerPhoneNumber',
+                    'branchManager.basic_salary AS branchManagerSalary',
+                    'COUNT(staff.staff_id) AS totalStaff',
+                    `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
+                    `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
+                    `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`
+                ])
+                .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
+                .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .groupBy('branch.name, branchManager.name, branchManager.phone_number, branchManager.basic_salary');
 
+            // Execute the query to fetch the aggregated branch data
+            const result = await query.getRawMany();
 
-        if (req.branchName) {
-            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+            // Query to fetch all technical staff for the specific branch
+            const technicalStaffQuery = this.createQueryBuilder('staff')
+                .select([
+                    'staff.staff_id AS staffId',
+                    'staff.name AS staffName',
+                    'staff.designation AS staffDesignation',
+                    'branch.name AS branchName',
+                    'staff.phone_number as phoneNumber',
+                    'staff.email as email',
+                    'staff.basic_salary as basicSalary'
+                ])
+                .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.Technician.toLowerCase() });
+
+            const technicalStaff = await technicalStaffQuery.getRawMany();
+
+            // Query to fetch all sales staff for the specific branch
+            const salesStaffQuery = this.createQueryBuilder('staff')
+                .select([
+                    'staff.staff_id AS staffId',
+                    'staff.name AS staffName',
+                    'staff.designation AS staffDesignation',
+                    'branch.name AS branchName',
+                    'staff.phone_number as phoneNumber',
+                    'staff.email as email',
+                    'staff.basic_salary as basicSalary'
+                ])
+                .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.SalesMan.toLowerCase() });
+
+            const salesStaff = await salesStaffQuery.getRawMany();
+
+            // Query to fetch all non-technical staff for the specific branch
+            const nonTechnicalStaffQuery = this.createQueryBuilder('staff')
+                .select([
+                    'staff.staff_id AS staffId',
+                    'staff.name AS staffName',
+                    'staff.designation AS staffDesignation',
+                    'branch.name AS branchName',
+                    'staff.phone_number as phoneNumber',
+                    'staff.email as email',
+                    'staff.basic_salary as basicSalary'
+                ])
+                .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .andWhere('LOWER(staff.designation) NOT IN (:...designations)', { designations: [DesignationEnum.Technician.toLowerCase(), DesignationEnum.SalesMan.toLowerCase()] });
+
+            const nonTechnicalStaff = await nonTechnicalStaffQuery.getRawMany();
+
+            // Create a map to aggregate the staff by branch
+            const branchesMap = new Map<string, any>();
+
+            result.forEach((branchData) => {
+                const { branchName, branchManagerName, branchManagerPhoneNumber, branchManagerSalary, totalStaff, totalTechnicians, totalSales, totalNonTechnicians } = branchData;
+
+                // Initialize the branch if it doesn't exist
+                if (!branchesMap.has(branchName)) {
+                    branchesMap.set(branchName, {
+                        branchName: branchName || 'N/A',
+                        branchManagerName: branchManagerName || 'N/A',
+                        branchManagerPhoneNumber: branchManagerPhoneNumber || 'N/A',
+                        branchManagerSalary: Number(branchManagerSalary) || 0,
+                        totalStaff: Number(totalStaff) || 0,
+                        totalTechnicians: Number(totalTechnicians) || 0,
+                        totalSales: Number(totalSales) || 0,
+                        totalNonTechnicians: Number(totalNonTechnicians) || 0,
+                        technicalStaff: [],
+                        salesStaff: [],
+                        nonTechnicalStaff: []
+                    });
+                }
+
+                // Push the corresponding technical, sales, and non-technical staff data to the branch
+                technicalStaff.forEach(staff => {
+                    if (staff.branchName === branchName) {
+                        branchesMap.get(branchName)?.technicalStaff.push(staff);
+                    }
+                });
+
+                salesStaff.forEach(staff => {
+                    if (staff.branchName === branchName) {
+                        branchesMap.get(branchName)?.salesStaff.push(staff);
+                    }
+                });
+
+                nonTechnicalStaff.forEach(staff => {
+                    if (staff.branchName === branchName) {
+                        branchesMap.get(branchName)?.nonTechnicalStaff.push(staff);
+                    }
+                });
+            });
+
+            // Convert the map to an array of branch objects
+            const results = Array.from(branchesMap.values());
+
+            return {
+                status: true,
+                errorCode: 200,
+                internalMessage: "Data retrieved successfully",
+                data: results
+            };
+
+        } catch (error) {
+            console.error('Error fetching branch staff details:', error);
+            throw new Error('Failed to fetch branch staff details');
         }
-
-        // Get aggregate branch data
-        const result = await query.getRawOne();
-
-        // Query to fetch all technical staff
-        const technicalStaffQuery = this.createQueryBuilder('staff')
-            .select([
-                'staff.staff_id AS staffId',
-                'staff.name AS staffName',
-                'staff.designation AS staffDesignation',
-                'branch.name AS branchName',
-                'staff.phone_number as phoneNumber',
-                'staff.email as email',
-                'staff.basic_salary as basicSalary'
-            ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.Technician.toLowerCase() });
-
-        if (req.branchName) {
-            technicalStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
-        }
-
-        const technicalStaff = await technicalStaffQuery.getRawMany();
-
-        // Query to fetch all sales staff
-        const salesStaffQuery = this.createQueryBuilder('staff')
-            .select([
-                'staff.staff_id AS staffId',
-                'staff.name AS staffName',
-                'staff.designation AS staffDesignation',
-                'branch.name AS branchName',
-                'staff.phone_number as phoneNumber',
-                'staff.email as email',
-                'staff.basic_salary as basicSalary'
-            ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('LOWER(staff.designation) = :designation', { designation: DesignationEnum.SalesMan.toLowerCase() });
-
-        if (req.branchName) {
-            salesStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
-        }
-
-        const salesStaff = await salesStaffQuery.getRawMany();
-
-        // Query to fetch all non-technical staff
-        const nonTechnicalStaffQuery = this.createQueryBuilder('staff')
-            .select([
-                'staff.staff_id AS staffId',
-                'staff.name AS staffName',
-                'staff.designation AS staffDesignation',
-                'branch.name AS branchName',
-                'staff.phone_number as phoneNumber',
-                'staff.email as email',
-                'staff.basic_salary as basicSalary'
-            ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('LOWER(staff.designation) NOT IN (:...designations)', { designations: [DesignationEnum.Technician.toLowerCase(), DesignationEnum.SalesMan.toLowerCase()] });
-
-        if (req.branchName) {
-            nonTechnicalStaffQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
-        }
-
-        const nonTechnicalStaff = await nonTechnicalStaffQuery.getRawMany();
-
-        return {
-            branch: result,
-            technicalStaff,
-            salesStaff,
-            nonTechnicalStaff,
-        };
     }
 
-  
 }
 
 

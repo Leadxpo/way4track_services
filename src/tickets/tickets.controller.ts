@@ -11,6 +11,9 @@ export class TicketsController {
     @Post('handleTicketDetails')
     async handleTicketDetails(@Body() dto: TicketsDto): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.ticketsService.handleTicketDetails(dto);
         } catch (error) {
             console.error('Error in save ticket details in service:', error);

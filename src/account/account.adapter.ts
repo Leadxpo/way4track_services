@@ -13,15 +13,15 @@ export class AccountAdapter {
         branch.id = dto.branchId;
         account.branch = branch;
         // Mapping Other Properties
-        account.name = dto.name;
+        account.name = dto.bankName;
         account.accountType = dto.accountType;
         account.accountNumber = dto.accountNumber;
         account.ifscCode = dto.ifscCode;
-        account.phoneNumber = dto.phoneNumber;
-        account.address = dto.address;
+        account.phoneNumber = dto.bankPhoneNumber;
+        account.address = dto.bankAddress;
         account.companyCode = dto.companyCode;
         account.unitCode = dto.unitCode;
-        account.accountName = dto.accountName;
+        account.accountName = dto.accountHolderName;
         account.totalAmount = dto.totalAmount;
         if (dto.id) {
             account.id = dto.id
@@ -29,23 +29,25 @@ export class AccountAdapter {
         return account;
     }
 
+    // Convert Entity to DTO using constructor
     convertEntityToDto(entities: AccountEntity[]): AccountResDto[] {
-        return entities.map((entity) => {
-            const response = new AccountResDto();
-            response.id = entity.id;
-            response.name = entity.name;
-            response.accountType = entity.accountType;
-            response.accountNumber = entity.accountNumber;
-            response.ifscCode = entity.ifscCode;
-            response.phoneNumber = entity.phoneNumber;
-            response.address = entity.address;
-            response.companyCode = entity.companyCode;
-            response.unitCode = entity.unitCode;
-            response.branchId = entity.branch?.id;
-            response.branchName = entity.branch?.branchName;
-            response.accountName = entity.accountName
-            response.totalAmount = entity.totalAmount
-            return response;
-        });
+        return entities.map(
+            (entity) =>
+                new AccountResDto(
+                    entity.id,
+                    entity.name,
+                    entity.accountType,
+                    entity.accountNumber,
+                    entity.ifscCode,
+                    entity.phoneNumber,
+                    entity.address,
+                    entity.companyCode,
+                    entity.unitCode,
+                    entity.branch?.id ?? 0, // Provide default value if null
+                    entity.branch?.branchName ?? '',
+                    entity.accountName,
+                    entity.totalAmount
+                )
+        );
     }
 }

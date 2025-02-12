@@ -19,6 +19,9 @@ export class VoucherController {
     async saveVoucher(@Body() dto: VoucherDto,
         @UploadedFile() file?: Express.Multer.File,): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             const savedVoucher = await this.voucherService.handleVoucher(dto, file);
             return new CommonResponse(true, 200, 'Voucher saved successfully', savedVoucher);
         } catch (error) {

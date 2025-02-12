@@ -21,6 +21,9 @@ export class SubDealerController {
     @Post('handleSubDealerDetails')
     async handleSubDealerDetails(@Body() dto: SubDealerDto, @UploadedFile() photo?: Express.Multer.File) {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.subDealerService.handleSubDealerDetails(dto, photo);
         } catch (error) {
             console.log("Error in create address in services..", error)

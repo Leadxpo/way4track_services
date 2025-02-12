@@ -171,6 +171,7 @@ export class RequestRaiseService {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
                 'req.request_id AS requestNumber',
+                'req.id as requestId',
                 // 'client.name AS client',
                 'branch.name AS branchName',
                 'req.created_date AS paymentDate',

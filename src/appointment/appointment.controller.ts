@@ -11,6 +11,9 @@ export class AppointmentController {
   @Post('handleAppointmentDetails')
   async handleAppointmentDetails(@Body() dto: AppointmentDto): Promise<CommonResponse> {
     try {
+      if (dto.id) {
+        dto.id = Number(dto.id);
+      }
       return await this.appointmentService.handleAppointmentDetails(dto);
     } catch (error) {
       console.error('Error in save appointment details:', error);

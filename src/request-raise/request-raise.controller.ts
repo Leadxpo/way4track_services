@@ -12,6 +12,9 @@ export class RequestRaiseController {
     @Post('handleRequestDetails')
     async handleRequestDetails(@Body() dto: RequestRaiseDto): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.requestService.handleRequestDetails(dto);
         } catch (error) {
             console.error('Error in save request details in service:', error);
@@ -83,5 +86,5 @@ export class RequestRaiseController {
             return new CommonResponse(false, 500, "Error fetching today's requests");
         }
     }
-    
+
 }

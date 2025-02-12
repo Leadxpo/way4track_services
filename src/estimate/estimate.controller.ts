@@ -15,8 +15,8 @@ const multerOptions = {
 };
 @Controller('estimate')
 export class EstimateController {
-    constructor(private readonly estimateService: EstimateService) {}
-   
+    constructor(private readonly estimateService: EstimateService) { }
+
 
     @Post('handleEstimateDetails')
     @UseInterceptors(FileFieldsInterceptor([
@@ -27,6 +27,9 @@ export class EstimateController {
         @Body() dto: EstimateDto,
         @UploadedFiles() files: { estimatePdf?: Express.Multer.File[], invoicePDF?: Express.Multer.File[] }
     ): Promise<CommonResponse> {
+        if (dto.id) {
+            dto.id = Number(dto.id);
+        }
         try {
             return await this.estimateService.uploadAndHandleEstimateDetails(dto, files);
         } catch (error) {

@@ -293,6 +293,57 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
+    async getClientPurchaseOrderDataTable(req: {
+        phoneNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'cl.name AS clientName',
+                'cl.phone_number AS phoneNumber',
+                'cl.client_id AS clientId',
+                'cl.address AS address',
+                've.voucher_id AS voucherId',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                've.name AS name',
+                've.quantity AS quantity',
+                've.payment_status AS paymentStatus',
+                'pa.product_name AS productName',
+                'SUM(ve.amount) AS totalAmount'
+            ])
+            .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            // Optional filters based on provided phoneNumber, companyCode, and unitCode
+            .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // If phoneNumber is provided, filter by phoneNumber
+        if (req.phoneNumber) {
+            query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
+        }
+
+        // Group by necessary fields
+        query.groupBy('ve.voucher_id')
+            .addGroupBy('cl.name')
+            .addGroupBy('cl.phone_number')
+            .addGroupBy('cl.client_id')
+            .addGroupBy('cl.address')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.name')
+            .addGroupBy('ve.quantity')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('pa.product_name');
+
+        // Execute the query and return results
+        const result = await query.getRawMany();
+        return result;
+    }
+
+
     async getLedgerDataById(req: {
         subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     }) {

@@ -23,6 +23,9 @@ export class StaffController {
         @Body() dto: StaffDto,
         @UploadedFile() photo?: Express.Multer.File,
     ): Promise<CommonResponse> {
+        if (dto.id) {
+            dto.id = Number(dto.id);
+        }
         return this.staffService.handleStaffDetails(dto, photo);
     }
 

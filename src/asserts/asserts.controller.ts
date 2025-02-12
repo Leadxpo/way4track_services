@@ -23,6 +23,9 @@ export class AssertsController {
         @Body() createAssertsDto: AssertsDto,
         @UploadedFile() photo: Express.Multer.File,
     ): Promise<CommonResponse> {
+        if (createAssertsDto.id) {
+            createAssertsDto.id = Number(createAssertsDto.id);
+        }
         return this.assertsService.create(createAssertsDto, photo);
     }
 

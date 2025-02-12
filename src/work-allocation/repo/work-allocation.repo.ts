@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
 import { WorkAllocationEntity } from "../entity/work-allocation.entity";
 import { WorkStatusEnum } from "../enum/work-status-enum";
+import { StaffEntity } from "src/staff/entity/staff.entity";
 
 
 @Injectable()
@@ -57,10 +58,12 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
             .select([
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
+                'v.amount as amount',
                 'COUNT(wa.id) AS totalAppointments',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
-            .leftJoin('staff', 'staff', 'wa.staff_id = staff.id')
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .leftJoin('wa.voucherId', 'v')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('wa.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
@@ -84,10 +87,10 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'COUNT(wa.id) AS totalAppointments',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
-            .leftJoin('staff', 'staff', 'wa.staff_id = staff.id')
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('wa.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
             .andWhere('YEAR(wa.date) = :year', { year: req.year })  // Filter for the specified year
             .groupBy('YEAR(wa.date), MONTH(wa.date)')  // Group by year and month
             .addGroupBy('staff.name')

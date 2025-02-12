@@ -11,6 +11,9 @@ export class WorkAllocationController {
     @Post('handleWorkAllocationDetails')
     async handleWorkAllocationDetails(@Body() dto: WorkAllocationDto) {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return this.workAllocationService.handleWorkAllocationDetails(dto);
 
         } catch (error) {

@@ -201,4 +201,31 @@ export class HiringService {
             totalQualified: parseInt(result.totalQualified, 10) || 0,
         };
     }
+
+
+    async getHiringTodayDetails(req: CommonReq) {
+        const query = this.hiringRepository.createQueryBuilder('hiring')
+            .select([
+                'hiring.id AS hiringId',
+                'hiring.candidate_name AS candidateName',
+                'hiring.phone_number AS phoneNumber',
+                'hiring.email AS email',
+                'hiring.address AS address',
+                'hiring.qualifications AS qualifications',
+                'hiring.resume_path AS resumePath',
+                'hiring.date_of_upload AS dateOfUpload',
+                'hiring.status AS status',
+                'hiring.company_code AS companyCode',
+                'hiring.unit_code AS unitCode',
+                'hiring.hiring_level AS hiringLevel',
+            ])
+            .where('hiring.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('hiring.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('DATE(hiring.created_at) = CURRENT_DATE');  // Change this if your date column is different, like 'created_at'
+
+        const result = await query.getRawMany();
+        return result;
+    }
+
+
 }

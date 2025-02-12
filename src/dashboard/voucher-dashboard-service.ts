@@ -224,6 +224,20 @@ export class VoucherDashboardService {
 
     }
 
+    async getClientPurchaseOrderDataTable(req: {
+        phoneNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getClientPurchaseOrderDataTable(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getLedgerDataById(req: {
         subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     }): Promise<CommonResponse> {

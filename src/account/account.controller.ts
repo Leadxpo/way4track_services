@@ -13,6 +13,9 @@ export class AccountController {
     @Post('createAccount')
     async createAccount(@Body() dto: AccountDto): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.accountService.createAccount(dto);
         } catch (error) {
             console.error('Error in save account details:', error);

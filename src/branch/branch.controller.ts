@@ -16,14 +16,20 @@ const multerOptions = {
 @Controller('branch')
 export class BranchController {
     constructor(private readonly branchService: BranchService) { }
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
-    @Post('saveBranchDetails')
+
+
+    @UseInterceptors(FileInterceptor("photo", multerOptions))
+    @Post("saveBranchDetails")
     async saveBranchDetails(
         @Body() dto: BranchDto,
-        @UploadedFile() photo: Express.Multer.File,
+        @UploadedFile() photo: Express.Multer.File
     ): Promise<CommonResponse> {
+        if (dto.id) {
+            dto.id = Number(dto.id);
+        }
         return this.branchService.saveBranchDetails(dto, photo);
     }
+
     @Post('deleteBranchDetails')
     async deleteBranchDetails(@Body() dto: BranchIdDto): Promise<CommonResponse> {
         try {

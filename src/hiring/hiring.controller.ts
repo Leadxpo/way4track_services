@@ -24,6 +24,9 @@ export class HiringController {
         @UploadedFile() file: Express.Multer.File
     ): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.hiringService.saveHiringDetails(dto, file);
         } catch (error) {
             console.error('Error in save hiring details with resume in service:', error);
@@ -34,6 +37,11 @@ export class HiringController {
     @Post('getCandidatesStatsLast30Days')
     async getCandidatesStatsLast30Days(@Body() req: CommonReq) {
         return await this.hiringService.getCandidatesStatsLast30Days(req);
+    }
+
+    @Post('getHiringTodayDetails')
+    async getHiringTodayDetails(@Body() req: CommonReq) {
+        return await this.hiringService.getHiringTodayDetails(req);
     }
 
     @Post('deleteHiringDetails')

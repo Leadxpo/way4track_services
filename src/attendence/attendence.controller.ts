@@ -10,6 +10,9 @@ export class AttendanceController {
     @Post('createAttendance')
     async createAttendance(@Body() dto: CreateAttendanceDto): Promise<CommonResponse> {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return this.attendanceService.saveAttendance(dto);
 
         } catch (error) {

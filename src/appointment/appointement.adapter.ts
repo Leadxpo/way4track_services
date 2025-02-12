@@ -5,6 +5,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { AppointmentDto } from './dto/appointement.dto';
 import { AppointmentResDto } from './dto/appointment-res.sto';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 
 
 @Injectable()
@@ -22,6 +23,9 @@ export class AppointmentAdapter {
         const staff = new StaffEntity();
         staff.id = dto.assignedToId;
         entity.staffId = staff;
+        const voucher = new VoucherEntity()
+        voucher.voucherId = dto.voucherId
+        entity.voucherId = voucher
 
         const branch = new BranchEntity();
         branch.id = dto.branchId;
@@ -58,7 +62,8 @@ export class AppointmentAdapter {
                 entity.status,
                 entity.appointmentId,
                 entity.companyCode,
-                entity.unitCode
+                entity.unitCode,
+                entity.voucherId.voucherId || ''
             );
         });
     }
