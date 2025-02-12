@@ -11,7 +11,7 @@ export class HiringDto {
     address: string;
     qualifications: { qualificationName: string; marks: number; yearOfPass: number }[];
     levelWiseData: {
-        dateOfConductor: number,
+        dateOfConductor: string,
         conductorBy: DesignationEnum.HR,
         conductorPlace: string,
         result: string,

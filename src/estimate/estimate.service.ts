@@ -36,103 +36,45 @@ export class EstimateService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
+
     async updateEstimateDetails(
         dto: EstimateDto,
-        estimatePdf: string | null,
-        invoicePath: string | null
+        estimatePdf?: string,
+        invoicePath?: string
     ): Promise<CommonResponse> {
         try {
-            let existingEstimate: EstimateEntity | null = null;
 
-            if (!dto.id && !dto.estimateId) {
-                return new CommonResponse(false, 400, 'Either Estimate ID or Estimate ID must be provided');
-            }
-            if (dto.id) {
-                existingEstimate = await this.estimateRepository.findOne({ where: { id: dto.id } });
-            } else if (dto.clientId) {
-                existingEstimate = await this.estimateRepository.findOne({ where: { estimateId: dto.estimateId } });
-            }
-
+            const existingEstimate = await this.estimateRepository.findOne({
+                where: { id: dto.id, estimateId: dto.estimateId || undefined },
+            });
             if (!existingEstimate) {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id || dto.estimateId} not found`);
             }
-            console.log(dto, estimatePdf, invoicePath, "======updated valueds=====")
-            let productDetailsArray: ProductDetailDto[] = [];
-
-            if (dto.productDetails !== undefined) {  // Ensure it is not undefined
-                if (typeof dto.productDetails === 'string') {
-                    try {
-                        // Parse the productDetails string into an array
-                        productDetailsArray = JSON.parse(dto.productDetails);
-
-                        // Check if the result is actually an array after parsing
-                        if (!Array.isArray(productDetailsArray)) {
-                            throw new Error('Invalid format for productDetails. Expected an array after parsing JSON.');
-                        }
-                    } catch (error) {
-                        console.error('Failed to parse productDetails as JSON:', error);
-                        throw new Error('Failed to parse productDetails as JSON');
-                    }
-                } else if (Array.isArray(dto.productDetails)) {
-                    // If it's already an array, just use it
-                    productDetailsArray = dto.productDetails;
-                } else {
-                    console.error('Invalid format for productDetails. Expected an array or string');
-                    throw new Error('Invalid format for productDetails. Expected an array or string');
-                }
-
-                // Ensure the parsed productDetailsArray is not empty
-                if (productDetailsArray.length === 0) {
-                    if (!existingEstimate.productDetails || existingEstimate.productDetails.length === 0) {
-                        throw new Error('Product details are empty or missing');
-                    }
-                }
-            }
-
-
-
-            console.log(productDetailsArray, "+++++")
-            // Proceed with existing logic for updating the estimate
-
 
             const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
 
-            const productIds = productDetailsArray.map((p) => p.productId);
-            const products = await this.productRepository.find({ where: { id: In(productIds) } });
+            let productDetails: ProductDetailDto[] = Array.isArray(dto.productDetails)
+                ? dto.productDetails
+                : dto.productDetails ? JSON.parse(dto.productDetails) : [];
 
-            if (products.length !== productIds.length) {
-                throw new Error('Some products in the provided details do not exist');
-            }
+            let updatedProductDetails = existingEstimate.productDetails || [];
 
-            // Retrieve existing product details linked to the estimate
-            const existingProductDetails = existingEstimate.productDetails || [];
+            if (productDetails.length > 0) {
+                const productIds = productDetails
+                    .map(p => p.productId && !isNaN(Number(p.productId)) ? Number(p.productId) : null)
+                    .filter(id => id !== null);
 
-            // Flag to check if there are any changes to product details
-            let isProductDetailsUpdated = false;
+                const products = await this.productRepository.find({ where: { id: In(productIds) } });
 
-            // Update or add new products to the existing estimate
-            const updatedProductDetails = productDetailsArray.map((productDetail) => {
-                const existingProductDetail = existingProductDetails.find(
-                    (existingProduct) => existingProduct.productId === productDetail.productId
-                );
+                if (products.length !== productIds.length) {
+                    throw new Error('Some products in the provided details do not exist');
+                }
 
-                const product = products.find((p) => p.id === productDetail.productId);
-
-                if (existingProductDetail) {
-                    // Update existing product detail (e.g., updating quantity and total cost)
-                    existingProductDetail.quantity = productDetail.quantity;
-                    existingProductDetail.totalCost = product.price * productDetail.quantity;
-                    existingProductDetail.productName = product.productName;
-                    existingProductDetail.hsnCode = product.hsnCode;
-                    existingProductDetail.costPerUnit = product.price;
-                    isProductDetailsUpdated = true; // Mark that product details were updated
-                    return existingProductDetail;
-                } else {
-                    // Add new product to the details if it doesn't already exist
-                    isProductDetailsUpdated = true; // Mark that new products were added
+                updatedProductDetails = productDetails.map(productDetail => {
+                    const product = products.find(p => p.id === Number(productDetail.productId));
                     return {
                         productId: product.id,
                         productName: product.productName,
@@ -141,56 +83,32 @@ export class EstimateService {
                         totalCost: product.price * productDetail.quantity,
                         hsnCode: product.hsnCode,
                     };
-                }
-            });
+                });
+            }
 
             const totalAmount = updatedProductDetails.reduce((sum, product) => sum + product.totalCost, 0);
 
-            // If product details are updated, update the productDetails field
-            if (isProductDetailsUpdated) {
-                existingEstimate.productDetails = updatedProductDetails;
-            }
-
+            existingEstimate.productDetails = updatedProductDetails;
             existingEstimate.clientId = client;
             existingEstimate.amount = totalAmount;
 
-            // Handle Estimate PDF Upload
-            const updatedValues = this.estimateAdapter.convertDtoToEntity(dto);
-            updatedValues.clientId = client;
-
             if (estimatePdf) {
-                existingEstimate.estimatePdfUrl = await this.handleFileUpload(
-                    estimatePdf,
-                    existingEstimate.estimatePdfUrl,
-                    'estimate_pdfs'
-                );
-                dto.estimatePdfUrl = existingEstimate.estimatePdfUrl;
-                updatedValues.estimatePdfUrl = existingEstimate.estimatePdfUrl;
+                existingEstimate.estimatePdfUrl = await this.handleFileUpload(estimatePdf, existingEstimate.estimatePdfUrl, 'estimate_pdfs');
+                // dto.estimatePdfUrl = existingEstimate.estimatePdfUrl;
+
             }
 
-            updatedValues.amount = totalAmount;
-
             if (dto.convertToInvoice) {
-                const invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
-                dto.invoiceId = invoiceId;
-                updatedValues.invoiceId = invoiceId;
-
+                existingEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
                 if (invoicePath) {
-                    existingEstimate.invoicePdfUrl = await this.handleFileUpload(
-                        invoicePath,
-                        existingEstimate.invoicePdfUrl,
-                        'invoices_pdfs'
-                    );
-                    dto.invoicePdfUrl = existingEstimate.invoicePdfUrl;
-                    updatedValues.invoicePdfUrl = existingEstimate.invoicePdfUrl;
+                    existingEstimate.invoicePdfUrl = await this.handleFileUpload(invoicePath, existingEstimate.invoicePdfUrl, 'invoices_pdfs');
                 }
             }
 
-            updatedValues.CGST = (totalAmount * dto.cgstPercentage) / 100 || 0;
-            updatedValues.SCST = (totalAmount * dto.scstPercentage) / 100 || 0;
+            existingEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100;
+            existingEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100;
 
-            Object.assign(existingEstimate, updatedValues);
-            await this.estimateRepository.update({ estimateId: existingEstimate.estimateId }, updatedValues);
+            await this.estimateRepository.save(existingEstimate);
 
             return new CommonResponse(true, 200, 'Estimate details updated successfully');
         } catch (error) {
@@ -198,6 +116,7 @@ export class EstimateService {
             throw new ErrorResponse(500, `Failed to update estimate details: ${error.message}`);
         }
     }
+
 
     private async handleFileUpload(newFile: string, existingFileUrl: string | null, folder: string): Promise<string> {
         if (existingFileUrl && newFile !== existingFileUrl) {

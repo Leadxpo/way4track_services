@@ -32,7 +32,7 @@ export class HiringEntity extends BaseEntity {
 
     @Column('json', { name: 'level_wise_data', nullable: true })
     levelWiseData: {
-        dateOfConductor: number,
+        dateOfConductor: string,
         conductorBy: DesignationEnum.HR,
         conductorPlace: string,
         result: string,
