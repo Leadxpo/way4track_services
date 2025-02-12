@@ -135,6 +135,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
         return finalResult;
     }
+
+    
     async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string }) {
         try {
             // Base query for grouping branches

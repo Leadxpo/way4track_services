@@ -22,6 +22,15 @@ export class PermissionsController {
         }
     }
 
+    @Post('savePermissionDetails')
+    async savePermissionDetails(@Body() dto: PermissionsDto): Promise<CommonResponse> {
+        try {
+            return this.service.savePermissionDetails(dto);
+        } catch (error) {
+            console.log("Error in create Permission in services..", error)
+        }
+    }
+
 
     @Post('getPermissionDetails')
     async getPermissionDetails(@Body() req: PermissionIdDto): Promise<CommonResponse> {

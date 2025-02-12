@@ -554,27 +554,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-    // async getMonthWiseBalance(req: BranchChartDto) {
-    //     const query = this.createQueryBuilder('ve')
-    //         .select([
-    //             `YEAR(ve.generation_date) AS year`,
-    //             `MONTH(ve.generation_date) AS month`,
-    //             `MONTHNAME(ve.generation_date) AS monthName`,
-    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
-    //             `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
-    //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
-    //         ])
-    //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-    //         .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
-    //         .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
-    //         .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-    //         .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-    //         .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date),branch.name');  // Added MONTHNAME to GROUP BY
-
-    //     const result = await query.getRawMany();
-    //     return result;
-
-    // }
 
     async getMonthWiseBalance(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')

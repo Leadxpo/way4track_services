@@ -184,14 +184,14 @@ export class HiringService {
             .createQueryBuilder('hiring')
             .select('COUNT(*) AS totalAttended')
             .addSelect('SUM(CASE WHEN hiring.status = :qualifiedStatus THEN 1 ELSE 0 END) AS totalQualified')
-            .where('hiring.date_of_upload > :thirtyDaysAgo')
-            .andWhere('hiring.companyCode = :companyCode')
-            .andWhere('hiring.unitCode = :unitCode')
+            .where('hiring.created_at > :thirtyDaysAgo')
+            .andWhere('hiring.company_code = :companyCode')
+            .andWhere('hiring.unit_code = :unitCode')
             .setParameters({
                 thirtyDaysAgo: thirtyDaysAgo.toISOString(),
                 companyCode: req.companyCode,
                 unitCode: req.unitCode,
-                qualifiedStatus: HiringStatus.QUALIFIED,
+                qualifiedStatus: HiringStatus.QUALIFIED,  // Ensure the status is referred here correctly
             })
             .getRawOne();
 
@@ -203,7 +203,17 @@ export class HiringService {
     }
 
 
+
     async getHiringTodayDetails(req: CommonReq) {
+        const timezoneOffset = new Date().getTimezoneOffset(); // in minutes (positive = behind UTC, negative = ahead of UTC)
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);  // Set to midnight in local time
+        startOfDay.setMinutes(startOfDay.getMinutes() - timezoneOffset); // Adjust for the timezone offset
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);  // Set to the end of the day in local time
+        endOfDay.setMinutes(endOfDay.getMinutes() - timezoneOffset);  // Set to the end of the day
+
         const query = this.hiringRepository.createQueryBuilder('hiring')
             .select([
                 'hiring.id AS hiringId',
@@ -221,11 +231,52 @@ export class HiringService {
             ])
             .where('hiring.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('hiring.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('DATE(hiring.created_at) = CURRENT_DATE');  // Change this if your date column is different, like 'created_at'
+            .andWhere('hiring.created_at BETWEEN :startOfDay AND :endOfDay', {
+                startOfDay: startOfDay.toISOString(),
+                endOfDay: endOfDay.toISOString(),
+            });
 
         const result = await query.getRawMany();
         return result;
     }
+
+    // async getHiringTodayDetails(req: CommonReq) {
+    //     const timezoneOffset = 5.5 * 60;  // Timezone offset in minutes (for UTC+5:30)
+    //     const startOfDay = new Date();
+    //     startOfDay.setHours(0, 0, 0, 0);  // Set to midnight in local time
+    //     startOfDay.setMinutes(startOfDay.getMinutes() - timezoneOffset);  // Adjust for the timezone offset
+
+    //     const endOfDay = new Date();
+    //     endOfDay.setHours(23, 59, 59, 999);  // Set to the end of the day in local time
+    //     endOfDay.setMinutes(endOfDay.getMinutes() - timezoneOffset);  // Adjust for the timezone offset
+
+    //     const query = this.hiringRepository.createQueryBuilder('hiring')
+    //         .select([
+    //             'hiring.id AS hiringId',
+    //             'hiring.candidate_name AS candidateName',
+    //             'hiring.phone_number AS phoneNumber',
+    //             'hiring.email AS email',
+    //             'hiring.address AS address',
+    //             'hiring.qualifications AS qualifications',
+    //             'hiring.resume_path AS resumePath',
+    //             'hiring.date_of_upload AS dateOfUpload',
+    //             'hiring.status AS status',
+    //             'hiring.company_code AS companyCode',
+    //             'hiring.unit_code AS unitCode',
+    //             'hiring.hiring_level AS hiringLevel',
+    //         ])
+    //         .where('hiring.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('hiring.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('hiring.created_at BETWEEN :startOfDay AND :endOfDay', {
+    //             startOfDay: startOfDay.toISOString(),
+    //             endOfDay: endOfDay.toISOString(),
+    //         });
+
+    //     const result = await query.getRawMany();
+    //     return result;
+    // }
+
+
 
 
 }

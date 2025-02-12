@@ -90,7 +90,7 @@ export class ProductController {
 
 
   @Post('getDetailProduct')
-  async getDetailProduct(req: CommonReq): Promise<CommonResponse> {
+  async getDetailProduct(@Body() req: CommonReq): Promise<CommonResponse> {
     try {
       return this.productService.getDetailProduct(req);
     } catch (error) {

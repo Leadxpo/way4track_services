@@ -1,7 +1,7 @@
 import { ProductStatusEnum } from "src/product/enum/product-status.enum";
 
 export class ProductAssignDto {
-    id: number;
+    id?: number;
     staffId: number;
     productId: number;
     branchId: number;

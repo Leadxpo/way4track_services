@@ -106,7 +106,7 @@ export class ProductAssignService {
             if (photoPath) {
                 entity.productAssignPhoto = photoPath;
             }
-
+            console.log(entity, "??????????????")
             await this.productAssignRepository.insert(entity);
 
             await this.assignProductsByImei(
@@ -227,8 +227,9 @@ export class ProductAssignService {
                 photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
             // Handle photo upload
-            const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
-            if (existingProduct) {
+            // const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+            if (dto.id) {
+                console.log(dto, "<<<<")
                 return await this.updateProductAssign(dto, photoPath);
             } else {
                 // Create a new Product

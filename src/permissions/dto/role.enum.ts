@@ -7,7 +7,7 @@ export enum Roles {
     Vendor = 'vendor',
     SubDealer = 'subdealer',
     Hiring = 'hiring',
-    Bank = 'bak',
+    Bank = 'bank',
     Product = 'product',
     ProductAssign = 'productassign',
     Tickets = 'tickets',

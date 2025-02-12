@@ -28,8 +28,8 @@ export class ProductRepository extends Repository<ProductEntity> {
             ])
             .leftJoin('pr.vendorId', 'vendor')
             .leftJoin('pr.voucherId', 'voucher')
-            .where('pr.companyCode = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pr.unitCode = :unitCode', { unitCode: req.unitCode });
+            .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.id) {
             query.andWhere('pr.id = :productId', { productId: req.id });
@@ -52,13 +52,17 @@ export class ProductRepository extends Repository<ProductEntity> {
 
 
     async getDetailProduct(req: CommonReq) {
+        console.log('Request Object:', req);
+        console.log('Company Code:', req.companyCode);
+        console.log('Unit Code:', req.unitCode);
+
         const query = this.createQueryBuilder('pr')
             .select([
                 'pr.product_name AS productName',
                 'SUM(pr.quantity) AS presentStock'
             ])
-            .where('pr.companyCode = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pr.unitCode = :unitCode', { unitCode: req.unitCode })
+            .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode })
             .groupBy('pr.product_name');
 
         const result = await query.getRawMany();
