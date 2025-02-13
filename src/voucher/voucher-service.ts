@@ -8,7 +8,7 @@ import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { PayEmiDto } from "./dto/pay-emi.dto";
 import { VoucherIdDto } from "./dto/voucher-id.dto";
 import { VoucherResDto } from "./dto/voucher-res.dto";
-import { VoucherDto } from "./dto/voucher.dto";
+import { ProductDetailDto, VoucherDto } from "./dto/voucher.dto";
 import { VoucherEntity } from "./entity/voucher.entity";
 import { VoucherTypeEnum } from "./enum/voucher-type-enum";
 import { VoucherRepository } from "./repo/voucher.repo";
@@ -17,6 +17,7 @@ import { AccountEntity } from "src/account/entity/account.entity";
 import { EmiPaymentEntity } from "./entity/emi-payments";
 import { EmiPaymentRepository } from "./repo/emi-payment-repo";
 import { Storage } from '@google-cloud/storage';
+import { ProductRepository } from "src/product/repo/product.repo";
 
 @Injectable()
 export class VoucherService {
@@ -28,7 +29,9 @@ export class VoucherService {
         private readonly accountRepo: AccountRepository,
         private readonly estimateRepo: EstimateRepository,
         private readonly accountRepository: AccountRepository,
-        private readonly emiPaymentRepository: EmiPaymentRepository
+        private readonly emiPaymentRepository: EmiPaymentRepository,
+        private readonly productRepository: ProductRepository,
+
 
     ) {
         this.storage = new Storage({
@@ -97,107 +100,288 @@ export class VoucherService {
         }
     }
 
+    // async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
+    //     try {
+    //         const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
+    //         const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
+
+    //         // Fetch From Account (Mandatory for all transactions)
+    //         const fromAccount = await this.accountRepository.findOne({
+    //             where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.fromAccount },
+    //         });
+
+    //         if (!fromAccount) {
+    //             throw new Error('From account not found.');
+    //         }
+
+    //         let toAccount: AccountEntity | null = null;
+
+    //         // For CONTRA transactions, To Account is mandatory
+    //         if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
+    //             if (!voucherDto.toAccount) {
+    //                 throw new Error('To account is required for CONTRA transactions.');
+    //             }
+
+    //             toAccount = await this.accountRepository.findOne({
+    //                 where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.toAccount },
+    //             });
+
+    //             if (!toAccount) {
+    //                 throw new Error('To account not found for CONTRA transaction.');
+    //             }
+    //         }
+
+    //         const voucherAmount = voucherDto.amount; // Corrected to use DTO amount
+    //         console.log(voucherAmount, "voucherAmountvoucherAmount")
+    //         // Check for sufficient funds before deducting
+    //         if (
+    //             [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
+    //             && fromAccount.totalAmount < voucherAmount
+    //         ) {
+    //             throw new Error('Insufficient funds in the from account.');
+    //         }
+
+    //         switch (voucherEntity.voucherType) {
+    //             // case VoucherTypeEnum.RECEIPT:
+    //             //     fromAccount.totalAmount += voucherAmount;
+    //             //     break;
+    //             case VoucherTypeEnum.RECEIPT:
+    //                 console.log('Before updating totalAmount:', fromAccount.totalAmount);
+    //                 fromAccount.totalAmount = Number(fromAccount.totalAmount) + Number(voucherAmount);
+    //                 console.log('After updating totalAmount:', fromAccount.totalAmount);
+    //                 break;
+
+    //             case VoucherTypeEnum.PAYMENT:
+    //             case VoucherTypeEnum.JOURNAL:
+    //             case VoucherTypeEnum.PURCHASE:
+    //                 fromAccount.totalAmount -= voucherAmount; // Deducting money
+    //                 break;
+    //             case VoucherTypeEnum.CONTRA:
+    //                 if (!toAccount) {
+    //                     throw new Error('To account is required for bank-to-bank transfers.');
+    //                 }
+
+    //                 // Check if sufficient funds exist in the from account
+    //                 if (fromAccount.totalAmount < voucherAmount) {
+    //                     throw new Error('Insufficient funds in the from account for CONTRA transaction.');
+    //                 }
+
+    //                 fromAccount.totalAmount -= voucherAmount; // Debit from source
+    //                 toAccount.totalAmount += voucherAmount; // Credit to destination
+    //                 break;
+    //             default:
+    //                 throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
+    //         }
+    //         console.log(fromAccount, voucherAmount, "fromAccountfromAccount")
+    //         // Save updated accounts
+    //         await this.accountRepository.save(toAccount ? [fromAccount, toAccount] : [fromAccount]);
+
+    //         // Set Voucher ID
+    //         voucherEntity.voucherId = generatedVoucherId;
+
+    //         // Handle Invoice Payment
+    //         if (voucherDto.invoice && VoucherTypeEnum.RECEIPT) {
+    //             const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
+    //             if (!estimate) {
+    //                 throw new ErrorResponse(4001, 'Estimate not found.');
+    //             }
+
+    //             if (receiptPdf) {
+    //                 estimate.receiptPdfUrl = receiptPdf;
+    //                 await this.estimateRepo.save(estimate);
+    //             }
+
+    //         }
+
+    //         // Insert the voucher record
+    //         await this.voucherRepository.insert(voucherEntity);
+
+    //         return new CommonResponse(
+    //             true,
+    //             65152,
+    //             `Voucher Created Successfully with ID: ${generatedVoucherId}`
+    //         );
+    //     } catch (error) {
+    //         console.error(`Error creating voucher details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(
+    //             error?.code || 5416,
+    //             `Failed to create voucher details: ${error.message}`
+    //         );
+    //     }
+    // }
+
     async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
+
         try {
+
+            console.log(voucherDto, "?????????????????")
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
 
-            // Fetch From Account (Mandatory for all transactions)
-            const fromAccount = await this.accountRepository.findOne({
-                where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.fromAccount },
-            });
+            let fromAccount: AccountEntity | null = null;
 
-            if (!fromAccount) {
-                throw new Error('From account not found.');
-            }
+            let productDetails: ProductDetailDto[] = [];
+            if (voucherEntity.voucherType === VoucherTypeEnum.PURCHASE) {
+                const productDetailsArray: ProductDetailDto[] =
+                    typeof voucherDto.productDetails === "string"
+                        ? JSON.parse(voucherDto.productDetails)
+                        : voucherDto.productDetails;
 
-            let toAccount: AccountEntity | null = null;
-
-            // For CONTRA transactions, To Account is mandatory
-            if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
-                if (!voucherDto.toAccount) {
-                    throw new Error('To account is required for CONTRA transactions.');
+                if (!Array.isArray(productDetailsArray)) {
+                    throw new Error("Invalid productDetails format. Expected an array.");
                 }
 
-                toAccount = await this.accountRepository.findOne({
-                    where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.toAccount },
-                });
+                productDetails = await Promise.all(
+                    productDetailsArray.map(async (productDetail) => {
+                        const product = await this.productRepository.findOne({
+                            where: { id: productDetail.productId },
+                        });
+                        if (!product) {
+                            throw new Error(`Product with ID ${productDetail.productId} not found`);
+                        }
 
-                if (!toAccount) {
-                    throw new Error('To account not found for CONTRA transaction.');
+                        const quantity = productDetail.quantity ? parseInt(productDetail.quantity.toString(), 10) : 0;
+                        if (quantity <= 0) {
+                            throw new Error(`Quantity for product ${product.productName} must be greater than 0`);
+                        }
+
+                        const costPerUnit = parseFloat(product.price.toString()) || 0;
+                        if (costPerUnit <= 0) {
+                            throw new Error(`Cost per unit for product ${product.productName} must be greater than 0`);
+                        }
+
+                        return {
+                            productId: product.id,
+                            productName: product.productName,
+                            quantity: quantity,
+                            totalCost: costPerUnit * quantity || 0,
+                        };
+                    })
+                );
+            }
+
+            // Assign productDetails to voucherEntity
+            voucherEntity.productDetails = productDetails;
+            //![VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT].includes(voucherEntity.voucherType) || 
+            // Fetch From Account (Mandatory for some transactions)
+            if (voucherDto.paymentType !== PaymentType.CASH) {
+
+                if (voucherDto.fromAccount) {
+                    fromAccount = await this.accountRepository.findOne({
+                        where: { id: voucherDto.fromAccount },
+                    });
+                    if (!fromAccount) {
+                        throw new Error('From account not found.');
+                    }
+                    const voucherAmount = Number(voucherDto.amount); // Ensure it's a number
+                    const accountBalance = Number(fromAccount.totalAmount); // Ensure it's a number
+                    console.log(`Voucher Amount: ${voucherAmount}, Account Balance: ${accountBalance}`);
+
+                    if (voucherAmount > accountBalance) {
+                        throw new Error('Insufficient funds in the from account.');
+                    }
+
+
+                    if (
+                        [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
+                        && accountBalance < voucherAmount
+                    ) {
+                        throw new Error('Insufficient funds in the from account.');
+                    }
                 }
-            }
 
-            const voucherAmount = voucherDto.amount; // Corrected to use DTO amount
-            console.log(voucherAmount, "voucherAmountvoucherAmount")
-            // Check for sufficient funds before deducting
-            if (
-                [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
-                && fromAccount.totalAmount < voucherAmount
-            ) {
-                throw new Error('Insufficient funds in the from account.');
-            }
 
-            switch (voucherEntity.voucherType) {
-                // case VoucherTypeEnum.RECEIPT:
-                //     fromAccount.totalAmount += voucherAmount;
-                //     break;
-                case VoucherTypeEnum.RECEIPT:
-                    console.log('Before updating totalAmount:', fromAccount.totalAmount);
-                    fromAccount.totalAmount = Number(fromAccount.totalAmount) + Number(voucherAmount);
-                    console.log('After updating totalAmount:', fromAccount.totalAmount);
-                    break;
 
-                case VoucherTypeEnum.PAYMENT:
-                case VoucherTypeEnum.JOURNAL:
-                case VoucherTypeEnum.PURCHASE:
-                    fromAccount.totalAmount -= voucherAmount; // Deducting money
-                    break;
-                case VoucherTypeEnum.CONTRA:
+                let toAccount: AccountEntity | null = null;
+
+                // For CONTRA transactions, To Account is mandatory
+                if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
+                    if (!voucherDto.toAccount) {
+                        throw new Error('To account is required for CONTRA transactions.');
+                    }
+
+                    toAccount = await this.accountRepository.findOne({
+                        where: { id: voucherDto.toAccount },
+                    });
+
                     if (!toAccount) {
-                        throw new Error('To account is required for bank-to-bank transfers.');
+                        throw new Error('To account not found for CONTRA transaction.');
                     }
-
-                    // Check if sufficient funds exist in the from account
-                    if (fromAccount.totalAmount < voucherAmount) {
-                        throw new Error('Insufficient funds in the from account for CONTRA transaction.');
-                    }
-
-                    fromAccount.totalAmount -= voucherAmount; // Debit from source
-                    toAccount.totalAmount += voucherAmount; // Credit to destination
-                    break;
-                default:
-                    throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
-            }
-            console.log(fromAccount, voucherAmount, "fromAccountfromAccount")
-            // Save updated accounts
-            await this.accountRepository.save(toAccount ? [fromAccount, toAccount] : [fromAccount]);
-
-            // Set Voucher ID
-            voucherEntity.voucherId = generatedVoucherId;
-
-            // Handle Invoice Payment
-            if (voucherDto.invoice && VoucherTypeEnum.RECEIPT) {
-                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
-                if (!estimate) {
-                    throw new ErrorResponse(4001, 'Estimate not found.');
                 }
 
-                if (receiptPdf) {
-                    estimate.receiptPdfUrl = receiptPdf;
-                    await this.estimateRepo.save(estimate);
+                const voucherAmount = voucherDto.amount;
+                let accountBalance = Number(fromAccount.totalAmount);
+                switch (voucherEntity.voucherType) {
+                    case VoucherTypeEnum.RECEIPT:
+                        console.log('Before updating totalAmount:', accountBalance);
+                        if (fromAccount) {
+                            fromAccount.totalAmount = accountBalance + voucherAmount;  // Directly update the entity
+                        }
+                        console.log('After updating totalAmount:', fromAccount.totalAmount);
+                        break;
+
+                    case VoucherTypeEnum.PAYMENT:
+                    case VoucherTypeEnum.JOURNAL:
+                    case VoucherTypeEnum.PURCHASE:
+                        console.log('Before updating totalAmount:', accountBalance);
+                        if (fromAccount) {
+                            fromAccount.totalAmount = accountBalance - voucherAmount;  // Directly update the entity
+                        }
+                        console.log('After updating totalAmount:', fromAccount.totalAmount);
+                        break;
+
+                    case VoucherTypeEnum.CONTRA:
+                        if (fromAccount) {
+                            fromAccount.totalAmount = accountBalance - voucherAmount;  // Debit from source
+                        }
+                        console.log('After updating totalAmount from source:', fromAccount.totalAmount);
+                        if (toAccount) {
+                            toAccount.totalAmount += voucherAmount;  // Credit to destination
+                        }
+                        console.log('After updating totalAmount for destination:', toAccount.totalAmount);
+                        break;
+
+                    default:
+                        throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
                 }
+
+                // Save updated accounts
+                const accountsToSave = [fromAccount, toAccount].filter(account => account !== null) as AccountEntity[];
+                await this.accountRepository.save(accountsToSave);  // Ensure these changes are saved
+
+
+                // Set Voucher ID
+                voucherEntity.voucherId = generatedVoucherId;
+
+
+                // Handle Invoice Payment (only for RECEIPT type)
+                if (voucherDto.invoice && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
+                    console.log("Attempting to find estimate for invoice:", voucherDto.invoice);
+                    const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
+
+                    if (!estimate) {
+                        throw new ErrorResponse(4001, 'Estimate not found.');
+                    }
+
+                    console.log("Estimate found:", estimate);
+                    if (receiptPdf) {
+                        console.log("Updating receiptPdfUrl with:", receiptPdf);
+                        estimate.receiptPdfUrl = receiptPdf;
+                        await this.estimateRepo.save(estimate);
+                    }
+                }
+                // Insert the voucher record
+                await this.voucherRepository.insert(voucherEntity);
+
+                return new CommonResponse(
+                    true,
+                    65152,
+                    `Voucher Created Successfully with ID: ${generatedVoucherId}`
+                );
+
 
             }
 
-            // Insert the voucher record
-            await this.voucherRepository.insert(voucherEntity);
-
-            return new CommonResponse(
-                true,
-                65152,
-                `Voucher Created Successfully with ID: ${generatedVoucherId}`
-            );
         } catch (error) {
             console.error(`Error creating voucher details: ${error.message}`, error.stack);
             throw new ErrorResponse(
@@ -206,6 +390,8 @@ export class VoucherService {
             );
         }
     }
+
+
 
     private calculateNextDueDate(lastPaidDate: Date): Date {
         const nextDueDate = new Date(lastPaidDate);
@@ -366,16 +552,7 @@ export class VoucherService {
                 }
             }
 
-            // 🔹 Check if voucher already exists
-            const existingVoucher = await this.voucherRepository.findOne({
-                where: {
-                    voucherId: voucherDto.voucherId,
-                    companyCode: voucherDto.companyCode,
-                    unitCode: voucherDto.unitCode,
-                },
-            });
-
-            if (existingVoucher) {
+            if ((voucherDto.id && voucherDto.id !== null) || (voucherDto.voucherId && voucherDto.voucherId.trim() !== '')) {
                 console.log(`🔄 Updating existing voucher with ID: ${voucherDto.voucherId}`);
                 return await this.updateVoucher(voucherDto);
             }
@@ -400,19 +577,25 @@ export class VoucherService {
         return this.voucherAdapter.entityToDto(vouchers);
     }
 
-    async deleteVoucherDetails(dto: VoucherIdDto): Promise<CommonResponse> {
+    async deleteVoucherDetails(dto: { voucherId: string }): Promise<CommonResponse> {
         try {
-            const voucher = await this.voucherRepository.findOne({ where: { voucherId: dto.voucherId } });
+            // Find voucher by voucherId as a string
+            const voucher = await this.voucherRepository.findOne({
+                where: { voucherId: String(dto.voucherId) }
+            });
+
             if (!voucher) {
                 return new CommonResponse(false, 404, 'Voucher not found');
             }
 
-            await this.voucherRepository.delete(dto.voucherId);
+            // Delete voucher by voucherId as string
+            await this.voucherRepository.delete({ voucherId: String(dto.voucherId) });
             return new CommonResponse(true, 200, 'Voucher deleted successfully');
         } catch (error) {
             return new CommonResponse(false, 500, error.message);
         }
     }
+
 
     async getVoucherNamesDropDown(): Promise<CommonResponse> {
         const data = await this.voucherRepository.find({

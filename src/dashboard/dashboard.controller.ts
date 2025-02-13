@@ -67,6 +67,17 @@ export class DashboardController {
         }
     }
 
+    @Get('sendReceipt')
+    async sendReceipt(@Body() dto: EstimateSendDto): Promise<CommonResponse> {
+        try {
+            return await this.estimateDashboardService.sendReceipt(dto)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Get('sendEstimate')
     async sendEstimate(@Body() dto: EstimateSendDto): Promise<CommonResponse> {
         try {

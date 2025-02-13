@@ -31,7 +31,7 @@ export class VoucherController {
     }
 
     @Post('deleteVoucher')
-    async deleteVoucher(@Body() dto: VoucherIdDto): Promise<CommonResponse> {
+    async deleteVoucher(@Body() dto: { voucherId: string }): Promise<CommonResponse> {
         try {
             return await this.voucherService.deleteVoucherDetails(dto);
         } catch (error) {

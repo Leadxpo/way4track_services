@@ -13,6 +13,7 @@ import { AccountModule } from 'src/account/account.module';
 import { EstimateModule } from 'src/estimate/estimate.module';
 import { EmiPaymentRepository } from './repo/emi-payment-repo';
 import { EmiPaymentEntity } from './entity/emi-payments';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
     imports: [
@@ -22,7 +23,8 @@ import { EmiPaymentEntity } from './entity/emi-payments';
         forwardRef(() => SubDealerModule),
         forwardRef(() => ClientModule),
         forwardRef(() => AccountModule),
-        forwardRef(() => EstimateModule)
+        forwardRef(() => EstimateModule),
+        forwardRef(() => ProductModule)
     ],
     controllers: [VoucherController],
     providers: [VoucherService, VoucherAdapter, VoucherRepository, EmiPaymentRepository],

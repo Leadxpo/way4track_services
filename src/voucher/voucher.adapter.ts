@@ -35,7 +35,18 @@ export class VoucherAdapter {
       entity.fromAccount = fromAccount;
     }
 
-
+    if (!dto.productDetails || dto.productDetails.length === 0) {
+      entity.productDetails = [];
+    } else {
+      entity.productDetails = dto.productDetails.map((productDetail) => {
+        return {
+          productId: productDetail.productId,
+          productName: productDetail.productName,
+          quantity: productDetail.quantity,
+          totalCost: productDetail.totalCost || 0,
+        };
+      });
+    }
     // Client
     const client = new ClientEntity();
     client.clientId = dto.clientId;

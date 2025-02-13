@@ -55,7 +55,9 @@ export class VoucherResDto {
     invoiceId?: string
     paymentTo?: string
     receiptPdfUrl?: string
-
+    products?: {
+        name: string; quantity: number; amount: number
+    }[];
     constructor(
         id: number,
         name: string,
@@ -105,7 +107,10 @@ export class VoucherResDto {
         invoice?: number,
         invoiceId?: string,
         paymentTo?: string,
-        receiptPdfUrl?: string
+        receiptPdfUrl?: string,
+        products?: {
+            name: string; quantity: number; amount: number
+        }[]
 
     ) {
         this.id = id;
@@ -157,6 +162,6 @@ export class VoucherResDto {
         this.invoiceId = invoiceId;
         this.paymentTo = paymentTo
         this.receiptPdfUrl = receiptPdfUrl
-
+        this.products = products
     }
 }

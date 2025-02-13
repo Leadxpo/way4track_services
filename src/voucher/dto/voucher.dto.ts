@@ -54,4 +54,12 @@ export class VoucherDto {
     invoice?: string
     amountPaid?: number
     receiptPdfUrl?: string
+    productDetails?: ProductDetailDto[];
+}
+
+export class ProductDetailDto {
+    productId: number;
+    productName: string;
+    quantity: number;
+    totalCost: number;
 }

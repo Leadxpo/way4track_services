@@ -76,7 +76,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'pr.product_description AS productDescription',
                 'pr.price AS productPrice',
                 'es.invoicePdfUrl'
-
             ])
             .leftJoinAndSelect(ClientEntity, 'cl', 'cl.client_id = ve.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
@@ -98,15 +97,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .addGroupBy('pr.price')
             .addGroupBy('ve.expire_date')
             .addGroupBy('ve.payment_status')
-            .addGroupBy('es.estimate_date') // Add this line
-            .addGroupBy('es.expire_date')   // If needed, add this too
+            .addGroupBy('es.estimate_date')
+            .addGroupBy('es.expire_date')
+            .addGroupBy('es.id')  // Add es.id to GROUP BY
             .getRawOne();
 
         return query;
-
-
-
     }
+
 
     async getReceiptDataForReport(filters: {
         voucherId?: string; companyCode?: string;
@@ -816,28 +814,34 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere('DATE(ve.generation_date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
-            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`);
         const last30DaysResult = await query.getRawOne();
+
         const weekQuery = this.createQueryBuilder('ve')
             .select('COUNT(ve.voucher_id) AS totalPurchases')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere('DATE(ve.generation_date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
-            .andWhere(`ve.unit_code = "${req.unitCode}"`)
+            .andWhere(`ve.unit_code = "${req.unitCode}"`);
         const last7DaysResult = await weekQuery.getRawOne();
-        const last30DaysPurchases = last30DaysResult.totalPurchases;
-        const last7DaysPurchases = last7DaysResult.totalPurchases;
+
+        const last30DaysPurchases = Number(last30DaysResult.totalPurchases);
+        const last7DaysPurchases = Number(last7DaysResult.totalPurchases);
 
         let percentageChange = 0;
         if (last7DaysPurchases && last30DaysPurchases) {
+            // Calculate percentage change
             percentageChange = ((last30DaysPurchases - last7DaysPurchases) / last7DaysPurchases) * 100;
+            // Optionally, cap the percentage at 100% if you want to limit positive growth
+            percentageChange = Math.min(percentageChange, 100);
         }
 
         return {
             last30DaysPurchases: last30DaysPurchases,
-            percentageChange: percentageChange.toFixed(2),
+            percentageChange: percentageChange.toFixed(2), // Will show negative percentages for losses
         };
     }
+
 
     async getExpansesTableData(req: InvoiceDto) {
         const query = this.createQueryBuilder('ve')

@@ -195,4 +195,12 @@ export class VoucherEntity {
 
     @Column('decimal', { name: 'paid_amount', nullable: true })
     paidAmount: number;
+
+    @Column({ type: 'json', name: 'product_details', nullable: true })
+    productDetails: {
+        productId: number;
+        productName: string;
+        quantity: number;
+        totalCost: number;
+    }[];
 }
