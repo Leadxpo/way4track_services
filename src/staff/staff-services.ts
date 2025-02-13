@@ -238,7 +238,7 @@ export class StaffService {
     }
 
     async getStaffNamesDropDown(): Promise<CommonResponse> {
-        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId', 'designation'], relations: ['branch'] });
+        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId', 'designation'] });
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {

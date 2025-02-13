@@ -67,4 +67,10 @@ export class ProductAssignEntity extends BaseEntity {
 
   @Column({ name: 'status', type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.available })
   status: ProductStatusEnum
+
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }

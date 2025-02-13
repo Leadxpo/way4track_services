@@ -57,31 +57,25 @@ export class RequestRaiseService {
         let successResponse: CommonResponse;
         let entity: RequestRaiseEntity;
         try {
-            // Convert DTO to entity
             entity = this.requestAdapter.convertDtoToEntity(dto);
-
-            // Ensure 'id' is not set before creating a new entity
-            entity.id = undefined;  // Set to undefined to prevent accidental update.
-
-            // Manually generate the requestId
+            entity.id = null; // Ensure it's treated as a new insert
             entity.requestId = `RR-${(await this.requestRepository.count() + 1).toString().padStart(5, '0')}`;
 
-            // Save the request data to the database
-            const savedEntity = await this.requestRepository.save(entity);
+            console.log("Saving entity:", entity); // Debugging line
 
-            if (!savedEntity) {
+            const insertResult = await this.requestRepository.insert(entity);
+
+            if (!insertResult.identifiers.length) {
                 throw new Error('Failed to save request details');
             }
 
-            // Send a success response after successfully saving the data
             successResponse = new CommonResponse(true, 201, 'Request details created successfully');
 
-            // Send the notification after the successful creation of the request
+            // Send notification
             try {
-                await this.notificationService.createNotification(savedEntity, NotificationEnum.Request);
+                await this.notificationService.createNotification(entity, NotificationEnum.Request);
             } catch (notificationError) {
                 console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
-                // Log the notification failure but don't affect the main operation
             }
 
             return successResponse;
@@ -93,11 +87,9 @@ export class RequestRaiseService {
 
 
 
+
     async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
-        const existingRequest = await this.requestRepository.findOne({
-            where: { id: dto.id, requestId: dto.requestId }
-        });
-        if (existingRequest) {
+        if (dto.id && dto.id !== null || dto.requestId) {
             // Update if id or requestId is present
             return await this.updateRequestDetails(dto);
         } else {

@@ -16,8 +16,8 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
         super(AppointmentEntity, dataSource.createEntityManager());
     }
 
- 
-    async getAllAppointmentDetails(req: CommonReq, branch?: string) {
+
+    async getAllAppointmentDetails(req: { unitCode: string; companyCode: string; branch?: string }) {
         const groupedBranches = await this.createQueryBuilder('appointment')
             .select([
                 'branch.name AS branchName',
@@ -28,8 +28,8 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        if (branch) {
-            groupedBranches.andWhere('branch.name = :branchName', { branchName: branch });
+        if (req.branch) {
+            groupedBranches.andWhere('branch.name = :branchName', { branchName: req.branch });
         }
 
         const result = await groupedBranches.groupBy('branch.name').getRawMany();
@@ -57,8 +57,8 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        if (branch) {
-            appointments.andWhere('branch.name = :branchName', { branchName: branch });
+        if (req.branch) {
+            appointments.andWhere('branch.name = :branchName', { branchName: req.branch });
         }
 
         const appointmentsResult = await appointments.orderBy('branch.name', 'ASC').getRawMany();

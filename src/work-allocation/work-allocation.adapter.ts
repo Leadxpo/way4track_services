@@ -20,7 +20,7 @@ export class WorkAllocationAdapter {
         entity.clientId = client;
 
         const staff = new StaffEntity();
-        staff.staffId = dto.staffId;
+        staff.id = dto.staffId;
         entity.staffId = staff;
 
         // entity.serviceOrProduct = dto.serviceOrProduct;
@@ -40,7 +40,7 @@ export class WorkAllocationAdapter {
         entity.vendorId = vendor;
 
         const voucher = new VoucherEntity();
-        voucher.voucherId = dto.voucherId
+        voucher.id = dto.voucherId
         entity.voucherId = voucher;
 
         entity.productDetails = dto.productDetails
@@ -93,7 +93,7 @@ export class WorkAllocationAdapter {
                 product?.vendorName || '',
                 product?.vendorAddress || '',
                 product?.vendorEmailId || '',
-                voucher?.voucherId || '',
+                voucher?.id || null,
                 voucher?.name || '',
                 // Mapping productDetails array
                 entity.productDetails?.map(productDetail => ({

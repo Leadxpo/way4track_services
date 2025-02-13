@@ -81,12 +81,12 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'sum(pa.number_of_products) AS totalProducts',
             ]);
 
-        const monthResult = await query.andWhere(`DATE(pa.date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()`)
+        const monthResult = await query.andWhere(`DATE(pa.created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()`)
             .where(`pa.company_code = "${req.companyCode}"`)
             .andWhere(`pa.unit_code = "${req.unitCode}"`)
             .getRawOne();
 
-        const weekResult = await query.andWhere(`DATE(pa.date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()`)
+        const weekResult = await query.andWhere(`DATE(pa.created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()`)
             .where(`pa.company_code = "${req.companyCode}"`)
             .andWhere(`pa.unit_code = "${req.unitCode}"`)
             .getRawOne();
@@ -136,7 +136,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         return finalResult;
     }
 
-    
+
     async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string }) {
         try {
             // Base query for grouping branches

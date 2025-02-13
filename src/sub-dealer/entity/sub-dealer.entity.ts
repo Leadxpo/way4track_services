@@ -30,7 +30,7 @@ export class SubDealerEntity {
   @Column({ name: 'gst_number', type: 'varchar', length: 20, unique: true, nullable: true })
   gstNumber: string;
 
-  @Column({ name: 'starting_date', type: 'date' })
+  @Column({ name: 'starting_date', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   startingDate: Date;
 
   @Column({ name: 'email', type: 'varchar', length: 150 })

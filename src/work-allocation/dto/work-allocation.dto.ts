@@ -3,7 +3,7 @@ import { WorkStatusEnum } from "../enum/work-status-enum";
 
 export class WorkAllocationDto {
     id?: number;
-    staffId: string;
+    staffId: number;
     clientId: number;
     serviceOrProduct: string;
     otherInformation?: string;
@@ -13,7 +13,7 @@ export class WorkAllocationDto {
     workAllocationNumber?: string
     productId?: number
     vendorId?: number
-    voucherId?: string
+    voucherId?: number
     // imeiNumber?: string
     productDetails?: ProductDetail[];
     workStatus: WorkStatusEnum;

@@ -6,6 +6,7 @@ import { CommonResponse } from "src/models/common-response";
 import { ErrorResponse } from "src/models/error-response";
 import { CommonReq } from "src/models/common-req";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 
 
 
@@ -18,29 +19,36 @@ export class TicketsRepository extends Repository<TicketsEntity> {
     }
 
     async totalTickets(req: CommonReq): Promise<any> {
-        const query = this.createQueryBuilder('tc')
-            .select([
-                'count(tc.ticket_number) AS totalTickets',
-            ]);
-        const monthResult = await query.andWhere(`DATE(tc.date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()`)
-            .where(`tc.company_code = "${req.companyCode}"`)
-            .andWhere(`tc.unit_code = "${req.unitCode}"`)
-            .getRawOne();
-        const weekResult = await query.andWhere(`DATE(tc.date) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()`)
-            .where(`tc.company_code = "${req.companyCode}"`)
-            .andWhere(`tc.unit_code = "${req.unitCode}"`)
-            .getRawOne();
-        const last30DaysTickets = monthResult.totalTickets;
-        const last7DaysTickets = weekResult.totalTickets;
+        const monthQuery = this.createQueryBuilder('tc')
+            .select('COUNT(tc.ticket_number)', 'totalTickets')
+            .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('DATE(tc.created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()');
+
+        const weekQuery = this.createQueryBuilder('tc')
+            .select('COUNT(tc.ticket_number)', 'totalTickets')
+            .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('DATE(tc.created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()');
+
+        const monthResult = await monthQuery.getRawOne();
+        const weekResult = await weekQuery.getRawOne();
+
+        const last30DaysTickets = parseInt(monthResult?.totalTickets || '0', 10);
+        const last7DaysTickets = parseInt(weekResult?.totalTickets || '0', 10);
+
+        console.log(last30DaysTickets, last7DaysTickets, ":::::::::::::");
+
         let percentageChange = 0;
-        if (last7DaysTickets && last30DaysTickets) {
+        if (last7DaysTickets > 0) {
             percentageChange = ((last30DaysTickets - last7DaysTickets) / last7DaysTickets) * 100;
         }
 
         return {
             last30DaysTickets: last30DaysTickets,
+            last7DaysTickets: last7DaysTickets,
             percentageChange: percentageChange.toFixed(2),
-        }
+        };
     }
 
 
@@ -48,9 +56,10 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         const query = this.createQueryBuilder('tc')
             .select([
                 'COUNT(tc.ticket_number) AS totalTickets',
-                'tc.branch_id AS branchId',
+                'br.name as branchName',
                 'SUM(CASE WHEN tc.work_status = :pending THEN 1 ELSE 0 END) AS pendingTickets',
             ])
+            .leftJoin(BranchEntity, 'br', 'tc.branch_id=br.id')
             .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
             .groupBy('tc.branch_id');

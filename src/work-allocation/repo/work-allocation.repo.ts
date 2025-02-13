@@ -3,6 +3,8 @@ import { DataSource, Repository } from "typeorm";
 import { WorkAllocationEntity } from "../entity/work-allocation.entity";
 import { WorkStatusEnum } from "../enum/work-status-enum";
 import { StaffEntity } from "src/staff/entity/staff.entity";
+import { ClientEntity } from "src/client/entity/client.entity";
+import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 
 
 @Injectable()
@@ -26,12 +28,12 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'wa.date AS date',
                 'staff.name AS staffName',
                 'client.name AS clientName',
-                'wa.company_code AS companyCode',
-                'wa.unit_code AS unitCode',
                 'wa.work_status as workStatus'
             ])
-            .leftJoin('wa.staffId', 'staff')
-            .leftJoin('wa.clientId', 'client');
+            .leftJoin(StaffEntity, 'staff', 'staff.id=wa.staff_id')
+            .leftJoin(ClientEntity, 'client', 'wa.client_id=client.id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
 
         if (req.workAllocationNumber) {
             query.andWhere('wa.work_allocation_number = :workAllocationNumber', { workAllocationNumber: req.workAllocationNumber });
@@ -63,15 +65,17 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .leftJoin('wa.voucherId', 'v')
+            .leftJoin(VoucherEntity, 'v', 'wa.voucher_id = v.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('wa.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
             .groupBy('wa.staff_id')
-            .addGroupBy('staff.name');
+            .addGroupBy('staff.name')
+            .addGroupBy('v.amount'); // Add v.amount to the GROUP BY clause
 
         const result = await query.setParameter('completed', WorkStatusEnum.COMPLETED).getRawMany();
         return result;
+
     }
 
     async getMonthTotalWorkAllocation(req: {

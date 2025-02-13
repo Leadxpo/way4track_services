@@ -62,17 +62,9 @@ export class TicketsService {
         }
     }
 
-
-
-
-
-
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
-        const existingTicket = await this.ticketsRepository.findOne({
-            where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
-        });
-
-        if (existingTicket) {
+      
+        if (dto.id) {
             // If an ID is provided, update the ticket details
             return await this.updateTicketDetails(dto);
         } else {
@@ -80,9 +72,7 @@ export class TicketsService {
             return await this.createTicketDetails(dto);
         }
     }
-
-
-
+    
     async deleteTicketDetails(req: TicketsIdDto): Promise<CommonResponse> {
         try {
             const ticket = await this.ticketsRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });

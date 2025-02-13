@@ -386,9 +386,9 @@ export class DashboardController {
     }
 
     @Post('getAllAppointmentDetails')
-    async getAllAppointmentDetails(@Body() req: CommonReq, branch?: string): Promise<CommonResponse> {
+    async getAllAppointmentDetails(@Body() req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
         try {
-            return await this.appointmentDashboardService.getAllAppointmentDetails(req, branch)
+            return await this.appointmentDashboardService.getAllAppointmentDetails(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

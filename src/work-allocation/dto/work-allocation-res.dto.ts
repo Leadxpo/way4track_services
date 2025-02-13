@@ -28,7 +28,7 @@ export class WorkAllocationResDto {
     vendorAddress?: string;
     vendorEmailId?: string;
     // install?: boolean
-    voucherId?: string
+    voucherId?: number
     voucherName?: string
     products?: {
         productId: number; productName: string; imeiNumber: string, install: boolean
@@ -62,7 +62,7 @@ export class WorkAllocationResDto {
         vendorAddress?: string,
         vendorEmailId?: string,
         // install?: boolean,
-        voucherId?: string,
+        voucherId?: number,
         voucherName?: string,
         products?: {
             productId: number; productName: string; imeiNumber: string, install: boolean

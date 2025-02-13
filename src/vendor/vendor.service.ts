@@ -96,10 +96,8 @@ export class VendorService {
         console.log(`File uploaded to GCS: ${uniqueFileName}`);
         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
-      const existingVendor = await this.vendorRepository.findOne({
-        where: { id: dto.id, vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode },
-      });
-      if (existingVendor) {
+
+      if (dto.id && dto.id !== null || dto.vendorId) {
         // If an ID or vendorId is provided, update the vendor details
         return await this.updateVendorDetails(dto, filePath);
       } else {

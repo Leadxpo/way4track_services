@@ -15,10 +15,10 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'work_allocation_number', type: 'varchar', unique: true })
     workAllocationNumber: string;
 
-    @Column({ name: 'service_or_product', type: 'varchar', length: 100 })
+    @Column({ name: 'service_or_product', type: 'varchar', length: 100, nullable: true })
     serviceOrProduct: string;
 
-    @Column({ name: 'other_information', type: 'text' })
+    @Column({ name: 'other_information', type: 'text', nullable: true })
     otherInformation: string;
 
     @Column({ name: 'description', type: 'text', nullable: true })
@@ -27,13 +27,13 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
 
-    @Column({ name: 'date', type: 'date' })
+    @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     date: Date;
 
     // @Column({ name: 'install', type: 'boolean', default: false })
     // install: boolean;
 
-    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation)
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 
@@ -49,11 +49,11 @@ export class WorkAllocationEntity extends BaseEntity {
     @JoinColumn({ name: 'vendor_id' })
     vendorId: VendorEntity;
 
-    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation)
+    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.workAllocation, { nullable: true })
     @JoinColumn({ name: 'client_id' })
     clientId: ClientEntity;
 
-    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.workAllocation)
+    @ManyToOne(() => VoucherEntity, (VoucherEntity) => VoucherEntity.workAllocation, { nullable: true })
     @JoinColumn({ name: 'voucher_id' })
     voucherId: VoucherEntity;
 

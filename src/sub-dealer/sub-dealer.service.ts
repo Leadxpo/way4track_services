@@ -97,11 +97,9 @@ export class SubDealerService {
         console.log(`File uploaded to GCS: ${uniqueFileName}`);
         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
-      const existingSubDealer = await this.subDealerRepository.findOne({
-        where: { id: dto.id, subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode },
-      });
 
-      if (existingSubDealer) {
+
+      if (dto.id && dto.id !== null || dto.subDealerId) {
         return await this.updateSubDealerDetails(dto, filePath);
       } else {
         return await this.createSubDealerDetails(dto, filePath);

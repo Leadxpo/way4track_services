@@ -7,11 +7,13 @@ import { WorkAllocationAdapter } from './work-allocation.adapter';
 import { WorkAllocationRepository } from './repo/work-allocation.repo';
 import { NotificationModule } from 'src/notifications/notification.module';
 import { StaffModule } from 'src/staff/staff.module';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([WorkAllocationEntity]),
     forwardRef(() => NotificationModule),
-    forwardRef(() => StaffModule)],
+    forwardRef(() => StaffModule),
+    forwardRef(() => ProductModule)],
     controllers: [WorkAllocationController],
     providers: [WorkAllocationService, WorkAllocationAdapter, WorkAllocationRepository],
     exports: [WorkAllocationRepository, WorkAllocationService]
