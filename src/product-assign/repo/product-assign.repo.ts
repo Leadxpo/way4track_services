@@ -90,36 +90,36 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             .leftJoin('pr.voucherId', 'voucher')
             .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
-    
+
         // Apply filters if provided
         if (req.id) {
             query.andWhere('pr.id = :productId', { productId: req.id });
         }
-    
+
         if (req.productName) {
             query.andWhere('pr.product_name LIKE :productName', { productName: `%${req.productName}%` });
         }
-    
+
         if (req.location) {
             query.andWhere('pr.location LIKE :location', { location: `%${req.location}%` });
         }
-    
+
         if (req.staffId) {
             query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
-    
+
         // Add staff_id to GROUP BY clause
         query.groupBy('pr.id, pr.product_name, pr.product_description, vendor.name, pr.imei_number, pr.location, staff.staff_id');
-    
+
         // Execute and return the result
         const result = await query.getRawMany();
-    
+
         // Optional: log result for debugging
         console.log(result);
-    
+
         return result;
     }
-    
+
 
     async totalProducts(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('pa')
@@ -324,13 +324,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             // Convert the map to an array of branch objects
             const results = Array.from(branchesMap.values());
 
-            return {
-                status: true,
-                errorCode: 200,
-                internalMessage: "Data retrieved successfully",
-                data: results
-            };
-
+            return results
         } catch (error) {
             console.error('Error fetching product details by branch:', error);
             throw new Error('Failed to fetch product details by branch');

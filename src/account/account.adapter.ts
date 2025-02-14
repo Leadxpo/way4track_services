@@ -13,7 +13,7 @@ export class AccountAdapter {
         branch.id = dto.branchId;
         account.branch = branch;
         // Mapping Other Properties
-        account.name = dto.bankName;
+        account.name = dto.name;
         account.accountType = dto.accountType;
         account.accountNumber = dto.accountNumber;
         account.ifscCode = dto.ifscCode;

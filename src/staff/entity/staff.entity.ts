@@ -22,14 +22,14 @@ export enum DesignationEnum {
   CEO = 'CEO',
   HR = 'HR',
   Accountant = 'Accountant',
-  // Operator = 'Operator',
   WarehouseManager = 'Warehouse Manager',
   BranchManager = 'Branch Manager',
   SubDealer = 'Sub Dealer',
   Technician = 'Technician',
-  SalesMan = 'Sales Man',
+  SalesMan = 'Sales Man', // make sure this matches with the dropdown
   CallCenter = 'Call Center',
 }
+
 
 
 @Entity('staffs')

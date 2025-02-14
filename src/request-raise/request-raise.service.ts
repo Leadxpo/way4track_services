@@ -151,7 +151,7 @@ export class RequestRaiseService {
         const data = await this.requestRepository.getTodayRequestBranchWise(req);
         return data.length
             ? new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
-            : new CommonResponse(false, 4579, "There are no branch names");
+            : new CommonResponse(true, 4579, "There are no branch names", data);
     }
 
 

@@ -14,10 +14,10 @@ export class AccountEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ name: 'name', type: 'varchar', length: 255 })
+  @Column({ name: 'name', type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ name: 'account_name', type: 'varchar', length: 255 })
+  @Column({ name: 'account_name', type: 'varchar', length: 255, nullable: true })
   accountName: string;
 
   @Column('decimal', { name: 'total_amount', precision: 10, scale: 2, nullable: true })
@@ -26,17 +26,17 @@ export class AccountEntity {
   @Column({ type: 'enum', enum: AccountType, name: 'account_type' })
   accountType: AccountType;
 
-  @Column({ name: 'account_number', type: 'varchar' })
+  @Column({ name: 'account_number', type: 'varchar', nullable: true })
   accountNumber: string;
 
   @ManyToOne(() => BranchEntity, (branch) => branch.accounts, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 
-  @Column({ name: 'ifsc_code', type: 'varchar', length: 20 })
+  @Column({ name: 'ifsc_code', type: 'varchar', length: 20, nullable: true })
   ifscCode: string;
 
-  @Column({ name: 'phone_number', type: 'varchar', length: 15 })
+  @Column({ name: 'phone_number', type: 'varchar', length: 15, nullable: true })
   phoneNumber: string;
 
   @Column({ name: 'address', type: 'text', nullable: true })

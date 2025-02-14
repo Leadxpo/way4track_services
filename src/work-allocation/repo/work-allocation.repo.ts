@@ -89,9 +89,14 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'YEAR(wa.date) AS year',
                 'MONTH(wa.date) AS month',
                 'COUNT(wa.id) AS totalAppointments',
-                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
+                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments',
+                'SUM(ve.amount) AS totalSalesAmount',
+
+
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .leftJoin(VoucherEntity, 've', 'wa.voucher_id = ve.id')
+
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
