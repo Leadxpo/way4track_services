@@ -157,7 +157,7 @@ export class RequestRaiseService {
 
     async getRequests(filter: {
         // fromDate?: Date; toDate?: Date; 
-        branchName?: string, companyCode?: string,
+        branchName?: string, staffId?: string, companyCode?: string,
         unitCode?: string
     }) {
         const query = this.requestRepository.createQueryBuilder('req')
@@ -183,9 +183,9 @@ export class RequestRaiseService {
         //     query.andWhere('req.created_date >= :fromDate', { fromDate: filter.fromDate });
         // }
 
-        // if (filter.toDate) {
-        //     query.andWhere('req.created_date <= :toDate', { toDate: filter.toDate });
-        // }
+        if (filter.staffId) {
+            query.andWhere('sf.staff_id= :staffId', { staffId: filter.staffId });
+        }
 
         if (filter.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: filter.branchName });

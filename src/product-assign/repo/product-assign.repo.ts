@@ -6,6 +6,7 @@ import { ProductEntity } from "src/product/entity/product.entity";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { RequestRaiseEntity } from "src/request-raise/entity/request-raise.entity";
 import { CommonReq } from "src/models/common-req";
+import { ProductIdDto } from "src/product/dto/product.id.dto";
 
 
 
@@ -71,9 +72,54 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         // Return the grouped and detailed results
         return { result, rawResults };
     }
-
-
-
+    async getSearchDetailProduct(req: ProductIdDto) {
+        const query = this.createQueryBuilder('productAssign')
+            .select([
+                'pr.id AS productId',
+                'pr.product_name AS productName',
+                'pr.product_description AS productDescription',
+                'vendor.name AS vendorName',
+                'pr.imei_number AS imeiNumber',
+                'staff.staff_id as staffId',
+                'pr.location as location',
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock'
+            ])
+            .leftJoin(StaffEntity, 'staff', 'staff.id = productAssign.staff_id')
+            .leftJoin(ProductEntity, 'pr', 'pr.id = productAssign.product_id')
+            .leftJoin('pr.vendorId', 'vendor')
+            .leftJoin('pr.voucherId', 'voucher')
+            .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+    
+        // Apply filters if provided
+        if (req.id) {
+            query.andWhere('pr.id = :productId', { productId: req.id });
+        }
+    
+        if (req.productName) {
+            query.andWhere('pr.product_name LIKE :productName', { productName: `%${req.productName}%` });
+        }
+    
+        if (req.location) {
+            query.andWhere('pr.location LIKE :location', { location: `%${req.location}%` });
+        }
+    
+        if (req.staffId) {
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+    
+        // Add staff_id to GROUP BY clause
+        query.groupBy('pr.id, pr.product_name, pr.product_description, vendor.name, pr.imei_number, pr.location, staff.staff_id');
+    
+        // Execute and return the result
+        const result = await query.getRawMany();
+    
+        // Optional: log result for debugging
+        console.log(result);
+    
+        return result;
+    }
+    
 
     async totalProducts(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('pa')
@@ -137,7 +183,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
     }
 
 
-    async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string }) {
+    async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string, staffId?: string }) {
         try {
             // Base query for grouping branches
             const groupedBranchesQuery = this.createQueryBuilder('productAssign')
@@ -168,10 +214,11 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
             const totalAssignedQty = await totalAssignedQtyQuery.getRawOne();
 
-            // Query for total in-hands quantity
-            const totalInHandsQtyQuery = this.createQueryBuilder('productAssign')
+            // Query for total in-hands quantity (handle staffId if provided)
+            let totalInHandsQtyQuery = this.createQueryBuilder('productAssign')
                 .select('SUM(productAssign.number_of_products)', 'totalInHandsQty')
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+                .leftJoin(StaffEntity, 'staff', 'staff.id = productAssign.staff_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('productAssign.in_hands = :inHands', { inHands: 'true' });
@@ -181,10 +228,15 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 totalInHandsQtyQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
 
+            // If staffId is provided, filter for the specific staff
+            if (req.staffId) {
+                totalInHandsQtyQuery.andWhere('staff.id = :staffId', { staffId: req.staffId });
+            }
+
             const totalInHandsQty = await totalInHandsQtyQuery.getRawOne();
 
             // Query for total quantity (assigned + in-hands)
-            const totalQtyQuery = this.createQueryBuilder('productAssign')
+            let totalQtyQuery = this.createQueryBuilder('productAssign')
                 .select('SUM(productAssign.number_of_products)', 'totalQty')
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
@@ -214,6 +266,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             throw new Error('Failed to fetch product assignment data');
         }
     }
+
 
     async getProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string }) {
         try {

@@ -26,6 +26,7 @@ import { AccountDashboardService } from "./account.dashboard.service";
 import { AccountIdDto } from "src/account/dto/account.id.dto";
 import { ClientSearchDto } from "src/client/dto/client-search.dto";
 import { EstimateSendDto } from "src/estimate/dto/estimate.send.dto";
+import { ProductIdDto } from "src/product/dto/product.id.dto";
 
 
 
@@ -212,6 +213,18 @@ export class DashboardController {
             return new CommonResponse(false, 500, 'Error details');
         }
     }
+
+    @Post('getSearchDetailProductAssign')
+    async getSearchDetailProductAssign(@Body() req: ProductIdDto): Promise<CommonResponse> {
+        try {
+            return await this.productAssignDashboardService.getSearchDetailProduct(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getTicketDetailsAgainstSearch')
     async getTicketDetailsAgainstSearch(@Body() req: TicketsSearchDto): Promise<CommonResponse> {
         try {
@@ -265,7 +278,7 @@ export class DashboardController {
 
 
     @Post('getProductAssignmentSummary')
-    async getProductAssignmentSummary(@Body() req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
+    async getProductAssignmentSummary(@Body() req: { unitCode: string; companyCode: string; branch?: string, staffId?: string }): Promise<CommonResponse> {
         try {
             return await this.productAssignDashboardService.getProductAssignmentSummary(req)
         }
@@ -397,7 +410,7 @@ export class DashboardController {
     }
 
     @Post('getAllAppointmentDetails')
-    async getAllAppointmentDetails(@Body() req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
+    async getAllAppointmentDetails(@Body() req: { unitCode: string; companyCode: string; branch?: string, staffId?: string }): Promise<CommonResponse> {
         try {
             return await this.appointmentDashboardService.getAllAppointmentDetails(req)
         }
@@ -550,7 +563,7 @@ export class DashboardController {
     @Post('getPaymentData')
     async getPaymentData(@Body() req: {
         fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        unitCode?: string; staffId?: string
     }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getPaymentData(req)
@@ -746,7 +759,7 @@ export class DashboardController {
     }
 
     @Post('getLast30DaysCreditAndDebitPercentages')
-    async getLast30DaysCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
+    async getLast30DaysCreditAndDebitPercentages(@Body() req: { companyCode: string, unitCode: string, branchName?: string }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getLast30DaysCreditAndDebitPercentages(req)
         }
@@ -768,7 +781,11 @@ export class DashboardController {
     }
 
     @Post('getPaymentDataTable')
-    async getPaymentDataTable(@Body() req: CommonReq): Promise<CommonResponse> {
+    async getPaymentDataTable(@Body() req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId?: string;
+    }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getPaymentDataTable(req)
         }

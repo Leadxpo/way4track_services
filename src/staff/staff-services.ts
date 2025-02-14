@@ -194,6 +194,7 @@ export class StaffService {
                 .leftJoinAndSelect('staff.staffTo', 'staffTo')
                 .leftJoinAndSelect('staff.request', 'request')
                 .leftJoinAndSelect('staff.productAssign', 'productAssign')
+                .leftJoinAndSelect('staff.permissions', 'permissions')
                 .where('staff.staffId = :staffId', { staffId: req.staffId })
                 .andWhere('staff.companyCode = :companyCode', { companyCode: req.companyCode })
                 .andWhere('staff.unitCode = :unitCode', { unitCode: req.unitCode })

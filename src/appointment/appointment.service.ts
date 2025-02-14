@@ -45,9 +45,21 @@ export class AppointmentService {
     async createAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         try {
             const entity = this.appointmentAdapter.convertDtoToEntity(dto);
-            // Generate the appointmentId if not already provided
-            const count = await this.appointmentRepository.count();
-            entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
+            console.log(dto, "::::::::::")
+            const lastAppointment = await this.appointmentRepository
+                .createQueryBuilder('appointment')
+                .select('appointment.appointmentId')
+                .orderBy('appointment.id', 'DESC')
+                .limit(1)
+                .getOne();
+
+            let nextNumber = 1;
+            if (lastAppointment && lastAppointment.appointmentId) {
+                const match = lastAppointment.appointmentId.match(/\d+/);
+                nextNumber = match ? parseInt(match[0]) + 1 : 1;
+            }
+
+            entity.appointmentId = `A-${nextNumber.toString().padStart(5, '0')}`;
 
             await this.appointmentRepository.insert(entity);
             return new CommonResponse(true, 201, 'Appointment details created successfully');
@@ -57,24 +69,14 @@ export class AppointmentService {
         }
     }
 
+
     async handleAppointmentDetails(dto: AppointmentDto): Promise<CommonResponse> {
         if (dto.id && dto.id !== null && dto.id !== undefined) {
-            // Convert ID to a number if it's a valid value
             dto.id = Number(dto.id);
-
-            // Check if the appointment actually exists
-            const existingAppointment = await this.appointmentRepository.findOne({
-                where: { id: dto.id }
-            });
-
-            if (existingAppointment) {
-                console.log(existingAppointment, "{{{{{{{{{{{");
-                return await this.updateAppointmentDetails(dto);
-            }
+            return await this.updateAppointmentDetails(dto);
+        } else {
+            return await this.createAppointmentDetails(dto);
         }
-
-        // If no valid ID is provided or no matching appointment is found, create a new one
-        return await this.createAppointmentDetails(dto);
     }
 
 

@@ -17,24 +17,28 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
     }
 
 
-    async getAllAppointmentDetails(req: { unitCode: string; companyCode: string; branch?: string }) {
+    async getAllAppointmentDetails(req: { unitCode: string; companyCode: string; branch?: string, staffId?: string }) {
+        const acceptedStatus = 'accepted';  // You can set this to whatever value is appropriate for the status
+    
         const groupedBranches = await this.createQueryBuilder('appointment')
             .select([
                 'branch.name AS branchName',
                 'COUNT(appointment.id) AS totalAppointments',
+                'SUM(CASE WHEN appointment.status = :accepted THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = appointment.branch_id')
-            // Ensure correct alias
             .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
-
+            .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode })
+            .setParameter('accepted', acceptedStatus);
+    
         if (req.branch) {
             groupedBranches.andWhere('branch.name = :branchName', { branchName: req.branch });
         }
-
+    
+        // Execute the groupedBranches query
         const result = await groupedBranches.groupBy('branch.name').getRawMany();
-
-        const appointments = await this.createQueryBuilder('appointment')
+    
+        const appointments = this.createQueryBuilder('appointment')
             .select([
                 'appointment.id AS appointment_id',
                 'appointment.name AS appointment_name',
@@ -48,7 +52,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
                 'appointment.time AS slot',
                 'appointment.description AS description',
                 'appointment.status AS status',
-                'staff.id AS staffId',
+                'staff.staff_id AS staffId',
                 'staff.name AS assignedTo',
             ])
             .leftJoin(ClientEntity, 'client', 'appointment.client_id = client.id')
@@ -56,15 +60,21 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
             .leftJoin(StaffEntity, 'staff', 'staff.id = appointment.staff_id')
             .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
-
+    
         if (req.branch) {
             appointments.andWhere('branch.name = :branchName', { branchName: req.branch });
         }
-
+    
+        if (req.staffId) {
+            appointments.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+    
         const appointmentsResult = await appointments.orderBy('branch.name', 'ASC').getRawMany();
-
+    
         return { result, appointments: appointmentsResult };
     }
+    
+
 
 
 }

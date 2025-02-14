@@ -21,7 +21,7 @@ export class AppointmentAdapter {
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         const staff = new StaffEntity();
-        staff.id = dto.assignedToId;
+        staff.id = dto.assignedTo;
         entity.staffId = staff;
         if (dto.voucherId) {
             const voucher = new VoucherEntity();

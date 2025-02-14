@@ -138,7 +138,7 @@ export class HiringService {
         }
     }
 
-    async getHiringSearchDetails(req: HiringFilterDto) {
+    async getHiringSearchDetails(req: HiringFilterDto): Promise<CommonResponse> {
         const query = this.hiringRepository.createQueryBuilder('hiring')
             .select([
                 'hiring.id AS hiringId',
@@ -172,7 +172,7 @@ export class HiringService {
         }
 
         const result = await query.getRawMany();
-        return result;
+        return new CommonResponse(true, 200, 'hiring details  successfully', result);
     }
 
     async getCandidatesStatsLast30Days(req: CommonReq): Promise<{ totalAttended: number, totalQualified: number }> {

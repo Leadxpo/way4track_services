@@ -5,7 +5,7 @@ export class AppointmentDto {
   appointmentId?: string;
   appointmentType: AppointmentType;
   name: string;
-  assignedToId: number;
+  assignedTo: number;
   date: string
   slot: string;
   period: TimePeriodEnum;

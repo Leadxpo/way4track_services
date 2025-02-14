@@ -59,7 +59,7 @@ export class VoucherDashboardService {
 
     async getPaymentData(req: {
         fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        unitCode?: string; staffId?: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getPaymentData(req)
         if (!VoucherData) {
@@ -325,7 +325,7 @@ export class VoucherDashboardService {
 
     }
 
-    async getLast30DaysCreditAndDebitPercentages(req: CommonReq): Promise<CommonResponse> {
+    async getLast30DaysCreditAndDebitPercentages(req: { companyCode: string, unitCode: string, branchName?: string }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getLast30DaysCreditAndDebitPercentages(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
@@ -355,7 +355,11 @@ export class VoucherDashboardService {
 
     }
 
-    async getPaymentDataTable(req: CommonReq): Promise<CommonResponse> {
+    async getPaymentDataTable(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId?: string;
+    }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getPaymentDataTable(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])

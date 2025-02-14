@@ -15,6 +15,7 @@ import { InvoiceDto } from "../dto/invoice.dto";
 import { VoucherIDResDTo } from "../dto/voucher-id.res.dto";
 import { VoucherEntity } from "../entity/voucher.entity";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
+import { StaffEntity } from "src/staff/entity/staff.entity";
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -172,7 +173,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
     async getPaymentData(filters: {
         fromDate?: Date; toDate?: Date; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        unitCode?: string; staffId?: string
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -182,10 +183,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'ac.account_name AS paymentTo',
                 'ac.account_number AS accountNumber',
                 've.payment_status AS paymentStatus',
+                'sf.name as staffName',
                 've.amount AS amount',
             ])
             .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
             .leftJoin(AccountEntity, 'ac', 'ac.id=ve.to_account_id')
+            .leftJoin(StaffEntity, 'sf', 'sf.id=ve.staff_id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PAYMENT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)
@@ -199,6 +202,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         if (filters.paymentStatus) {
             query.andWhere('ve.payment_status = :paymentStatus', { paymentStatus: filters.paymentStatus });
+        }
+
+        if (filters.staffId) {
+            query.andWhere('sf.staff_id = :staffId', { staffId: filters.staffId });
         }
 
         // Execute the query
@@ -908,16 +915,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         };
     }
 
-    async getLast30DaysCreditAndDebitPercentages(req: CommonReq) {
+    async getLast30DaysCreditAndDebitPercentages(req: { companyCode: string, unitCode: string, branchName?: string }) {
         const query = this.createQueryBuilder('ve')
             .select([
-                `DATE(ve.generation_date) AS date`,
-                `branch.id as id`,
                 `branch.name AS branchName`,
-                `branch.branch_number AS branchNumber`,
-                `branch.branch_address AS branchAddress`,
-                `COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) AS creditAmount`,
-                `COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) AS debitAmount`,
                 `ROUND(
                     COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) / 
                     NULLIF(SUM(ve.amount), 0) * 100, 2
@@ -932,22 +933,21 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
             .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
-            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            .groupBy(`
-                DATE(ve.generation_date), 
-                branch.id, 
-                branch.name, 
-                branch.branch_number, 
-                branch.branch_address
-            `)
-            .orderBy(`DATE(ve.generation_date)`, 'ASC')
-            .addOrderBy('branch.name', 'ASC')
-            .addOrderBy('branch.branch_number', 'ASC')
-            .getRawMany();
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        return query;
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        query
+            .groupBy('branch.name') // Use groupBy instead of addGroupBy
+            .orderBy('branch.name', 'ASC');
+
+        return query.getRawMany();
     }
+
+
 
     async getSolidLiquidCash(req: CommonReq) {
         const result = await this.dataSource
@@ -1154,7 +1154,11 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
 
-    async getPurchaseOrderDataTable(req: CommonReq) {
+    async getPurchaseOrderDataTable(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId?: string;
+    }) {
         const query = this.createQueryBuilder('ve')
             .select([
                 've.voucher_id AS voucherId',
@@ -1168,10 +1172,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             ])
             .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
             .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
+            .leftJoin(StaffEntity, 'sf', 'sf.id=ve.staff_id')
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.PURCHASE] })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('ve.voucher_id')
+        if (req.staffId) {
+            query.andWhere('sf.staff_id = :staffId', { staffId: req.staffId });
+        }
+        query.groupBy('ve.voucher_id')
             .addGroupBy('ve.generation_date')
             .addGroupBy('ve.purpose')
             .addGroupBy('ve.payment_status')
@@ -1182,13 +1190,18 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return await query.getRawMany();
     }
 
-    async getPaymentDataTable(req: CommonReq) {
+    async getPaymentDataTable(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId?: string;
+    }) {
         const query = this.createQueryBuilder('ve')
             .select([
                 've.voucher_id AS voucherId',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
                 've.name AS name',
+                'sf.name as staffName',
                 've.quantity AS quantity',
                 've.payment_status AS paymentStatus',
                 'pa.product_name AS productName',
@@ -1196,10 +1209,18 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             ])
             .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
             .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
+            .leftJoin(StaffEntity, 'sf', 'sf.id = ve.staff_id')
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.PAYMENT] })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('ve.voucher_id')
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // Add staffId condition if provided
+        if (req.staffId) {
+            query.andWhere('sf.staff_id = :staffId', { staffId: req.staffId });
+        }
+
+        // Group by necessary fields
+        query.groupBy('ve.voucher_id')
             .addGroupBy('ve.generation_date')
             .addGroupBy('ve.purpose')
             .addGroupBy('ve.payment_status')
@@ -1209,6 +1230,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return await query.getRawMany();
     }
+
 
 
 }

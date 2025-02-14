@@ -75,7 +75,14 @@ export class HiringController {
     }
 
     @Post('getHiringSearchDetails')
-    async getHiringSearchDetails(@Body() req: HiringFilterDto) {
-        return this.hiringService.getHiringSearchDetails(req);
+    async getHiringSearchDetails(@Body() dto: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.hiringService.getHiringSearchDetails(dto);
+        } catch (error) {
+            console.error('Error in get hiring details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching hiring details');
+        }
     }
+
+
 }
