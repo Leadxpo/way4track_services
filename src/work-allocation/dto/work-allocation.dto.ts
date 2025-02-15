@@ -24,5 +24,5 @@ export class ProductDetail {
     productId: number;
     productName: string;
     imeiNumber: string;
-    install: string;
+    install: boolean;
 }
