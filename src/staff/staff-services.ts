@@ -58,7 +58,7 @@ export class StaffService {
             //     where: [{ id: req.id }, { staffId: req.staffId }],
             // });
 
-            if (req.id) {
+            if (req.id && req.id !== null || req.staffId) {
                 console.log("🔄 Updating existing staff record...");
                 return await this.updateStaffDetails(req, filePath);
             } else {
