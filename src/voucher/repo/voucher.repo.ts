@@ -324,24 +324,33 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+        query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
+
 
         // If phoneNumber is provided, filter by phoneNumber
-        if (req.phoneNumber) {
-            query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
-        }
+        // if (req.phoneNumber) {
+        //     query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
+        // }
 
         // Group by necessary fields
-        query.groupBy('ve.voucher_id')
+        query.groupBy('cl.client_id')
             .addGroupBy('cl.name')
             .addGroupBy('cl.phone_number')
-            .addGroupBy('cl.client_id')
             .addGroupBy('cl.address')
-            .addGroupBy('ve.generation_date')
-            .addGroupBy('ve.purpose')
-            .addGroupBy('ve.name')
-            .addGroupBy('ve.quantity')
-            .addGroupBy('ve.payment_status')
-            .addGroupBy('pa.product_name');
+            .addGroupBy('cl.address')
+
+            .addGroupBy('ve.voucher_id');
+        // query.groupBy('ve.voucher_id')
+        //     .addGroupBy('cl.name')
+        //     .addGroupBy('cl.phone_number')
+        //     .addGroupBy('cl.client_id')
+        //     .addGroupBy('cl.address')
+        //     .addGroupBy('ve.generation_date')
+        //     .addGroupBy('ve.purpose')
+        //     .addGroupBy('ve.name')
+        //     .addGroupBy('ve.quantity')
+        //     .addGroupBy('ve.payment_status')
+        //     .addGroupBy('pa.product_name');
 
         // Execute the query and return results
         const result = await query.getRawMany();

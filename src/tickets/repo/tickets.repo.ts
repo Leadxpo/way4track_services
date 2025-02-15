@@ -42,6 +42,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         let percentageChange = 0;
         if (last7DaysTickets > 0) {
             percentageChange = ((last30DaysTickets - last7DaysTickets) / last7DaysTickets) * 100;
+            percentageChange = Math.min(percentageChange, 100); // Ensure the percentage doesn't exceed 100%
         }
 
         return {
@@ -50,6 +51,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
             percentageChange: percentageChange.toFixed(2),
         };
     }
+
 
 
     async totalTicketsBranchWise(req: CommonReq): Promise<any> {
