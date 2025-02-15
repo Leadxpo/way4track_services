@@ -77,7 +77,7 @@ export class WorkAllocationEntity extends BaseEntity {
         productId: number;
         productName: string
         imeiNumber: string;
-        install: boolean;
+        install: string;
     }[];
 
 }
