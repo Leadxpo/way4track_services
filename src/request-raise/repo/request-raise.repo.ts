@@ -29,7 +29,9 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
             .where('re.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('re.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('re.status = :status', { status: ClientStatusEnum.pending }) // Status filter
-          
+        if (req.branch) {
+            query.andWhere('br.name = :branch', { branch: req.branch });
+        }
 
         query.groupBy('br.name, pr.product_name');
 
