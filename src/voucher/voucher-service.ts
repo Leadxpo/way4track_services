@@ -315,7 +315,7 @@ export class VoucherService {
                     case VoucherTypeEnum.RECEIPT:
                         console.log('Before updating totalAmount:', accountBalance);
                         if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance + voucherAmount;  // Directly update the entity
+                            fromAccount.totalAmount = accountBalance + Number(voucherAmount);  // Directly update the entity
                         }
                         console.log('After updating totalAmount:', fromAccount.totalAmount);
                         break;
@@ -325,18 +325,18 @@ export class VoucherService {
                     case VoucherTypeEnum.PURCHASE:
                         console.log('Before updating totalAmount:', accountBalance);
                         if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance - voucherAmount;  // Directly update the entity
+                            fromAccount.totalAmount = accountBalance - Number(voucherAmount);  // Directly update the entity
                         }
                         console.log('After updating totalAmount:', fromAccount.totalAmount);
                         break;
 
                     case VoucherTypeEnum.CONTRA:
                         if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance - voucherAmount;  // Debit from source
+                            fromAccount.totalAmount = accountBalance - Number(voucherAmount);  // Debit from source
                         }
                         console.log('After updating totalAmount from source:', fromAccount.totalAmount);
                         if (toAccount) {
-                            toAccount.totalAmount += voucherAmount;  // Credit to destination
+                            toAccount.totalAmount += Number(voucherAmount);  // Credit to destination
                         }
                         console.log('After updating totalAmount for destination:', toAccount.totalAmount);
                         break;
@@ -351,36 +351,37 @@ export class VoucherService {
 
 
                 // Set Voucher ID
-                voucherEntity.voucherId = generatedVoucherId;
 
 
                 // Handle Invoice Payment (only for RECEIPT type)
-                if (voucherDto.invoice && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
-                    console.log("Attempting to find estimate for invoice:", voucherDto.invoice);
-                    const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
-
-                    if (!estimate) {
-                        throw new ErrorResponse(4001, 'Estimate not found.');
-                    }
-
-                    console.log("Estimate found:", estimate);
-                    if (receiptPdf) {
-                        console.log("Updating receiptPdfUrl with:", receiptPdf);
-                        estimate.receiptPdfUrl = receiptPdf;
-                        await this.estimateRepo.save(estimate);
-                    }
-                }
-                // Insert the voucher record
-                await this.voucherRepository.insert(voucherEntity);
-
-                return new CommonResponse(
-                    true,
-                    65152,
-                    `Voucher Created Successfully with ID: ${generatedVoucherId}`
-                );
-
 
             }
+            voucherEntity.voucherId = generatedVoucherId;
+
+            if (voucherDto.invoiceId && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
+                console.log("Attempting to find estimate for invoice:", voucherDto.invoiceId);
+                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoiceId } });
+
+                if (!estimate) {
+                    throw new ErrorResponse(4001, 'Estimate not found.');
+                }
+                voucherEntity.estimate = estimate
+
+                console.log("Estimate found:", estimate);
+                if (receiptPdf) {
+                    console.log("Updating receiptPdfUrl with:", receiptPdf);
+                    estimate.receiptPdfUrl = receiptPdf;
+                    await this.estimateRepo.save(estimate);
+                }
+            }
+            // Insert the voucher record
+            await this.voucherRepository.insert(voucherEntity);
+
+            return new CommonResponse(
+                true,
+                65152,
+                `Voucher Created Successfully with ID: ${generatedVoucherId}`
+            );
 
         } catch (error) {
             console.error(`Error creating voucher details: ${error.message}`, error.stack);

@@ -53,7 +53,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
         }
     }
 
@@ -64,7 +64,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
         }
     }
 
@@ -75,7 +75,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
         }
     }
 
@@ -125,7 +125,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -136,7 +136,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -147,7 +147,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -158,7 +158,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -169,7 +169,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -180,7 +180,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -195,7 +195,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -210,7 +210,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         // return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -221,7 +221,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -232,7 +232,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -246,7 +246,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -260,7 +260,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -271,7 +271,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -284,7 +284,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -295,7 +295,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -306,7 +306,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -320,7 +320,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -331,7 +331,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -342,7 +342,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -354,7 +354,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -366,7 +366,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -377,7 +377,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -391,7 +391,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -405,7 +405,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -416,7 +416,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -428,7 +428,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -439,7 +439,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -450,7 +450,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -461,7 +461,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
         }
     }
 
@@ -472,7 +472,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new CommonResponse(false, 500, 'Error deleting assert details');
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
         }
     }
 
@@ -484,7 +484,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -495,7 +495,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -507,7 +507,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -522,7 +522,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -539,7 +539,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -556,7 +556,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -570,7 +570,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -581,7 +581,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -595,7 +595,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -610,7 +610,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -623,7 +623,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -637,7 +637,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -648,7 +648,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -660,7 +660,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -671,7 +671,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -688,7 +688,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -705,7 +705,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -720,7 +720,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -732,7 +732,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -743,7 +743,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -754,7 +754,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -765,7 +765,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -776,7 +776,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -791,7 +791,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -802,7 +802,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -816,7 +816,7 @@ export class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new CommonResponse(false, 500, 'Error details');
+            //         return new CommonResponse(false, 500, 'Error details');
         }
     }
 
@@ -827,7 +827,7 @@ export class DashboardController {
     //     }
     //     catch (error) {
     //         console.log("Error in details in service..", error);
-    //         return new CommonResponse(false, 500, 'Error details');
-    //     }
+    // return new CommonResponse(false, 500, 'Error details');
+    // }
     // }
 }

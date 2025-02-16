@@ -65,7 +65,7 @@ export class WorkAllocationService {
             // Update productDetails with 'install: false'
             const updatedProductDetails = dto.productDetails?.map(product => ({
                 ...product,
-                install: 'false',
+                install: false,
             }));
 
             dto.productDetails = updatedProductDetails;

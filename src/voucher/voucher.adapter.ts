@@ -74,7 +74,7 @@ export class VoucherAdapter {
     entity.vendorId = vendor
 
     const estimatePayment = new EstimateEntity()
-    estimatePayment.invoiceId = dto.invoice
+    estimatePayment.invoiceId = dto.invoiceId
     entity.estimate = estimatePayment
     // Basic fields
     entity.role = dto.role;

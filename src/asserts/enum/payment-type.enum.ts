@@ -1,8 +1,8 @@
 export enum PaymentType {
-    CASH = 'cash',
-    UPI = 'upi',
-    BANK = 'bank',      
-    CHECK = 'check',
-    EMI = 'emi',
-    CARD = 'card',
-  }
+  CASH = 'cash',
+  UPI = 'upi',
+  BANK = 'bank',
+  cheque = 'cheque',
+  EMI = 'emi',
+  CARD = 'card',
+}
