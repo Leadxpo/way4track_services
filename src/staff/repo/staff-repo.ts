@@ -161,9 +161,11 @@ export class StaffRepository extends Repository<StaffEntity> {
                 sf.password AS staffPassword,
                 sf.designation AS staffDesignation,
                 sf.name AS staffName,
-                pa.permissions as staffPermissions
+                pa.permissions as staffPermissions,
+                branch.name as branchName
             `)
             .leftJoin('sf.permissions', 'pa')
+            .leftJoin(BranchEntity, 'branch', 'branch.id=sf.branch_id')
             .where(
                 `sf.staff_id = :staffId AND sf.password = :password AND sf.designation = :designation`,
                 {
