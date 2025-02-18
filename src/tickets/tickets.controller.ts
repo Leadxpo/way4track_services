@@ -31,6 +31,21 @@ export class TicketsController {
         }
     }
 
+    @Post('getTotalPendingAndSucessTickets')
+    async getTotalPendingAndSucessTickets(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }) {
+        try {
+            return this.ticketsService.getTotalPendingAndSucessTickets(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getTicketDetailsById')
     async getTicketDetailsById(@Body() dto: TicketsIdDto): Promise<CommonResponse> {
         try {

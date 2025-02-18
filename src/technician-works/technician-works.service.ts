@@ -202,4 +202,49 @@ export class TechnicianService {
             return new CommonResponse(false, 500, 'Error fetching Technician details');
         }
     }
+
+    async getTotalWorkAllocation(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getTotalWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getPaymentWorkAllocation(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getPaymentWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+
+    async getUpCommingWorkAllocation(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getUpCommingWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
 }

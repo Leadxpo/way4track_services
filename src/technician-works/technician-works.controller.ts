@@ -50,6 +50,50 @@ export class TechnicianController {
         }
     }
 
+    @Post('getTotalWorkAllocation')
+    async getTotalWorkAllocation(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }) {
+        try {
+            return this.techService.getTotalWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getPaymentWorkAllocation')
+    async getPaymentWorkAllocation(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }) {
+        try {
+            return this.techService.getPaymentWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getUpCommingWorkAllocation')
+    async getUpCommingWorkAllocation(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }) {
+        try {
+            return this.techService.getUpCommingWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getTechnicianDetails')
     async getTechnicianDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {

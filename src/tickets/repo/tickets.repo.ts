@@ -7,6 +7,7 @@ import { ErrorResponse } from "src/models/error-response";
 import { CommonReq } from "src/models/common-req";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { BranchEntity } from "src/branch/entity/branch.entity";
+import { StaffEntity } from "src/staff/entity/staff.entity";
 
 
 
@@ -119,4 +120,38 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         const result = await query.getRawMany();
         return result;
     }
+
+    async getTotalPendingAndSucessTickets(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string;
+        date: string; // Logged-in staff ID
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'DATE_FORMAT(wa.date, "%Y-%m") AS date',
+                'wa.staff_id AS staffId', // Ensuring the selection is from the 'wa' table
+                'staff.name AS staffName',
+                'COUNT(wa.id) AS totalTickets',
+                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingTickets',
+                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessTickets'
+            ])
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
+            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Grouping by month
+            .addGroupBy('wa.staff_id')
+            .addGroupBy('staff.name');
+
+        // Set the status parameters
+        const result = await query
+            .setParameter('completed', WorkStatusEnum.COMPLETED)
+            .setParameter('pending', WorkStatusEnum.PENDING) // Correctly setting pending and completed statuses
+            .getRawMany();
+
+        return result;
+    }
+
 }

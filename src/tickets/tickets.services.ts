@@ -63,7 +63,7 @@ export class TicketsService {
     }
 
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
-      
+
         if (dto.id) {
             // If an ID is provided, update the ticket details
             return await this.updateTicketDetails(dto);
@@ -72,7 +72,7 @@ export class TicketsService {
             return await this.createTicketDetails(dto);
         }
     }
-    
+
     async deleteTicketDetails(req: TicketsIdDto): Promise<CommonResponse> {
         try {
             const ticket = await this.ticketsRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
@@ -108,6 +108,22 @@ export class TicketsService {
         unitCode?: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.ticketsRepository.getTicketDetails(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+
+    async getTotalPendingAndSucessTickets(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+        date: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.ticketsRepository.getTotalPendingAndSucessTickets(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
