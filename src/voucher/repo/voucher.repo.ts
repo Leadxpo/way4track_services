@@ -1156,7 +1156,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .createQueryBuilder('ac')
             .select([
                 'br.name AS branchName',
-                'SUM(ac.totalAmount) AS liquidCash',
+                'SUM(ac.total_amount) AS liquidCash',
             ])
             .leftJoin('branches', 'br', 'br.id = ac.branch_id') // Assuming `branch_id` exists in AccountEntity
             .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
@@ -1171,10 +1171,13 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 'br.name AS branchName',
                 `SUM(CASE 
-                    WHEN ve.voucher_type = :receipt 
-                    AND ve.payment_type = :cash 
+                    WHEN ve.payment_type = :cash 
                     AND ve.product_type IN ('service', 'product', 'sales') 
-                    THEN ve.amount ELSE 0 END) AS solidCash`,
+                    THEN ve.amount 
+                    WHEN ve.payment_type = :cash 
+                    AND ve.product_type IN ('expanses', 'salaries') 
+                    THEN -ve.amount 
+                    ELSE 0 END) AS solidCash`
             ])
             .leftJoin('branches', 'br', 'br.id = ve.branch_id')
             .where('ve.voucher_type = :receipt', { receipt: 'receipt' })
@@ -1191,7 +1194,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         liquidCashResults.forEach(row => {
             branchWiseData.set(row.branchName, {
                 branchName: row.branchName || 'Unknown Branch',
-                liquidCash: parseFloat(row.liquidCash || 0),
+                liquidCash: parseFloat(row.liquidCash || '0'),
                 solidCash: 0,
             });
         });
@@ -1206,13 +1209,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 });
             }
             const branchData = branchWiseData.get(row.branchName);
-            branchData.solidCash += parseFloat(row.solidCash || 0);
+            branchData.solidCash += parseFloat(row.solidCash || '0');
         });
 
         // Return the response in the same structure as before
         return Array.from(branchWiseData.values());
     }
-
 
     async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
         const query = this.createQueryBuilder('ve')
