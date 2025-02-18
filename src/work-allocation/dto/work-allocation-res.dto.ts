@@ -31,7 +31,7 @@ export class WorkAllocationResDto {
     voucherId?: number
     voucherName?: string
     products?: {
-        productId: number; productName: string; imeiNumber: string, install: boolean
+        productName: string;
     }[];
     workStatus?: WorkStatusEnum;
     description?: string;
@@ -65,7 +65,7 @@ export class WorkAllocationResDto {
         voucherId?: number,
         voucherName?: string,
         products?: {
-            productId: number; productName: string; imeiNumber: string, install: boolean
+            productName: string;
         }[],
         workStatus?: WorkStatusEnum,
         description?: string

@@ -8,6 +8,7 @@ import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.en
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -69,6 +70,9 @@ export class BranchEntity extends BaseEntity {
 
   @OneToMany(() => StaffEntity, (asserts) => asserts.branch)
   staff: StaffEntity[];
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.branchId)
+  technician: TechnicianWorksEntity[];
 
   @OneToMany(() => AttendanceEntity, (asserts) => asserts.branchId)
   attendance: AttendanceEntity[];

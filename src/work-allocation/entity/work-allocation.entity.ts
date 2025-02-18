@@ -4,8 +4,9 @@ import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { WorkStatusEnum } from '../enum/work-status-enum';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -57,6 +58,9 @@ export class WorkAllocationEntity extends BaseEntity {
     @JoinColumn({ name: 'voucher_id' })
     voucherId: VoucherEntity;
 
+    @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.workId)
+    technician: TechnicianWorksEntity[];
+
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;
 
@@ -74,10 +78,7 @@ export class WorkAllocationEntity extends BaseEntity {
 
     @Column({ type: 'json', name: 'product_details', nullable: true })
     productDetails: {
-        productId: number;
         productName: string
-        imeiNumber: string;
-        install: boolean;
     }[];
 
 }

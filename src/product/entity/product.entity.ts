@@ -1,5 +1,6 @@
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
@@ -131,6 +132,9 @@ export class ProductEntity extends BaseEntity {
 
   @Column({ name: 'basket_name', type: 'varchar', length: 50, nullable: true })
   basketName: string;
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.productId)
+  technician: TechnicianWorksEntity[];
 
 
 }

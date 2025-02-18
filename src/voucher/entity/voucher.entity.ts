@@ -15,6 +15,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { AppointmentEntity, AppointmentStatus } from 'src/appointment/entity/appointement.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 
 export enum GSTORTDSEnum {
     GST = "GST",
@@ -50,6 +51,9 @@ export class VoucherEntity {
 
     @Column({ name: 'voucher_id', type: 'varchar', length: 50, unique: true, nullable: false })
     voucherId: string;
+
+    @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.voucherId)
+    technician: TechnicianWorksEntity[];
 
     @ManyToOne(() => BranchEntity, (branch) => branch.voucher, { nullable: true })
     @JoinColumn({ name: 'branch_id' })

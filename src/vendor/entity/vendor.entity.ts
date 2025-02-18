@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -42,6 +43,9 @@ export class VendorEntity {
 
   @OneToMany(() => ProductEntity, (product) => product.vendorId, { nullable: true })
   product: ProductEntity[];
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.vendorId)
+  technician: TechnicianWorksEntity[];
 
   @OneToMany(() => WorkAllocationEntity, (product) => product.vendorId, { nullable: true })
   workAllocation: WorkAllocationEntity[];

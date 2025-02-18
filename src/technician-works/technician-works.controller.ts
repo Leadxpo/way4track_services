@@ -1,0 +1,62 @@
+import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
+import { CommonReq } from 'src/models/common-req';
+import { CommonResponse } from 'src/models/common-response';
+import { TechnicianWorksDto } from './dto/technician-works.dto';
+import { TechnicianService } from './technician-works.service';
+import { TechIdDto } from './dto/technician-id.dto';
+
+
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
+@Controller('technician')
+export class TechnicianController {
+    constructor(private readonly techService: TechnicianService) { }
+
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @Post('handleTechnicianDetails')
+    async handleTechnicianDetails(
+        @Body() dto: TechnicianWorksDto,
+        @UploadedFile() photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        if (dto.id) {
+            dto.id = Number(dto.id);
+        }
+        return this.techService.handleTechnicianDetails(dto, photo);
+    }
+
+    @Post('deleteTechnicianDetails')
+    async deleteTechnicianDetails(@Body() dto: TechIdDto): Promise<CommonResponse> {
+        try {
+            return this.techService.deleteTechnicianDetails(dto);
+        } catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getTechnicianDetailsById')
+    async getTechnicianDetailsById(@Body() req: TechIdDto): Promise<CommonResponse> {
+        try {
+            return this.techService.getTechnicianDetailsById(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching Technician type details');
+        }
+    }
+
+    @Post('getTechnicianDetails')
+    async getTechnicianDetails(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return this.techService.getTechnicianDetails(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+}

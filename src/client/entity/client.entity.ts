@@ -6,6 +6,7 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ClientStatusEnum } from '../enum/client-status.enum';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -38,6 +39,9 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'joining_date', type: 'date', nullable: true })
     joiningDate: string;
+
+    @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.clientId)
+    technician: TechnicianWorksEntity[];
 
 
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client)

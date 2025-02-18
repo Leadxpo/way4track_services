@@ -49,10 +49,7 @@ export class WorkAllocationAdapter {
         } else {
             entity.productDetails = dto.productDetails.map((productDetail) => {
                 return {
-                    productId: productDetail.productId,
                     productName: productDetail.productName,
-                    imeiNumber: productDetail.imeiNumber,
-                    install: productDetail.install,
 
                 };
             });
@@ -97,10 +94,7 @@ export class WorkAllocationAdapter {
                 voucher?.name || '',
                 // Mapping productDetails array
                 entity.productDetails?.map(productDetail => ({
-                    productId: productDetail.productId,
                     productName: productDetail.productName,
-                    imeiNumber: productDetail.imeiNumber,
-                    install: productDetail.install
                 })) || []
             );
         });
