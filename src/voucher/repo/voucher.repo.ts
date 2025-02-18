@@ -16,6 +16,7 @@ import { VoucherIDResDTo } from "../dto/voucher-id.res.dto";
 import { VoucherEntity } from "../entity/voucher.entity";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { StaffEntity } from "src/staff/entity/staff.entity";
+import { AccountDto } from "src/account/dto/account.dto";
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -958,67 +959,124 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
 
 
+    // async getSolidLiquidCash(req: CommonReq) {
+    //     const result = await this.dataSource
+    //         .getRepository(VoucherEntity)
+    //         .createQueryBuilder('ve')
+    //         .select([
+    //             `SUM(CASE 
+    //                 WHEN ve.voucher_type = :receipt 
+    //                 AND ve.payment_type = :cash 
+    //                 AND ve.product_type IN ('service', 'product', 'sales') 
+    //                 THEN ve.amount ELSE 0 END) AS solidCash`,
+    //             `SUM(CASE 
+    //                 WHEN ve.voucher_type = :contra 
+    //                 AND ve.payment_type = :cash 
+    //                 THEN ve.amount ELSE 0 END) AS solidCashFromContra`,
+    //             `SUM(CASE 
+    //                 WHEN ve.voucher_type = :contra 
+    //                 AND ve.from_account_id IS NOT NULL 
+    //                 THEN ve.amount ELSE 0 END) AS liquidCash`,
+    //             'br.name AS branchName',
+    //             'ac.account_name AS paymentTo',
+    //             'ac.account_number AS accountNumber',
+    //         ])
+    //         .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+    //         .leftJoin('accounts', 'ac', 'ac.id = ve.to_account_id')
+    //         .where('ve.voucher_type IN (:...voucherTypes)', {
+    //             voucherTypes: ['receipt', 'contra'],
+    //         })
+    //         .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .groupBy('br.name, ac.account_name, ac.account_number') // Grouping by non-aggregated columns
+    //         .setParameters({
+    //             receipt: 'receipt',
+    //             contra: 'contra',
+    //             cash: 'cash',
+    //         })
+    //         .getRawMany();
+
+    //     // Aggregate the result
+    //     const aggregatedResult = result.reduce(
+    //         (acc, row) => {
+    //             acc.solidCash += parseFloat(row.solidCash || 0);
+    //             acc.solidCashFromContra += parseFloat(row.solidCashFromContra || 0);
+    //             acc.liquidCash += parseFloat(row.liquidCash || 0);
+
+    //             acc.details.push({
+    //                 branchName: row.branchName,
+    //                 paymentTo: row.paymentTo,
+    //                 accountNumber: row.accountNumber,
+    //             });
+
+    //             return acc;
+    //         },
+    //         { solidCash: 0, solidCashFromContra: 0, liquidCash: 0, details: [] },
+    //     );
+
+    //     return {
+    //         solidCash: aggregatedResult.solidCash + aggregatedResult.solidCashFromContra,
+    //         liquidCash: aggregatedResult.liquidCash,
+    //         details: aggregatedResult.details,
+    //     };
+    // }
+
     async getSolidLiquidCash(req: CommonReq) {
-        const result = await this.dataSource
+        // Fetch the liquid cash by summing all account totalAmount
+        const liquidCashResult = await this.dataSource
+            .getRepository(AccountEntity)
+            .createQueryBuilder('ac')
+            .select('SUM(ac.total_amount)', 'liquidCash')
+            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
+            .getRawOne();
+
+        // Fetch the solid cash based on vouchers
+        const solidCashResult = await this.dataSource
             .getRepository(VoucherEntity)
             .createQueryBuilder('ve')
             .select([
                 `SUM(CASE 
-                    WHEN ve.voucher_type = :receipt 
-                    AND ve.payment_type = :cash 
+                    WHEN ve.payment_type = :cash 
                     AND ve.product_type IN ('service', 'product', 'sales') 
-                    THEN ve.amount ELSE 0 END) AS solidCash`,
-                `SUM(CASE 
-                    WHEN ve.voucher_type = :contra 
-                    AND ve.payment_type = :cash 
-                    THEN ve.amount ELSE 0 END) AS solidCashFromContra`,
-                `SUM(CASE 
-                    WHEN ve.voucher_type = :contra 
-                    AND ve.from_account_id IS NOT NULL 
-                    THEN ve.amount ELSE 0 END) AS liquidCash`,
+                    THEN ve.amount 
+                    WHEN ve.payment_type = :cash 
+                    AND ve.product_type IN ('expanses', 'salaries') 
+                    THEN -ve.amount ELSE 0 END) AS solidCash`,
                 'br.name AS branchName',
                 'ac.account_name AS paymentTo',
                 'ac.account_number AS accountNumber',
             ])
             .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-            .leftJoin('accounts', 'ac', 'ac.id = ve.to_account_id')
-            .where('ve.voucher_type IN (:...voucherTypes)', {
-                voucherTypes: ['receipt', 'contra'],
-            })
+            .leftJoin(AccountEntity, 'ac', 'ac.id = ve.to_account_id')
+            .where('ve.payment_type = :cash', { cash: 'cash' })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name, ac.account_name, ac.account_number') // Grouping by non-aggregated columns
-            .setParameters({
-                receipt: 'receipt',
-                contra: 'contra',
-                cash: 'cash',
-            })
+            .groupBy('br.name, ac.account_name, ac.account_number')
             .getRawMany();
 
-        // Aggregate the result
-        const aggregatedResult = result.reduce(
+        // Aggregate the solid cash results
+        const aggregatedResult = solidCashResult.reduce(
             (acc, row) => {
                 acc.solidCash += parseFloat(row.solidCash || 0);
-                acc.solidCashFromContra += parseFloat(row.solidCashFromContra || 0);
-                acc.liquidCash += parseFloat(row.liquidCash || 0);
-
                 acc.details.push({
                     branchName: row.branchName,
                     paymentTo: row.paymentTo,
                     accountNumber: row.accountNumber,
                 });
-
                 return acc;
             },
-            { solidCash: 0, solidCashFromContra: 0, liquidCash: 0, details: [] },
+            { solidCash: 0, details: [] }
         );
 
         return {
-            solidCash: aggregatedResult.solidCash + aggregatedResult.solidCashFromContra,
-            liquidCash: aggregatedResult.liquidCash,
+            solidCash: aggregatedResult.solidCash,
+            liquidCash: parseFloat(liquidCashResult?.liquidCash || 0),
             details: aggregatedResult.details,
         };
     }
+
+
 
     async getProductsPhotos(req: {
         subDealerId?: string;
@@ -1053,8 +1111,61 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         }));
     }
 
+    // async getBranchWiseSolidLiquidCash(req: CommonReq) {
+    //     const result = await this.dataSource
+    //         .getRepository(VoucherEntity)
+    //         .createQueryBuilder('ve')
+    //         .select([
+    //             'br.name AS branchName',
+    //             `SUM(CASE 
+    //                 WHEN ve.voucher_type = :receipt 
+    //                 AND ve.payment_type = :cash 
+    //                 AND ve.product_type IN ('service', 'product', 'sales') 
+    //                 THEN ve.amount ELSE 0 END) AS solidCash`,
+    //             `SUM(CASE 
+    //                 WHEN ve.voucher_type = :contra 
+    //                 AND ve.from_account_id IS NOT NULL 
+    //                 THEN ve.amount ELSE 0 END) AS liquidCash`,
+    //         ])
+    //         .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+    //         .where('ve.voucher_type IN (:...voucherTypes)', {
+    //             voucherTypes: ['receipt', 'contra'],
+    //         })
+    //         .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .groupBy('br.name') // Group by branch name
+    //         .setParameters({
+    //             receipt: 'receipt',
+    //             contra: 'contra',
+    //             cash: 'cash',
+    //         })
+    //         .getRawMany();
+
+    //     // Format the response
+    //     return result.map(row => ({
+    //         branchName: row.branchName || 'Unknown Branch',
+    //         solidCash: parseFloat(row.solidCash || 0),
+    //         liquidCash: parseFloat(row.liquidCash || 0),
+    //     }));
+    // }
+
     async getBranchWiseSolidLiquidCash(req: CommonReq) {
-        const result = await this.dataSource
+        // Fetch branch-wise liquid cash from AccountEntity
+        const liquidCashResults = await this.dataSource
+            .getRepository(AccountEntity)
+            .createQueryBuilder('ac')
+            .select([
+                'br.name AS branchName',
+                'SUM(ac.totalAmount) AS liquidCash',
+            ])
+            .leftJoin('branches', 'br', 'br.id = ac.branch_id') // Assuming `branch_id` exists in AccountEntity
+            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name')
+            .getRawMany();
+
+        // Fetch branch-wise solid cash from VoucherEntity
+        const solidCashResults = await this.dataSource
             .getRepository(VoucherEntity)
             .createQueryBuilder('ve')
             .select([
@@ -1064,32 +1175,44 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                     AND ve.payment_type = :cash 
                     AND ve.product_type IN ('service', 'product', 'sales') 
                     THEN ve.amount ELSE 0 END) AS solidCash`,
-                `SUM(CASE 
-                    WHEN ve.voucher_type = :contra 
-                    AND ve.from_account_id IS NOT NULL 
-                    THEN ve.amount ELSE 0 END) AS liquidCash`,
             ])
             .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-            .where('ve.voucher_type IN (:...voucherTypes)', {
-                voucherTypes: ['receipt', 'contra'],
-            })
+            .where('ve.voucher_type = :receipt', { receipt: 'receipt' })
+            .andWhere('ve.payment_type = :cash', { cash: 'cash' })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name') // Group by branch name
-            .setParameters({
-                receipt: 'receipt',
-                contra: 'contra',
-                cash: 'cash',
-            })
+            .groupBy('br.name')
             .getRawMany();
 
-        // Format the response
-        return result.map(row => ({
-            branchName: row.branchName || 'Unknown Branch',
-            solidCash: parseFloat(row.solidCash || 0),
-            liquidCash: parseFloat(row.liquidCash || 0),
-        }));
+        // Create a map to merge solid and liquid cash results
+        const branchWiseData = new Map();
+
+        // Populate liquid cash data
+        liquidCashResults.forEach(row => {
+            branchWiseData.set(row.branchName, {
+                branchName: row.branchName || 'Unknown Branch',
+                liquidCash: parseFloat(row.liquidCash || 0),
+                solidCash: 0,
+            });
+        });
+
+        // Populate solid cash data
+        solidCashResults.forEach(row => {
+            if (!branchWiseData.has(row.branchName)) {
+                branchWiseData.set(row.branchName, {
+                    branchName: row.branchName || 'Unknown Branch',
+                    solidCash: 0,
+                    liquidCash: 0,
+                });
+            }
+            const branchData = branchWiseData.get(row.branchName);
+            branchData.solidCash += parseFloat(row.solidCash || 0);
+        });
+
+        // Return the response in the same structure as before
+        return Array.from(branchWiseData.values());
     }
+
 
     async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
         const query = this.createQueryBuilder('ve')
