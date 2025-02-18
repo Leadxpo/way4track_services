@@ -78,6 +78,9 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
+    @Column({ name: 'description', type: 'text', nullable: true })
+    description: string;
+
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 

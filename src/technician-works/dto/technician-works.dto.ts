@@ -13,7 +13,9 @@ export class TechnicianWorksDto {
     engineNumber: string;
     vehiclePhoto?: string;
     date: Date;
-  
+    description: string;
+
+
     staffId: number; branchId: number; productId: number;
     vendorId: number; clientId: number; voucherId: number;
     workId: number;

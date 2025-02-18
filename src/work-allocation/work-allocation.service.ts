@@ -75,7 +75,7 @@ export class WorkAllocationService {
     async updateWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         try {
             const workAllocation = await this.workAllocationRepository.findOne({
-                where: { workAllocationNumber: dto.workAllocationNumber }
+                where: { id: dto.id }
             });
 
             if (!workAllocation) {
@@ -83,26 +83,29 @@ export class WorkAllocationService {
             }
 
             // Get unique product names using Set
-            const uniqueProductNames = [...new Set(dto.productDetails?.map(product => product.productName))];
+            // const uniqueProductNames = [...new Set(dto.productDetails?.map(product => product.productName))];
 
             // Fetch products based on unique product names (no price included)
-            const products = await this.productRepo
-                .createQueryBuilder('product')
-                .where('product.product_name IN (:...uniqueProductNames)', { uniqueProductNames })
-                .getMany();
+            // const products = await this.productRepo
+            //     .createQueryBuilder('product')
+            //     .where('product.product_name IN (:...uniqueProductNames)', { uniqueProductNames })
+            //     .getMany();
 
             // Update product details to include only productName (no price)
-            const updatedProductDetails = uniqueProductNames.map(name => ({
-                productName: name,
-            }));
+            // const updatedProductDetails = uniqueProductNames.map(name => ({
+            //     productName: name,
+            // }));
 
             const updatedWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
 
-            if (!dto.productDetails || dto.productDetails.length === 0) {
-                updatedWorkAllocation.productId = null; // or handle it properly
-            }
+            // if (!dto.productDetails || dto.productDetails.length === 0) {
+            //     updatedWorkAllocation.productId = null; // or handle it properly
+            // }
 
-            updatedWorkAllocation.productDetails = updatedProductDetails;
+            // updatedWorkAllocation.productDetails = updatedProductDetails;
+            console.log(workAllocation, "++++++}}}}}}}}}}}")
+
+            console.log(updatedWorkAllocation, "{{{{{{{{{{{}}}}}}}}}}}}")
 
             // Merge updated details into the existing work allocation
             Object.assign(workAllocation, updatedWorkAllocation);
@@ -214,18 +217,18 @@ export class WorkAllocationService {
         let newWorkAllocation: WorkAllocationEntity;
         try {
             // Get unique product names using Set
-            const uniqueProductNames = [...new Set(dto.productDetails?.map(product => product.productName))];
+            // const uniqueProductNames = [...new Set(dto.productDetails?.map(product => product.productName))];
 
             // Fetch products based on unique product names (no price included)
-            const products = await this.productRepo
-                .createQueryBuilder('product')
-                .where('product.product_name IN (:...uniqueProductNames)', { uniqueProductNames })
-                .getMany();
+            // const products = await this.productRepo
+            //     .createQueryBuilder('product')
+            //     .where('product.product_name IN (:...uniqueProductNames)', { uniqueProductNames })
+            // .getMany();
 
             // Create a map of product names (no price needed)
-            const updatedProductDetails = uniqueProductNames.map(name => ({
-                productName: name,
-            }));
+            // const updatedProductDetails = uniqueProductNames.map(name => ({
+            //     productName: name,
+            // }));
 
             // Convert DTO to Entity
             newWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
@@ -236,15 +239,15 @@ export class WorkAllocationService {
                 .padStart(5, '0')}`;
 
             // Assign updated product details
-            newWorkAllocation.productDetails = updatedProductDetails;
+            // newWorkAllocation.productDetails = updatedProductDetails;
 
             // Save the entity
             await this.workAllocationRepository.insert(newWorkAllocation);
 
             // Send notification if there are product details
-            if (updatedProductDetails.length > 0) {
-                await this.notificationService.createNotification(newWorkAllocation, NotificationEnum.Technician);
-            }
+            // if (updatedProductDetails.length > 0) {
+            //     await this.notificationService.createNotification(newWorkAllocation, NotificationEnum.Technician);
+            // }
 
             // **Create Technician Details**
             const technicianDto: TechnicianWorksDto = {
@@ -256,6 +259,7 @@ export class WorkAllocationService {
                 vehicleNumber: "",
                 chassisNumber: "",
                 engineNumber: "",
+                description: "",
                 vehiclePhoto: "",
                 date: new Date(),
                 staffId: dto.staffId ?? null,
@@ -267,7 +271,7 @@ export class WorkAllocationService {
                 workId: newWorkAllocation.id,
                 companyCode: dto.companyCode ?? "",
                 unitCode: dto.unitCode ?? "",
-                productName: dto.productDetails[0].productName ?? "",
+                productName: dto.productName ?? "",
                 name: "",
                 phoneNumber: "",
                 simNumber: "",
@@ -288,7 +292,7 @@ export class WorkAllocationService {
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
 
-        if (dto.id && dto.id !== null || dto.workAllocationNumber) {
+        if (dto.id && dto.id !== null) {
             // If an ID is provided, update the work allocation details
             return await this.updateWorkAllocationDetails(dto);
         } else {

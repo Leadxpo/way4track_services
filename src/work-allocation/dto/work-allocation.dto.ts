@@ -15,7 +15,8 @@ export class WorkAllocationDto {
     vendorId?: number
     voucherId?: number
     // imeiNumber?: string
-    productDetails?: ProductDetail[];
+    // productDetails?: ProductDetail[];
+    productName: string
     workStatus: WorkStatusEnum;
     description: string;
 

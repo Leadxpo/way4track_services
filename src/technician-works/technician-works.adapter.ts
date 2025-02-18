@@ -74,6 +74,7 @@ export class TechnicianWorksAdapter {
             entity.chassisNumber,
             entity.engineNumber,
             entity.vehiclePhoto,
+            entity.description,
             entity.date,
             entity.staffId ? entity.staffId.id : null,
             entity.branchId ? entity.branchId.id : null,

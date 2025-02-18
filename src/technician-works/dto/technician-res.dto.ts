@@ -9,6 +9,8 @@ export class TechnicianWorksResponseDto {
     imeiNumber: string;
     vehicleType: string;
     vehicleNumber: string;
+    description: string;
+
     chassisNumber: string;
     engineNumber: string;
     vehiclePhoto?: string;
@@ -38,6 +40,9 @@ export class TechnicianWorksResponseDto {
         vehicleNumber: string,
         chassisNumber: string,
         engineNumber: string,
+
+        description: string,
+
         vehiclePhoto?: string,
         date?: Date,
         staffId?: number,
@@ -64,6 +69,7 @@ export class TechnicianWorksResponseDto {
         this.vehicleNumber = vehicleNumber;
         this.chassisNumber = chassisNumber;
         this.engineNumber = engineNumber;
+        this.description = description
         this.vehiclePhoto = vehiclePhoto;
         this.date = date ?? new Date();
         this.staffId = staffId ?? null;

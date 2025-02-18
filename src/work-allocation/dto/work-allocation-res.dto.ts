@@ -30,9 +30,10 @@ export class WorkAllocationResDto {
     // install?: boolean
     voucherId?: number
     voucherName?: string
-    products?: {
-        productName: string;
-    }[];
+    // products?: {
+    //     productName: string;
+    // }[];
+    // productName: string
     workStatus?: WorkStatusEnum;
     description?: string;
     constructor(
@@ -64,9 +65,9 @@ export class WorkAllocationResDto {
         // install?: boolean,
         voucherId?: number,
         voucherName?: string,
-        products?: {
-            productName: string;
-        }[],
+        // products?: {
+        //     productName: string;
+        // }[],
         workStatus?: WorkStatusEnum,
         description?: string
 
@@ -99,7 +100,7 @@ export class WorkAllocationResDto {
         // this.install = install
         this.voucherId = voucherId
         this.voucherName = this.voucherName
-        this.products = products;
+        // this.products = products;
         this.workStatus = workStatus
         this.description = description
 

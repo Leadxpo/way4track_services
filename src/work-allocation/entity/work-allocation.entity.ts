@@ -76,9 +76,7 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column({ type: 'json', name: 'product_details', nullable: true })
-    productDetails: {
-        productName: string
-    }[];
+    @Column('varchar', { name: 'product_name', nullable: true })
+    productName: string
 
 }

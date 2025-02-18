@@ -43,17 +43,17 @@ export class WorkAllocationAdapter {
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
 
-        entity.productDetails = dto.productDetails
-        if (!dto.productDetails || dto.productDetails.length === 0) {
-            entity.productDetails = [];
-        } else {
-            entity.productDetails = dto.productDetails.map((productDetail) => {
-                return {
-                    productName: productDetail.productName,
+        entity.productName = dto.productName
+        // if (!dto.productDetails || dto.productDetails.length === 0) {
+        //     entity.productDetails = [];
+        // } else {
+        //     entity.productDetails = dto.productDetails.map((productDetail) => {
+        //         return {
+        //             productName: productDetail.productName,
 
-                };
-            });
-        }
+        //         };
+        //     });
+        // }
         return entity;
     }
 
@@ -80,7 +80,7 @@ export class WorkAllocationAdapter {
                 entity.companyCode,
                 entity.unitCode,
                 product?.id || 0,
-                product?.productName || '',
+                entity?.productName || '',
                 product?.dateOfPurchase || null,
                 product?.vendorId?.id || null, // Accessing vendorId from product
                 product?.categoryName || '',
@@ -93,9 +93,9 @@ export class WorkAllocationAdapter {
                 voucher?.id || null,
                 voucher?.name || '',
                 // Mapping productDetails array
-                entity.productDetails?.map(productDetail => ({
-                    productName: productDetail.productName,
-                })) || []
+                // entity.productDetails?.map(productDetail => ({
+                //     productName: productDetail.productName,
+                // })) || []
             );
         });
     }
