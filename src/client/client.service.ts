@@ -123,10 +123,14 @@ export class ClientService {
             const updatedClient = {
                 ...existingClient,
                 ...entity,
-                clientPhoto: photoPath || existingClient.clientPhoto,
+                branchId: dto.branch ?? null,
+                clientPhoto: photoPath ?? existingClient.clientPhoto,
             };
 
+            console.log('Updated client payload:', updatedClient); // Debugging step
+
             await this.clientRepository.save(updatedClient);
+
 
             return new CommonResponse(true, 200, 'Client details updated successfully');
         } catch (error) {

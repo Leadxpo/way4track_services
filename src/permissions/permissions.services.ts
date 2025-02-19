@@ -82,7 +82,7 @@ export class PermissionsService {
                 ];
             case DesignationEnum.BranchManager:
                 return [
-                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.Branch, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Staff, add: true, edit: true, view: true, delete: true },

@@ -613,12 +613,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             data: groupedData[branchName],
         }));
 
-        return {
-            status: true,
-            errorCode: 200,
-            internalMessage: "Data retrieved successfully",
-            data: formattedResponse,
-        };
+        return formattedResponse
+
+
     }
 
 

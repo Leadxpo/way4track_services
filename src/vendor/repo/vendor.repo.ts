@@ -68,7 +68,7 @@ export class VendorRepository extends Repository<VendorEntity> {
             .where(`ve.vendor_id = "${req.vendorId}"`)
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
-            .getRawOne();
+            .getRawMany();
 
         return query;
     }

@@ -58,7 +58,7 @@ export class ClientRepository extends Repository<ClientEntity> {
             .andWhere(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
             .groupBy(`vr.voucher_id `)
-            .getRawOne();
+            .getRawMany();
         return query;
     }
 
@@ -73,7 +73,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.amount AS amount',
                 'vr.quantity as quantity',
                 'vr.voucher_id AS voucherId',
-                'br.name AS branchName',
+                'br.name AS branch',
                 'cl.email AS email',
                 'cl.dob AS dob',
                 'cl.address AS address',
