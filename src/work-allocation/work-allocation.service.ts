@@ -261,7 +261,7 @@ export class WorkAllocationService {
                 engineNumber: "",
                 description: "",
                 vehiclePhoto: "",
-                date: new Date(),
+                date: dto.date,
                 staffId: dto.staffId ?? null,
                 branchId: null,
                 productId: dto.productId ?? null,

@@ -85,7 +85,31 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
 
 
-    async getUpCommingWorkAllocation(req: {
+    // async getUpCommingWorkAllocation(req: {
+    //     companyCode?: string;
+    //     unitCode?: string;
+    //     staffId: string;
+    // }) {
+    //     const query = this.createQueryBuilder('wa')
+    //         .select([
+    //             'wa.staff_id AS staffId',
+    //             'staff.name AS staffName',
+    //             'COUNT(wa.id) AS totalPayment',
+    //         ])
+    //         .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+    //         .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+    //         .andWhere('wa.date >= :today', { today: new Date() })  // Filter to only upcoming work allocations
+    //         .groupBy('wa.staff_id')
+    //         .addGroupBy('staff.name');  // Removed DATE_FORMAT from GROUP BY as it's not necessary for grouping by staff and count
+
+    //     const result = await query.getRawMany();
+
+    //     return result;
+    // }
+
+    async getUpcomingWorkAllocation(req: {
         companyCode?: string;
         unitCode?: string;
         staffId: string;
@@ -94,20 +118,29 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .select([
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
-                'COUNT(wa.id) AS totalPayment',
+                'YEAR(wa.date) AS year',
+                'WEEK(wa.date) - WEEK(NOW()) + 1 AS weekNumber', // Correct week calculation
+                'COUNT(wa.id) AS totalTickets'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', {
+                today: new Date().toISOString().split('T')[0]
+            }) // Get next 4 weeks
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
-            .andWhere('wa.date >= :today', { today: new Date() })  // Filter to only upcoming work allocations
             .groupBy('wa.staff_id')
-            .addGroupBy('staff.name');  // Removed DATE_FORMAT from GROUP BY as it's not necessary for grouping by staff and count
+            .addGroupBy('staff.name')
+            .addGroupBy('YEAR(wa.date)')
+            .addGroupBy('WEEK(wa.date) - WEEK(NOW()) + 1'); // Ensure weekly grouping
 
         const result = await query.getRawMany();
-
         return result;
     }
+
+
+
+
 
     async getStaffWorkAllocation(req: {
         staffId: string; companyCode?: string;
@@ -138,11 +171,38 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
-    
+
         const result = await query.getRawMany();
         return result;
     }
-    
+
+    async getDailyWorkCountForWeek(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.staff_id AS staffId',
+                'staff.name AS staffName',
+                'DATE(wa.date) AS workDate', // Grouping by day
+                'COUNT(wa.id) AS totalTickets'
+            ])
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 6 DAY)', {
+                today: new Date().toISOString().split('T')[0]
+            }) // Fetch work counts for the next 7 days (one week)
+            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+            .groupBy('wa.staff_id')
+            .addGroupBy('staff.name')
+            .addGroupBy('DATE(wa.date)'); // Grouping by date ensures daily breakdown
+
+        const result = await query.getRawMany();
+        return result;
+    }
+
 
 
 }

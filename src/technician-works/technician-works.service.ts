@@ -251,7 +251,7 @@ export class TechnicianService {
         unitCode?: string
         staffId: string;
     }): Promise<CommonResponse> {
-        const VoucherData = await this.repo.getUpCommingWorkAllocation(req)
+        const VoucherData = await this.repo.getUpcomingWorkAllocation(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
