@@ -176,7 +176,8 @@ export class VoucherAdapter {
           voucher.estimate?.id || null,
           voucher.estimate?.invoiceId,
           voucher.staffId?.name || "",
-          voucher.estimate.receiptPdfUrl || ""
+          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : ""
+
         );
       });
     } else {
@@ -232,7 +233,8 @@ export class VoucherAdapter {
           voucher.estimate?.id || null,
           voucher.estimate?.invoiceId,
           voucher.staffId?.name || "",
-          voucher.estimate.receiptPdfUrl || ""
+          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : ""
+
         )
       ];
     }
