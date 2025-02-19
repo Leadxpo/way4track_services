@@ -103,4 +103,17 @@ export class TechnicianController {
             return new CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
+
+    @Post('getStaffWorkAllocation')
+    async getStaffWorkAllocation(@Body() req: {
+        staffId: string; companyCode?: string;
+        unitCode?: string
+    }) {
+        try {
+            return this.techService.getStaffWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
 }

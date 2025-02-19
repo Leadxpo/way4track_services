@@ -5,6 +5,7 @@ import { StaffEntity } from "src/staff/entity/staff.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
+import { ClientEntity } from "src/client/entity/client.entity";
 
 
 
@@ -108,6 +109,40 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return result;
     }
 
+    async getStaffWorkAllocation(req: {
+        staffId: string; companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.service AS service',
+                'wa.payment_status AS paymentStatus',
+                'wa.date AS date',
+                'staff.name AS staffName',
+                'client.name AS clientName',
+                'wa.work_status as workStatus',
+                'wa.product_name as productName',
+                'wa.imei_number as imeiNumber',
+                'wa.vehicle_type as vehicleType',
+                'wa.vehicle_number as vehicleNumber',
+                'wa.chassis_number as chassisNumber',
+                'wa.engine_number as engineNumber',
+                'wa.vehicle_photo as vehiclePhoto',
+                'wa.description as description',
+                'wa.name as clientName',
+                'wa.phone_number as phoneNumber',
+                'wa.sim_number as simNumber'
+            ])
+            .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+    
+        const result = await query.getRawMany();
+        return result;
+    }
+    
 
 
 }
