@@ -7,12 +7,16 @@ import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { StaffIdDto } from './dto/staff-id.dto';
 import { StaffDto } from './dto/staff.dto';
-import { StaffEntity } from './entity/staff.entity';
+import { Qualification, StaffEntity } from './entity/staff.entity';
 import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
 import { PermissionsDto } from 'src/permissions/dto/permissions.dto';
 import { PermissionsService } from 'src/permissions/permissions.services';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { LettersDto } from 'src/letters/dto/letters.dto';
+import { LettersService } from 'src/letters/letters.service';
+import { LettersRepository } from 'src/letters/repo/letters.repo';
+import { LettersEntity } from 'src/letters/entity/letters.entity';
 
 
 @Injectable()
@@ -23,7 +27,9 @@ export class StaffService {
         private adapter: StaffAdapter,
         private staffRepository: StaffRepository,
         private attendanceRepo: AttendenceRepository,
-        private service: PermissionsService
+        private service: PermissionsService,
+        private lettersService: LettersService,
+        private letterRepo: LettersRepository
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -34,36 +40,15 @@ export class StaffService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleStaffDetails(req: StaffDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    async handleStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
-            let filePath: string | null = null;
-
-            // Handle photo upload
-            if (photo) {
-                const bucket = this.storage.bucket(this.bucketName);
-                const uniqueFileName = `staff_photos/${Date.now()}-${photo.originalname}`;
-                const file = bucket.file(uniqueFileName);
-
-                await file.save(photo.buffer, {
-                    contentType: photo.mimetype,
-                    resumable: false,
-                });
-
-                console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-            }
-
-            // 🔍 Step 1: Check if staff record already exists
-            // const existingStaff = await this.staffRepository.findOne({
-            //     where: [{ id: req.id }, { staffId: req.staffId }],
-            // });
 
             if (req.id && req.id !== null || req.staffId) {
                 console.log("🔄 Updating existing staff record...");
-                return await this.updateStaffDetails(req, filePath);
+                return await this.updateStaffDetails(req, files);
             } else {
                 console.log("🆕 Creating a new staff record...");
-                return await this.createStaffDetails(req, filePath);
+                return await this.createStaffDetails(req, files);
             }
         } catch (error) {
             console.error(`❌ Error handling staff details: ${error.message}`, error.stack);
@@ -72,35 +57,73 @@ export class StaffService {
     }
 
 
-    async createStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
+    async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
             console.log(req, "req");
 
-            // Convert DTO to entity
             const newStaff = this.adapter.convertDtoToEntity(req);
-
-            // Generate staffId
             newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
 
-            // Assign staff photo if provided
-            if (filePath) {
-                newStaff.staffPhoto = filePath;
+            // Upload staff photo to GCS
+            if (files?.photo?.[0]) {
+                newStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${newStaff.staffId}.jpg`);
             }
 
-            console.log(newStaff, "new");
+            // Upload vehicle photo to GCS
+            if (files?.vehiclePhoto?.[0]) {
+                newStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${newStaff.staffId}.jpg`);
+            }
 
-            // Save new staff
+            const qualifications = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
+
+            if (files?.qualificationFiles) {
+                for (let i = 0; i < files.qualificationFiles.length; i++) {
+                    const file = files.qualificationFiles[i];
+                    const filePath = await this.uploadFile(file, `qualification_files/${newStaff.staffId}_${file.originalname}`);
+
+                    if (qualifications[i]) {
+                        qualifications[i].file = filePath;
+                    } else {
+                        console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
+                        qualifications.push({
+                            qualificationName: Qualification.TENTH, // Consider dynamically assigning a better fallback
+                            marksOrCgpa: null, // Null if unknown instead of forcing 0
+                            file: filePath
+                        });
+                    }
+                }
+            }
+
+            newStaff.qualifications = qualifications;
+
+
+
             await this.staffRepository.insert(newStaff);
 
-            // **Create default permissions for the new staff**
             const permissionsDto: PermissionsDto = {
                 staffId: newStaff.staffId,
-                // permissions: this.getDefaultPermissions(req.designation),
                 companyCode: req.companyCode,
-                unitCode: req.unitCode // Fetch default permissions
+                unitCode: req.unitCode
             };
 
             await this.service.savePermissionDetails(permissionsDto);
+
+            // Upload all letter files to GCS and save URLs in LettersDto
+            const lettersDto: LettersDto = {
+                staffId: newStaff.staffId,
+                companyCode: req.companyCode,
+                unitCode: req.unitCode,
+                offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
+                resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
+                terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
+                appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
+                leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
+                relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
+                experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
+            };
+
+            await this.lettersService.saveLetterDetails(lettersDto);
+
 
             return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
         } catch (error) {
@@ -108,9 +131,103 @@ export class StaffService {
             throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
         }
     }
+    //don't delete this code
+    // async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    //     try {
+    //         let existingStaff: StaffEntity | null = null;
 
+    //         if (req.id) {
+    //             existingStaff = await this.staffRepository.findOne({
+    //                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
+    //             });
+    //         } else if (req.staffId) {
+    //             existingStaff = await this.staffRepository.findOne({
+    //                 where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode }
+    //             });
+    //         }
 
-    async updateStaffDetails(req: StaffDto, filePath: string | null): Promise<CommonResponse> {
+    //         if (!existingStaff) {
+    //             return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
+    //         }
+
+    //         // ✅ Handle file updates
+    //         const updatedStaff: Partial<StaffEntity> = {
+    //             ...existingStaff,
+    //             ...this.adapter.convertDtoToEntity(req)
+    //         };
+
+    //         if (files?.photo?.[0]) {
+    //             if (existingStaff.staffPhoto) {
+    //                 await this.deleteFile(existingStaff.staffPhoto);
+    //             }
+    //             updatedStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${existingStaff.staffId}.jpg`);
+    //         }
+
+    //         if (files?.vehiclePhoto?.[0]) {
+    //             if (existingStaff.vehiclePhoto) {
+    //                 await this.deleteFile(existingStaff.vehiclePhoto);
+    //             }
+    //             updatedStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
+    //         }
+
+    //         let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
+
+    //         if (!existingLetters) {
+    //             existingLetters = new LettersEntity();
+    //             existingLetters.staffId = existingStaff;
+    //             existingLetters.companyCode = req.companyCode;
+    //             existingLetters.unitCode = req.unitCode;
+    //         }
+
+    //         // ✅ Handle letter file updates
+    //         const letterUpdates: Partial<LettersEntity> = {
+    //             offerLetter: files?.offerLetter?.[0]
+    //                 ? await this.uploadFile(files.offerLetter[0], `letters/${existingStaff.staffId}_offer.pdf`)
+    //                 : existingLetters.offerLetter,
+
+    //             resignationLetter: files?.resignationLetter?.[0]
+    //                 ? await this.uploadFile(files.resignationLetter[0], `letters/${existingStaff.staffId}_resignation.pdf`)
+    //                 : existingLetters.resignationLetter,
+
+    //             terminationLetter: files?.terminationLetter?.[0]
+    //                 ? await this.uploadFile(files.terminationLetter[0], `letters/${existingStaff.staffId}_termination.pdf`)
+    //                 : existingLetters.terminationLetter,
+
+    //             appointmentLetter: files?.appointmentLetter?.[0]
+    //                 ? await this.uploadFile(files.appointmentLetter[0], `letters/${existingStaff.staffId}_appointment.pdf`)
+    //                 : existingLetters.appointmentLetter,
+
+    //             leaveFormat: files?.leaveFormat?.[0]
+    //                 ? await this.uploadFile(files.leaveFormat[0], `letters/${existingStaff.staffId}_leave.pdf`)
+    //                 : existingLetters.leaveFormat,
+
+    //             relievingLetter: files?.relievingLetter?.[0]
+    //                 ? await this.uploadFile(files.relievingLetter[0], `letters/${existingStaff.staffId}_relieving.pdf`)
+    //                 : existingLetters.relievingLetter,
+
+    //             experienceLetter: files?.experienceLetter?.[0]
+    //                 ? await this.uploadFile(files.experienceLetter[0], `letters/${existingStaff.staffId}_experience.pdf`)
+    //                 : existingLetters.experienceLetter,
+    //         };
+
+    //         // ✅ Update the existing staff details
+    //         await this.staffRepository.update(existingStaff.id, updatedStaff);
+
+    //         // ✅ Update the existing letter record if it exists, otherwise save a new one
+    //         if (existingLetters.id) {
+    //             await this.letterRepo.update(existingLetters.id, letterUpdates);
+    //         } else {
+    //             await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+    //         }
+
+    //         return new CommonResponse(true, 65152, 'Staff Details and Letters Updated Successfully');
+    //     } catch (error) {
+    //         console.error(`Error updating staff details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
+    //     }
+    // }
+
+    async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
             let existingStaff: StaffEntity | null = null;
 
@@ -128,37 +245,96 @@ export class StaffService {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
 
-            // ✅ Delete old file only if a new one is uploaded
-            if (filePath && existingStaff.staffPhoto) {
-                const existingFilePath = existingStaff.staffPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
-
-                try {
-                    await file.delete();
-                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
-                } catch (error) {
-                    console.error(`Error deleting old file from GCS: ${error.message}`);
-                }
-            }
-            const staffEntity = this.adapter.convertDtoToEntity(req);
-            const updatedStaff = {
+            // ✅ Handle file updates
+            const updatedStaff: Partial<StaffEntity> = {
                 ...existingStaff,
-                ...staffEntity,
-                id: existingStaff.id,  // 🔴 Ensure ID is retained to prevent insert!
-                staffPhoto: filePath || existingStaff.staffPhoto, // ✅ Keep old photo if no new one is uploaded
+                ...this.adapter.convertDtoToEntity(req)
             };
 
+            if (files?.photo?.[0]) {
+                if (existingStaff.staffPhoto) {
+                    await this.deleteFile(existingStaff.staffPhoto);
+                }
+                updatedStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${existingStaff.staffId}.jpg`);
+            }
+
+            if (files?.vehiclePhoto?.[0]) {
+                if (existingStaff.vehiclePhoto) {
+                    await this.deleteFile(existingStaff.vehiclePhoto);
+                }
+                updatedStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
+            }
+
+            let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
+
+            if (!existingLetters) {
+                existingLetters = new LettersEntity();
+                existingLetters.staffId = existingStaff;
+                existingLetters.companyCode = req.companyCode;
+                existingLetters.unitCode = req.unitCode;
+            }
+
+            // ✅ Handle letter file updates
+            const letterFiles = [
+                "offerLetter", "resignationLetter", "terminationLetter",
+                "appointmentLetter", "leaveFormat", "relievingLetter", "experienceLetter"
+            ];
+
+            const letterUpdates: Partial<LettersEntity> = {};
+
+            for (const letterType of letterFiles) {
+                if (files?.[letterType]?.[0]) {
+                    if (existingLetters[letterType]) {
+                        await this.deleteFile(existingLetters[letterType]);
+                    }
+                    letterUpdates[letterType] = await this.uploadFile(files[letterType][0], `letters/${existingStaff.staffId}_${letterType}.pdf`);
+                } else {
+                    letterUpdates[letterType] = existingLetters[letterType];
+                }
+            }
+
+            // ✅ Update the existing staff details
             await this.staffRepository.update(existingStaff.id, updatedStaff);
-            // ✅ Merge the updates, keeping the old photo if none is provided
 
+            // ✅ Update the existing letter record if it exists, otherwise save a new one
+            if (existingLetters.id) {
+                await this.letterRepo.update(existingLetters.id, letterUpdates);
+            } else {
+                await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+            }
 
-            // await this.staffRepository.save(updatedStaff);
-            return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
+            return new CommonResponse(true, 65152, 'Staff Details and Letters Updated Successfully');
         } catch (error) {
             console.error(`Error updating staff details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
         }
     }
+
+    async deleteFile(fileUrl: string): Promise<void> {
+        try {
+            const existingFilePath = fileUrl.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+            const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+            await file.delete();
+            console.log(`Deleted old file from GCS: ${existingFilePath}`);
+        } catch (error) {
+            console.error(`Error deleting old file from GCS: ${error.message}`);
+        }
+    }
+
+
+    private async uploadFile(file: Express.Multer.File, fileName: string): Promise<string> {
+        const bucket = this.storage.bucket(this.bucketName);
+        const fileRef = bucket.file(fileName);
+
+        await fileRef.save(file.buffer, {
+            contentType: file.mimetype,
+            resumable: false,
+        });
+
+        console.log(`File uploaded to GCS: ${fileName}`);
+        return `https://storage.googleapis.com/${this.bucketName}/${fileName}`;
+    }
+
 
     async deleteStaffDetails(dto: StaffIdDto): Promise<CommonResponse> {
         try {

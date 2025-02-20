@@ -9,6 +9,7 @@ import { AttendanceModule } from 'src/attendence/attendence.module';
 import { StaffDashboardService } from 'src/dashboard/staff-dashboard.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { PermissionModule } from 'src/permissions/permissions.module';
+import { LettersModule } from 'src/letters/letters.module';
 
 
 @Module({
@@ -16,6 +17,7 @@ import { PermissionModule } from 'src/permissions/permissions.module';
         dest: './uploads',
     }),
     forwardRef(() => AttendanceModule),
+    forwardRef(() => LettersModule),
     forwardRef(() => PermissionModule)],
     controllers: [StaffController],
     providers: [StaffService, StaffRepository, StaffAdapter, StaffDashboardService],

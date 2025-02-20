@@ -1,5 +1,5 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
@@ -17,17 +17,45 @@ const multerOptions = {
 export class StaffController {
     constructor(private readonly staffService: StaffService) { }
 
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @UseInterceptors(
+        FileFieldsInterceptor([
+            { name: 'photo', maxCount: 1 },
+            { name: 'vehiclePhoto', maxCount: 1 },
+            { name: 'qualificationFiles', maxCount: 5 }, // Added qualification files
+            { name: 'offerLetter', maxCount: 1 },
+            { name: 'resignationLetter', maxCount: 1 },
+            { name: 'terminationLetter', maxCount: 1 },
+            { name: 'appointmentLetter', maxCount: 1 },
+            { name: 'leaveFormat', maxCount: 1 },
+            { name: 'relievingLetter', maxCount: 1 },
+            { name: 'experienceLetter', maxCount: 1 }
+        ], multerOptions)
+    )
     @Post('handleStaffDetails')
     async handleStaffDetails(
         @Body() dto: StaffDto,
-        @UploadedFile() photo?: Express.Multer.File,
+        @UploadedFiles() files: {
+            photo?: Express.Multer.File[],
+            vehiclePhoto?: Express.Multer.File[],
+            qualificationFiles?: Express.Multer.File[], // Added qualification files
+            offerLetter?: Express.Multer.File[],
+            resignationLetter?: Express.Multer.File[],
+            terminationLetter?: Express.Multer.File[],
+            appointmentLetter?: Express.Multer.File[],
+            leaveFormat?: Express.Multer.File[],
+            relievingLetter?: Express.Multer.File[],
+            experienceLetter?: Express.Multer.File[]
+        }
     ): Promise<CommonResponse> {
         if (dto.id) {
             dto.id = Number(dto.id);
         }
-        return this.staffService.handleStaffDetails(dto, photo);
+
+        return this.staffService.handleStaffDetails(dto, files);
     }
+
+
+
 
     @Post('deletestaffDetails')
     async deletestaffDetails(@Body() dto: StaffIdDto): Promise<CommonResponse> {

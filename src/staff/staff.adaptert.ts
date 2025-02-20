@@ -9,33 +9,67 @@ import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 export class StaffAdapter {
     convertDtoToEntity(dto: StaffDto): StaffEntity {
         const entity = new StaffEntity();
+
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
+        entity.alternateNumber = dto.alternateNumber;
         entity.staffPhoto = dto.staffPhoto;
         entity.designation = dto.designation;
+        entity.staffId = dto.staffId;
+        entity.password = dto.password;
+        entity.gender = dto.gender;
+        entity.location = dto.location;
         entity.dob = dto.dob;
         entity.email = dto.email;
         entity.aadharNumber = dto.aadharNumber;
-        entity.address = dto.address;
+        entity.panCardNumber = dto.panCardNumber;
+        entity.drivingLicence = dto.drivingLicence;
+        entity.drivingLicenceNumber = dto.drivingLicenceNumber;
+        entity.uanNumber = dto.uanNumber;
+        entity.esicNumber = dto.esicNumber;
+        entity.bloodGroup = dto.bloodGroup;
         entity.joiningDate = dto.joiningDate;
-        entity.basicSalary = dto.basicSalary;
+        entity.beforeExperience = dto.beforeExperience;
+        entity.previousCompany = dto.previousCompany;
+        entity.previousDesignation = dto.previousDesignation;
+        entity.totalExperience = dto.totalExperience;
+        entity.previousSalary = dto.previousSalary;
+        entity.bankName = dto.bankName;
+        entity.accountNumber = dto.accountNumber;
+        entity.ifscCode = dto.ifscCode;
+        entity.address = dto.address;
+        entity.branchName = dto.branchName;
+        entity.accountType = dto.accountType;
+        entity.department = dto.department;
+        entity.monthlySalary = dto.monthlySalary;
+        entity.salaryDate = dto.salaryDate;
+        entity.salaryStatus = dto.salaryStatus;
+        entity.bikeAllocation = dto.bikeAllocation;
+        entity.vehiclePhoto = dto.vehiclePhoto;
+        entity.bikeNumber = dto.bikeNumber;
+        entity.mobileAllocation = dto.mobileAllocation;
+        entity.mobileBrand = dto.mobileBrand;
+        entity.mobileNumber = dto.mobileNumber;
+        entity.imeiNumber = dto.imeiNumber;
+        entity.terminationDate = dto.terminationDate;
+        entity.resignationDate = dto.resignationDate;
+        entity.finalSettlementDate = dto.finalSettlementDate;
+        entity.insuranceNumber = dto.insuranceNumber;
+        entity.insuranceEligibilityDate = dto.insuranceEligibilityDate;
+        entity.insuranceExpiryDate = dto.insuranceExpiryDate;
+        entity.description = dto.description;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        entity.password = dto.password;
-        entity.beforeExperience = dto.beforeExperience;
-        entity.latitude = dto.latitude
-        entity.longitude = dto.longitude
+        entity.latitude = dto.latitude;
+        entity.longitude = dto.longitude;
+
         if (dto.id) {
             entity.id = dto.id;
         }
 
-        if (dto.staffId) {
-            entity.staffId = dto.staffId;
-        }
-
-        if (dto.branch) { // Ensure `branch` is set
+        if (dto.branch) {
             const branchEntity = new BranchEntity();
-            branchEntity.id = dto.branch; // Make sure `dto.branch` contains the ID
+            branchEntity.id = dto.branch;
             entity.branch = branchEntity;
         }
 
@@ -49,22 +83,60 @@ export class StaffAdapter {
                 staffMember.id,
                 staffMember.name,
                 staffMember.phoneNumber,
-                staffMember.staffId,
+                staffMember.alternateNumber,
                 staffMember.designation,
-                staffMember?.branch?.id,
-                staffMember?.branch?.branchName,
+                staffMember.staffId,
+                staffMember.password,
+                staffMember.staffPhoto,
+                staffMember.gender,
+                staffMember.location,
                 staffMember.dob,
                 staffMember.email,
                 staffMember.aadharNumber,
-                staffMember.address,
+                staffMember.panCardNumber,
+                staffMember.drivingLicence,
+                staffMember.drivingLicenceNumber,
+                staffMember.uanNumber,
+                staffMember.esicNumber,
+                staffMember.bloodGroup,
                 staffMember.joiningDate,
-                staffMember.basicSalary,
                 staffMember.beforeExperience,
-                staffMember.staffPhoto,
+                staffMember.previousCompany,
+                staffMember.previousDesignation,
+                staffMember.totalExperience,
+                staffMember.previousSalary,
+                staffMember.bankName,
+                staffMember.accountNumber,
+                staffMember.ifscCode,
+                staffMember.address,
+                staffMember.branch.id,
+                staffMember.branch.branchName,
+                staffMember.accountType,
+                staffMember.department,
+                staffMember.monthlySalary,
+                staffMember.salaryDate,
+                staffMember.salaryStatus,
+                staffMember.bikeAllocation,
+                staffMember.vehiclePhoto,
+                staffMember.bikeNumber,
+                staffMember.mobileAllocation,
+                staffMember.mobileBrand,
+                staffMember.mobileNumber,
+                staffMember.imeiNumber,
+                staffMember.terminationDate,
+                staffMember.resignationDate,
+                staffMember.finalSettlementDate,
+                staffMember.insuranceNumber,
+                staffMember.insuranceEligibilityDate,
+                staffMember.insuranceExpiryDate,
+                staffMember.description,
                 staffMember.companyCode,
                 staffMember.unitCode,
                 staffMember.latitude,
-                staffMember.longitude
+                staffMember.longitude,
+                staffMember.createdAt,
+                staffMember.updatedAt,
+                staffMember.qualifications
             );
         });
     }
