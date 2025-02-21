@@ -6,7 +6,6 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AttendanceEntity } from './entity/attendence.entity';
 import { AttendanceController } from './attendence.controller';
 import { AttendanceService } from './attendence.service';
-import { AttendanceAdapter } from './attendence.adapter';
 import { AttendenceRepository } from './repo/attendence.repo';
 import { BranchModule } from 'src/branch/branch.module';
 import { StaffModule } from 'src/staff/staff.module';
@@ -17,7 +16,7 @@ import { StaffModule } from 'src/staff/staff.module';
     forwardRef(() => StaffModule),
     ],
     controllers: [AttendanceController],
-    providers: [AttendanceService, AttendanceAdapter, AttendenceRepository],
+    providers: [AttendanceService, AttendenceRepository],
     exports: [AttendenceRepository, AttendanceService]
 })
 export class AttendanceModule { }

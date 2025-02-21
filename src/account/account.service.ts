@@ -27,7 +27,7 @@ export class AccountService {
             let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully";
             const convertDto = this.adapter.toEntity(dto);
 
-            if (dto.id) {
+            if (dto.id || dto.id !== null) {
                 // Ensure that update values are provided
                 await this.accountRepository.update(dto.id, convertDto);
             } else {
@@ -88,7 +88,7 @@ export class AccountService {
     }
     async deleteAccountDetails(dto: AccountIdDto): Promise<CommonResponse> {
         try {
-            
+
             const accountExists = await this.accountRepository.findOne({
                 where: { accountNumber: dto.fromAccountNumber, companyCode: dto.companyCode, unitCode: dto.unitCode },
             });

@@ -292,7 +292,7 @@ export class WorkAllocationService {
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
 
-        if (dto.id && dto.id !== null) {
+        if (dto.id && dto.id !== null || (dto.workAllocationNumber && dto.workAllocationNumber.trim() !== '')) {
             // If an ID is provided, update the work allocation details
             return await this.updateWorkAllocationDetails(dto);
         } else {

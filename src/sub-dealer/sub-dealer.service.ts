@@ -8,6 +8,7 @@ import { SubDealerIdDto } from './dto/sub-dealer-id.dto';
 import { SubDealerDto } from './dto/sub-dealer.dto';
 import { SubDealerRepository } from './repo/sub-dealer.repo';
 import { SubDealerAdapter } from './sub-dealer.adapter';
+import { SubDealerEntity } from './entity/sub-dealer.entity';
 
 @Injectable()
 export class SubDealerService {
@@ -35,9 +36,21 @@ export class SubDealerService {
 
   async updateSubDealerDetails(dto: SubDealerDto, filePath: string | null): Promise<CommonResponse> {
     try {
-      const existingSubDealer = await this.subDealerRepository.findOne({
-        where: { id: dto.id, subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode },
-      });
+
+      let existingSubDealer: SubDealerEntity | null = null;
+
+
+
+      if (dto.id) {
+        existingSubDealer = await this.subDealerRepository.findOne({
+          where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
+        });
+      } else if (dto.subDealerId) {
+        existingSubDealer = await this.subDealerRepository.findOne({
+          where: { subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode }
+        });
+      }
+
 
       if (!existingSubDealer) {
         return new CommonResponse(false, 4002, 'SubDealer not found for the provided ID.');
@@ -99,7 +112,7 @@ export class SubDealerService {
       }
 
 
-      if (dto.id && dto.id !== null || dto.subDealerId) {
+      if (dto.id && dto.id !== null || (dto.subDealerId && dto.subDealerId.trim() !== '')) {
         return await this.updateSubDealerDetails(dto, filePath);
       } else {
         return await this.createSubDealerDetails(dto, filePath);

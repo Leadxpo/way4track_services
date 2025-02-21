@@ -74,8 +74,8 @@ export class BranchEntity extends BaseEntity {
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.branchId)
   technician: TechnicianWorksEntity[];
 
-  @OneToMany(() => AttendanceEntity, (asserts) => asserts.branchId)
-  attendance: AttendanceEntity[];
+  // @OneToMany(() => AttendanceEntity, (asserts) => asserts.branchId)
+  // attendance: AttendanceEntity[];
 
   @OneToMany(() => AccountEntity, (asserts) => asserts.branch)
   accounts: AccountEntity[];

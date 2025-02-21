@@ -43,7 +43,7 @@ export class StaffService {
     async handleStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
 
-            if (req.id && req.id !== null || req.staffId) {
+            if (req.id && req.id !== null || (req.staffId && req.staffId.trim() !== '')) {
                 console.log("🔄 Updating existing staff record...");
                 return await this.updateStaffDetails(req, files);
             } else {

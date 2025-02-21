@@ -64,7 +64,7 @@ export class TicketsService {
 
     async handleTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
 
-        if (dto.id) {
+        if (dto.id || dto.id !== null) {
             // If an ID is provided, update the ticket details
             return await this.updateTicketDetails(dto);
         } else {

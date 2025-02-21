@@ -619,40 +619,87 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
 
-    async getYearWiseCreditAndDebitPercentages(req: BranchChartDto) {
-        // Ensure that req.date is treated as a number
-        const year = Number(req.date); // Convert to number
-
-        // Check if the conversion is successful
-        if (isNaN(year)) {
+    async getYearWiseCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
+        const year = Number(req.date);
+        if (!year || isNaN(year)) {
             throw new Error('Invalid year provided');
         }
 
         const query = this.createQueryBuilder('ve')
             .select([
                 `YEAR(ve.generation_date) AS year`,
-                `ve.product_type AS productType`,
+                `MONTH(ve.generation_date) AS month`,
+                `MONTHNAME(ve.generation_date) AS monthName`, // This column must be included in GROUP BY
                 `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
                 `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
-                `ROUND(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 2) AS creditPercentage`,
-                `ROUND(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 2) AS debitPercentage`,
+                `ROUND(
+                IF(SUM(ve.amount) > 0,
+                    SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 
+                    0
+                ), 2
+            ) AS creditPercentage`,
+                `ROUND(
+                IF(SUM(ve.amount) > 0,
+                    SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 
+                    0
+                ), 2
+            ) AS debitPercentage`
             ])
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
-            // Include data for the selected year and the previous 4 years
-            .andWhere('YEAR(ve.generation_date) BETWEEN :startYear AND :endYear', {
-                startYear: year - 4,  // 4 years before the selected year
-                endYear: year,        // Selected year
+            .andWhere('YEAR(ve.generation_date) = :year', { year })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('YEAR(ve.generation_date), MONTH(ve.generation_date), MONTHNAME(ve.generation_date)') // Add MONTHNAME here
+            .orderBy('YEAR(ve.generation_date)', 'ASC')
+            .addOrderBy('MONTH(ve.generation_date)', 'ASC')
+            .getRawMany();
+
+        return query
+
+    }
+    async get4YearWiseCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
+        const year = Number(req.date);
+        if (!year || isNaN(year)) {
+            throw new Error('Invalid year provided');
+        }
+
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `YEAR(ve.generation_date) AS year`,
+                `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
+                `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
+                `ROUND(
+                    IF(SUM(ve.amount) > 0,
+                        SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 
+                        0
+                    ), 2
+                ) AS creditPercentage`,
+                `ROUND(
+                    IF(SUM(ve.amount) > 0,
+                        SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) / SUM(ve.amount) * 100, 
+                        0
+                    ), 2
+                ) AS debitPercentage`
+            ])
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
-            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            .groupBy('YEAR(ve.generation_date), ve.product_type')
-            .orderBy('YEAR(ve.generation_date), ve.product_type')
+            .andWhere('YEAR(ve.generation_date) BETWEEN :startYear AND :endYear', {
+                startYear: year - 3, // Last 4 years including selected year
+                endYear: year
+            })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('YEAR(ve.generation_date)') // Grouping only by year
+            .orderBy('YEAR(ve.generation_date)', 'ASC')
             .getRawMany();
 
         return query;
     }
+
+
 
     async getTotalProductAndServiceSales(req: CommonReq) {
         const query = await this.createQueryBuilder('ve')
@@ -1213,10 +1260,16 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return Array.from(branchWiseData.values());
     }
 
-    async getProductTypeCreditAndDebitPercentages(req: CommonReq) {
+    async getProductTypeCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
+        const year = Number(req.date); // Convert to number
+
+        // Check if the conversion is successful
+        if (isNaN(year)) {
+            throw new Error('Invalid year provided');
+        }
         const query = this.createQueryBuilder('ve')
             .select([
-                `DATE(ve.generation_date) AS date`,
+                `YEAR(ve.generation_date) AS year`,
                 `branch.id AS branchId`,
                 `branch.name AS branchName`,
                 `branch.branch_number AS branchNumber`,
@@ -1266,23 +1319,103 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.voucher_type IN (:...types)', {
                 types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
             })
-            .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
+            .andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .groupBy(`
-                DATE(ve.generation_date), 
+                year(ve.generation_date), 
                 branch.id, 
                 branch.name, 
                 branch.branch_number, 
                 branch.branch_address
             `)
-            .orderBy(`DATE(ve.generation_date)`, 'ASC')
+            .orderBy(`year(ve.generation_date)`, 'ASC')
             .addOrderBy('branch.name', 'ASC')
             .addOrderBy('branch.branch_number', 'ASC')
             .getRawMany();
 
         return query;
     }
+
+    async get4ProductTypeCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
+        const year = Number(req.date);
+        if (isNaN(year)) {
+            throw new Error('Invalid year provided');
+        }
+
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `YEAR(ve.generation_date) AS year`,
+                `branch.id AS branchId`,
+                `branch.name AS branchName`,
+                `branch.branch_number AS branchNumber`,
+                `branch.branch_address AS branchAddress`,
+
+                // **Total Credit & Debit Amounts**
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) AS totalCreditAmount`,
+                `COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) AS totalDebitAmount`,
+
+                // **Product Type Wise Totals for Credit**
+                `COALESCE(SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END), 0) AS serviceTotalCreditAmount`,
+                `COALESCE(SUM(CASE WHEN ve.product_type = 'product' THEN ve.amount ELSE 0 END), 0) AS productTotalCreditAmount`,
+                `COALESCE(SUM(CASE WHEN ve.product_type = 'sales' THEN ve.amount ELSE 0 END), 0) AS salesTotalCreditAmount`,
+
+                // **Product Type Wise Totals for Debit**
+                `COALESCE(SUM(CASE WHEN ve.product_type = 'expanses' THEN ve.amount ELSE 0 END), 0) AS expansesTotalDebitAmount`,
+                `COALESCE(SUM(CASE WHEN ve.product_type = 'salaries' THEN ve.amount ELSE 0 END), 0) AS salariesTotalDebitAmount`,
+
+                // **Credit Percentages Relative to Total Credit**
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'service' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS serviceCreditPercentage`,
+
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'product' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS productCreditPercentage`,
+
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'sales' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS salesCreditPercentage`,
+
+                // **Debit Percentages Relative to Total Debit**
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'expanses' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS expansesDebitPercentage`,
+
+                `ROUND(
+                    COALESCE(SUM(CASE WHEN ve.product_type = 'salaries' THEN ve.amount ELSE 0 END), 0) / 
+                    NULLIF(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) * 100, 2
+                ) AS salariesDebitPercentage`
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .where('ve.voucher_type IN (:...types)', {
+                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
+            })
+            .andWhere('YEAR(ve.generation_date) BETWEEN :startYear AND :endYear', {
+                startYear: year - 3,
+                endYear: year
+            })
+            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy(`
+                YEAR(ve.generation_date), 
+                branch.id, 
+                branch.name, 
+                branch.branch_number, 
+                branch.branch_address
+            `)
+            .orderBy('YEAR(ve.generation_date)', 'ASC')
+            .addOrderBy('branch.name', 'ASC')
+            .addOrderBy('branch.branch_number', 'ASC')
+            .getRawMany();
+
+        return query;
+    }
+
 
 
     async getPurchaseOrderDataTable(req: {

@@ -33,7 +33,7 @@ export class BranchService {
 
             // Check if this is an update and the entity already has a file
             let entity: BranchEntity | null = null;
-            if (dto.id) {
+            if (dto.id || dto.id !== null) {
                 entity = await this.branchRepo.findOneBy({ id: dto.id });
                 if (!entity) {
                     throw new ErrorResponse(404, 'Branch not found');

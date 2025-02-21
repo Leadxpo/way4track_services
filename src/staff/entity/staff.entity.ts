@@ -248,7 +248,7 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.user)
   notifications: NotificationEntity[];
 
-  @OneToMany(() => AttendanceEntity, (attendanceEntity) => attendanceEntity.staffId)
+  @OneToMany(() => AttendanceEntity, (attendanceEntity) => attendanceEntity.staff)
   attendance: AttendanceEntity[];
 
   @OneToMany(() => WorkAllocationEntity, (workAllocationEntity) => workAllocationEntity.staffId)

@@ -47,10 +47,10 @@ export class ClientService {
                 photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
 
-            const existingStaff = await this.clientRepository.findOne({
-                where: [{ id: dto.id }, { clientId: dto.clientId }],
-            });
-            if (existingStaff) {
+            // const existingStaff = await this.clientRepository.findOne({
+            //     where: [{ id: dto.id }, { clientId: dto.clientId }],
+            // });
+            if (dto.id || dto.id !== null || (dto.clientId && dto.clientId.trim() !== '')) {
                 return await this.updateClientDetails(dto, photoPath);
             } else {
                 // Create a new client

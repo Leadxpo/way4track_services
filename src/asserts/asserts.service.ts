@@ -83,7 +83,7 @@ export class AssertsService {
 
             let entity: AssertsEntity | null = null;
 
-            if (createAssertsDto.id) {
+            if (createAssertsDto.id || createAssertsDto.id !== null) {
                 // Fetch existing entity if updating
                 entity = await this.assertsRepository.findOneBy({ id: createAssertsDto.id });
                 if (!entity) {
@@ -105,7 +105,7 @@ export class AssertsService {
                 }
 
                 // Fetch and assign VoucherEntity properly
-                const voucherEntity = await this.voucherRepo.findOne({ where: { id:createAssertsDto.voucherId } });
+                const voucherEntity = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
                 if (!voucherEntity) {
                     throw new Error(`Voucher with ID ${voucherId} not found`);
                 }

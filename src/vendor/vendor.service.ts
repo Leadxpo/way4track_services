@@ -9,6 +9,7 @@ import { join } from 'path';
 import { promises as fs } from 'fs';
 import { CommonReq } from 'src/models/common-req';
 import { Storage } from '@google-cloud/storage';
+import { VendorEntity } from './entity/vendor.entity';
 
 @Injectable()
 export class VendorService {
@@ -33,9 +34,19 @@ export class VendorService {
   }
   async updateVendorDetails(dto: VendorDto, filePath: string | null): Promise<CommonResponse> {
     try {
-      const existingVendor = await this.vendorRepository.findOne({
-        where: { id: dto.id, vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode },
-      });
+      let existingVendor: VendorEntity | null = null;
+
+
+
+      if (dto.id) {
+        existingVendor = await this.vendorRepository.findOne({
+          where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }
+        });
+      } else if (dto.vendorId) {
+        existingVendor = await this.vendorRepository.findOne({
+          where: { vendorId: dto.vendorId, companyCode: dto.companyCode, unitCode: dto.unitCode }
+        });
+      }
 
       if (!existingVendor) {
         return new CommonResponse(false, 4002, 'Vendor not found for the provided ID.');
@@ -97,7 +108,7 @@ export class VendorService {
         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
 
-      if (dto.id && dto.id !== null || dto.vendorId) {
+      if (dto.id && dto.id !== null || (dto.vendorId && dto.vendorId.trim() !== '')) {
         // If an ID or vendorId is provided, update the vendor details
         return await this.updateVendorDetails(dto, filePath);
       } else {

@@ -34,7 +34,7 @@ export class HiringService {
             let resumePath: string | undefined;
             let entity: HiringEntity;
 
-            if (dto.id) {
+            if (dto.id || dto.id !== null) {
                 entity = await this.hiringRepository.findOne({ where: { id: dto.id } });
 
                 if (!entity) {

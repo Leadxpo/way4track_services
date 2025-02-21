@@ -228,7 +228,7 @@ export class ProductAssignService {
             }
             // Handle photo upload
             // const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
-            if (dto.id) {
+            if (dto.id || dto.id !== null) {
                 console.log(dto, "<<<<")
                 return await this.updateProductAssign(dto, photoPath);
             } else {

@@ -53,6 +53,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'br.name AS branchName',
                 'pr.product_name AS productName',
                 'pr.product_photo AS productPhoto',
+                'pa.id AS productId',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id')

@@ -736,6 +736,18 @@ export class DashboardController {
         }
     }
 
+
+    @Post('get4YearWiseCreditAndDebitPercentages')
+    async get4YearWiseCreditAndDebitPercentages(@Body() req: BranchChartDto): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.get4YearWiseCreditAndDebitPercentages(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getPurchaseCount')
     async getPurchaseCount(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
@@ -770,9 +782,20 @@ export class DashboardController {
     }
 
     @Post('getProductTypeCreditAndDebitPercentages')
-    async getProductTypeCreditAndDebitPercentages(@Body() req: CommonReq): Promise<CommonResponse> {
+    async getProductTypeCreditAndDebitPercentages(@Body() req: BranchChartDto): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getProductTypeCreditAndDebitPercentages(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('get4ProductTypeCreditAndDebitPercentages')
+    async get4ProductTypeCreditAndDebitPercentages(@Body() req: BranchChartDto): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.get4ProductTypeCreditAndDebitPercentages(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

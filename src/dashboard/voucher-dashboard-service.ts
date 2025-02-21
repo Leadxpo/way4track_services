@@ -295,6 +295,16 @@ export class VoucherDashboardService {
 
     }
 
+    async get4YearWiseCreditAndDebitPercentages(req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.get4YearWiseCreditAndDebitPercentages(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getDayBookData(req: BranchChartDto): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getDayBookData(req)
         if (!VoucherData) {
@@ -335,8 +345,18 @@ export class VoucherDashboardService {
 
     }
 
-    async getProductTypeCreditAndDebitPercentages(req: CommonReq): Promise<CommonResponse> {
+    async getProductTypeCreditAndDebitPercentages(req: BranchChartDto): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getProductTypeCreditAndDebitPercentages(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async get4ProductTypeCreditAndDebitPercentages(req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.get4ProductTypeCreditAndDebitPercentages(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
