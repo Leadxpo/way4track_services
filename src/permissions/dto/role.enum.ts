@@ -14,5 +14,6 @@ export enum Roles {
     Voucher = 'voucher',
     WorkAllocation = 'work-allocation',
     Estimate = 'estimate',
-    Attendance = 'attendance'
+    Attendance = 'attendance',
+    RequestRaise = 'requests'
 }

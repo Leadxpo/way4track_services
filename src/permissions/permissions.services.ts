@@ -38,27 +38,31 @@ export class PermissionsService {
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
                     { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.HR:
                 return [
-                    { name: Roles.Branch, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.Assets, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Appointments, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
+                    { name: Roles.Client, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Bank, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Product, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Voucher, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.Accountant:
@@ -69,16 +73,18 @@ export class PermissionsService {
                     { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Client, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.SubDealer, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Bank, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.Product, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
             case DesignationEnum.BranchManager:
                 return [
@@ -87,17 +93,19 @@ export class PermissionsService {
                     { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
+                    { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
                     { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
                     { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
                     { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
                     { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.WarehouseManager:
@@ -112,12 +120,14 @@ export class PermissionsService {
                     { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
                     { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
                     { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: true },
+                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
             case DesignationEnum.SubDealer:
                 return [
@@ -131,12 +141,14 @@ export class PermissionsService {
                     { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
                     { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
                     { name: Roles.Product, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: false, edit: false, view: false, delete: true }
+                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.Attendance, add: false, edit: false, view: false, delete: false },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.Technician:
@@ -156,7 +168,9 @@ export class PermissionsService {
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
                     { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.SalesMan:
@@ -176,7 +190,9 @@ export class PermissionsService {
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
                     { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             case DesignationEnum.CallCenter:
@@ -196,7 +212,9 @@ export class PermissionsService {
                     { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
                     { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
                     { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true }
+                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+
                 ];
 
             default:
@@ -280,7 +298,6 @@ export class PermissionsService {
         }
     }
 
-
     async getPermissionDetails(req: PermissionIdDto): Promise<CommonResponse> {
         try {
             const permissions = await this.repo.findOne({
@@ -344,7 +361,6 @@ export class PermissionsService {
         return new CommonResponse(true, 200, 'Permission details fetched successfully', addPermission);
 
     }
-
 
     async editPermissions(staffId: string, companyCode: string, unitCode: string): Promise<CommonResponse> {
         const staff = await this.staffRepo.findOne({ where: { staffId: staffId, companyCode: companyCode, unitCode: unitCode } });
