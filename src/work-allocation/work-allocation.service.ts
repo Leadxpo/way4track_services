@@ -278,7 +278,8 @@ export class WorkAllocationService {
                 name: "",
                 phoneNumber: "",
                 simNumber: "",
-                address: ""
+                address: "",
+                requirementDetails: []
             };
 
             await this.service.createTechnicianDetails(technicianDto);
