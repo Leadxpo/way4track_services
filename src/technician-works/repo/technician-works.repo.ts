@@ -6,6 +6,7 @@ import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ClientEntity } from "src/client/entity/client.entity";
+import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
 
 
 
@@ -233,9 +234,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.description as description',
                 'wa.name as clientName',
                 'wa.phone_number as phoneNumber',
-                'wa.sim_number as simNumber'
+                'wa.sim_number as simNumber',
+                'w.work_allocation_number as workAllocationNumber'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoin(WorkAllocationEntity, 'w', 'w.id = wa.work_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()

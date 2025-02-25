@@ -89,10 +89,13 @@ export class TechnicianService {
             const newTechnician = this.adapter.convertDtoToEntity(req);
 
             // Assign file URLs if available
-            newTechnician.vehiclePhoto1 = filePaths.photo1;
-            newTechnician.vehiclePhoto2 = filePaths.photo2;
-            newTechnician.vehiclePhoto3 = filePaths.photo3;
-            newTechnician.vehiclePhoto4 = filePaths.photo4;
+            if (filePaths) {
+                newTechnician.vehiclePhoto1 = filePaths.photo1;
+                newTechnician.vehiclePhoto2 = filePaths.photo2;
+                newTechnician.vehiclePhoto3 = filePaths.photo3;
+                newTechnician.vehiclePhoto4 = filePaths.photo4;
+            }
+
 
             await this.repo.insert(newTechnician);
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully');
@@ -117,7 +120,6 @@ export class TechnicianService {
                 return new CommonResponse(false, 4002, 'Work not found for the provided ID.');
             }
 
-            // Update product location if work status is completed
             if (req.workStatus === WorkStatusEnum.COMPLETED) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
@@ -125,15 +127,28 @@ export class TechnicianService {
                 );
             }
 
-            // Handle file deletion and update new file paths
-            const photoFields = ['photo1', 'photo2', 'photo3', 'photo4'];
+            // Photo field mapping
+            const photoMapping: Record<string, string> = {
+                photo1: 'vehiclePhoto1',
+                photo2: 'vehiclePhoto2',
+                photo3: 'vehiclePhoto3',
+                photo4: 'vehiclePhoto4',
+            };
 
-            for (const field of photoFields) {
-                const newFilePath = filePaths[field as keyof typeof filePaths];
-                const existingFilePath = existingTechnician[field as keyof TechnicianWorksEntity];
+            Object.keys(photoMapping).forEach(field => {
+                const entityField = photoMapping[field];
+                if (filePaths[field]) {
+                    (existingTechnician as any)[entityField] = filePaths[field];
+                }
+            });
+
+            // Delete old images from storage if new ones are provided
+            for (const field in photoMapping) {
+                const entityField = photoMapping[field];
+                const newFilePath = filePaths[field];
+                const existingFilePath = existingTechnician[entityField as keyof TechnicianWorksEntity];
 
                 if (typeof existingFilePath === 'string' && newFilePath) {
-                    // Delete old file from GCS
                     const existingFileName = existingFilePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
                     const file = this.storage.bucket(this.bucketName).file(existingFileName);
 
@@ -144,22 +159,33 @@ export class TechnicianService {
                         console.error(`Error deleting old file from GCS: ${error.message}`);
                     }
                 }
-
-                // Assign new file path only if the field is a string
-                if (typeof existingTechnician[field as keyof TechnicianWorksEntity] === 'string') {
-                    (existingTechnician as any)[field] = newFilePath;
-                }
             }
 
-            // Convert DTO to entity and ensure ID is retained
+            // Convert DTO to entity and retain existing ID
             const technicianEntity = this.adapter.convertDtoToEntity(req);
             technicianEntity.id = existingTechnician.id;
 
-            // Merge updated fields into existing technician
+            // Retain the photo fields in the updated entity
             Object.assign(existingTechnician, technicianEntity);
 
-            // Save the updated technician entity
-            await this.repo.save(existingTechnician);
+            Object.keys(photoMapping).forEach(field => {
+                const entityField = photoMapping[field];
+                if (filePaths[field]) {
+                    (existingTechnician as any)[entityField] = filePaths[field];
+                }
+            });
+
+            console.log("Final data before saving:", existingTechnician);
+
+            await this.repo.update({ id: existingTechnician.id }, {
+                ...existingTechnician,
+                vehiclePhoto1: existingTechnician.vehiclePhoto1,
+                vehiclePhoto2: existingTechnician.vehiclePhoto2,
+                vehiclePhoto3: existingTechnician.vehiclePhoto3,
+                vehiclePhoto4: existingTechnician.vehiclePhoto4,
+            });
+
+            console.log("Data saved successfully");
 
             return new CommonResponse(true, 65152, 'Work Details Updated Successfully');
         } catch (error) {
@@ -167,6 +193,8 @@ export class TechnicianService {
             throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
         }
     }
+
+
 
 
 
