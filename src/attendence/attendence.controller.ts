@@ -8,32 +8,57 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class AttendanceController {
     constructor(private readonly attendanceService: AttendanceService) { }
 
-    // @Post('createAttendance')
-    // async createAttendance(@Body() dto: CreateAttendanceDto): Promise<CommonResponse> {
-    //     try {
-    //         if (dto.id) {
-    //             dto.id = Number(dto.id);
-    //         }
-    //         return this.attendanceService.saveAttendance(dto);
+    @Post('updateAttendanceDetails')
+    async updateAttendanceDetails(@Body() dto: CreateAttendanceDto): Promise<CommonResponse> {
+        try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return this.attendanceService.updateAttendanceDetails(dto);
 
-    //     } catch (error) {
-    //         console.error('Error in save attendance details:', error);
-    //         return new CommonResponse(false, 500, 'Error saving attendance details');
-    //     }
-    // }
+        } catch (error) {
+            console.error('Error in save attendance details:', error);
+            return new CommonResponse(false, 500, 'Error saving attendance details');
+        }
+    }
 
-    // @Post('getAttendance')
-    // async getAttendance(
-    //     @Body() req: { staffId?: string, branchId?: number, dateRange?: { start: string, end: string }, companyCode?: string, unitCode?: string }
-    // ) {
-    //     try {
-    //         return this.attendanceService.getAttendance(req);
 
-    //     } catch (error) {
-    //         console.error('Error in get attendance details:', error);
-    //         return new CommonResponse(false, 500, 'Error fetching attendance details');
-    //     }
-    // }
+    @Post('getAttendanceDetails')
+    async getAttendanceDetails(): Promise<CommonResponse> {
+        try {
+
+            return this.attendanceService.getAttendanceDetails();
+
+        } catch (error) {
+            console.error('Error in save attendance details:', error);
+            return new CommonResponse(false, 500, 'Error saving attendance details');
+        }
+    }
+
+    @Post('getAttendanceDetailsById')
+    async getAttendanceDetailsById(@Body() req: CreateAttendanceDto): Promise<CommonResponse> {
+        try {
+
+            return this.attendanceService.getAttendanceDetailsById(req);
+
+        } catch (error) {
+            console.error('Error in save attendance details:', error);
+            return new CommonResponse(false, 500, 'Error saving attendance details');
+        }
+    }
+
+    @Post('getStaffAttendance')
+    async getStaffAttendance(
+        @Body() req: { staffId?: string }
+    ) {
+        try {
+            return this.attendanceService.getStaffAttendance(req);
+
+        } catch (error) {
+            console.error('Error in get attendance details:', error);
+            return new CommonResponse(false, 500, 'Error fetching attendance details');
+        }
+    }
 
 
     @Post('upload')

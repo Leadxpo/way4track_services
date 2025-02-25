@@ -9,6 +9,7 @@ import { AttendanceService } from './attendence.service';
 import { AttendenceRepository } from './repo/attendence.repo';
 import { BranchModule } from 'src/branch/branch.module';
 import { StaffModule } from 'src/staff/staff.module';
+import { AttendanceAdapter } from './attendence.adapter';
 
 @Module({
     imports: [TypeOrmModule.forFeature([AttendanceEntity, StaffEntity, BranchEntity]),
@@ -16,7 +17,7 @@ import { StaffModule } from 'src/staff/staff.module';
     forwardRef(() => StaffModule),
     ],
     controllers: [AttendanceController],
-    providers: [AttendanceService, AttendenceRepository],
+    providers: [AttendanceService, AttendenceRepository, AttendanceAdapter],
     exports: [AttendenceRepository, AttendanceService]
 })
 export class AttendanceModule { }
