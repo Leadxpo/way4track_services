@@ -26,5 +26,10 @@ export class TechnicianWorksDto {
     name: string;
     phoneNumber: string;
     simNumber: string;
+    requirementDetails?: Requirements[];
     address: string;
+} export class Requirements {
+    productName: string;
+    quantity: number;
+    price: number;
 }

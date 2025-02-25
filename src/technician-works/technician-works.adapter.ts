@@ -64,6 +64,8 @@ export class TechnicianWorksAdapter {
         entity.unitCode = dto.unitCode;
         entity.productName = dto.productName;
 
+        entity.requirementDetails = dto.requirementDetails
+
         return entity;
     }
 
@@ -78,7 +80,6 @@ export class TechnicianWorksAdapter {
             entity.vehicleNumber,
             entity.chassisNumber,
             entity.engineNumber,
-            entity.vehiclePhoto1,
             entity.description,
             entity.date,
             entity.staffId ? entity.staffId.id : null,
@@ -94,7 +95,13 @@ export class TechnicianWorksAdapter {
             entity.name ? entity.clientId.name : entity.name,
             entity.phoneNumber ? entity.clientId.phoneNumber : entity.phoneNumber,
             entity.simNumber ?? "",
-            entity.address ? entity.clientId.address : entity.address
+            entity.address ? entity.clientId.address : entity.address,
+            entity.vehiclePhoto1 ? entity.vehiclePhoto1 : null,
+            entity.vehiclePhoto2 ? entity.vehiclePhoto2 : null,
+            entity.vehiclePhoto3 ? entity.vehiclePhoto3 : null,
+            entity.vehiclePhoto4 ? entity.vehiclePhoto4 : null,
+            entity.requirementDetails ? entity.requirementDetails : []
+
         );
     }
 }

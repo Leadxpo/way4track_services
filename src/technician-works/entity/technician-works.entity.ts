@@ -110,4 +110,11 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column({ name: 'address', type: 'text', nullable: true })
     address: string;// Removed price field as per the previous request
+
+    @Column({ type: 'json', name: 'requirement_details', nullable: true })
+    requirementDetails: {
+        productName: string;
+        quantity: number;
+        price: number;
+    }[];
 }

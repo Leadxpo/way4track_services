@@ -1,5 +1,6 @@
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
+import { Requirements } from "./technician-works.dto";
 
 export class TechnicianWorksResponseDto {
     id: number;
@@ -13,7 +14,10 @@ export class TechnicianWorksResponseDto {
 
     chassisNumber: string;
     engineNumber: string;
-    vehiclePhoto?: string;
+    vehiclePhoto1?: string;
+    vehiclePhoto2?: string;
+    vehiclePhoto3?: string;
+    vehiclePhoto4?: string;
     date: Date;
     staffId: number;
     branchId: number;
@@ -29,7 +33,7 @@ export class TechnicianWorksResponseDto {
     phoneNumber: string;
     simNumber: string;
     address: string;
-
+    requirementDetails?: Requirements[];
     constructor(
         id: number,
         service: string,
@@ -40,10 +44,7 @@ export class TechnicianWorksResponseDto {
         vehicleNumber: string,
         chassisNumber: string,
         engineNumber: string,
-
         description: string,
-
-        vehiclePhoto?: string,
         date?: Date,
         staffId?: number,
         branchId?: number,
@@ -58,7 +59,12 @@ export class TechnicianWorksResponseDto {
         name?: string,
         phoneNumber?: string,
         simNumber?: string,
-        address?: string
+        address?: string,
+        vehiclePhoto1?: string,
+        vehiclePhoto2?: string,
+        vehiclePhoto3?: string,
+        vehiclePhoto4?: string,
+        requirementDetails?: Requirements[]
     ) {
         this.id = id;
         this.service = service;
@@ -70,7 +76,6 @@ export class TechnicianWorksResponseDto {
         this.chassisNumber = chassisNumber;
         this.engineNumber = engineNumber;
         this.description = description
-        this.vehiclePhoto = vehiclePhoto;
         this.date = date ?? new Date();
         this.staffId = staffId ?? null;
         this.branchId = branchId ?? null;
@@ -86,5 +91,10 @@ export class TechnicianWorksResponseDto {
         this.phoneNumber = phoneNumber ?? "";
         this.simNumber = simNumber ?? "";
         this.address = address ?? "";
+        this.vehiclePhoto1 = vehiclePhoto1 ?? "";
+        this.vehiclePhoto2 = vehiclePhoto2 ?? "";
+        this.vehiclePhoto3 = vehiclePhoto3 ?? "";
+        this.vehiclePhoto4 = vehiclePhoto4 ?? "";
+        this.requirementDetails = requirementDetails;
     }
 }
