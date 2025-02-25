@@ -203,12 +203,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return result;
     }
 
-
-
-
-
-
-
     async getStaffWorkAllocation(req: {
         staffId: string; companyCode?: string;
         unitCode?: string;
@@ -219,6 +213,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.payment_status AS paymentStatus',
                 'wa.date AS date',
                 'staff.name AS staffName',
+                'client.client_id as clientId',
+                'wa.client_id as WaclientId',
                 'client.name AS clientName',
                 'wa.work_status as workStatus',
                 'wa.product_name as productName',

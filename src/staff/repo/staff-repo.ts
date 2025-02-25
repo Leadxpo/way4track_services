@@ -249,8 +249,6 @@ export class StaffRepository extends Repository<StaffEntity> {
         return groupedData;
     }
 
-
-
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {
         const { date, staffId, companyCode, unitCode } = req;
 
@@ -347,7 +345,6 @@ export class StaffRepository extends Repository<StaffEntity> {
         return Promise.all(allDaysOfMonth);
     }
 
-
     async calculateTotalHours(timeRecords: { inTime: Date; outTime: Date }[]): Promise<number> {
         return timeRecords.reduce((total, record) => {
             const inTime = new Date(record.inTime).getTime();
@@ -355,8 +352,6 @@ export class StaffRepository extends Repository<StaffEntity> {
             return total + (outTime - inTime) / (1000 * 60 * 60);
         }, 0);
     }
-
-
 
     async LoginDetails(req: LoginDto) {
         const query = this.createQueryBuilder('sf')
@@ -443,8 +438,6 @@ export class StaffRepository extends Repository<StaffEntity> {
         const staffDetails = await query.getRawMany();
         return staffDetails;
     }
-
-
 
     async getStaffCardsDetails(req: StaffSearchDto) {
         const query = this.createQueryBuilder('staff')

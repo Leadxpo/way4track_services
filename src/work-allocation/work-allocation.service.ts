@@ -119,11 +119,6 @@ export class WorkAllocationService {
             throw new ErrorResponse(500, `Failed to update work allocation: ${error.message}`);
         }
     }
-
-
-
-
-
     // async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
     //     let newWorkAllocation: WorkAllocationEntity;
     //     try {
@@ -216,40 +211,12 @@ export class WorkAllocationService {
     async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         let newWorkAllocation: WorkAllocationEntity;
         try {
-            // Get unique product names using Set
-            // const uniqueProductNames = [...new Set(dto.productDetails?.map(product => product.productName))];
-
-            // Fetch products based on unique product names (no price included)
-            // const products = await this.productRepo
-            //     .createQueryBuilder('product')
-            //     .where('product.product_name IN (:...uniqueProductNames)', { uniqueProductNames })
-            // .getMany();
-
-            // Create a map of product names (no price needed)
-            // const updatedProductDetails = uniqueProductNames.map(name => ({
-            //     productName: name,
-            // }));
-
-            // Convert DTO to Entity
+          
             newWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
-
-            // Generate Work Allocation Number
             newWorkAllocation.workAllocationNumber = `#VOU-${(await this.workAllocationRepository.count() + 1)
                 .toString()
                 .padStart(5, '0')}`;
-
-            // Assign updated product details
-            // newWorkAllocation.productDetails = updatedProductDetails;
-
-            // Save the entity
             await this.workAllocationRepository.insert(newWorkAllocation);
-
-            // Send notification if there are product details
-            // if (updatedProductDetails.length > 0) {
-            //     await this.notificationService.createNotification(newWorkAllocation, NotificationEnum.Technician);
-            // }
-
-            // **Create Technician Details**
             const technicianDto: TechnicianWorksDto = {
                 service: "",
                 workStatus: WorkStatusEnum.PENDING,
@@ -287,20 +254,14 @@ export class WorkAllocationService {
         }
     }
 
-
-
-
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
 
         if (dto.id && dto.id !== null || (dto.workAllocationNumber && dto.workAllocationNumber.trim() !== '')) {
-            // If an ID is provided, update the work allocation details
             return await this.updateWorkAllocationDetails(dto);
         } else {
-            // If no ID is provided, create a new work allocation
             return await this.createWorkAllocationDetails(dto);
         }
     }
-
 
     async deleteWorkAllocation(req: WorkAllocationIdDto): Promise<CommonResponse> {
         try {
@@ -373,10 +334,7 @@ export class WorkAllocationService {
         }
 
     }
-
-
     /**
-     * Generates a work allocation number in the format #VOU-001.
      * @param sequenceNumber The sequence number for the allocation.
      */
     private generateWorkAllocationNumber(sequenceNumber: number): string {

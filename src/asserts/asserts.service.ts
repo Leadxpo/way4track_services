@@ -160,11 +160,6 @@ export class AssertsService {
         }
     }
 
-
-
-
-
-
     async deleteAssertDetails(dto: AssertsIdDto): Promise<CommonResponse> {
         try {
             console.log(dto, "++++")
