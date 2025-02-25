@@ -38,8 +38,17 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'engine_number', type: 'varchar', length: 20, nullable: true })
     engineNumber: string;
 
-    @Column({ name: 'vehicle_photo', type: 'varchar', length: 255, nullable: true })
-    vehiclePhoto: string;
+    @Column({ name: 'vehicle_photo_1', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto1: string;
+
+    @Column({ name: 'vehicle_photo_2', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto2: string;
+
+    @Column({ name: 'vehicle_photo_3', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto3: string;
+
+    @Column({ name: 'vehicle_photo_4', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto4: string;
 
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     date: Date;

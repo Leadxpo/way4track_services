@@ -22,7 +22,12 @@ export class TechnicianWorksAdapter {
         entity.vehicleNumber = dto.vehicleNumber;
         entity.chassisNumber = dto.chassisNumber;
         entity.engineNumber = dto.engineNumber;
-        entity.vehiclePhoto = dto.vehiclePhoto;
+        entity.vehiclePhoto1 = dto.vehiclePhoto1;
+        entity.vehiclePhoto2 = dto.vehiclePhoto2;
+        entity.vehiclePhoto3 = dto.vehiclePhoto3;
+        entity.vehiclePhoto4 = dto.vehiclePhoto4;
+
+
         entity.date = dto.date;
 
         // Assign related entities by their IDs
@@ -73,7 +78,7 @@ export class TechnicianWorksAdapter {
             entity.vehicleNumber,
             entity.chassisNumber,
             entity.engineNumber,
-            entity.vehiclePhoto,
+            entity.vehiclePhoto1,
             entity.description,
             entity.date,
             entity.staffId ? entity.staffId.id : null,

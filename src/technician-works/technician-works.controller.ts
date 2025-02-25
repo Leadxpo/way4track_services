@@ -1,5 +1,5 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
@@ -18,16 +18,33 @@ const multerOptions = {
 export class TechnicianController {
     constructor(private readonly techService: TechnicianService) { }
 
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
+
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'photo1', maxCount: 1 },
+                { name: 'photo2', maxCount: 1 },
+                { name: 'photo3', maxCount: 1 },
+                { name: 'photo4', maxCount: 1 },
+            ],
+            multerOptions
+        )
+    )
     @Post('handleTechnicianDetails')
     async handleTechnicianDetails(
         @Body() dto: TechnicianWorksDto,
-        @UploadedFile() photo?: Express.Multer.File,
+        @UploadedFiles() files: {
+            photo1?: Express.Multer.File[],
+            photo2?: Express.Multer.File[],
+            photo3?: Express.Multer.File[],
+            photo4?: Express.Multer.File[]
+        }
     ): Promise<CommonResponse> {
         if (dto.id) {
             dto.id = Number(dto.id);
         }
-        return this.techService.handleTechnicianDetails(dto, photo);
+
+        return this.techService.handleTechnicianDetails(dto, files);
     }
 
     @Post('deleteTechnicianDetails')

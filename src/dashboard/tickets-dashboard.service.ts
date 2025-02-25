@@ -37,6 +37,7 @@ export class TicketsDashboardService {
         try {
             const queryBuilder = this.ticketsRepositort.createQueryBuilder('ticket')
                 .select([
+                    'ticket.id as ticketId',
                     'ticket.ticket_number as ticketNumber',
                     'staff.name AS staffName',
                     'ticket.addressing_department as addressingDepartment',

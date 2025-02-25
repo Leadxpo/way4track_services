@@ -39,61 +39,71 @@ export class TechnicianService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleTechnicianDetails(req: TechnicianWorksDto, photo?: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            let filePath: string | null = null;
+    async handleTechnicianDetails(
+        req: TechnicianWorksDto,
+        photos: {
+            photo1?: Express.Multer.File[];
+            photo2?: Express.Multer.File[];
+            photo3?: Express.Multer.File[];
+            photo4?: Express.Multer.File[];
+        }
+    ): Promise<CommonResponse> {
+        let filePaths: Record<keyof typeof photos, string | undefined> = {
+            photo1: undefined,
+            photo2: undefined,
+            photo3: undefined,
+            photo4: undefined
+        };
 
-            // Handle photo upload
-            if (photo) {
-                const bucket = this.storage.bucket(this.bucketName);
-                const uniqueFileName = `vechile_photos/${Date.now()}-${photo.originalname}`;
-                const file = bucket.file(uniqueFileName);
+        for (const [key, fileArray] of Object.entries(photos)) {
+            if (fileArray && fileArray.length > 0) {
+                const file = fileArray[0]; // Get the first file
+                const uniqueFileName = `vehicle_photos/${Date.now()}-${file.originalname}`;
+                const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
 
-                await file.save(photo.buffer, {
-                    contentType: photo.mimetype,
+                await storageFile.save(file.buffer, {
+                    contentType: file.mimetype,
                     resumable: false,
                 });
 
                 console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                filePaths[key] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
-            if (req.id && req.id !== null) {
-                console.log("🔄 Updating existing Technician record...");
-                return await this.updateTechnicianDetails(req, filePath);
-            } else {
-                console.log("🆕 Creating a new Technician record...");
-                return await this.createTechnicianDetails(req, filePath);
-            }
-        } catch (error) {
-            console.error(`❌ Error handling Technician details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to handle Technician details: ${error.message}`);
         }
+
+        return req.id
+            ? await this.updateTechnicianDetails(req, filePaths)
+            : await this.createTechnicianDetails(req, filePaths);
     }
 
-    async createTechnicianDetails(req: TechnicianWorksDto, filePath?: string | null): Promise<CommonResponse> {
+
+    async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
         try {
-            if (req.imeiNumber) {
-                if (req.workStatus === WorkStatusEnum.COMPLETED) {
-                    await this.productRepo.update(
-                        { imeiNumber: req.imeiNumber },
-                        { location: 'install' }
-                    );
-                }
+            if (req.imeiNumber && req.workStatus === WorkStatusEnum.COMPLETED) {
+                await this.productRepo.update(
+                    { imeiNumber: req.imeiNumber },
+                    { location: 'install' }
+                );
             }
 
             const newTechnician = this.adapter.convertDtoToEntity(req);
-            if (filePath) {
-                newTechnician.vehiclePhoto = filePath;
-            }
+
+            // Assign file URLs if available
+            newTechnician.vehiclePhoto1 = filePaths.photo1;
+            newTechnician.vehiclePhoto2 = filePaths.photo2;
+            newTechnician.vehiclePhoto3 = filePaths.photo3;
+            newTechnician.vehiclePhoto4 = filePaths.photo4;
+
             await this.repo.insert(newTechnician);
-            return new CommonResponse(true, 65152, 'Technician Details and Permissions Created Successfully');
+            return new CommonResponse(true, 65152, 'Technician Details Created Successfully');
         } catch (error) {
             console.error(`Error creating Technician details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
         }
     }
 
-    async updateTechnicianDetails(req: TechnicianWorksDto, filePath?: string | null): Promise<CommonResponse> {
+
+    async updateTechnicianDetails(req: TechnicianWorksDto, filePaths: Record<string, string | null>): Promise<CommonResponse> {
         try {
             let existingTechnician: TechnicianWorksEntity | null = null;
 
@@ -115,22 +125,30 @@ export class TechnicianService {
                 );
             }
 
-            // Delete old vehicle photo if a new one is uploaded
-            if (existingTechnician.vehiclePhoto && filePath) {
-                const existingFilePath = existingTechnician.vehiclePhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+            // Handle file deletion and update new file paths
+            const photoFields = ['photo1', 'photo2', 'photo3', 'photo4'];
 
-                try {
-                    await file.delete();
-                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
-                } catch (error) {
-                    console.error(`Error deleting old file from GCS: ${error.message}`);
+            for (const field of photoFields) {
+                const newFilePath = filePaths[field as keyof typeof filePaths];
+                const existingFilePath = existingTechnician[field as keyof TechnicianWorksEntity];
+
+                if (typeof existingFilePath === 'string' && newFilePath) {
+                    // Delete old file from GCS
+                    const existingFileName = existingFilePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFileName);
+
+                    try {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFileName}`);
+                    } catch (error) {
+                        console.error(`Error deleting old file from GCS: ${error.message}`);
+                    }
                 }
-            }
 
-            // Update vehiclePhoto if a new file path is provided
-            if (filePath) {
-                existingTechnician.vehiclePhoto = filePath;
+                // Assign new file path only if the field is a string
+                if (typeof existingTechnician[field as keyof TechnicianWorksEntity] === 'string') {
+                    (existingTechnician as any)[field] = newFilePath;
+                }
             }
 
             // Convert DTO to entity and ensure ID is retained
@@ -149,6 +167,8 @@ export class TechnicianService {
             throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
         }
     }
+
+
 
     async deleteTechnicianDetails(dto: TechIdDto): Promise<CommonResponse> {
         try {

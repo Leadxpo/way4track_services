@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource, Repository } from "typeorm";
-import { DesignationEnum, StaffEntity } from "../entity/staff.entity";
+import { DesignationEnum, Gender, StaffEntity } from "../entity/staff.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { AttendanceEntity } from "src/attendence/entity/attendence.entity";
 import { StaffAttendanceQueryDto } from "../dto/staff-date.dto";
@@ -18,33 +18,237 @@ export class StaffRepository extends Repository<StaffEntity> {
         super(StaffEntity, dataSource.createEntityManager());
     }
 
-    async payRoll(req: {
-        branch?: string;
-        companyCode: string;
-        unitCode: string;
-    }) {
+
+    // async payRoll(req: { branch?: string; companyCode: string; unitCode: string }) {
+    //     const query = this.createQueryBuilder('sf')
+    //         .select([
+    //             'sf.staff_id AS staffId',
+    //             'sf.name AS staffName',
+    //             'br.name AS branch',
+    //             'sf.designation AS designation',
+    //             'sf.staff_photo AS staffPhoto',
+    //             'MONTH(a.day) AS month',
+    //             'YEAR(a.day) AS year',
+    //             'DAY(LAST_DAY(a.day)) AS monthDays',
+    //             'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
+    //             'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
+    //             'sf.monthly_salary AS actualSalary',
+    //             'sf.salary_status as salaryStatus',
+    //             // Early & Late Minutes Calculation
+    //             'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN TIME_TO_SEC(a.in_time_remark) / 60 ELSE 0 END) AS totalOTMinutes',
+    //             'SUM(CASE WHEN a.out_time_remark LIKE "%E%" THEN TIME_TO_SEC(a.out_time_remark) / 60 ELSE 0 END) AS totalLateDeductionMinutes',
+
+    //             'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN TIME_TO_SEC(a.in_time_remark) / 60 ELSE 0 END) AS totalLateMinutes',
+    //             'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN TIME_TO_SEC(a.out_time_remark) / 60 ELSE 0 END) AS totalOTHours',
+
+    //             // Late Count  OR a.out_time_remark LIKE "%L%"
+    //             'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays'
+    //         ])
+    //         .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
+    //         .leftJoin('sf.attendance', 'a')
+    //         .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode });
+
+    //     if (req.branch) {
+    //         query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
+    //     }
+
+    //     query.groupBy('sf.staff_id,br.name, sf.designation, sf.staff_photo, month, year, monthDays');
+
+    //     const result = await query.getRawMany();
+
+    //     // Process the results
+    //     const groupedData = result.reduce((acc, record) => {
+    //         const key = record.staffId;
+    //         if (!acc[key]) {
+    //             acc[key] = {
+    //                 staffId: record.staffId,
+    //                 staffName: record.staffName,
+
+    //                 branch: record.branch,
+    //                 designation: record.designation,
+    //                 staffPhoto: record.staffPhoto,
+    //                 salaryDetails: []
+    //             };
+    //         }
+
+    //         const monthDays = Number(record.monthDays);
+    //         const perDaySalary = Number(record.actualSalary) / monthDays;
+    //         const perHourSalary = perDaySalary / 9;
+    //         let totalOTMinutes = Number(record.totalOTMinutes);
+    //         let totalOutLateOTMinutes = Number(record.totalOTHours);
+    //         let totalOTPayableMinutes = totalOTMinutes + totalOutLateOTMinutes;
+    //         let totalOTHoursWorked = totalOTPayableMinutes / 60;
+
+    //         if (totalOTHoursWorked >= 8 && Number(record.lateDays) < 2) {
+    //             (totalOTHoursWorked) *= 1.5;
+    //         } else if (totalOTHoursWorked >= 8 && Number(record.lateDays) > 2) {
+    //             (totalOTHoursWorked) *= 1;
+    //         }
+    //         let finalOTAmount = totalOTHoursWorked * perHourSalary;
+    //         const totalOutTimeEarly = Number(record.totalLateDeductionMinutes) / 60
+    //         const totalLateHours = Number(record.totalLateMinutes) / 60
+    //         let lateDeductions = (totalLateHours + totalOutTimeEarly) * perHourSalary;
+    //         const grossSalary = Math.round(Number(record.actualSalary) + finalOTAmount);
+    //         const ESIC_Employee = Math.round(grossSalary * 0.0075);
+    //         const ESIC_Employer = Math.round(grossSalary * 0.0325);
+    //         const PFDayWage = Math.round(Number(record.actualSalary) * 0.4);
+    //         const PF_Employee = Math.round(PFDayWage * 0.12);
+    //         const PF_Employer1 = Math.round(PFDayWage * 0.0833);
+    //         const PF_Employer2 = Math.round(PFDayWage * 0.0367);
+    //         let netSalary = 0;
+    //         if (record.designation === DesignationEnum.CEO) {
+    //             netSalary = Math.round(
+    //                 grossSalary - ESIC_Employee - PF_Employee - lateDeductions
+    //             );
+    //         }
+    //         else {
+    //             netSalary = Math.round(
+    //                 grossSalary - ESIC_Employee - ESIC_Employer - lateDeductions
+    //             );
+    //         }
+    //         acc[key].salaryDetails.push({
+    //             year: record.year,
+    //             month: record.month,
+    //             monthDays,
+    //             presentDays: Number(record.presentDays),
+    //             leaveDays: Number(record.leaveDays),
+    //             actualSalary: Number(record.actualSalary),
+    //             totalEarlyMinutes: Number(record.totalEarlyMinutes),
+    //             totalLateMinutes: Number(record.totalLateMinutes),
+    //             lateDays: Number(record.lateDays),
+    //             perDaySalary,
+    //             perHourSalary,
+    //             totalOTHours: totalOTHoursWorked,
+    //             OTAmount: finalOTAmount,
+    //             lateDeductions,
+    //             grossSalary,
+    //             ESIC_Employee,
+    //             ESIC_Employer,
+    //             PF_Employee,
+    //             PF_Employer1,
+    //             PF_Employer2,
+    //             netSalary,
+    //             salaryStatus: record.salaryStatus
+    //         });
+
+    //         return acc;
+    //     }, {});
+
+    //     return Object.values(groupedData);
+    // }
+
+
+    async payRoll(req: { branch?: string; companyCode: string; unitCode: string }) {
         const query = this.createQueryBuilder('sf')
-            .select(`
-                sf.staff_id AS staffId,
-                sf.name AS staffName,
-                br.name AS branch,
-                sf.staff_photo as staffPhoto,
-                ROUND(DATEDIFF(CURDATE(), sf.joining_date) / 365.25, 2) AS inExperience,
-                ROUND(
-                    IFNULL(DATEDIFF(sf.joining_date, sf.before_experience) / 365.25, 0) + 
-                    DATEDIFF(CURDATE(), sf.joining_date) / 365.25, 2
-                ) AS overallExperience,
-                sf.basic_salary AS basicSalary
-            `)
+            .select([
+                'sf.staff_id AS staffId',
+                'sf.name AS staffName',
+                'br.name AS branch',
+                'sf.designation AS designation',
+                'sf.staff_photo AS staffPhoto',
+                'MONTH(a.day) AS month',
+                'YEAR(a.day) AS year',
+                'DAY(LAST_DAY(a.day)) AS monthDays',
+                'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
+                'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
+                'sf.monthly_salary AS actualSalary',
+                'sf.salary_status AS salaryStatus',
+                'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOTMinutes',
+                'SUM(CASE WHEN a.out_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalLateDeductionMinutes',
+                'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalLateMinutes',
+                'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalOTHours',
+                'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
+                'SUM(CASE WHEN COALESCE(TIME_TO_SEC(a.out_time_remark), 0) / 3600 >= 6 AND (a.out_time_remark IS NULL OR a.out_time_remark NOT LIKE "%OT%") THEN 1 ELSE 0 END) AS daysWith6HoursOutLate'
+            ])
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
-            .where(`sf.company_code = "${req.companyCode}"`)
-            .andWhere(`sf.unit_code = "${req.unitCode}"`)
+            .leftJoin('sf.attendance', 'a')
+            .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode });
+
         if (req.branch) {
             query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
         }
-        const payRollData = query.getRawMany();
-        return payRollData;
+
+        query.groupBy('sf.staff_id, br.name, sf.designation, sf.staff_photo, month, year, monthDays');
+
+        const result = await query.getRawMany();
+        console.log(result, ">>>>>>>>>>>>")
+
+        // Process the data
+        const groupedData = result.map((record) => {
+            const monthDays = Number(record.monthDays);
+            const perDaySalary = Number(record.actualSalary) / monthDays;
+            const perHourSalary = perDaySalary / 9;
+            let totalOTMinutes = Number(record.totalOTMinutes);
+            let totalOutLateOTMinutes = Number(record.totalOTHours);
+            const daysWith6HoursOutLate = Number(record.daysWith6HoursOutLate) || 0;
+
+            totalOutLateOTMinutes -= daysWith6HoursOutLate * 6 * 60;
+            let totalOTPayableMinutes = totalOTMinutes + totalOutLateOTMinutes;
+            let totalOTHoursWorked = totalOTPayableMinutes / 60;
+
+            if (totalOTHoursWorked >= 8 && Number(record.lateDays) < 2) {
+                totalOTHoursWorked *= 1.5;
+            } else if (totalOTHoursWorked >= 8 && Number(record.lateDays) > 2) {
+                totalOTHoursWorked *= 1;
+            }
+
+            let finalOTAmount = totalOTHoursWorked * perHourSalary;
+            const totalOutTimeEarly = Number(record.totalLateDeductionMinutes) / 60;
+            const totalLateHours = Number(record.totalLateMinutes) / 60;
+            let lateDeductions = (totalLateHours + totalOutTimeEarly) * perHourSalary;
+            const grossSalary = Math.round(Number(record.actualSalary) + finalOTAmount);
+            const ESIC_Employee = Math.round(grossSalary * 0.0075);
+            const ESIC_Employer = Math.round(grossSalary * 0.0325);
+            const PFDayWage = Math.round(Number(record.actualSalary) * 0.4);
+            const PF_Employee = Math.round(PFDayWage * 0.12);
+            const PF_Employer1 = Math.round(PFDayWage * 0.0833);
+            const PF_Employer2 = Math.round(PFDayWage * 0.0367);
+            const extraHalfSalary = daysWith6HoursOutLate * (perDaySalary / 2);
+            const updatedNetSalary = grossSalary - (record.designation !== DesignationEnum.CEO ? ESIC_Employer : ESIC_Employee) - lateDeductions - PF_Employee + extraHalfSalary;
+
+            return {
+                staffId: record.staffId,
+                staffName: record.staffName,
+                branch: record.branch,
+                designation: record.designation,
+                staffPhoto: record.staffPhoto,
+                salaryDetails: [
+                    {
+                        year: record.year,
+                        month: record.month,
+                        monthDays,
+                        presentDays: Number(record.presentDays),
+                        leaveDays: Number(record.leaveDays),
+                        actualSalary: Number(record.actualSalary),
+                        totalEarlyMinutes: Number(record.totalLateDeductionMinutes),
+                        totalLateMinutes: Number(record.totalLateMinutes),
+                        lateDays: Number(record.lateDays),
+                        perDaySalary,
+                        perHourSalary,
+                        totalOTHours: totalOTHoursWorked,
+                        OTAmount: finalOTAmount,
+                        lateDeductions,
+                        grossSalary,
+                        ESIC_Employee,
+                        ESIC_Employer,
+                        PF_Employee,
+                        PF_Employer1,
+                        PF_Employer2,
+                        extraHalfSalary,
+                        daysOutLate6HoursOrMore: daysWith6HoursOutLate,
+                        netSalary: updatedNetSalary,
+                        salaryStatus: record.salaryStatus
+                    }
+                ]
+            };
+        });
+        console.log(groupedData, "??????????????")
+
+        return groupedData;
     }
+
 
 
     async staffAttendanceDetails(req: StaffAttendanceQueryDto) {

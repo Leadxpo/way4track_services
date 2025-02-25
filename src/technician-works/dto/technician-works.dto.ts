@@ -11,11 +11,12 @@ export class TechnicianWorksDto {
     vehicleNumber: string;
     chassisNumber: string;
     engineNumber: string;
-    vehiclePhoto?: string;
+    vehiclePhoto1?: string;
+    vehiclePhoto2?: string;
+    vehiclePhoto3?: string;
+    vehiclePhoto4?: string;
     date: Date;
     description: string;
-
-
     staffId: number; branchId: number; productId: number;
     vendorId: number; clientId: number; voucherId: number;
     workId: number;
