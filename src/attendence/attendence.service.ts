@@ -111,11 +111,17 @@ import { AttendanceEntity } from './entity/attendence.entity';
 import { AttendenceRepository } from './repo/attendence.repo';
 import { StaffRepository } from 'src/staff/repo/staff-repo';
 import { AttendanceStatus } from 'src/staff/enum/attendence-status.enum';
+import { CreateAttendanceDto } from './dto/attendence.dto';
+import { CommonResponse } from 'src/models/common-response';
+import { ErrorResponse } from 'src/models/error-response';
+import { AttendanceAdapter } from './attendence.adapter';
+import { CommonReq } from 'src/models/common-req';
 
 @Injectable()
 export class AttendanceService {
     constructor(
         private readonly attendanceRepo: AttendenceRepository,
+        private readonly adapter: AttendanceAdapter,
         private readonly staffRepo: StaffRepository,
     ) { }
 
@@ -200,5 +206,87 @@ export class AttendanceService {
         console.log(attendanceRecords, "_________________")
         return { message: 'Attendance data uploaded successfully', inserted: attendanceRecords.length };
     }
+
+    async updateAttendanceDetails(dto: CreateAttendanceDto): Promise<CommonResponse> {
+        try {
+            // Check for Attendance by id or AttendanceId
+            let existingAttendance: AttendanceEntity | null = null;
+
+            if (dto.id) {
+                existingAttendance = await this.attendanceRepo.findOne({ where: { id: dto.id } });
+            }
+
+
+            if (!existingAttendance) {
+                throw new Error('Attendance not found');
+            }
+
+            const entity = this.adapter.toEntity(dto);
+            console.log(entity, "????????")
+            // Merge existing Attendance details with new data
+            const updatedAttendance = {
+                ...existingAttendance,
+                ...entity,
+                staff: entity.staff ?? existingAttendance.staff // Preserve staff object
+            };
+
+
+            console.log('Updated Attendance payload:', updatedAttendance); // Debugging step
+
+            await this.attendanceRepo.save(updatedAttendance);
+
+
+            return new CommonResponse(true, 200, 'Attendance details updated successfully');
+        } catch (error) {
+            console.error(`Error updating Attendance details: ${error.message}`, error.stack);
+            throw new ErrorResponse(500, `Failed to update Attendance details: ${error.message}`);
+        }
+    }
+
+    async getAttendanceDetailsById(req: CreateAttendanceDto): Promise<CommonResponse> {
+        try {
+            console.log(req, "+++++++++++")
+
+            const Attendance = await this.attendanceRepo.findOne({ relations: ['staff'], where: { id: req.id } });
+            console.log(Attendance, "+++++++++++")
+
+            if (!Attendance) {
+                return new CommonResponse(false, 404, 'Attendance not found');
+            }
+            else {
+                // const data = this.AttendanceAdapter.convertEntityToDto([Attendance])
+                return new CommonResponse(true, 200, 'Attendance details fetched successfully', Attendance);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getAttendanceDetails(): Promise<CommonResponse> {
+        try {
+            const attendanceRecords = await this.attendanceRepo.find({ relations: ['staff'] });
+
+            if (!attendanceRecords.length) {
+                return new CommonResponse(false, 404, 'Attendance not found');
+            }
+
+            const data = attendanceRecords.map(record => this.adapter.toDto(record));
+
+            return new CommonResponse(true, 200, 'Attendance details fetched successfully', data);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+
+    async getStaffAttendance(req: { staffId?: string }): Promise<CommonResponse> {
+        const branch = await this.attendanceRepo.getStaffAttendance(req)
+        if (!branch.length) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        } else {
+            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
+        }
+    }
+
 
 }
