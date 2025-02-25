@@ -216,6 +216,9 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'client.client_id as clientId',
                 'wa.client_id as WaclientId',
                 'client.name AS clientName',
+                'client.phone_number as phoneNumber',
+                'client.email as email',
+                'client.address as address',
                 'wa.work_status as workStatus',
                 'wa.product_name as productName',
                 'wa.imei_number as imeiNumber',
@@ -228,8 +231,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.vehicle_photo_3 as vehiclePhoto3',
                 'wa.vehicle_photo_4 as vehiclePhoto4',
                 'wa.description as description',
-                'wa.name as clientName',
-                'wa.phone_number as phoneNumber',
+                'wa.name as WaclientName',
+                'wa.phone_number as WaphoneNumber',
                 'wa.sim_number as simNumber',
                 'w.work_allocation_number as workAllocationNumber'
             ])
