@@ -40,6 +40,13 @@ import { AccountModule } from './account/account.module';
 import { AccountEntity } from './account/entity/account.entity';
 import { NotificationModule } from './notifications/notification.module';
 import { NotificationEntity } from './notifications/entity/notification.entity';
+import { EmiPaymentRepository } from './voucher/repo/emi-payment-repo';
+import { EmiPaymentEntity } from './voucher/entity/emi-payments';
+import { EMIModule } from './voucher/emi-module';
+import { TechnicianWorksEntity } from './technician-works/entity/technician-works.entity';
+import { TechnicianModule } from './technician-works/technician-work.module';
+import { LettersEntity } from './letters/entity/letters.entity';
+import { LettersModule } from './letters/letters.module';
 
 @Module({
   imports: [
@@ -48,13 +55,13 @@ import { NotificationEntity } from './notifications/entity/notification.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'Varma@77',
-      database: 'way4track',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity],
+      password: 'root',
+      database: 'waytrackservice',
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -75,7 +82,10 @@ import { NotificationEntity } from './notifications/entity/notification.entity';
     LoginModule,
     PermissionModule,
     AccountModule,
-    NotificationModule
+    NotificationModule,
+    EMIModule,
+    TechnicianModule,
+    LettersModule
   ],
   controllers: [],
   providers: [],
