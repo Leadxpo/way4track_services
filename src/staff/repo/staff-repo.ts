@@ -422,7 +422,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.designation AS designation',
                 'staff.phone_number AS phoneNumber',
                 'staff.email AS email',
-                'staff.basic_salary as salary'
+                'staff.monthly_salary as salary'
 
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
@@ -508,18 +508,23 @@ export class StaffRepository extends Repository<StaffEntity> {
                     'branch.name AS branchName',
                     'branchManager.name AS branchManagerName',
                     'branchManager.phone_number AS branchManagerPhoneNumber',
-                    'branchManager.basic_salary AS branchManagerSalary',
+                    'branchManager.monthly_salary AS branchManagerSalary',
                     'COUNT(staff.staff_id) AS totalStaff',
                     `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.Technician.toLowerCase()}' THEN 1 ELSE 0 END) AS totalTechnicians`,
                     `SUM(CASE WHEN LOWER(staff.designation) = '${DesignationEnum.SalesMan.toLowerCase()}' THEN 1 ELSE 0 END) AS totalSales`,
                     `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('${DesignationEnum.Technician.toLowerCase()}', '${DesignationEnum.SalesMan.toLowerCase()}') THEN 1 ELSE 0 END) AS totalNonTechnicians`
                 ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-                .leftJoin(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
+                .leftJoinAndSelect(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(branchManager.designation) = :managerDesignation', { managerDesignation: DesignationEnum.BranchManager.toLowerCase() })
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
-                .groupBy('branch.name, branchManager.name, branchManager.phone_number, branchManager.basic_salary');
-
+                .groupBy(`
+                    branch.name, 
+                    branchManager.id, 
+                    branchManager.name, 
+                    branchManager.phone_number, 
+                    branchManager.monthly_salary
+                `);
             // Execute the query to fetch the aggregated branch data
             const result = await query.getRawMany();
 
@@ -532,7 +537,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                     'branch.name AS branchName',
                     'staff.phone_number as phoneNumber',
                     'staff.email as email',
-                    'staff.basic_salary as basicSalary'
+                    'staff.monthly_salary as basicSalary'
                 ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
@@ -550,7 +555,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                     'branch.name AS branchName',
                     'staff.phone_number as phoneNumber',
                     'staff.email as email',
-                    'staff.basic_salary as basicSalary'
+                    'staff.monthly_salary as basicSalary'
                 ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
@@ -568,7 +573,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                     'branch.name AS branchName',
                     'staff.phone_number as phoneNumber',
                     'staff.email as email',
-                    'staff.basic_salary as basicSalary'
+                    'staff.monthly_salary as basicSalary'
                 ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })

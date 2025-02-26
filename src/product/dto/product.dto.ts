@@ -35,6 +35,7 @@ export class ProductDto {
   SIM_IMSI: string;
   SIM_NO: string;
   MOBILE_NUMBER: string;
+  productTypeId?:number
 }
 
 

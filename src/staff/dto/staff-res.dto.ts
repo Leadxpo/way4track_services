@@ -189,9 +189,9 @@ export class GetStaffResDto {
 export class Qualifications {
     qualificationName: Qualification;
     marksOrCgpa: number;
-    file: string;
+    file?: string;
 
-    constructor(qualificationName: Qualification, marksOrCgpa: number, file: string) {
+    constructor(qualificationName: Qualification, marksOrCgpa: number, file?: string) {
         this.qualificationName = qualificationName;
         this.marksOrCgpa = marksOrCgpa;
         this.file = file;

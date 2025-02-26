@@ -17,7 +17,7 @@ export class ProductAssignDto {
     isAssign: string;
     assignTime: Date;
     assignTo: string;
-    productType: string;
+    productTypeId: number;
     inHands: string;
     status?: ProductStatusEnum
 

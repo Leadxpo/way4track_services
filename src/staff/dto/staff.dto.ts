@@ -65,5 +65,5 @@ export class StaffDto {
 export class Qualifications {
     qualificationName: Qualification;
     marksOrCgpa: number;
-    file: string;
+    file?: string;
 }

@@ -62,6 +62,7 @@ export class StaffAdapter {
         entity.unitCode = dto.unitCode;
         entity.latitude = dto.latitude;
         entity.longitude = dto.longitude;
+        entity.qualifications = dto.qualifications
 
         if (dto.id) {
             entity.id = dto.id;

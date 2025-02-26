@@ -14,6 +14,9 @@ import { ProductIdDto } from './dto/product.id.dto';
 import { DataSource } from "typeorm";
 import { CommonReq } from 'src/models/common-req';
 import { Storage } from '@google-cloud/storage';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { ProductTypeRepository } from 'src/product-type/repo/product-type.repo';
+import * as xlsx from 'xlsx';
 
 @Injectable()
 export class ProductService {
@@ -23,7 +26,8 @@ export class ProductService {
         private readonly productRepository: ProductRepository,
         private readonly vendorRepository: VendorRepository,
         private readonly voucherRepository: VoucherRepository,
-        private dataSource: DataSource
+        private dataSource: DataSource,
+        private readonly productTypeRepo: ProductTypeRepository
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -34,8 +38,7 @@ export class ProductService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-
-    async bulkUploadProducts(file: Express.Multer.File): Promise<CommonResponse> {
+    async bulkUploadProducts(file: Express.Multer.File): Promise<any[]> {
         const getCellValue = (cell: ExcelJS.Cell) => {
             if (cell.value === null || cell.value === undefined) {
                 return null;
@@ -50,10 +53,6 @@ export class ProductService {
             const parsedDate = new Date(dateString);
             return isNaN(parsedDate.getTime()) ? null : parsedDate;
         };
-
-        const queryRunner = this.dataSource.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
 
         try {
             const workbook = new ExcelJS.Workbook();
@@ -70,8 +69,6 @@ export class ProductService {
                 "imei number": "imeiNumber",
                 "supplier name": "supplierName",
                 "serial number": "serialNumber",
-                "device serial no": "serialNumber",
-                "device serial number": "serialNumber",
                 "primary no": "primaryNo",
                 "secondary no": "secondaryNo",
                 "primary network": "primaryNetwork",
@@ -89,14 +86,13 @@ export class ProductService {
                 "remarks 1": "remarks1",
                 "remarks 2": "remarks2",
                 "quantity": "quantity",
-                "sno": "SNO",
                 "iccid no": "ICCIDNo",
                 "hsn code": "hsnCode",
                 "remarks3": "remarks3",
                 "BASKET_NAME": "BASKET_NAME",
                 "SIM_IMSI": "SIM_IMSI",
+                "SIM_NO": "SIM_NO",
                 "MOBILE_NUMBER": "MOBILE_NUMBER",
-
             };
 
             // Map headers dynamically, case-insensitively
@@ -117,7 +113,7 @@ export class ProductService {
                     };
 
                     const imeiNumber = getCellValueByHeader('imeiNumber');
-                    const ICCIDNo = getCellValueByHeader('ICCIDNo'); // SIM_IMSI equivalent
+                    const ICCIDNo = getCellValueByHeader('ICCIDNo');
 
                     // Skip row if both imeiNumber and ICCIDNo are missing
                     if (!imeiNumber && !ICCIDNo) {
@@ -132,7 +128,7 @@ export class ProductService {
                         vendorAddress: getCellValueByHeader('vendorAddress'),
                         imeiNumber,
                         supplierName: getCellValueByHeader('supplierName'),
-                        serialNumber: getCellValueByHeader('serialNumber'), // Normalized column
+                        serialNumber: getCellValueByHeader('serialNumber'),
                         primaryNo: getCellValueByHeader('primaryNo'),
                         secondaryNo: getCellValueByHeader('secondaryNo'),
                         primaryNetwork: getCellValueByHeader('primaryNetwork'),
@@ -150,8 +146,7 @@ export class ProductService {
                         remarks1: getCellValueByHeader('remarks1'),
                         remarks2: getCellValueByHeader('remarks2'),
                         quantity: parseInt(getCellValueByHeader('quantity') || '0', 10),
-                        SNO: parseInt(getCellValueByHeader('SNO') || '0', 10),
-                        ICCIDNo, // Normalized SIM_IMSI field
+                        ICCIDNo,
                         hsnCode: getCellValueByHeader('hsnCode'),
                         remarks3: getCellValueByHeader('remarks3'),
                         BASKET_NAME: getCellValueByHeader('BASKET_NAME'),
@@ -162,31 +157,20 @@ export class ProductService {
                 }
             });
 
-            // console.log(data, "Filtered Data");
+            // const productEntities = await Promise.all(
+            //     data.map(async (productDto) => this.handleProductData(productDto))
+            // );
 
-            const productEntities = await Promise.all(
-                data.map(async (productDto) => this.handleProductData(productDto))
-            );
-
-            // console.log(productEntities, "Product Entities");
-
-            await queryRunner.manager.save(productEntities);
-            await queryRunner.commitTransaction();
-
-            return new CommonResponse(true, 201, 'Products uploaded successfully');
+            return data;
         } catch (error) {
-            await queryRunner.rollbackTransaction();
-            throw new ErrorResponse(500, 'Bulk upload failed');
-        } finally {
-            await queryRunner.release();
+            throw new ErrorResponse(500, 'Error parsing Excel file');
         }
     }
 
-
-    async handleProductData(productDto: ProductDto, photo?: Express.Multer.File): Promise<ProductEntity> {
+    async handleProductData(productDto: ProductDto): Promise<ProductEntity> {
         let productEntity: ProductEntity;
 
-        if (productDto.id) {
+        if (productDto.id || productDto.id !== null) {
             productEntity = await this.productRepository.findOne({ where: { id: productDto.id } });
             if (!productEntity) {
                 throw new ErrorResponse(400, `Product with ID ${productDto.id} not found`);
@@ -227,8 +211,8 @@ export class ProductService {
             BASKET_NAME: productDto.BASKET_NAME ?? productEntity.basketName,
             SIM_IMSI: productDto.SIM_IMSI ?? productEntity.simImsi,
             SIM_NO: productDto.SIM_NO ?? productEntity.simNo,
-            MOBILE_NUMBER: productDto.MOBILE_NUMBER ?? productEntity.mobileNumber
-
+            MOBILE_NUMBER: productDto.MOBILE_NUMBER ?? productEntity.mobileNumber,
+            productTypeId: productDto.productTypeId ?? productEntity.productTypeId
         });
 
         if (productDto.vendorEmailId) {
@@ -264,36 +248,119 @@ export class ProductService {
         return productEntity;
     }
 
-
     private generateVendorId(sequenceNumber: number): string {
         const paddedNumber = sequenceNumber.toString().padStart(3, '0');
         return `v-${paddedNumber}`;
     }
-    async createOrUpdateProduct(productDto: ProductDto, photo?: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            let photoPath: string | null = null
 
-            if (photo) {
-                const bucket = this.storage.bucket(this.bucketName);
-                const uniqueFileName = `client_photos/${Date.now()}-${photo.originalname}`;
-                const file = bucket.file(uniqueFileName);
+    async createOrUpdateProduct(
+        productDto: ProductDto,
+        file: Express.Multer.File
+    ): Promise<CommonResponse> {
+        if (!file) {
+            return new CommonResponse(false, 400, 'File is required');
+        }
 
-                await file.save(photo.buffer, {
-                    contentType: photo.mimetype,
-                    resumable: false,
+        // Convert Excel file to JSON
+        const jsonData = await this.bulkUploadProducts(file);
+        if (!jsonData || jsonData.length === 0) {
+            return new CommonResponse(false, 400, 'Invalid or empty Excel file');
+        }
+        console.log(jsonData, "...........")
+        // Validate Product Type
+        const productType = await this.productTypeRepo.findOne({ where: { id: productDto.productTypeId } });
+        if (!productType) {
+            return new CommonResponse(false, 404, 'Product type not found');
+        }
+        if (productDto.vendorEmailId) {
+            let vendor = await this.vendorRepository.findOne({
+                where: { emailId: productDto.vendorEmailId },
+            });
+
+            if (!vendor) {
+                vendor = new VendorEntity();
+                Object.assign(vendor, {
+                    name: productDto.vendorName,
+                    vendorPhoneNumber: productDto.vendorPhoneNumber,
+                    address: productDto.vendorAddress,
+                    emailId: productDto.vendorEmailId,
+                    companyCode: productDto.companyCode,
+                    unitCode: productDto.unitCode,
                 });
 
-                // console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                vendor.vendorId = this.generateVendorId((await this.vendorRepository.count()) + 1);
+                vendor = await this.vendorRepository.save(vendor); // Save and update the reference
             }
-            const productEntity = await this.handleProductData(productDto, photo);
-            // console.log(productEntity, productDto, "{{{{{{{{{{{{{{{{{{{{")
-            await this.productRepository.save(productEntity);
-            return new CommonResponse(true, 201, 'Product details created successfully');
-        } catch (error) {
-            console.error('Error creating or updating product', error);
-            throw new ErrorResponse(500, 'Error creating or updating product');
+
+            productDto.vendorId = vendor.id; // Ensure the product gets the vendorId
         }
+
+
+        if (productDto.voucherId) {
+            const voucher = await this.voucherRepository.findOne({
+                where: { id: productDto.voucherId },
+            });
+
+            if (!voucher) {
+                return new CommonResponse(false, 400, `Voucher with ID ${productDto.voucherId} not found`);
+            }
+        }
+
+        // Merge additional inputs with Excel data
+        // const finalProductData = jsonData.map((excelRow) => ({
+        //     ...excelRow,
+        //     ...productDto, // Merge all productDto fields directly
+        //     productTypeId: productDto.productTypeId,
+        //     productName: productDto.productName,
+        //     dateOfPurchase: productDto.dateOfPurchase,
+        //     categoryName: productDto.categoryName,
+        //     price: productDto.price,
+        //     productDescription: productDto.productDescription,
+        //     companyCode: productDto.companyCode,
+        //     unitCode: productDto.unitCode,
+        //     primaryNo: productDto.primaryNo,
+        //     supplierName: productDto.supplierName,
+        //     serialNumber: productDto.serialNumber,
+        //     secondaryNo: productDto.secondaryNo,
+        //     primaryNetwork: productDto.primaryNetwork,
+        //     secondaryNetwork: productDto.secondaryNetwork,
+        //     simStatus: productDto.simStatus,
+        //     planName: productDto.planName,
+        //     remarks1: productDto.remarks1,
+        //     remarks2: productDto.remarks2,
+        //     deviceModel: productDto.deviceModel,
+        //     imeiNumber: productDto.imeiNumber,
+        //     quantity: productDto.quantity,
+        //     vendorName: productDto.vendorName,
+        //     vendorPhoneNumber: productDto.vendorPhoneNumber,
+        //     vendorAddress: productDto.vendorAddress,
+        //     vendorEmailId: productDto.vendorEmailId,
+        //     ICCIDNo: productDto.ICCIDNo,
+        //     hsnCode: productDto.hsnCode,
+        //     remarks3: productDto.remarks3,
+        //     BASKET_NAME: productDto.BASKET_NAME,
+        //     SIM_IMSI: productDto.SIM_IMSI,
+        //     SIM_NO: productDto.SIM_NO,
+        //     MOBILE_NUMBER: productDto.MOBILE_NUMBER,
+        //     voucherId: productDto.voucherId,
+        //     vendorId: productDto.vendorId
+
+        // }));
+
+        const finalProductData = jsonData.map((excelRow) => ({
+            ...excelRow,
+            ...productDto,
+            productTypeId: productDto.productTypeId,  // Merging the DTO directly
+        }));
+
+        console.log(finalProductData, "/////")
+        // Convert JSON to entities
+        // const productEntities = this.productRepository.create(finalProductData);
+        // console.log(productEntities, ">>>>>")
+        // Save all data to the database
+        await this.productRepository.save(finalProductData);
+
+        return new CommonResponse(true, 201, 'Products saved successfully');
     }
 
     async deleteProductDetails(dto: ProductIdDto): Promise<CommonResponse> {

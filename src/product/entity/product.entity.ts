@@ -1,5 +1,6 @@
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -44,6 +45,10 @@ export class ProductEntity extends BaseEntity {
   @ManyToOne(() => VendorEntity, (vendorEntity) => vendorEntity.product, { nullable: true })
   @JoinColumn({ name: 'vendor_id' })
   vendorId: VendorEntity;
+
+  @ManyToOne(() => ProductTypeEntity, (ProductTypeEntity) => ProductTypeEntity.productType, { nullable: true })
+  @JoinColumn({ name: 'product_type_id' })
+  productTypeId: ProductTypeEntity;
 
   @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, nullable: true })
   vendorPhoneNumber: string;

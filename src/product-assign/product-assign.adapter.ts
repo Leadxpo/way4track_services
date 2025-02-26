@@ -5,6 +5,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 
 @Injectable()
 export class ProductAssignAdapter {
@@ -35,6 +36,12 @@ export class ProductAssignAdapter {
       entity.requestId = request;
     }
 
+
+    if (dto.productTypeId) {
+      const product = new ProductTypeEntity();
+      product.id = dto.productTypeId;
+      entity.productTypeId = product;
+    }
     // Handle product
     if (dto.productId) {
       const product = new ProductEntity();

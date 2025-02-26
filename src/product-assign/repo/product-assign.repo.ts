@@ -7,6 +7,7 @@ import { StaffEntity } from "src/staff/entity/staff.entity";
 import { RequestRaiseEntity } from "src/request-raise/entity/request-raise.entity";
 import { CommonReq } from "src/models/common-req";
 import { ProductIdDto } from "src/product/dto/product.id.dto";
+import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
 
 
 
@@ -73,6 +74,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         // Return the grouped and detailed results
         return { result, rawResults };
     }
+    
     async getSearchDetailProduct(req: ProductIdDto) {
         const query = this.createQueryBuilder('productAssign')
             .select([
@@ -120,7 +122,6 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
         return result;
     }
-
 
     async totalProducts(req: CommonReq): Promise<any> {
         const query = this.createQueryBuilder('pa')
@@ -182,7 +183,6 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
         return finalResult;
     }
-
 
     async getProductAssignmentSummary(req: { unitCode: string; companyCode: string; branch?: string, staffId?: string }) {
         try {
@@ -268,7 +268,6 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         }
     }
 
-
     async getProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string }) {
         try {
             // Base query for grouping products by branch
@@ -276,7 +275,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 .select([
                     'pa.id AS productId',
                     'pa.product_name AS productName',
-                    'productAssign.product_type AS productType',
+                    'pt.name AS productType',
                     'br.name AS branchName',
                     'SUM(productAssign.number_of_products) AS totalProducts',
                     'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty',
@@ -284,6 +283,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -332,8 +332,6 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         }
     }
 
-
-
     async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }) {
         try {
             // Base query for grouping products by product name only
@@ -341,12 +339,13 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 .select([
                     'pa.id AS productId',
                     'pa.product_name AS productName',
-                    'productAssign.product_type AS productType',
+                    'pt.name AS productType',
                     'productAssign.status AS status',
                     'SUM(productAssign.number_of_products) AS totalProducts',
                     'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty'
                 ])
                 .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -396,8 +395,5 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             throw new Error('Failed to fetch product details');
         }
     }
-
-
-
 }
 

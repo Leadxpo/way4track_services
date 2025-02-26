@@ -49,6 +49,8 @@ import { LettersEntity } from './letters/entity/letters.entity';
 import { LettersModule } from './letters/letters.module';
 import { DispatchEntity } from './dispatch/entity/dispatch.entity';
 import { DispatchModule } from './dispatch/dispatch.module';
+import { ProductTypeEntity } from './product-type/entity/product-type.entity';
+import { ProductTypeModule } from './product-type/product-type.module';
 
 @Module({
   imports: [
@@ -59,11 +61,11 @@ import { DispatchModule } from './dispatch/dispatch.module';
       username: 'root',
       password: 'root',
       database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -88,7 +90,8 @@ import { DispatchModule } from './dispatch/dispatch.module';
     EMIModule,
     TechnicianModule,
     LettersModule,
-    DispatchModule
+    DispatchModule,
+    ProductTypeModule
   ],
   controllers: [],
   providers: [],

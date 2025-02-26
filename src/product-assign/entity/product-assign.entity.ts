@@ -5,6 +5,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { ProductStatusEnum } from 'src/product/enum/product-status.enum';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
+import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 
 @Entity('product_assignments')
 export class ProductAssignEntity extends BaseEntity {
@@ -19,8 +20,8 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'branch_id' })
   branchId: BranchEntity;
 
-   @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId,{nullable:true})
-    dispatch: DispatchEntity[];
+  @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId, { nullable: true })
+  dispatch: DispatchEntity[];
 
   @ManyToOne(() => ProductEntity, (productEntity) => productEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'product_id' })
@@ -57,8 +58,9 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'assign_to', type: 'varchar', length: 50, nullable: true })
   assignTo: string;
 
-  @Column({ name: 'product_type', type: 'varchar', length: 50, nullable: true })
-  productType: string;
+  @ManyToOne(() => ProductTypeEntity, (ProductTypeEntity) => ProductTypeEntity.productAssign)
+  @JoinColumn({ name: 'product_type_id' })
+  productTypeId: ProductTypeEntity;
 
   @Column({ name: 'in_hands', type: 'varchar', default: false })
   inHands: string;

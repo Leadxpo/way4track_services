@@ -41,6 +41,7 @@ export enum Qualification {
   INTERMEDIATE = 'Intermediate',
   DEGREE = 'Degree',
   POST_GRADUATION = 'Post Graduation',
+  ITIORDiploma="ITI / Diploma"
 }
 
 export enum AccountType {
@@ -230,7 +231,7 @@ export class StaffEntity extends BaseEntity {
   qualifications: {
     qualificationName: Qualification;
     marksOrCgpa: number;
-    file: string;
+    file?: string;
   }[];
 
   @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.staff)
