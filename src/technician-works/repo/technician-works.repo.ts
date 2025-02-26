@@ -209,6 +209,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
+                'wa.id as id',
                 'wa.service AS service',
                 'wa.payment_status AS paymentStatus',
                 'wa.date AS date',
@@ -234,7 +235,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.name as WaclientName',
                 'wa.phone_number as WaphoneNumber',
                 'wa.sim_number as simNumber',
-                'w.work_allocation_number as workAllocationNumber'
+                'w.work_allocation_number as workAllocationNumber',
+
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(WorkAllocationEntity, 'w', 'w.id = wa.work_id')

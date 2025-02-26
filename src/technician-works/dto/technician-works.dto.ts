@@ -28,6 +28,7 @@ export class TechnicianWorksDto {
     simNumber: string;
     requirementDetails?: Requirements[];
     address: string;
+    attendedDate?: Date;
 } export class Requirements {
     productName: string;
     quantity: number;

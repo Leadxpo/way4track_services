@@ -7,6 +7,7 @@ import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ClientStatusEnum } from '../enum/client-status.enum';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -43,7 +44,9 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.clientId)
     technician: TechnicianWorksEntity[];
 
-
+    @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
+    dispatch: DispatchEntity[];
+    
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client)
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;

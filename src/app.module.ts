@@ -47,6 +47,8 @@ import { TechnicianWorksEntity } from './technician-works/entity/technician-work
 import { TechnicianModule } from './technician-works/technician-work.module';
 import { LettersEntity } from './letters/entity/letters.entity';
 import { LettersModule } from './letters/letters.module';
+import { DispatchEntity } from './dispatch/entity/dispatch.entity';
+import { DispatchModule } from './dispatch/dispatch.module';
 
 @Module({
   imports: [
@@ -57,11 +59,11 @@ import { LettersModule } from './letters/letters.module';
       username: 'root',
       password: 'root',
       database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -85,7 +87,8 @@ import { LettersModule } from './letters/letters.module';
     NotificationModule,
     EMIModule,
     TechnicianModule,
-    LettersModule
+    LettersModule,
+    DispatchModule
   ],
   controllers: [],
   providers: [],

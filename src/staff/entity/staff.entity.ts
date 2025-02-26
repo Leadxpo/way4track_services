@@ -11,6 +11,7 @@ import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, BaseEntity } from 'typeorm';
 import { LettersEntity } from '../../letters/entity/letters.entity';
+import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 
 
 export enum Gender {
@@ -244,6 +245,9 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.staffId)
   permissions: PermissionEntity[];
+
+  @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
+  dispatch: DispatchEntity[];
 
   @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.user)
   notifications: NotificationEntity[];

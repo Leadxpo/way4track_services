@@ -26,7 +26,7 @@ export class TechnicianWorksAdapter {
         entity.vehiclePhoto2 = dto.vehiclePhoto2;
         entity.vehiclePhoto3 = dto.vehiclePhoto3;
         entity.vehiclePhoto4 = dto.vehiclePhoto4;
-
+        entity.attendedDate = dto.attendedDate
 
         entity.date = dto.date;
 

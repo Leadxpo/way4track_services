@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { ProductStatusEnum } from 'src/product/enum/product-status.enum';
+import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 
 @Entity('product_assignments')
 export class ProductAssignEntity extends BaseEntity {
@@ -17,6 +18,9 @@ export class ProductAssignEntity extends BaseEntity {
   @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branchId: BranchEntity;
+
+   @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId,{nullable:true})
+    dispatch: DispatchEntity[];
 
   @ManyToOne(() => ProductEntity, (productEntity) => productEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'product_id' })

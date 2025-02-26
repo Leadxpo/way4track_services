@@ -53,6 +53,9 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     date: Date;
 
+    @Column({ name: 'attended_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    attendedDate: Date;
+
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.technician, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
