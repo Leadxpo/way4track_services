@@ -20,6 +20,7 @@ export class StaffController {
     @UseInterceptors(
         FileFieldsInterceptor([
             { name: 'photo', maxCount: 1 },
+            { name: 'resume', maxCount: 1 },
             { name: 'vehiclePhoto', maxCount: 1 },
             { name: 'qualificationFiles', maxCount: 5 }, // Added qualification files
             { name: 'offerLetter', maxCount: 1 },
@@ -36,6 +37,7 @@ export class StaffController {
         @Body() dto: StaffDto,
         @UploadedFiles() files: {
             photo?: Express.Multer.File[],
+            resume?: Express.Multer.File[],
             vehiclePhoto?: Express.Multer.File[],
             qualificationFiles?: Express.Multer.File[], // Added qualification files
             offerLetter?: Express.Multer.File[],

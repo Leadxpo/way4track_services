@@ -1,6 +1,7 @@
-import { DesignationEnum } from "src/staff/entity/staff.entity";
+import { DesignationEnum, YesNo } from "src/staff/entity/staff.entity";
 import { HiringLevel } from "../enum/hiring-level.enum";
 import { HiringStatus } from "../enum/hiring-status.enum";
+import { InterviewWith } from "../entity/hiring.entity";
 
 export class HiringDto {
     id?: number;
@@ -12,7 +13,7 @@ export class HiringDto {
     qualifications: { qualificationName: string; marks: number; yearOfPass: number }[];
     levelWiseData: {
         dateOfConductor: string,
-        conductorBy: DesignationEnum.HR,
+        conductorBy: InterviewWith.HR,
         conductorPlace: string,
         result: string,
         review: string,
@@ -21,5 +22,10 @@ export class HiringDto {
     dateOfUpload: Date;
     status: HiringStatus
     companyCode: string;
-    unitCode: string
+    unitCode: string;
+    drivingLicence: YesNo;
+    drivingLicenceNumber: string;
+    joiningDate: string
+    noticePeriod: string;
+
 }

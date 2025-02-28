@@ -281,6 +281,16 @@ export class TechnicianService {
 
     }
 
+    async getPaymentStatus(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getPaymentStatus(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getStaffWorkAllocation(req: {
         staffId: string; companyCode?: string;
         unitCode?: string

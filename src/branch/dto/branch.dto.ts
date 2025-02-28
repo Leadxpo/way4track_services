@@ -13,4 +13,6 @@ export class BranchDto {
     branchPhoto?: string;
     companyCode: string;
     unitCode: string
+    latitude: string;
+    longitude: string;
 }

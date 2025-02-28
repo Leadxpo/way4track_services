@@ -65,7 +65,7 @@ export class NotificationService {
             userId: typeof user === 'object' ? user.id : user, // Fallback for primitive
             branchId: typeof branch === 'object' ? branch.id : branch, // Fallback for primitive
             companyCode,
-            unitCode
+            unitCode,
         });
 
         await this.notificationRepository.insert(notificationEntity);
@@ -89,10 +89,6 @@ export class NotificationService {
 
         return { message: `${result.affected} notifications marked as read` };
     }
-
-
-
-
 
     async getAllNotifications(req: {
         branch?: string, companyCode?: string

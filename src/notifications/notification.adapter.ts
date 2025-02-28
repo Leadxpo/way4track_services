@@ -34,7 +34,7 @@ export class NotificationAdapter {
                 data.createdAt,
                 data.notificationType,
                 data.unitCode,
-                data.companyCode
+                data.companyCode,
             );
         });
     }

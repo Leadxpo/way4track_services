@@ -12,6 +12,7 @@ import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-wo
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, BaseEntity } from 'typeorm';
 import { LettersEntity } from '../../letters/entity/letters.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
+import { OtpEntity } from 'src/otp-generation/entity/otp-generation.entity';
 
 
 export enum Gender {
@@ -41,7 +42,7 @@ export enum Qualification {
   INTERMEDIATE = 'Intermediate',
   DEGREE = 'Degree',
   POST_GRADUATION = 'Post Graduation',
-  ITIORDiploma="ITI / Diploma"
+  ITIORDiploma = "ITI / Diploma"
 }
 
 export enum AccountType {
@@ -66,6 +67,9 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'phone_number', type: 'varchar', length: 15 })
   phoneNumber: string;
 
+  @Column({ name: 'office_phone_number', type: 'varchar', length: 15, nullable: true })
+  officePhoneNumber: string;
+
   @Column({ name: 'alternate_number', type: 'varchar', length: 15, nullable: true })
   alternateNumber: string;
 
@@ -86,6 +90,9 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'staff_photo', type: 'text', nullable: true })
   staffPhoto: string;
 
+  @Column({ name: 'resume', type: 'text', nullable: true })
+  resume: string;
+
   @Column({ name: 'gender', type: 'enum', enum: Gender })
   gender: Gender;
 
@@ -97,6 +104,9 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
   email: string;
+
+  @Column({ name: 'office_email', type: 'varchar', length: 150, unique: true, nullable: true })
+  officeEmail: string;
 
   @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true })
   aadharNumber: string;
@@ -179,6 +189,9 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'mobile_allocation', type: 'enum', enum: YesNo })
   mobileAllocation: YesNo;
 
+  @Column({ name: 'mail_allocation', type: 'enum', enum: YesNo, nullable: true })
+  mailAllocation: YesNo;
+
   @Column({ name: 'mobile_brand', type: 'varchar', length: 100, nullable: true })
   mobileBrand: string;
 
@@ -241,6 +254,9 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.staffId)
   appointment: AppointmentEntity[];
 
+  @OneToMany(() => OtpEntity, (OtpEntity) => OtpEntity.staff)
+  otpGeneration: OtpEntity[];
+
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.staffId)
   technician: TechnicianWorksEntity[];
 
@@ -282,6 +298,7 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => LettersEntity, (LettersEntity) => LettersEntity.staffId)
   Letters: LettersEntity[];
+
 
 
 

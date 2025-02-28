@@ -18,6 +18,8 @@ export class HiringAdapter {
     entity.companyCode = dto.companyCode
     entity.unitCode = dto.unitCode
     entity.levelWiseData = dto.levelWiseData
+    entity.drivingLicence = dto.drivingLicence
+    entity.drivingLicenceNumber = dto.drivingLicenceNumber
     return entity;
   }
 }

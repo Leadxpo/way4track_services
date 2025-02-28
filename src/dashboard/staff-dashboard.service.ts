@@ -80,4 +80,13 @@ export class StaffDashboardService {
             return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
         }
     }
+
+    async getAllBranchStaffDetails(req: StaffSearchDto) {
+        const staffData = await this.staffRepository.getAllBranchStaffDetails(req)
+        if (!staffData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
 }

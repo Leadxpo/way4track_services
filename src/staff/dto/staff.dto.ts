@@ -60,6 +60,10 @@ export class StaffDto {
     attendance?: AttendanceStatus;
     qualifications?: Qualifications[];
     branch: number
+    officePhoneNumber: string;
+    officeEmail: string;
+    mailAllocation: YesNo;
+
 }
 
 export class Qualifications {

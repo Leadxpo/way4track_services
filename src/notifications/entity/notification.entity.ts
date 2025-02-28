@@ -12,7 +12,7 @@ import {
 export enum NotificationEnum {
     Request = "Request",
     Ticket = "Ticket",
-    Technician = "Technician"
+    Technician = "Technician",
 }
 
 @Entity('notifications')
@@ -20,7 +20,7 @@ export class NotificationEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ name: 'message', type: 'varchar', length: 255, nullable: true })
     message: string;
 
     @Column({ default: false, name: 'is_read' })

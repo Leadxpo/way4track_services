@@ -63,6 +63,9 @@ export class StaffAdapter {
         entity.latitude = dto.latitude;
         entity.longitude = dto.longitude;
         entity.qualifications = dto.qualifications
+        entity.mailAllocation = dto.mailAllocation
+        entity.officeEmail = dto.officeEmail
+        entity.officePhoneNumber = dto.officePhoneNumber
 
         if (dto.id) {
             entity.id = dto.id;

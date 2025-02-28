@@ -24,7 +24,6 @@ export class GetNotificationDto {
     notificationType: NotificationEnum;
     unitCode: string;
     companyCode: string;
-
     // Constructor to initialize the DTO properties
     constructor(
         id: number,
@@ -38,6 +37,7 @@ export class GetNotificationDto {
         notificationType: NotificationEnum,
         unitCode: string,
         companyCode: string,
+
     ) {
         this.id = id;
         this.user = user;

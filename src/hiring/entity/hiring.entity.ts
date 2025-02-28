@@ -1,9 +1,13 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 import { HiringStatus } from '../enum/hiring-status.enum';
 import { HiringLevel } from '../enum/hiring-level.enum';
-import { DesignationEnum } from 'src/staff/entity/staff.entity';
+import { DesignationEnum, YesNo } from 'src/staff/entity/staff.entity';
 
-
+export enum InterviewWith {
+    Sunil = "Sunil",
+    Ashok = 'Ashok',
+    HR = "HR"
+}
 @Entity('hiring')
 export class HiringEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -33,7 +37,7 @@ export class HiringEntity extends BaseEntity {
     @Column('json', { name: 'level_wise_data', nullable: true })
     levelWiseData: {
         dateOfConductor: string,
-        conductorBy: DesignationEnum.HR,
+        conductorBy: InterviewWith.HR,
         conductorPlace: string,
         result: string,
         review: string,
@@ -41,6 +45,12 @@ export class HiringEntity extends BaseEntity {
 
     @Column({ name: 'resume_path', type: 'varchar', nullable: true })
     resumePath: string;
+
+    @Column({ name: 'joining_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    joiningDate: string;
+
+    @Column({ name: 'notice_period', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    noticePeriod: string;
 
     @Column({ name: 'date_of_upload', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateOfUpload: Date;
@@ -59,4 +69,10 @@ export class HiringEntity extends BaseEntity {
 
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
+
+    @Column({ name: 'driving_licence', type: 'enum', enum: YesNo })
+    drivingLicence: YesNo;
+
+    @Column({ name: 'driving_licence_number', type: 'varchar', length: 20, nullable: true })
+    drivingLicenceNumber: string;
 }

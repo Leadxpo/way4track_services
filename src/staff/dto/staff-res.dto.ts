@@ -62,7 +62,9 @@ export class GetStaffResDto {
     // attendance?: AttendanceStatus;
     qualifications?: Qualifications[];
     // branch: number;
-
+    officePhoneNumber?: string;
+    officeEmail?: string;
+    mailAllocation?: YesNo;
     constructor(
         id: number,
         name: string,
@@ -122,6 +124,9 @@ export class GetStaffResDto {
         updatedAt: Date | undefined,
         // attendance: AttendanceStatus | undefined,
         qualifications: Qualifications[] | undefined,
+        officePhoneNumber?: string,
+        officeEmail?: string,
+        mailAllocation?: YesNo
         // branch: number
     ) {
         this.id = id;
@@ -183,6 +188,9 @@ export class GetStaffResDto {
         // this.attendance = attendance;
         this.qualifications = qualifications;
         // this.branch = branch;
+        this.officeEmail = officeEmail
+        this.officePhoneNumber = officePhoneNumber
+        this.mailAllocation = mailAllocation
     }
 }
 

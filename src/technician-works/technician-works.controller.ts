@@ -97,6 +97,16 @@ export class TechnicianController {
         }
     }
 
+    @Post('getPaymentStatusData')
+    async getPaymentStatus(@Body() req: CommonReq) {
+        try {
+            return this.techService.getPaymentStatus(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getUpCommingWorkAllocation')
     async getUpCommingWorkAllocation(@Body() req: {
         companyCode?: string;

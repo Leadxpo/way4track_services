@@ -51,6 +51,8 @@ import { DispatchEntity } from './dispatch/entity/dispatch.entity';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { ProductTypeEntity } from './product-type/entity/product-type.entity';
 import { ProductTypeModule } from './product-type/product-type.module';
+import { OTPModule } from './otp-generation/otp-generation.module';
+import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
 
 @Module({
   imports: [
@@ -61,11 +63,11 @@ import { ProductTypeModule } from './product-type/product-type.module';
       username: 'root',
       password: 'root',
       database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -91,7 +93,8 @@ import { ProductTypeModule } from './product-type/product-type.module';
     TechnicianModule,
     LettersModule,
     DispatchModule,
-    ProductTypeModule
+    ProductTypeModule,
+    OTPModule
   ],
   controllers: [],
   providers: [],

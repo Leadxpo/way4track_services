@@ -18,6 +18,8 @@ export class BranchAdapter {
         entity.branchPhoto = dto.branchPhoto;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode;
+        entity.latitude = dto.latitude;
+        entity.longitude = dto.longitude;
         // entity.phoneNumber = dto.phoneNumber
         if (entity.id) {
             entity.id = dto.id;

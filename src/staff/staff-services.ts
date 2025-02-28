@@ -74,6 +74,10 @@ export class StaffService {
                 newStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${newStaff.staffId}.jpg`);
             }
 
+            if (files?.resume?.[0]) {
+                newStaff.resume = await this.uploadFile(files.resume[0], `resume/${newStaff.staffId}.jpg`)
+            }
+
             const qualifications = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
 
             if (files?.qualificationFiles) {
@@ -263,6 +267,13 @@ export class StaffService {
                     await this.deleteFile(existingStaff.vehiclePhoto);
                 }
                 updatedStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
+            }
+
+            if (files?.resume?.[0]) {
+                if (existingStaff.resume) {
+                    await this.deleteFile(existingStaff.resume)
+                }
+                updatedStaff.resume = await this.uploadFile(files.resume[0], `resume/${existingStaff.resume}.jpg`)
             }
 
             let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
