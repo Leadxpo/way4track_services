@@ -8,6 +8,8 @@ import { ClientModule } from './client/client.module';
 import { StaffModule } from './staff/staff.module';
 import { ClientEntity } from './client/entity/client.entity';
 import { StaffEntity } from './staff/entity/staff.entity';
+import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
+import { OTPModule } from './otp-generation/otp-generation.module';
 import { VendorModule } from './vendor/vendor.module';
 import { VendorEntity } from './vendor/entity/vendor.entity';
 import { SubDealerModule } from './sub-dealer/sub-dealer.module';
@@ -51,8 +53,6 @@ import { DispatchEntity } from './dispatch/entity/dispatch.entity';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { ProductTypeEntity } from './product-type/entity/product-type.entity';
 import { ProductTypeModule } from './product-type/product-type.module';
-import { OTPModule } from './otp-generation/otp-generation.module';
-import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
 
 @Module({
   imports: [
@@ -61,17 +61,18 @@ import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'root',
-      database: 'waytrackservice',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity],
+      password: 'Varma@77',
+      database: 'way4track',
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, OtpEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, OtpEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
     StaffModule,
+    OTPModule,
     VendorModule,
     SubDealerModule,
     ProductModule,
@@ -93,8 +94,7 @@ import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
     TechnicianModule,
     LettersModule,
     DispatchModule,
-    ProductTypeModule,
-    OTPModule
+    ProductTypeModule
   ],
   controllers: [],
   providers: [],
