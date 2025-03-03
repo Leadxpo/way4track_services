@@ -8,6 +8,8 @@ import { ClientModule } from './client/client.module';
 import { StaffModule } from './staff/staff.module';
 import { ClientEntity } from './client/entity/client.entity';
 import { StaffEntity } from './staff/entity/staff.entity';
+import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
+import { OTPModule } from './otp-generation/otp-generation.module';
 import { VendorModule } from './vendor/vendor.module';
 import { VendorEntity } from './vendor/entity/vendor.entity';
 import { SubDealerModule } from './sub-dealer/sub-dealer.module';
@@ -51,8 +53,6 @@ import { DispatchEntity } from './dispatch/entity/dispatch.entity';
 import { DispatchModule } from './dispatch/dispatch.module';
 import { ProductTypeEntity } from './product-type/entity/product-type.entity';
 import { ProductTypeModule } from './product-type/product-type.module';
-import { OTPModule } from './otp-generation/otp-generation.module';
-import { OtpEntity } from './otp-generation/entity/otp-generation.entity';
 import { DesignationModule } from './designation/designation.module';
 import { DesignationEntity } from './designation/entity/designation.entity';
 import { SalesworkModule } from './sales-man/sales-man.module';
@@ -76,6 +76,7 @@ import { SalesWorksEntity } from './sales-man/entity/sales-man.entity';
     AssertModule,
     ClientModule,
     StaffModule,
+    OTPModule,
     VendorModule,
     SubDealerModule,
     ProductModule,
