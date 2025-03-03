@@ -363,7 +363,7 @@ export class StaffService {
 
     async getStaffDetails(req: CommonReq): Promise<CommonResponse> {
         const branch = await this.staffRepository.find({
-            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch', 'voucherId']
+            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch', 'voucherId', 'designation']
         });
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");
@@ -382,6 +382,7 @@ export class StaffService {
                 .leftJoinAndSelect('staff.request', 'request')
                 .leftJoinAndSelect('staff.productAssign', 'productAssign')
                 .leftJoinAndSelect('staff.permissions', 'permissions')
+                .leftJoinAndSelect('staff. designation',  'designation')
                 .where('staff.staffId = :staffId', { staffId: req.staffId })
                 .andWhere('staff.companyCode = :companyCode', { companyCode: req.companyCode })
                 .andWhere('staff.unitCode = :unitCode', { unitCode: req.unitCode })
@@ -406,27 +407,31 @@ export class StaffService {
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
             const staff = await this.staffRepository.find({
-                relations: ['branch', 'voucherId', 'notifications', 'permissions'],
+                relations: ['branch', 'voucherId', 'notifications', 'permissions', 'designation'],
                 where: {
-                    staffId: req.staffId, password: req.password,
-                    designation: req.designation, companyCode: req.companyCode, unitCode: req.unitCode
+                    staffId: req.staffId, 
+                    password: req.password,
+                    companyCode: req.companyCode, 
+                    unitCode: req.unitCode,
+                    designation: { designation: req.designation } // Fix: Compare by designation name
                 },
             });
-
+    
             if (!staff.length) {
-                return new CommonResponse(false, 404, 'staff not found');
+                return new CommonResponse(false, 404, 'Staff not found');
             } else {
-                const data = this.adapter.convertEntityToDto(staff)
-                return new CommonResponse(true, 200, 'staff details fetched successfully', data);
+                const data = this.adapter.convertEntityToDto(staff);
+                return new CommonResponse(true, 200, 'Staff details fetched successfully', data);
             }
         } catch (error) {
-            console.error("Error in getstaffDetails service:", error);
+            console.error("Error in getStaffProfileDetails service:", error);
             return new CommonResponse(false, 500, 'Error fetching staff details');
         }
     }
+    
 
     async getStaffNamesDropDown(): Promise<CommonResponse> {
-        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId', 'designation'] });
+        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId'],relations:[ 'designation'] });
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {

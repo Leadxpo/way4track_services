@@ -43,7 +43,8 @@ export class NotificationService {
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         } else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
-            if (entity.staffId?.designation === 'Technician') {
+            const designation = entity.staffId?.designation.designation.toLowerCase();
+            if (designation === 'Technician') {
                 message = `Technician allocated for ${entity.otherInformation}`;
                 createdAt = entity.date;
                 user = entity.staffId; // Assuming staffId is a number

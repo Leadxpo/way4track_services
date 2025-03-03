@@ -6,7 +6,9 @@ export class PermissionsDto {
     companyCode: string;
     unitCode: string;
     staffId?: string;
-    subDealerId?:number // Staff ID used to find the related StaffEntity
+    subDealerId?:number
+    designations?:string
+     // Staff ID used to find the related StaffEntity
 }
 
 export class Permission {

@@ -1,4 +1,4 @@
-import { AccountType, DesignationEnum, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
+import { AccountType, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Qualification } from "../enum/qualifications.enum";
 
@@ -7,7 +7,7 @@ export class GetStaffResDto {
     name: string;
     phoneNumber: string;
     alternateNumber?: string;
-    designation: DesignationEnum;
+    designation: string;
     staffId: string;
     password?: string;
     staffPhoto?: string;
@@ -70,7 +70,7 @@ export class GetStaffResDto {
         name: string,
         phoneNumber: string,
         alternateNumber: string | undefined,
-        designation: DesignationEnum,
+        designation: string,
         staffId: string,
         password: string | undefined,
         staffPhoto: string | undefined,

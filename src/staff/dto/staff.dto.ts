@@ -1,4 +1,4 @@
-import { AccountType, DesignationEnum, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
+import { AccountType, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Qualification } from "../enum/qualifications.enum";
 export class StaffDto {
@@ -6,7 +6,7 @@ export class StaffDto {
     name: string;
     phoneNumber: string;
     alternateNumber?: string;
-    designation: DesignationEnum;
+    designation: string;
     staffId?: string;
     password: string;
     staffPhoto?: string;

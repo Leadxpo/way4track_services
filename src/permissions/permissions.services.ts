@@ -5,267 +5,320 @@ import { CommonResponse } from "src/models/common-response";
 import { PermissionsDto } from "./dto/permissions.dto";
 import { ErrorResponse } from "src/models/error-response";
 import { PermissionIdDto } from "./dto/permission-id.dto";
-import { DesignationEnum, StaffEntity } from "src/staff/entity/staff.entity";
 import { Permission, PermissionEntity } from "./entity/permissions.entity";
 import { Roles } from "./dto/role.enum";
 import { StaffRepository } from "src/staff/repo/staff-repo";
+import { DesignationService } from "src/designation/designation.service";
 
 @Injectable()
 export class PermissionsService {
     constructor(
         private adapter: PermissionAdapter,
         private repo: PermissionRepository,
-        private readonly staffRepo: StaffRepository
+        private readonly staffRepo: StaffRepository,
+        private readonly designationSerie: DesignationService
     ) { }
 
-    private getDefaultPermissions(designation: DesignationEnum): Permission[] {
-        switch (designation) {
-            case DesignationEnum.CEO:
-                // If the designation is CEO, give all permissions
-                return [
-                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.SubDealer, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Bank, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    // private getDefaultPermissions(designation: DesignationEnum): Permission[] {
+    //     switch (designation) {
+    //         case DesignationEnum.CEO:
+    //             // If the designation is CEO, give all permissions
+    //             return [
+    //                 { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Client, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Bank, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Product, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.HR:
-                return [
-                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Appointments, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Product, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Voucher, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.HR:
+    //             return [
+    //                 { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Assets, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Appointments, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Product, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Voucher, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.Accountant:
-                return [
-                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Bank, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.Accountant:
+    //             return [
+    //                 { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Client, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Bank, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Product, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
-            case DesignationEnum.BranchManager:
-                return [
-                    { name: Roles.Branch, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //             ];
+    //         case DesignationEnum.BranchManager:
+    //             return [
+    //                 { name: Roles.Branch, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Hiring, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.WarehouseManager:
-                return [
-                    { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.WarehouseManager:
+    //             return [
+    //                 { name: Roles.Branch, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Assets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Vendor, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Estimate, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
-            case DesignationEnum.SubDealer:
-                return [
-                    { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Appointments, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Staff, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.Attendance, add: false, edit: false, view: false, delete: false },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //             ];
+    //         case DesignationEnum.SubDealer:
+    //             return [
+    //                 { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Assets, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Appointments, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Staff, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Tickets, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.Attendance, add: false, edit: false, view: false, delete: false },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.Technician:
-                return [
-                    { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.Technician:
+    //             return [
+    //                 { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.SalesMan:
-                return [
-                    { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.SalesMan:
+    //             return [
+    //                 { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            case DesignationEnum.CallCenter:
-                return [
-                    { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Client, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Product, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
-                    { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
-                    { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
-                    { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
+    //         case DesignationEnum.CallCenter:
+    //             return [
+    //                 { name: Roles.Branch, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Assets, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Appointments, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Staff, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Client, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Vendor, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.SubDealer, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Hiring, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Bank, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Product, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.ProductAssign, add: false, edit: false, view: false, delete: true },
+    //                 { name: Roles.Tickets, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Voucher, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.WorkAllocation, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.Estimate, add: false, edit: false, view: true, delete: true },
+    //                 { name: Roles.Attendance, add: true, edit: true, view: true, delete: true },
+    //                 { name: Roles.RequestRaise, add: true, edit: true, view: true, delete: true },
 
-                ];
+    //             ];
 
-            default:
-                return [];
-        }
-    }
+    //         default:
+    //             return [];
+    //     }
+    // }
+
+    // async savePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
+    //     try {
+    //         // Fetch the staff entity based on the staffId provided in the DTO
+    //         const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } });
+
+    //         if (!staff) {
+    //             throw new ErrorResponse(5417, 'Staff not found');
+    //         }
+
+    //         // Debugging: Check if permissions are received or default is needed
+    //         console.log("Incoming Permissions:", dto.permissions);
+            
+    //         const res = this.designationSerie.getDesignation(staff.designation);
+    //         // Set default permissions if not provided
+    //         dto.permissions = dto.permissions ?? (await res).data.roles;
+
+    //         // Debugging: Check default permissions
+    //         console.log("Default Permissions Applied:", dto.permissions);
+
+    //         // Ensure permissions are not null
+    //         if (!dto.permissions) {
+    //             throw new ErrorResponse(5418, 'Default permissions not found');
+    //         }
+
+    //         // Convert DTO to entity
+    //         const entity = this.adapter.convertPermissionDtoToEntity(dto);
+
+    //         // Associate the existing staff entity with the permission entity
+    //         entity.staffId = staff; // Use the full staff entity instead of just the ID
+
+    //         // Store permissions directly as an array (without JSON.stringify)
+    //         entity.permissions = dto.permissions;
+
+    //         // Debugging: Check entity before saving
+    //         console.log("Entity Before Save:", entity);
+
+    //         // Save the permission entity
+    //         await this.repo.insert(entity);
+
+    //         return new CommonResponse(true, 65152, 'Permission Details Created Successfully');
+    //     } catch (error) {
+    //         console.error('Error:', error.message);
+    //         throw new ErrorResponse(5416, error.message);
+    //     }
+    // }
+
 
     async savePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
-            // Fetch the staff entity based on the staffId provided in the DTO
-            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } });
-
+            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId }, relations: ['designation'] });
+    
             if (!staff) {
                 throw new ErrorResponse(5417, 'Staff not found');
             }
-
-            // Debugging: Check if permissions are received or default is needed
+    
             console.log("Incoming Permissions:", dto.permissions);
-
-            // Set default permissions if not provided
-            dto.permissions = dto.permissions ?? this.getDefaultPermissions(staff.designation);
-
-            // Debugging: Check default permissions
-            console.log("Default Permissions Applied:", dto.permissions);
-
-            // Ensure permissions are not null
-            if (!dto.permissions) {
-                throw new ErrorResponse(5418, 'Default permissions not found');
+    
+            // Ensure staff.designation is a string
+            const staffDesignation = typeof staff.designation === 'string' ? staff.designation : staff.designation?.designation;
+    
+            if (!staffDesignation) {
+                throw new ErrorResponse(5419, 'Staff designation is missing or invalid');
             }
-
-            // Convert DTO to entity
+    
+            // Fetch the default permissions for the staff's designation
+            const designationRes = await this.designationSerie.getDesignation({
+                designation: staffDesignation,
+                companyCode: staff.companyCode,
+                unitCode: staff.unitCode
+            });
+    
+            if (!designationRes || !designationRes.data) {
+                throw new ErrorResponse(5418, 'Default permissions not found for designation');
+            }
+    
+            // Apply default permissions if none are provided
+            dto.permissions = dto.permissions ?? designationRes.data.roles;
+    
+            console.log("Final Permissions Applied:", dto.permissions);
+    
             const entity = this.adapter.convertPermissionDtoToEntity(dto);
-
-            // Associate the existing staff entity with the permission entity
-            entity.staffId = staff; // Use the full staff entity instead of just the ID
-
-            // Store permissions directly as an array (without JSON.stringify)
+            entity.staffId = staff;
             entity.permissions = dto.permissions;
-
-            // Debugging: Check entity before saving
+    
             console.log("Entity Before Save:", entity);
-
-            // Save the permission entity
+    
             await this.repo.insert(entity);
-
+    
             return new CommonResponse(true, 65152, 'Permission Details Created Successfully');
         } catch (error) {
             console.error('Error:', error.message);
             throw new ErrorResponse(5416, error.message);
         }
     }
+    
+    
 
     async updatePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
@@ -377,6 +430,7 @@ export class PermissionsService {
         return new CommonResponse(true, 200, 'Permission details fetched successfully', addPermission);
 
     }
+
     async getStaffPermissions(req: { staffId?: string, companyCode: string, unitCode: string }): Promise<CommonResponse> {
         const data = await this.repo.getStaffPermissions(req)
         if (!data) {

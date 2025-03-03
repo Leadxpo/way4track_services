@@ -3,5 +3,5 @@ export enum Qualification {
     INTERMEDIATE = 'Intermediate',
     DEGREE = 'Degree',
     POST_GRADUATION = 'Post Graduation',
-    ITIORDiploma = "ITI / Diploma"
+    ITIORDiploma = "ITI / Diploma"      
 }

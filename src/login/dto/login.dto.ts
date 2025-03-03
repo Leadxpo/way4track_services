@@ -1,10 +1,9 @@
 import { CommonReq } from "src/models/common-req";
-import { DesignationEnum } from "src/staff/entity/staff.entity";
 
 export class LoginDto extends CommonReq {
     staffId: string;
     password: string;
-    designation?: DesignationEnum;
+    designation?: string;
 
     constructor(
         staffId: string,
@@ -13,7 +12,7 @@ export class LoginDto extends CommonReq {
         companyCode: string,
         userId?: number,
         userName?: string,
-        designation?: DesignationEnum,
+        designation?: string,
     ) {
         super(unitCode, companyCode, userId, userName);
         this.staffId = staffId;

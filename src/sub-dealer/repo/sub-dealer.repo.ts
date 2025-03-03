@@ -4,7 +4,7 @@ import { SubDealerEntity } from "../entity/sub-dealer.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { DetailSubDealerDto } from "../dto/detail-sub-dealer.dto";
 import { LoginDto } from "src/login/dto/login.dto";
-import { DesignationEnum } from "src/staff/entity/staff.entity";
+
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 
 

@@ -3,6 +3,7 @@ import { PermissionEntity } from "./entity/permissions.entity";
 import { PermissionsDto } from "./dto/permissions.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { DesignationEntity } from "src/designation/entity/designation.entity";
 @Injectable()
 export class PermissionAdapter {
     convertPermissionDtoToEntity(dto: PermissionsDto): PermissionEntity {
@@ -21,6 +22,10 @@ export class PermissionAdapter {
         const staff = new StaffEntity();
         staff.staffId = dto.staffId;
         entity.staffId = staff;
+
+        const des = new DesignationEntity();
+        des.designation = dto.designations;
+        entity.designations = des;
         if (entity.id) {
             entity.id = dto.id;
         }

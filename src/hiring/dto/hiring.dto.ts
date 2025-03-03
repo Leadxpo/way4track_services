@@ -1,4 +1,4 @@
-import { DesignationEnum, YesNo } from "src/staff/entity/staff.entity";
+import { YesNo } from "src/staff/entity/staff.entity";
 import { HiringLevel } from "../enum/hiring-level.enum";
 import { HiringStatus } from "../enum/hiring-status.enum";
 import { InterviewWith } from "../entity/hiring.entity";

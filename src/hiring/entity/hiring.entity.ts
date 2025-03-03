@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 import { HiringStatus } from '../enum/hiring-status.enum';
 import { HiringLevel } from '../enum/hiring-level.enum';
-import { DesignationEnum, YesNo } from 'src/staff/entity/staff.entity';
+import {  YesNo } from 'src/staff/entity/staff.entity';
 
 export enum InterviewWith {
     Sunil = "Sunil",

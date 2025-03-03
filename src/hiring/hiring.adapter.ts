@@ -19,6 +19,9 @@ export class HiringAdapter {
     entity.unitCode = dto.unitCode
     entity.levelWiseData = dto.levelWiseData
     entity.drivingLicence = dto.drivingLicence
+    if (entity.id) {
+      entity.id = dto.id;
+  }
     entity.drivingLicenceNumber = dto.drivingLicenceNumber
     return entity;
   }

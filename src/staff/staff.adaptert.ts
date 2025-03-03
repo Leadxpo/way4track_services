@@ -4,6 +4,7 @@ import { StaffDto } from './dto/staff.dto';
 import { GetStaffResDto } from './dto/staff-res.dto';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
+import { DesignationEntity } from 'src/designation/entity/designation.entity';
 
 @Injectable()
 export class StaffAdapter {
@@ -13,8 +14,17 @@ export class StaffAdapter {
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         entity.alternateNumber = dto.alternateNumber;
-        entity.staffPhoto = dto.staffPhoto;
-        entity.designation = dto.designation;
+        entity.staffPhoto = dto.staffPhoto; 
+        if (dto.designation) {
+            entity.designation = new DesignationEntity();
+            entity.designation.designation = dto.designation; // Assigning designation name
+        }
+        
+       
+
+        // const des=new DesignationEntity()
+        // des.designation=dto.designation
+        // entity.designation =des;
         entity.staffId = dto.staffId;
         entity.password = dto.password;
         entity.gender = dto.gender;
@@ -88,7 +98,7 @@ export class StaffAdapter {
                 staffMember.name,
                 staffMember.phoneNumber,
                 staffMember.alternateNumber,
-                staffMember.designation,
+                staffMember.designation.designation,
                 staffMember.staffId,
                 staffMember.password,
                 staffMember.staffPhoto,

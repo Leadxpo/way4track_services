@@ -13,6 +13,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColum
 import { LettersEntity } from '../../letters/entity/letters.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { OtpEntity } from 'src/otp-generation/entity/otp-generation.entity';
+import { DesignationEntity } from 'src/designation/entity/designation.entity';
 
 
 export enum Gender {
@@ -25,17 +26,17 @@ export enum YesNo {
   NO = 'No',
 }
 
-export enum DesignationEnum {
-  CEO = 'CEO',
-  HR = 'HR',
-  Accountant = 'Accountant',
-  WarehouseManager = 'Warehouse Manager',
-  BranchManager = 'Branch Manager',
-  SubDealer = 'Sub Dealer',
-  Technician = 'Technician',
-  SalesMan = 'Sales Man', // make sure this matches with the dropdown
-  CallCenter = 'Call Center',
-}
+// export enum DesignationEnum {
+//   CEO = 'CEO',
+//   HR = 'HR',
+//   Accountant = 'Accountant',
+//   WarehouseManager = 'Warehouse Manager',
+//   BranchManager = 'Branch Manager',
+//   SubDealer = 'Sub Dealer',
+//   Technician = 'Technician',
+//   SalesMan = 'Sales Man', // make sure this matches with the dropdown
+//   CallCenter = 'Call Center',
+// }
 
 export enum Qualification {
   TENTH = '10th Class',
@@ -73,13 +74,13 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'alternate_number', type: 'varchar', length: 15, nullable: true })
   alternateNumber: string;
 
-  @Column({
-    name: 'designation',
-    type: 'enum',
-    enum: DesignationEnum,
-    default: DesignationEnum.CEO
-  })
-  designation: DesignationEnum;
+  // @Column({
+  //   name: 'designation',
+  //   type: 'enum',
+  //   enum: DesignationEnum,
+  //   default: DesignationEnum.CEO
+  // })
+  // designation: DesignationEnum;
 
   @Column({ name: 'staff_id', type: 'varchar', unique: true })
   staffId: string;
@@ -299,7 +300,7 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => LettersEntity, (LettersEntity) => LettersEntity.staffId)
   Letters: LettersEntity[];
 
-
-
-
+   @ManyToOne(() => DesignationEntity, (DesignationEntity) => DesignationEntity.permissions)
+    @JoinColumn({ name: 'designation' })
+    designation: DesignationEntity;
 }
