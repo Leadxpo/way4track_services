@@ -21,9 +21,6 @@ export class DesignationEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @Column('varchar', { name: 'designation', length: 20, nullable: false })
-    designation: string;
-
     @Column({ type: 'json', name: 'roles', nullable: true })
     roles: {
         name: Roles;
@@ -33,6 +30,12 @@ export class DesignationEntity {
         // delete: boolean;
     }[];
 
-    @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.designations)
-    permissions: PermissionEntity[];
+    // @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.designations)
+    // permissions: PermissionEntity[];
+
+    @Column('varchar', { name: 'designation', length: 20, nullable: false, unique: true })
+    designation: string; // Unique constraint added
+
+    @OneToMany(() => StaffEntity, (staff) => staff.designationRelation)
+    staff: StaffEntity[];
 }

@@ -234,7 +234,7 @@ export class PermissionsService {
 
     //         // Debugging: Check if permissions are received or default is needed
     //         console.log("Incoming Permissions:", dto.permissions);
-            
+
     //         const res = this.designationSerie.getDesignation(staff.designation);
     //         // Set default permissions if not provided
     //         dto.permissions = dto.permissions ?? (await res).data.roles;
@@ -272,53 +272,53 @@ export class PermissionsService {
 
     async savePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
-            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId }, relations: ['designation'] });
-    
+            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId }, relations: ['designationRelation'] });
+
             if (!staff) {
                 throw new ErrorResponse(5417, 'Staff not found');
             }
-    
+
             console.log("Incoming Permissions:", dto.permissions);
-    
+
             // Ensure staff.designation is a string
-            const staffDesignation = typeof staff.designation === 'string' ? staff.designation : staff.designation?.designation;
-    
+            const staffDesignation = typeof staff.designation === 'string' ? staff.designation : staff.designation;
+
             if (!staffDesignation) {
                 throw new ErrorResponse(5419, 'Staff designation is missing or invalid');
             }
-    
+
             // Fetch the default permissions for the staff's designation
             const designationRes = await this.designationSerie.getDesignation({
                 designation: staffDesignation,
                 companyCode: staff.companyCode,
                 unitCode: staff.unitCode
             });
-    
+
             if (!designationRes || !designationRes.data) {
                 throw new ErrorResponse(5418, 'Default permissions not found for designation');
             }
-    
+
             // Apply default permissions if none are provided
             dto.permissions = dto.permissions ?? designationRes.data.roles;
-    
+
             console.log("Final Permissions Applied:", dto.permissions);
-    
+
             const entity = this.adapter.convertPermissionDtoToEntity(dto);
             entity.staffId = staff;
             entity.permissions = dto.permissions;
-    
+
             console.log("Entity Before Save:", entity);
-    
+
             await this.repo.insert(entity);
-    
+
             return new CommonResponse(true, 65152, 'Permission Details Created Successfully');
         } catch (error) {
             console.error('Error:', error.message);
             throw new ErrorResponse(5416, error.message);
         }
     }
-    
-    
+
+
 
     async updatePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {

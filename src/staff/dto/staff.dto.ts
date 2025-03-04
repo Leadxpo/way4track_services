@@ -63,7 +63,7 @@ export class StaffDto {
     officePhoneNumber: string;
     officeEmail: string;
     mailAllocation: YesNo;
-
+    designation_id?:number
 }
 
 export class Qualifications {

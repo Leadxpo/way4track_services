@@ -23,9 +23,9 @@ export class PermissionAdapter {
         staff.staffId = dto.staffId;
         entity.staffId = staff;
 
-        const des = new DesignationEntity();
-        des.designation = dto.designations;
-        entity.designations = des;
+        // const des = new DesignationEntity();
+        // des.designation = dto.designations;
+        // entity.designations = des;
         if (entity.id) {
             entity.id = dto.id;
         }

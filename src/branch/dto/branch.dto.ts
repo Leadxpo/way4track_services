@@ -1,5 +1,5 @@
 export class BranchDto {
-    id: number;
+    id?: number;
     branchName: string;
     branchNumber: string;
     branchAddress?: string;

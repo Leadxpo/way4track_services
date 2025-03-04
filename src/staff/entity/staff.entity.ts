@@ -57,7 +57,7 @@ export enum SalaryStatus {
   OTHER = 'Other Reason',
 }
 
-@Entity({ name: 'staffs' })
+@Entity({ name: 'st' })
 export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -300,7 +300,10 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => LettersEntity, (LettersEntity) => LettersEntity.staffId)
   Letters: LettersEntity[];
 
-   @ManyToOne(() => DesignationEntity, (DesignationEntity) => DesignationEntity.permissions)
-    @JoinColumn({ name: 'designation' })
-    designation: DesignationEntity;
+  @Column('varchar', { name: 'designation', length: 20, nullable: false })
+  designation: string;
+
+  @ManyToOne(() => DesignationEntity, (designation) => designation.staff, { nullable: true })
+  @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
+  designationRelation: DesignationEntity;
 }

@@ -41,9 +41,9 @@ export class PermissionEntity {
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 
-    @ManyToOne(() => DesignationEntity, (DesignationEntity) => DesignationEntity.permissions)
-    @JoinColumn({ name: 'designations' })
-    designations: DesignationEntity;
+    // @ManyToOne(() => DesignationEntity, (DesignationEntity) => DesignationEntity.permissions)
+    // @JoinColumn({ name: 'designations' })
+    // designations: DesignationEntity;
 
     @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.permissions)
     @JoinColumn({ name: 'sub_dealer_id' })

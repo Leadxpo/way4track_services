@@ -14,14 +14,8 @@ export class StaffAdapter {
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         entity.alternateNumber = dto.alternateNumber;
-        entity.staffPhoto = dto.staffPhoto; 
-        if (dto.designation) {
-            entity.designation = new DesignationEntity();
-            entity.designation.designation = dto.designation; // Assigning designation name
-        }
-        
-       
-
+        entity.staffPhoto = dto.staffPhoto;
+        entity.designation = dto.designation; // Assigning designation name
         // const des=new DesignationEntity()
         // des.designation=dto.designation
         // entity.designation =des;
@@ -91,6 +85,9 @@ export class StaffAdapter {
     }
 
 
+
+
+
     convertEntityToDto(entity: StaffEntity[]): GetStaffResDto[] {
         return entity.map((staffMember) => {
             return new GetStaffResDto(
@@ -98,7 +95,7 @@ export class StaffAdapter {
                 staffMember.name,
                 staffMember.phoneNumber,
                 staffMember.alternateNumber,
-                staffMember.designation.designation,
+                staffMember.designation,
                 staffMember.staffId,
                 staffMember.password,
                 staffMember.staffPhoto,

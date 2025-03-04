@@ -11,40 +11,40 @@ import { ErrorResponse } from 'src/models/error-response';
 import { Storage } from '@google-cloud/storage';
 @Injectable()
 export class SalesWorksService {
-     private storage: Storage;
-        private bucketName: string;
+    private storage: Storage;
+    private bucketName: string;
     constructor(
-        
-        private readonly salesWorksRepository:SalesworkRepository,
-        private readonly adapter:SalesWorksAdapter,
-        private readonly productRepository:ProductRepository
+
+        private readonly salesWorksRepository: SalesworkRepository,
+        private readonly adapter: SalesWorksAdapter,
+        private readonly productRepository: ProductRepository
 
     ) {
-         this.storage = new Storage({
-                    projectId: process.env.GCLOUD_PROJECT_ID ||
-                        'sharontelematics-1530044111318',
-                    keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
-                });
-        
-                this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-      async handleSales(req: SalesWorksDto, files: any): Promise<CommonResponse> {
-              try {
-      
-                  if (req.id && req.id !== null || (req.staffId && req.staffId.trim() !== '')) {
-                      console.log("🔄 Updating existing staff record...");
-                      return await this.update(req, files);
-                  } else {
-                      console.log("🆕 Creating a new staff record...");
-                      return await this.create(req, files);
-                  }
-              } catch (error) {
-                  console.error(`❌ Error handling staff details: ${error.message}`, error.stack);
-                  throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
-              }
-          }
-      
+    async handleSales(req: SalesWorksDto, files: any): Promise<CommonResponse> {
+        try {
+
+            if (req.id && req.id !== null) {
+                console.log("🔄 Updating existing staff record...");
+                return await this.update(req, files);
+            } else {
+                console.log("🆕 Creating a new staff record...");
+                return await this.create(req, files);
+            }
+        } catch (error) {
+            console.error(`❌ Error handling staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
+        }
+    }
+
 
     async findAll(): Promise<SalesWorksDto[]> {
         const entities = await this.salesWorksRepository.find({ relations: ['staffId'] });
@@ -59,11 +59,11 @@ export class SalesWorksService {
         return this.adapter.convertEntityToDto(entity);
     }
 
-    async create(dto: SalesWorksDto,files: any): Promise<CommonResponse> {
+    async create(dto: SalesWorksDto, files: any): Promise<CommonResponse> {
         const entity = this.adapter.convertDtoToEntity(dto);
-
+        console.log(dto, "?????")
         if (files?.visitingCard?.[0]) {
-            entity.visitingCard = await this.uploadFile(files.photo[0], `isiting_card__photos/${entity.staffId}.jpg`);
+            entity.visitingCard = await this.uploadFile(files.photo[0], `visiting_card__photos/${entity.staffId}.jpg`);
         }
 
         // Upload vehicle photo to GCS
@@ -86,11 +86,11 @@ export class SalesWorksService {
                 quantity: dto.requirementDetails.find((item) => item.productName === product.productName)?.quantity || 0,
             }));
         }
+        console.log(entity, ">>>>>>>>")
+        await this.salesWorksRepository.insert(entity);
+        //    await this.adapter.convertEntityToDto(savedEntity);
 
-        const savedEntity = await this.salesWorksRepository.save(entity);
-       await this.adapter.convertEntityToDto(savedEntity);
-
-       return new CommonResponse(true, 65152, 'Staff Details and Letters Updated Successfully');
+        return new CommonResponse(true, 65152, 'Staff Details and Letters created Successfully');
     }
 
     private async uploadFile(file: Express.Multer.File, fileName: string): Promise<string> {
@@ -117,14 +117,14 @@ export class SalesWorksService {
         }
     }
 
-    async update(dto: SalesWorksDto,files: any): Promise<CommonResponse> {
+    async update(dto: SalesWorksDto, files: any): Promise<CommonResponse> {
 
-         let existingStaff: SalesWorksEntity | null = null;
+        let existingStaff: SalesWorksEntity | null = null;
         const entity = await this.salesWorksRepository.findOne({ where: { id: dto.id } });
         if (!entity) {
             throw new Error('Sales Work not found');
         }
-        
+
         const updatedStaff = this.adapter.convertDtoToEntity(dto);
 
         if (files?.visitingCard?.[0]) {
@@ -149,7 +149,7 @@ export class SalesWorksService {
 
             const products = await this.productRepository.find({
                 where: { productName: In(uniqueProductNames) }
-,
+                ,
             });
 
             updatedStaff.requirementDetails = products.map((product) => ({
@@ -160,10 +160,10 @@ export class SalesWorksService {
 
         updatedStaff.id = dto.id;
         await this.salesWorksRepository.save(updatedStaff);
-        
-       await this.adapter.convertEntityToDto(updatedStaff);
 
-       return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
+        await this.adapter.convertEntityToDto(updatedStaff);
+
+        return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
     }
 
 
