@@ -70,6 +70,7 @@ export class StaffAdapter {
         entity.mailAllocation = dto.mailAllocation
         entity.officeEmail = dto.officeEmail
         entity.officePhoneNumber = dto.officePhoneNumber
+        entity.carryForwardLeaves = dto.carryForwardLeaves
 
         if (dto.id) {
             entity.id = dto.id;
@@ -147,7 +148,11 @@ export class StaffAdapter {
                 staffMember.longitude,
                 staffMember.createdAt,
                 staffMember.updatedAt,
-                staffMember.qualifications
+                staffMember.qualifications,
+                staffMember.officePhoneNumber,
+                staffMember.officeEmail,
+                staffMember.mailAllocation,
+                staffMember.carryForwardLeaves
             );
         });
     }

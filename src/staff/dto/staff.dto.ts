@@ -64,6 +64,8 @@ export class StaffDto {
     officeEmail: string;
     mailAllocation: YesNo;
     designation_id?:number
+    carryForwardLeaves: number;
+
 }
 
 export class Qualifications {

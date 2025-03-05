@@ -306,4 +306,7 @@ export class StaffEntity extends BaseEntity {
   @ManyToOne(() => DesignationEntity, (designation) => designation.staff, { nullable: true })
   @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
   designationRelation: DesignationEntity;
+
+  @Column({ type: 'int', default: 0 })
+  carryForwardLeaves: number;
 }

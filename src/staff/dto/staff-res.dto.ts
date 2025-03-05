@@ -65,6 +65,8 @@ export class GetStaffResDto {
     officePhoneNumber?: string;
     officeEmail?: string;
     mailAllocation?: YesNo;
+    carryForwardLeaves?: number;
+
     constructor(
         id: number,
         name: string,
@@ -126,7 +128,9 @@ export class GetStaffResDto {
         qualifications: Qualifications[] | undefined,
         officePhoneNumber?: string,
         officeEmail?: string,
-        mailAllocation?: YesNo
+        mailAllocation?: YesNo,
+        carryForwardLeaves?: number
+
         // branch: number
     ) {
         this.id = id;
@@ -191,6 +195,7 @@ export class GetStaffResDto {
         this.officeEmail = officeEmail
         this.officePhoneNumber = officePhoneNumber
         this.mailAllocation = mailAllocation
+        this.carryForwardLeaves = carryForwardLeaves
     }
 }
 
