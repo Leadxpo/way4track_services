@@ -11,6 +11,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { PermissionModule } from 'src/permissions/permissions.module';
 import { LettersModule } from 'src/letters/letters.module';
 import { DesignationModule } from 'src/designation/designation.module';
+import { PayRollModule } from 'src/payRoll/pay-roll.module';
 
 
 @Module({
@@ -19,7 +20,8 @@ import { DesignationModule } from 'src/designation/designation.module';
     }),
     forwardRef(() => AttendanceModule),
     forwardRef(() => LettersModule),
-     forwardRef(() => DesignationModule),
+    forwardRef(() => PayRollModule),
+    forwardRef(() => DesignationModule),
     forwardRef(() => PermissionModule)],
     controllers: [StaffController],
     providers: [StaffService, StaffRepository, StaffAdapter, StaffDashboardService],

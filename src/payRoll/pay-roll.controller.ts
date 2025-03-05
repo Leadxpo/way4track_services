@@ -5,7 +5,7 @@ import { PayrollDto } from './dto/payroll.dto';
 
 
 @Controller('PAYROLL')
-export class TicketsController {
+export class PayRollController {
     constructor(private readonly ticketsService: PayrollService) { }
 
     @Post('createOrUpdatePayroll')

@@ -33,6 +33,8 @@ import { EstimateDashboardService } from './estimate-dashboard.service';
 import { EstimateRepository } from 'src/estimate/repo/estimate.repo';
 import { AccountDashboardService } from './account.dashboard.service';
 import { AccountModule } from 'src/account/account.module';
+import { PayRollModule } from 'src/payRoll/pay-roll.module';
+import { PayrollRepository } from 'src/payRoll/repo/payroll.repo';
 
 @Module({
     imports: [
@@ -47,7 +49,9 @@ import { AccountModule } from 'src/account/account.module';
         forwardRef(() => StaffModule),
         forwardRef(() => AppointmentModule),
         forwardRef(() => EstimateModule),
-        forwardRef(() => AccountModule)
+        forwardRef(() => AccountModule),
+        forwardRef(() => PayRollModule),
+
 
     ],
     providers: [
@@ -71,7 +75,8 @@ import { AccountModule } from 'src/account/account.module';
         TicketsRepository,
         VoucherRepository,
         AppointmentRepository,
-        EstimateRepository
+        EstimateRepository,
+        PayrollRepository
     ],
     controllers: [DashboardController],
 })
