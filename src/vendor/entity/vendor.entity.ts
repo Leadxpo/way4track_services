@@ -1,5 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -52,6 +53,9 @@ export class VendorEntity {
 
   @OneToMany(() => VoucherEntity, (product) => product.vendorId, { nullable: true })
   voucherId: VoucherEntity[];
+
+  @OneToMany(() => LedgerEntity, (product) => product.vendorId, { nullable: true })
+  ledger: LedgerEntity[];
 
   @OneToMany(() => EstimateEntity, (product) => product.vendorId, { nullable: true })
   estimate: EstimateEntity[];

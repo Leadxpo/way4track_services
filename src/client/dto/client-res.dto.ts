@@ -7,7 +7,7 @@ export class ClientResDto {
     clientPhoto: string;
     branchId: number;
     branchName: string;
-    dob: string;
+    // dob: string;
     email: string;
     address: string;
     joiningDate: string;
@@ -21,7 +21,7 @@ export class ClientResDto {
         clientPhoto: string,
         branchId: number,
         branchName: string,
-        dob: string,
+        // dob: string,
         email: string,
         address: string,
         joiningDate: string,
@@ -35,7 +35,7 @@ export class ClientResDto {
         this.clientPhoto = clientPhoto
         this.branchId = branchId;
         this.branchName = branchName;
-        this.dob = dob;
+        // this.dob = dob;
         this.email = email;
         this.address = address;
         this.joiningDate = joiningDate;

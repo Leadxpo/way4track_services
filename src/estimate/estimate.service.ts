@@ -164,7 +164,7 @@ export class EstimateService {
         return url;
     }
 
-    async createEstimateDetails(dto: EstimateDto, estimatePdf: string | null): Promise<CommonResponse> {
+    async createEstimateDetails(dto: EstimateDto, estimatePdf: string | null, invoicePath?: string): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.findOne({
                 where: { clientId: dto.clientId },
@@ -223,7 +223,15 @@ export class EstimateService {
             newEstimate.productDetails = productDetails;
             newEstimate.amount = totalAmount || 0;
             newEstimate.estimateId = `EST-${(await this.estimateRepository.count() + 1).toString().padStart(4, '0')}`;
+            if (dto.convertToInvoice) {
+                newEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(newEstimate.id));
+                if (invoicePath) {
+                    newEstimate.invoicePdfUrl = await this.handleFileUpload(invoicePath, newEstimate.invoicePdfUrl, 'invoices_pdfs');
+                }
+            }
 
+            newEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100 || 0;
+            newEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100 || 0;
 
             if (estimatePdf) {
                 newEstimate.estimatePdfUrl = await this.handleFileUpload(
@@ -262,7 +270,7 @@ export class EstimateService {
             }
             return (dto.id && dto.id !== null) || (dto.estimateId && dto.estimateId.trim() !== '')
                 ? await this.updateEstimateDetails(dto, estimatePath, invoicePath)
-                : await this.createEstimateDetails(dto, estimatePath);
+                : await this.createEstimateDetails(dto, estimatePath, invoicePath);
         } catch (error) {
             console.error('Error in uploadAndHandleEstimateDetails:', error);
             return new CommonResponse(false, 500, 'Error processing estimate details');

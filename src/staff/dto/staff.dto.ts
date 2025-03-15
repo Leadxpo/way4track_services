@@ -1,6 +1,7 @@
-import { AccountType, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
+import { AccountType, Gender, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Qualification } from "../enum/qualifications.enum";
+import { StaffStatus } from "../enum/staff-status";
 export class StaffDto {
     id?: number;
     name: string;
@@ -36,7 +37,7 @@ export class StaffDto {
     department?: string;
     monthlySalary?: number;
     salaryDate?: Date;
-    salaryStatus: SalaryStatus;
+    staffStatus: StaffStatus;
     bikeAllocation: YesNo;
     vehiclePhoto?: string;
     bikeNumber?: string;
@@ -63,7 +64,7 @@ export class StaffDto {
     officePhoneNumber: string;
     officeEmail: string;
     mailAllocation: YesNo;
-    designation_id?:number
+    designation_id?: number
     carryForwardLeaves: number;
 
 }

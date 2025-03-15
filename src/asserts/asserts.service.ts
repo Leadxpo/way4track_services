@@ -70,16 +70,16 @@ export class AssertsService {
             console.log(createAssertsDto, "+========");
 
             // Ensure voucherId is an integer
-            const voucherId = Number(createAssertsDto.voucherId);
-            if (isNaN(voucherId)) {
-                throw new Error('Invalid voucher ID');
-            }
+            // const voucherId = Number(createAssertsDto.voucherId);
+            // if (isNaN(voucherId)) {
+            //     throw new Error('Invalid voucher ID');
+            // }
 
-            const voucher = await this.voucherRepo.findOne({ where: { id: voucherId } });
+            // const voucher = await this.voucherRepo.findOne({ where: { id: voucherId } });
 
-            if (!voucher) {
-                throw new Error('Voucher not found');
-            }
+            // if (!voucher) {
+            //     throw new Error('Voucher not found');
+            // }
 
             let entity: AssertsEntity | null = null;
 
@@ -105,11 +105,11 @@ export class AssertsService {
                 }
 
                 // Fetch and assign VoucherEntity properly
-                const voucherEntity = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
-                if (!voucherEntity) {
-                    throw new Error(`Voucher with ID ${voucherId} not found`);
-                }
-                entity.voucherId = voucherEntity; // Assign full entity instead of string
+                // const voucherEntity = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
+                // if (!voucherEntity) {
+                //     throw new Error(`Voucher with ID ${voucherId} not found`);
+                // }
+                // entity.voucherId = voucherEntity; // Assign full entity instead of string
 
                 // If a new photo is uploaded, delete the existing file from GCS
                 if (photo && entity.assetPhoto) {

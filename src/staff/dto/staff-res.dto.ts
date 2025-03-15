@@ -1,6 +1,7 @@
-import { AccountType, Gender, SalaryStatus, YesNo } from "../entity/staff.entity";
+import { AccountType, Gender, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Qualification } from "../enum/qualifications.enum";
+import { StaffStatus } from "../enum/staff-status";
 
 export class GetStaffResDto {
     id: number;
@@ -38,7 +39,7 @@ export class GetStaffResDto {
     department?: string;
     monthlySalary?: number;
     salaryDate?: Date;
-    salaryStatus: SalaryStatus;
+    // salaryStatus: SalaryStatus;
     bikeAllocation: YesNo;
     vehiclePhoto?: string;
     bikeNumber?: string;
@@ -66,6 +67,7 @@ export class GetStaffResDto {
     officeEmail?: string;
     mailAllocation?: YesNo;
     carryForwardLeaves?: number;
+    staffStatus?: StaffStatus;
 
     constructor(
         id: number,
@@ -103,7 +105,7 @@ export class GetStaffResDto {
         department: string | undefined,
         monthlySalary: number | undefined,
         salaryDate: Date | undefined,
-        salaryStatus: SalaryStatus,
+        // salaryStatus: SalaryStatus,
         bikeAllocation: YesNo,
         vehiclePhoto: string | undefined,
         bikeNumber: string | undefined,
@@ -129,7 +131,9 @@ export class GetStaffResDto {
         officePhoneNumber?: string,
         officeEmail?: string,
         mailAllocation?: YesNo,
-        carryForwardLeaves?: number
+        carryForwardLeaves?: number,
+        staffStatus?: StaffStatus
+
 
         // branch: number
     ) {
@@ -168,7 +172,7 @@ export class GetStaffResDto {
         this.department = department;
         this.monthlySalary = monthlySalary;
         this.salaryDate = salaryDate;
-        this.salaryStatus = salaryStatus;
+        // this.salaryStatus = salaryStatus;
         this.bikeAllocation = bikeAllocation;
         this.vehiclePhoto = vehiclePhoto;
         this.bikeNumber = bikeNumber;
@@ -196,6 +200,7 @@ export class GetStaffResDto {
         this.officePhoneNumber = officePhoneNumber
         this.mailAllocation = mailAllocation
         this.carryForwardLeaves = carryForwardLeaves
+        this.staffStatus = staffStatus
     }
 }
 

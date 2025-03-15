@@ -12,4 +12,6 @@ export class AccountDto extends CommonReq {
     bankAddress: string;
     accountHolderName: string;
     totalAmount: number;
+    unitCode: string;
+    companyCode: string;
 }

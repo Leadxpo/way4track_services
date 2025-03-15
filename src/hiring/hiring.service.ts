@@ -33,10 +33,10 @@ export class HiringService {
         try {
             let resumePath: string | undefined;
             let entity: HiringEntity;
-
-            if (dto.id || dto.id !== null) {
+            console.log(dto, ":::::::::::::::::")
+            if (dto.id) {
                 entity = await this.hiringRepository.findOne({ where: { id: dto.id } });
-
+                console.log(entity, ">>>>>>>>>")
                 if (!entity) {
                     throw new ErrorResponse(404, 'details not found');
                 }
@@ -58,6 +58,7 @@ export class HiringService {
             } else {
                 // For new branches, convert DTO to Entity
                 entity = this.hiringAdapter.convertDtoToEntity(dto);
+                console.log(entity, ";;;;;;;;;")
             }
 
 
@@ -75,7 +76,7 @@ export class HiringService {
                 resumePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
                 entity.resumePath = resumePath;
             }
-
+            console.log(entity, "//////")
             await this.hiringRepository.save(entity);
 
             const internalMessage = dto.id
@@ -114,7 +115,7 @@ export class HiringService {
 
     async getHiringDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const hiring = await HiringEntity.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const hiring = await this.hiringRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!hiring.length) {
                 throw new ErrorResponse(404, 'Hiring record not found');
             }
@@ -156,7 +157,7 @@ export class HiringService {
             ])
             .where(`hiring.company_code = "${req.companyCode}"`)
             .andWhere(`hiring.unit_code = "${req.unitCode}"`)
-
+            .andWhere('hiring.status != :status', { status: 'Qualified' });
         if (req.hiringId) {
             query.andWhere('hiring.id = :hiringId', { hiringId: req.hiringId });
         }

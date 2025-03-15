@@ -5,7 +5,7 @@ export class ClientDto {
     name: string;
     branch: number;
     phoneNumber: string;
-    dob: string;
+    // dob: string;
     email: string;
     address: string;
     joiningDate: string;
@@ -14,4 +14,10 @@ export class ClientDto {
     voucherId?: number
     companyCode: string;
     unitCode: string
+    hsnCode: string;
+    SACCode: string;
+    tds: boolean;
+    tcs: boolean;
+    billWiseDate: boolean;
+
 }

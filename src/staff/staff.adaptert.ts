@@ -47,7 +47,7 @@ export class StaffAdapter {
         entity.department = dto.department;
         entity.monthlySalary = dto.monthlySalary;
         entity.salaryDate = dto.salaryDate;
-        entity.salaryStatus = dto.salaryStatus;
+        // entity.salaryStatus = dto.salaryStatus;
         entity.bikeAllocation = dto.bikeAllocation;
         entity.vehiclePhoto = dto.vehiclePhoto;
         entity.bikeNumber = dto.bikeNumber;
@@ -71,6 +71,7 @@ export class StaffAdapter {
         entity.officeEmail = dto.officeEmail
         entity.officePhoneNumber = dto.officePhoneNumber
         entity.carryForwardLeaves = dto.carryForwardLeaves
+        entity.status = dto.staffStatus
 
         if (dto.id) {
             entity.id = dto.id;
@@ -127,7 +128,7 @@ export class StaffAdapter {
                 staffMember.department,
                 staffMember.monthlySalary,
                 staffMember.salaryDate,
-                staffMember.salaryStatus,
+                // staffMember.salaryStatus,
                 staffMember.bikeAllocation,
                 staffMember.vehiclePhoto,
                 staffMember.bikeNumber,
@@ -152,7 +153,8 @@ export class StaffAdapter {
                 staffMember.officePhoneNumber,
                 staffMember.officeEmail,
                 staffMember.mailAllocation,
-                staffMember.carryForwardLeaves
+                staffMember.carryForwardLeaves,
+                staffMember.status
             );
         });
     }

@@ -4,18 +4,18 @@ import { RoleEnum } from "../enum/role-enum";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ProductType } from "src/product/dto/product-type.enum";
-import { GSTORTDSEnum } from "../entity/voucher.entity";
+import { DebitORCreditEnum, TypeEnum } from "../entity/voucher.entity";
 
 export class VoucherDto {
     id?: number;
     name: string;
     quantity?: number;
     branchId: number;
-    role: RoleEnum;
+    // role: RoleEnum;
     purpose: string;
     creditAmount: number;
     amount?: number; // nullable if not always provided
-    remainingAmount?: number; // Fixed the typo "reminingAmount"
+    reminigAmount?: number; // Fixed the typo "reminingAmount"
     paymentType: PaymentType;
     clientId: string;
     staffId: number;
@@ -27,14 +27,16 @@ export class VoucherDto {
     shippingAddress?: string;
     buildingAddress?: string;
     hsnCode?: string;
-    GSTORTDS?: GSTORTDSEnum;
+    journalType: DebitORCreditEnum;
     SCST?: number;
     CGST?: number;
+    IGST?: number;
+
     subDealerId?: number;
     vendorId?: number;
-    initialPayment?: number;
-    numberOfEmi?: number;
-    emiNumber?: number;
+    // initialPayment?: number;
+    // numberOfEmi?: number;
+    // emiNumber?: number;
     // emiAmount?: number;
     ifscCode?: string;
     bankAccountNumber?: string;
@@ -55,11 +57,30 @@ export class VoucherDto {
     amountPaid?: number
     receiptPdfUrl?: string
     productDetails?: ProductDetailDto[];
+    // invoice?: number
+    ledgerId?: number
+    pendingInvoices?: PendingInvoice[]
+    supplierLocation?: string;
+    voucherGST?: number;
+    estimate?: number
+    paidAmount?: number;
+    TCS?: number;
+    TDS?: number;
+    calculateProductWise?: boolean
 }
 
 export class ProductDetailDto {
-    productId: number;
+    type?: TypeEnum;
     productName: string;
     quantity: number;
+    rate: number;
     totalCost: number;
+    description?: string;
+}
+
+export class PendingInvoice {
+    invoiceId: string;
+    paidAmount: number;
+    amount: number
+    reminigAmount: number
 }

@@ -1,3 +1,4 @@
+import { StaffStatus } from "src/staff/enum/staff-status";
 import { Roles } from "./role.enum";
 
 export class PermissionsDto {
@@ -6,9 +7,14 @@ export class PermissionsDto {
     companyCode: string;
     unitCode: string;
     staffId?: string;
-    subDealerId?:number
+    subDealerId?: number
+    staffStatus?: StaffStatus;
+    startDate?: Date;
+    endDate?: Date;
+
+
     // designations?:string
-     // Staff ID used to find the related StaffEntity
+    // Staff ID used to find the related StaffEntity
 }
 
 export class Permission {

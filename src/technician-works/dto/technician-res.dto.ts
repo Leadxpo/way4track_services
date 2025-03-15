@@ -33,8 +33,9 @@ export class TechnicianWorksResponseDto {
     phoneNumber: string;
     simNumber: string;
     address: string;
-    requirementDetails?: Requirements[];
+    // requirementDetails?: Requirements[];
     attendedDate?: Date;
+    screenShot?: string
     constructor(
         id: number,
         service: string,
@@ -65,8 +66,9 @@ export class TechnicianWorksResponseDto {
         vehiclePhoto2?: string,
         vehiclePhoto3?: string,
         vehiclePhoto4?: string,
-        requirementDetails?: Requirements[],
-        attendedDate?: Date
+        // requirementDetails?: Requirements[],
+        attendedDate?: Date,
+        screenShot?: string
     ) {
         this.id = id;
         this.service = service;
@@ -97,7 +99,8 @@ export class TechnicianWorksResponseDto {
         this.vehiclePhoto2 = vehiclePhoto2 ?? "";
         this.vehiclePhoto3 = vehiclePhoto3 ?? "";
         this.vehiclePhoto4 = vehiclePhoto4 ?? "";
-        this.requirementDetails = requirementDetails;
+        // this.requirementDetails = requirementDetails;
         this.attendedDate = attendedDate;
+        this.screenShot = screenShot
     }
 }

@@ -3,7 +3,7 @@ import { RoleEnum } from "../enum/role-enum";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ProductType } from "src/product/dto/product-type.enum";
-import { GSTORTDSEnum } from "../entity/voucher.entity";
+import { DebitORCreditEnum } from "../entity/voucher.entity";
 
 export class VoucherResDto {
     id: number;
@@ -11,7 +11,7 @@ export class VoucherResDto {
     quantity?: number;
     branchId: number;
     branchName: string;
-    role: RoleEnum;
+    // role: RoleEnum;
     purpose: string;
     creditAmount: number;
     paymentType: PaymentType;
@@ -30,7 +30,7 @@ export class VoucherResDto {
     buildingAddress?: string;
     remainingAmount?: number;
     hsnCode?: string;
-    GSTORTDS?: GSTORTDSEnum;
+    GSTORTDS?: DebitORCreditEnum;
     SCST?: number;
     CGST?: number;
     amount?: number;
@@ -48,9 +48,9 @@ export class VoucherResDto {
     upiId?: string;
     checkNumber?: string;
     cardNumber?: string;
-    initialPayment?: number;
-    emiCount?: number;
-    emiNumber?: number;
+    // initialPayment?: number;
+    // emiCount?: number;
+    // emiNumber?: number;
     invoice?: number
     invoiceId?: string
     paymentTo?: string
@@ -63,7 +63,7 @@ export class VoucherResDto {
         name: string,
         branchId: number,
         branchName: string,
-        role: RoleEnum,
+        // role: RoleEnum,
         purpose: string,
         creditAmount: number,
         paymentType: PaymentType,
@@ -88,7 +88,7 @@ export class VoucherResDto {
         buildingAddress?: string,
         remainingAmount?: number,
         hsnCode?: string,
-        GSTORTDS?: GSTORTDSEnum,
+        GSTORTDS?: DebitORCreditEnum,
         SCST?: number,
         CGST?: number,
         amount?: number,
@@ -97,9 +97,9 @@ export class VoucherResDto {
         upiId?: string,
         checkNumber?: string,
         cardNumber?: string,
-        initialPayment?: number,
-        emiCount?: number,
-        emiNumber?: number,
+        // initialPayment?: number,
+        // emiCount?: number,
+        // emiNumber?: number,
         fromAccountId?: string,
         toAccountId?: string,
         product?: number,
@@ -117,7 +117,7 @@ export class VoucherResDto {
         this.name = name;
         this.branchId = branchId;
         this.branchName = branchName;
-        this.role = role;
+        // this.role = role;
         this.purpose = purpose;
         this.creditAmount = creditAmount;
         this.paymentType = paymentType;
@@ -151,9 +151,9 @@ export class VoucherResDto {
         this.upiId = upiId ?? "";
         this.checkNumber = checkNumber ?? "";
         this.cardNumber = cardNumber ?? "";
-        this.initialPayment = initialPayment ?? 0;
-        this.emiCount = emiCount ?? 0;
-        this.emiNumber = emiNumber ?? 0;
+        // this.initialPayment = initialPayment ?? 0;
+        // this.emiCount = emiCount ?? 0;
+        // this.emiNumber = emiNumber ?? 0;
         this.toAccountId = toAccountId
         this.fromAccountId = fromAccountId
         this.product = product

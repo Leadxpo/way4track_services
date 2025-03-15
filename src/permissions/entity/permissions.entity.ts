@@ -1,4 +1,3 @@
-import { StaffEntity } from 'src/staff/entity/staff.entity';
 import {
     Column,
     Entity,
@@ -10,6 +9,8 @@ import {
 import { Roles } from '../dto/role.enum';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { StaffStatus } from 'src/staff/enum/staff-status';
 
 @Entity('permissions')
 export class PermissionEntity {
@@ -49,7 +50,22 @@ export class PermissionEntity {
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
 
-  
+    @Column({
+        type: 'enum',
+        name: 'staffs_status',
+        enum: StaffStatus,
+        nullable: true,
+        default: StaffStatus.ACTIVE
+
+    })
+    staffStatus: StaffStatus;
+
+    @Column({ name: 'start_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    startDate: Date;
+
+    @Column({ name: 'end_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    endDate: Date;
+
 }
 
 export class Permission {

@@ -1,4 +1,3 @@
-import { GSTORTDSEnum } from "src/voucher/entity/voucher.entity";
 
 export class EstimateResDto {
     id: number;
@@ -21,7 +20,7 @@ export class EstimateResDto {
     }[];  // Modified to include name, quantity, and amount
     estimateId?: string;
     invoiceId?: string;
-    GSTORTDS?: GSTORTDSEnum;
+    // GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
     vendorId?: number;
@@ -47,7 +46,7 @@ export class EstimateResDto {
         products?: { name: string; quantity: number; amount: number, costPerUnit: number, totalCost: number, hsnCode: string }[],  // Modified to match the structure
         estimateId?: string,
         invoiceId?: string,
-        GSTORTDS?: GSTORTDSEnum,
+        // GSTORTDS?: GSTORTDSEnum,
         SCST?: number,
         CGST?: number,
         // hsnCode?: string,
@@ -75,7 +74,7 @@ export class EstimateResDto {
         this.unitCode = unitCode;
         this.estimateId = estimateId;
         this.invoiceId = invoiceId;
-        this.GSTORTDS = GSTORTDS;
+        // this.GSTORTDS = GSTORTDS;
         this.SCST = SCST;
         this.CGST = CGST;
         // this.hsnCode = hsnCode;

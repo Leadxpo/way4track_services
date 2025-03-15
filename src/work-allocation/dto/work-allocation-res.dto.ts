@@ -36,6 +36,7 @@ export class WorkAllocationResDto {
     // productName: string
     workStatus?: WorkStatusEnum;
     description?: string;
+    amount: number;
     constructor(
         id: number,
         workAllocationNumber: string,
@@ -69,7 +70,8 @@ export class WorkAllocationResDto {
         //     productName: string;
         // }[],
         workStatus?: WorkStatusEnum,
-        description?: string
+        description?: string,
+        amount?: number
 
     ) {
         this.id = id;
@@ -103,6 +105,7 @@ export class WorkAllocationResDto {
         // this.products = products;
         this.workStatus = workStatus
         this.description = description
+        this.amount = amount
 
     }
 }

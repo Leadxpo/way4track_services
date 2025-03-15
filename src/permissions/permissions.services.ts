@@ -9,6 +9,7 @@ import { Permission, PermissionEntity } from "./entity/permissions.entity";
 import { Roles } from "./dto/role.enum";
 import { StaffRepository } from "src/staff/repo/staff-repo";
 import { DesignationService } from "src/designation/designation.service";
+import { StaffStatus } from "src/staff/enum/staff-status";
 
 @Injectable()
 export class PermissionsService {
@@ -269,7 +270,6 @@ export class PermissionsService {
     //     }
     // }
 
-
     async savePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
             const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId }, relations: ['designationRelation'] });
@@ -317,32 +317,34 @@ export class PermissionsService {
             throw new ErrorResponse(5416, error.message);
         }
     }
-
-
-
     async updatePermissionDetails(dto: PermissionsDto): Promise<CommonResponse> {
         try {
-            // Ensure the staff entity exists
-            const staff = await this.staffRepo.findOne({ where: { staffId: dto.staffId } });
+            const staff = await this.staffRepo.findOne({
+                where: { staffId: dto.staffId },
+                relations: ['designationRelation']
+            });
+
             if (!staff) {
                 throw new ErrorResponse(5417, 'Staff not found');
             }
 
-            // Ensure the permission entity exists
-            const permission = await this.repo.findOne({ where: { staffId: staff } });
-            if (!permission) {
-                throw new ErrorResponse(5417, 'Permission not found');
+            const currentPermission = await this.repo.findOne({
+                where: { staffId: staff, staffStatus: StaffStatus.ACTIVE }
+            });
+
+            if (currentPermission) {
+                // Mark previous permissions as inactive
+                currentPermission.staffStatus = StaffStatus.INACTIVE;
+                currentPermission.endDate = new Date();
+                await this.repo.save(currentPermission);
             }
 
-            // Merge updated values
-            const permissionEntity = this.adapter.convertPermissionDtoToEntity(dto);
-            const updatedEntity = this.repo.merge(permission, permissionEntity);
-
-            // Debugging: Check if the entity is valid before saving
-            console.log("Updated Permission Entity:", updatedEntity);
-
-            // Save changes
-            await this.repo.save(updatedEntity);
+            // Create new permission entry
+            const newPermission = this.adapter.convertPermissionDtoToEntity(dto);
+            newPermission.staffId = staff;
+            newPermission.staffStatus = StaffStatus.ACTIVE;
+            newPermission.startDate = new Date();
+            await this.repo.insert(newPermission);
 
             return new CommonResponse(true, 65152, 'Permission Details Updated Successfully');
         } catch (error) {

@@ -15,6 +15,8 @@ export class TechnicianWorksDto {
     vehiclePhoto2?: string;
     vehiclePhoto3?: string;
     vehiclePhoto4?: string;
+    screenShot?: string;
+
     date: Date;
     description: string;
     staffId: number; branchId: number; productId: number;
@@ -26,9 +28,10 @@ export class TechnicianWorksDto {
     name: string;
     phoneNumber: string;
     simNumber: string;
-    requirementDetails?: Requirements[];
+    // requirementDetails?: Requirements[];
     address: string;
     attendedDate?: Date;
+    amount: number;
 } export class Requirements {
     productName: string;
     quantity: number;

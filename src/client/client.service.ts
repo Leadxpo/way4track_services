@@ -207,4 +207,34 @@ export class ClientService {
         }
     }
 
+    async updateIsStatus(req: ClientIdDto): Promise<CommonResponse> {
+        // Fetch the current record
+        const client = await this.clientRepository.findOne({ where: { id: req.id } });
+
+        if (!client) {
+            return new CommonResponse(false, 6541, "No Data Found");
+        }
+
+        // Prepare updated fields (only if they are changed)
+        const updatedFields: Partial<ClientEntity> = {};
+
+        if (req.hasOwnProperty('tds')) {
+            updatedFields.tds = !client.tds;
+        }
+        if (req.hasOwnProperty('tcs')) {
+            updatedFields.tcs = !client.tcs;
+        }
+        if (req.hasOwnProperty('billWiseDate')) {
+            updatedFields.billWiseDate = !client.billWiseDate;
+        }
+
+        // Only update if there are changes
+        if (Object.keys(updatedFields).length > 0) {
+            await this.clientRepository.update({ id: req.id }, updatedFields);
+        }
+
+        return new CommonResponse(true, 65152, "Status updated successfully");
+    }
+
+
 }

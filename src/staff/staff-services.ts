@@ -353,29 +353,149 @@ export class StaffService {
     //     }
     // }
 
+    // async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    //     try {
+    //         let existingStaff: StaffEntity | null = null;
+
+    //         if (req.id) {
+    //             existingStaff = await this.staffRepository.findOne({
+    //                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
+    //             });
+    //         } else if (req.staffId) {
+    //             existingStaff = await this.staffRepository.findOne({
+    //                 where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode }
+    //             });
+    //         }
+
+    //         if (!existingStaff) {
+    //             return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
+    //         }
+
+    //         // ✅ Handle file updates
+    //         const updatedStaff: Partial<StaffEntity> = {
+    //             ...existingStaff,
+    //             ...this.adapter.convertDtoToEntity(req)
+    //         };
+
+    //         if (files?.photo?.[0]) {
+    //             if (existingStaff.staffPhoto) {
+    //                 await this.deleteFile(existingStaff.staffPhoto);
+    //             }
+    //             updatedStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${existingStaff.staffId}.jpg`);
+    //         }
+
+    //         if (files?.vehiclePhoto?.[0]) {
+    //             if (existingStaff.vehiclePhoto) {
+    //                 await this.deleteFile(existingStaff.vehiclePhoto);
+    //             }
+    //             updatedStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
+    //         }
+
+    //         if (files?.resume?.[0]) {
+    //             if (existingStaff.resume) {
+    //                 await this.deleteFile(existingStaff.resume)
+    //             }
+    //             updatedStaff.resume = await this.uploadFile(files.resume[0], `resume/${existingStaff.resume}.jpg`)
+    //         }
+
+    //         let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
+
+    //         if (!existingLetters) {
+    //             existingLetters = new LettersEntity();
+    //             existingLetters.staffId = existingStaff;
+    //             existingLetters.companyCode = req.companyCode;
+    //             existingLetters.unitCode = req.unitCode;
+    //         }
+
+    //         // ✅ Handle letter file updates
+    //         const letterFiles = [
+    //             "offerLetter", "resignationLetter", "terminationLetter",
+    //             "appointmentLetter", "leaveFormat", "relievingLetter", "experienceLetter"
+    //         ];
+
+    //         const letterUpdates: Partial<LettersEntity> = {};
+
+    //         for (const letterType of letterFiles) {
+    //             if (files?.[letterType]?.[0]) {
+    //                 if (existingLetters[letterType]) {
+    //                     await this.deleteFile(existingLetters[letterType]);
+    //                 }
+    //                 letterUpdates[letterType] = await this.uploadFile(files[letterType][0], `letters/${existingStaff.staffId}_${letterType}.pdf`);
+    //             } else {
+    //                 letterUpdates[letterType] = existingLetters[letterType];
+    //             }
+    //         }
+    //         if (updatedStaff.designation !== req.designation) {
+    //             let designationEntity = null;
+
+    //             designationEntity = await this.designationRepository.findOne({
+    //                 where: { id: req.designation_id }
+    //             });
+
+    //             if (!designationEntity) {
+    //                 throw new Error(`Designation with ID '${req.designation_id}' not found.`);
+    //             }
+    //             console.log(designationEntity, 'designationEntity');
+
+    //             updatedStaff.designation = designationEntity.designation; // Store name
+    //             updatedStaff.designationRelation = designationEntity;
+
+    //             const permissionsDto: PermissionsDto = {
+    //                 staffId: updatedStaff.staffId,
+    //                 companyCode: req.companyCode,
+    //                 unitCode: req.unitCode
+    //             };
+    //             await this.service.savePermissionDetails(permissionsDto);
+    //         }
+    //         // ✅ Update the existing staff details
+    //         await this.staffRepository.update(existingStaff.id, updatedStaff);
+
+
+    //         // ✅ Update the existing letter record if it exists, otherwise save a new one
+    //         if (existingLetters.id) {
+    //             await this.letterRepo.update(existingLetters.id, letterUpdates);
+    //         } else {
+    //             await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+    //         }
+
+    //         return new CommonResponse(true, 65152, 'Staff Details and Letters Updated Successfully');
+    //     } catch (error) {
+    //         console.error(`Error updating staff details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
+    //     }
+    // }
+
+
     async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
-            let existingStaff: StaffEntity | null = null;
-
-            if (req.id) {
-                existingStaff = await this.staffRepository.findOne({
-                    where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }
-                });
-            } else if (req.staffId) {
-                existingStaff = await this.staffRepository.findOne({
-                    where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode }
-                });
-            }
+            let existingStaff: StaffEntity | null = await this.staffRepository.findOne({
+                where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
+                relations: ['designationRelation']
+            });
 
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
 
-            // ✅ Handle file updates
+            // Check if designation has changed
+            const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;
+
+            // Update staff details
             const updatedStaff: Partial<StaffEntity> = {
                 ...existingStaff,
                 ...this.adapter.convertDtoToEntity(req)
             };
+
+            // Handle designation change
+            if (designationChanged) {
+                const permissionsDto: PermissionsDto = {
+                    staffId: existingStaff.staffId,
+                    companyCode: req.companyCode,
+                    unitCode: req.unitCode
+                };
+
+                await this.service.updatePermissionDetails(permissionsDto);
+            }
 
             if (files?.photo?.[0]) {
                 if (existingStaff.staffPhoto) {
@@ -397,6 +517,8 @@ export class StaffService {
                 }
                 updatedStaff.resume = await this.uploadFile(files.resume[0], `resume/${existingStaff.resume}.jpg`)
             }
+
+
 
             let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
 
@@ -426,22 +548,21 @@ export class StaffService {
                 }
             }
 
-            // ✅ Update the existing staff details
             await this.staffRepository.update(existingStaff.id, updatedStaff);
 
-            // ✅ Update the existing letter record if it exists, otherwise save a new one
             if (existingLetters.id) {
                 await this.letterRepo.update(existingLetters.id, letterUpdates);
             } else {
                 await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
             }
 
-            return new CommonResponse(true, 65152, 'Staff Details and Letters Updated Successfully');
+            return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
-            console.error(`Error updating staff details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
+            console.error('Error:', error.message);
+            throw new ErrorResponse(5416, error.message);
         }
     }
+
 
     async deleteFile(fileUrl: string): Promise<void> {
         try {

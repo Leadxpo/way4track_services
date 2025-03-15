@@ -21,9 +21,9 @@ export class ClientAdapter {
         // entity.joiningDate = dto.joiningDate;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
-        if (entity.dob) {
-            entity.dob = new Date(entity.dob).toISOString().split('T')[0];
-        }
+        // if (entity.dob) {
+        //     entity.dob = new Date(entity.dob).toISOString().split('T')[0];
+        // }
         if (entity.joiningDate) {
             entity.joiningDate = new Date(entity.joiningDate).toISOString().split('T')[0];
         }
@@ -32,10 +32,15 @@ export class ClientAdapter {
         if (dto.id) {
             entity.id = dto.id;
         }
-
+        entity.hsnCode = dto.hsnCode
+        entity.SACCode = dto.SACCode
         if (dto.clientId) {
             entity.clientId = dto.clientId;
+
         }
+        entity.tcs = dto.tcs
+        entity.tds = dto.tds
+        entity.billWiseDate = dto.billWiseDate
         return entity;
     }
 
@@ -49,7 +54,7 @@ export class ClientAdapter {
                 client.clientPhoto,
                 client?.branch?.id,
                 client?.branch?.branchName,
-                client.dob,
+                // client.dob,
                 client.email,
                 client.address,
                 client.joiningDate,

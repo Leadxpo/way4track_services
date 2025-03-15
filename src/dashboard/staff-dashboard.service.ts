@@ -4,6 +4,7 @@ import { AssertsRepository } from "src/asserts/repo/asserts.repo";
 import { CommonReq } from "src/models/common-req";
 import { CommonResponse } from "src/models/common-response";
 import { PayrollDto } from "src/payRoll/dto/payroll.dto";
+import { SalaryStatus } from "src/payRoll/entity/pay-roll.entity";
 import { PayrollService } from "src/payRoll/pay-roll.service";
 import { PayrollRepository } from "src/payRoll/repo/payroll.repo";
 import { StaffAttendanceQueryDto } from "src/staff/dto/staff-date.dto";
@@ -28,7 +29,6 @@ export class StaffDashboardService {
 
         // Extract year and month from staff data
         const { year, month } = staffData[0]?.salaryDetails[0] || {};
-
         if (!year || !month) {
             return new CommonResponse(false, 400, "Invalid Salary Details", []);
         }
@@ -40,7 +40,6 @@ export class StaffDashboardService {
                 month,
             },
         });
-
         // Convert existing payroll records into a map for easy lookup
         const existingPayrollMap = new Map(existingPayrollRecords.map(record => [record.staffId, record]));
 
@@ -77,7 +76,7 @@ export class StaffDashboardService {
                 extraHalfSalary: record.salaryDetails[0]?.extraHalfSalary,
                 daysOutLate6HoursOrMore: record.salaryDetails[0]?.daysOutLate6HoursOrMore,
                 netSalary: record.salaryDetails[0]?.netSalary,
-                salaryStatus: record.salaryDetails[0]?.salaryStatus,
+                salaryStatus: existingPayroll.salaryStatus || SalaryStatus.PAID,
                 carryForwardLeaves: existingPayroll?.carryForwardLeaves ?? 0, // Preserve previous value if exists
                 professionalTax: existingPayroll?.professionalTax ?? 0,
                 incentives: existingPayroll?.incentives ?? 0,
@@ -89,7 +88,6 @@ export class StaffDashboardService {
 
             return payrollEntry;
         });
-
         // Save or update payroll records
         await this.service.createOrUpdatePayroll(payrollEntries);
 

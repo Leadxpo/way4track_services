@@ -1,3 +1,4 @@
+import { SalaryStatus } from "../entity/pay-roll.entity";
 
 export class PayrollDto {
     id?: number
@@ -29,7 +30,7 @@ export class PayrollDto {
     extraHalfSalary?: number;
     daysOutLate6HoursOrMore: number;
     netSalary?: number;
-    salaryStatus: string;
+    salaryStatus: SalaryStatus;
     carryForwardLeaves: number;
     professionalTax?: number;
     incentives?: number;

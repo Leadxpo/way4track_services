@@ -47,6 +47,9 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'vehicle_photo_3', type: 'varchar', length: 255, nullable: true })
     vehiclePhoto3: string;
 
+    @Column({ name: 'screen_shot', type: 'varchar', length: 255, nullable: true })
+    screenShot: string;
+
     @Column({ name: 'vehicle_photo_4', type: 'varchar', length: 255, nullable: true })
     vehiclePhoto4: string;
 
@@ -114,10 +117,13 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'address', type: 'text', nullable: true })
     address: string;// Removed price field as per the previous request
 
-    @Column({ type: 'json', name: 'requirement_details', nullable: true })
-    requirementDetails: {
-        productName: string;
-        quantity: number;
-        price: number;
-    }[];
+    // @Column({ type: 'json', name: 'requirement_details', nullable: true })
+    // requirementDetails: {
+    //     productName: string;
+    //     quantity: number;
+    //     price: number;
+    // }[];
+
+    @Column({ name: 'amount', type: 'float', nullable: true })
+    amount: number;
 }

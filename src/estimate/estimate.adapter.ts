@@ -30,7 +30,7 @@ export class EstimateAdapter {
         entity.vendorId = vendorEntity;
 
         entity.quantity = dto.quantity;
-        if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
+        // if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
         if (dto.SCST) entity.SCST = dto.SCST;
         if (dto.CGST) entity.CGST = dto.CGST;
         // entity.hsnCode = dto.hsnCode;
@@ -58,7 +58,7 @@ export class EstimateAdapter {
         return entity;
     }
 
-  
+
 
     convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
         return entities.map(entity => new EstimateResDto(
@@ -86,7 +86,7 @@ export class EstimateAdapter {
             })) ?? [],  // ✅ Default empty array
             entity.estimateId,
             entity.invoiceId,
-            entity.GSTORTDS,
+            // entity.GSTORTDS,
             entity.SCST,
             entity.CGST,
             // entity.hsnCode,

@@ -27,7 +27,7 @@ export class AccountService {
             let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully";
             const convertDto = this.adapter.toEntity(dto);
 
-            if (dto.id || dto.id !== null) {
+            if (dto.id) {
                 // Ensure that update values are provided
                 await this.accountRepository.update(dto.id, convertDto);
             } else {

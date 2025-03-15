@@ -45,7 +45,6 @@ export class SalesWorksService {
         }
     }
 
-
     async findAll(): Promise<SalesWorksDto[]> {
         const entities = await this.salesWorksRepository.find({ relations: ['staffId'] });
         return entities.map(this.adapter.convertEntityToDto);
@@ -62,10 +61,15 @@ export class SalesWorksService {
     async create(dto: SalesWorksDto, files: any): Promise<CommonResponse> {
         const entity = this.adapter.convertDtoToEntity(dto);
         console.log(dto, "?????")
+
         if (files?.visitingCard?.[0]) {
-            entity.visitingCard = await this.uploadFile(files.photo[0], `visiting_card__photos/${entity.staffId}.jpg`);
+            entity.visitingCard = await this.uploadFile(files.visitingCard[0], `visiting_card__photos/${entity.staffId}.jpg`);
         }
 
+       
+        entity.visitingNumber = `#VI-${(await this.salesWorksRepository.count() + 1)
+            .toString()
+            .padStart(5, '0')}`;
         // Upload vehicle photo to GCS
         if (files?.clientPhoto?.[0]) {
             entity.clientPhoto = await this.uploadFile(files.clientPhoto[0], `client_photos/${entity.staffId}.jpg`);

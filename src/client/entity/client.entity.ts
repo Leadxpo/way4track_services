@@ -8,6 +8,7 @@ import { ClientStatusEnum } from '../enum/client-status.enum';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -26,8 +27,17 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
     request: RequestRaiseEntity[];
 
-    @Column({ name: 'dob', type: 'date', nullable: true })
-    dob: string;
+    // @Column({ name: 'dob', type: 'date', nullable: true })
+    // dob: string;
+
+    @Column({ name: 'tds', type: 'boolean', default: false })
+    tds: boolean;
+
+    @Column({ name: 'tcs', type: 'boolean', default: false })
+    tcs: boolean;
+
+    @Column({ name: 'bill_wise_date', type: 'boolean', default: false })
+    billWiseDate: boolean;
 
     @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
     email: string;
@@ -46,7 +56,7 @@ export class ClientEntity extends BaseEntity {
 
     @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
     dispatch: DispatchEntity[];
-    
+
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client)
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
@@ -63,6 +73,9 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => WorkAllocationEntity, (asserts) => asserts.clientId)
     workAllocation: WorkAllocationEntity[];
 
+    @OneToMany(() => LedgerEntity, (asserts) => asserts.clientId)
+    ledger: LedgerEntity[];
+
     @Column({ name: 'client_photo', type: 'text', nullable: true })
     clientPhoto: string;
 
@@ -71,4 +84,10 @@ export class ClientEntity extends BaseEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
+
+    @Column({ name: 'hsn_code', type: 'varchar', length: 20, nullable: true })
+    hsnCode: string;
+
+    @Column({ name: 'sac_code', type: 'varchar', length: 20, nullable: true })
+    SACCode: string;
 }

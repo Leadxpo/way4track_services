@@ -17,6 +17,9 @@ export class WorkAllocationDto {
     productName: string
     workStatus: WorkStatusEnum;
     description: string;
+    amount: number;
+    sales_id: number
+    visitingNumber: string;
 
 }
 export class ProductDetail {

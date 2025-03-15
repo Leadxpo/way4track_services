@@ -72,4 +72,11 @@ export class ClientController {
         }
     }
 
+    @Post('updateIsStatus')
+    async updateIsStatus(@Body() dto: ClientIdDto): Promise<CommonResponse> {
+
+        return this.clientService.updateIsStatus(dto);
+
+    }
+
 }

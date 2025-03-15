@@ -9,12 +9,14 @@ import { NotificationModule } from 'src/notifications/notification.module';
 import { StaffModule } from 'src/staff/staff.module';
 import { ProductModule } from 'src/product/product.module';
 import { TechnicianModule } from 'src/technician-works/technician-work.module';
+import { SalesworkModule } from 'src/sales-man/sales-man.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([WorkAllocationEntity]),
     forwardRef(() => NotificationModule),
     forwardRef(() => StaffModule),
     forwardRef(() => TechnicianModule),
+    forwardRef(() => SalesworkModule),
 
     forwardRef(() => ProductModule)],
     controllers: [WorkAllocationController],

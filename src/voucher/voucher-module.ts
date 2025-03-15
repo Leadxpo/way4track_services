@@ -14,6 +14,7 @@ import { EstimateModule } from 'src/estimate/estimate.module';
 import { EmiPaymentRepository } from './repo/emi-payment-repo';
 import { EmiPaymentEntity } from './entity/emi-payments';
 import { ProductModule } from 'src/product/product.module';
+import { LedgerModule } from 'src/ledger/ledger.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { ProductModule } from 'src/product/product.module';
         forwardRef(() => ClientModule),
         forwardRef(() => AccountModule),
         forwardRef(() => EstimateModule),
+        forwardRef(() => LedgerModule),
         forwardRef(() => ProductModule)
     ],
     controllers: [VoucherController],

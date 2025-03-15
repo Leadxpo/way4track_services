@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { AccountRepository } from "src/account/repo/account.repo";
 import { PaymentType } from "src/asserts/enum/payment-type.enum";
 import { EstimateRepository } from "src/estimate/repo/estimate.repo";
@@ -9,7 +9,7 @@ import { PayEmiDto } from "./dto/pay-emi.dto";
 import { VoucherIdDto } from "./dto/voucher-id.dto";
 import { VoucherResDto } from "./dto/voucher-res.dto";
 import { ProductDetailDto, VoucherDto } from "./dto/voucher.dto";
-import { VoucherEntity } from "./entity/voucher.entity";
+import { DebitORCreditEnum, TypeEnum, VoucherEntity } from "./entity/voucher.entity";
 import { VoucherTypeEnum } from "./enum/voucher-type-enum";
 import { VoucherRepository } from "./repo/voucher.repo";
 import { VoucherAdapter } from "./voucher.adapter";
@@ -18,6 +18,8 @@ import { EmiPaymentEntity } from "./entity/emi-payments";
 import { EmiPaymentRepository } from "./repo/emi-payment-repo";
 import { Storage } from '@google-cloud/storage';
 import { ProductRepository } from "src/product/repo/product.repo";
+import { LedgerRepository } from "src/ledger/repo/ledger.repo";
+import { In } from "typeorm";
 
 @Injectable()
 export class VoucherService {
@@ -26,11 +28,11 @@ export class VoucherService {
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly voucherAdapter: VoucherAdapter,
-        private readonly accountRepo: AccountRepository,
         private readonly estimateRepo: EstimateRepository,
         private readonly accountRepository: AccountRepository,
-        private readonly emiPaymentRepository: EmiPaymentRepository,
+        // private readonly emiPaymentRepository: EmiPaymentRepository,
         private readonly productRepository: ProductRepository,
+        private readonly ledgerRepo: LedgerRepository
 
 
     ) {
@@ -51,32 +53,47 @@ export class VoucherService {
             JOURNAL: 'JU',
             CONTRA: 'CO',
             PURCHASE: 'PU',
-            EMI: 'EMI'
-            // INVOICE: 'INV',
+            DEBITNOTE: 'DN',
+            CREDITNOTE: 'CN',
+            SALESORDER: 'SO',
+            PURCHASEORDER: 'PO',
+            SALES: 'SA',
         };
 
-        const prefix = typePrefix[voucherType.toUpperCase()] || 'UN';
+        // Convert input to uppercase to match the enum
+        const formattedVoucherType = voucherType.toUpperCase();
+        const prefix = typePrefix[formattedVoucherType] || 'UN';
 
-        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
         console.log(`Voucher Type: ${voucherType}, Prefix Selected: ${prefix}`);
 
+        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+
+        // Fetch the last voucher ID regardless of the date
         const lastVoucher = await this.voucherRepository
             .createQueryBuilder('voucher')
             .where('voucher.voucherType = :voucherType', { voucherType })
-            .andWhere('voucher.voucherId LIKE :prefix', { prefix: `${prefix}-${timestamp}%` })
+            .andWhere('voucher.voucherId LIKE :prefix', { prefix: `${prefix}-%` }) // Allow different dates
             .orderBy('voucher.voucherId', 'DESC')
             .getOne();
-        console.log(lastVoucher, "{{{{{{{{{{{")
+
+        console.log(lastVoucher, "Last Voucher Retrieved");
+
         let sequentialNumber = 1;
+
         if (lastVoucher) {
+            // Extract the last numeric sequence
             const lastVoucherNumber = lastVoucher.voucherId.split('-').pop();
-            sequentialNumber = parseInt(lastVoucherNumber, 10) + 1;
+            if (lastVoucherNumber) {
+                sequentialNumber = parseInt(lastVoucherNumber, 10) + 1;
+            }
         }
 
         const paddedSequentialNumber = sequentialNumber.toString().padStart(3, '0');
 
         return `${prefix}-${timestamp}-${paddedSequentialNumber}`;
     }
+
+
     async updateVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
         try {
             const existingVoucher = await this.voucherRepository.findOne({
@@ -100,128 +117,19 @@ export class VoucherService {
         }
     }
 
-    // async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
-    //     try {
-    //         const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
-    //         const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
-
-    //         // Fetch From Account (Mandatory for all transactions)
-    //         const fromAccount = await this.accountRepository.findOne({
-    //             where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.fromAccount },
-    //         });
-
-    //         if (!fromAccount) {
-    //             throw new Error('From account not found.');
-    //         }
-
-    //         let toAccount: AccountEntity | null = null;
-
-    //         // For CONTRA transactions, To Account is mandatory
-    //         if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
-    //             if (!voucherDto.toAccount) {
-    //                 throw new Error('To account is required for CONTRA transactions.');
-    //             }
-
-    //             toAccount = await this.accountRepository.findOne({
-    //                 where: { companyCode: voucherDto.companyCode, unitCode: voucherDto.unitCode, id: voucherDto.toAccount },
-    //             });
-
-    //             if (!toAccount) {
-    //                 throw new Error('To account not found for CONTRA transaction.');
-    //             }
-    //         }
-
-    //         const voucherAmount = voucherDto.amount; // Corrected to use DTO amount
-    //         console.log(voucherAmount, "voucherAmountvoucherAmount")
-    //         // Check for sufficient funds before deducting
-    //         if (
-    //             [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
-    //             && fromAccount.totalAmount < voucherAmount
-    //         ) {
-    //             throw new Error('Insufficient funds in the from account.');
-    //         }
-
-    //         switch (voucherEntity.voucherType) {
-    //             // case VoucherTypeEnum.RECEIPT:
-    //             //     fromAccount.totalAmount += voucherAmount;
-    //             //     break;
-    //             case VoucherTypeEnum.RECEIPT:
-    //                 console.log('Before updating totalAmount:', fromAccount.totalAmount);
-    //                 fromAccount.totalAmount = Number(fromAccount.totalAmount) + Number(voucherAmount);
-    //                 console.log('After updating totalAmount:', fromAccount.totalAmount);
-    //                 break;
-
-    //             case VoucherTypeEnum.PAYMENT:
-    //             case VoucherTypeEnum.JOURNAL:
-    //             case VoucherTypeEnum.PURCHASE:
-    //                 fromAccount.totalAmount -= voucherAmount; // Deducting money
-    //                 break;
-    //             case VoucherTypeEnum.CONTRA:
-    //                 if (!toAccount) {
-    //                     throw new Error('To account is required for bank-to-bank transfers.');
-    //                 }
-
-    //                 // Check if sufficient funds exist in the from account
-    //                 if (fromAccount.totalAmount < voucherAmount) {
-    //                     throw new Error('Insufficient funds in the from account for CONTRA transaction.');
-    //                 }
-
-    //                 fromAccount.totalAmount -= voucherAmount; // Debit from source
-    //                 toAccount.totalAmount += voucherAmount; // Credit to destination
-    //                 break;
-    //             default:
-    //                 throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
-    //         }
-    //         console.log(fromAccount, voucherAmount, "fromAccountfromAccount")
-    //         // Save updated accounts
-    //         await this.accountRepository.save(toAccount ? [fromAccount, toAccount] : [fromAccount]);
-
-    //         // Set Voucher ID
-    //         voucherEntity.voucherId = generatedVoucherId;
-
-    //         // Handle Invoice Payment
-    //         if (voucherDto.invoice && VoucherTypeEnum.RECEIPT) {
-    //             const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoice } });
-    //             if (!estimate) {
-    //                 throw new ErrorResponse(4001, 'Estimate not found.');
-    //             }
-
-    //             if (receiptPdf) {
-    //                 estimate.receiptPdfUrl = receiptPdf;
-    //                 await this.estimateRepo.save(estimate);
-    //             }
-
-    //         }
-
-    //         // Insert the voucher record
-    //         await this.voucherRepository.insert(voucherEntity);
-
-    //         return new CommonResponse(
-    //             true,
-    //             65152,
-    //             `Voucher Created Successfully with ID: ${generatedVoucherId}`
-    //         );
-    //     } catch (error) {
-    //         console.error(`Error creating voucher details: ${error.message}`, error.stack);
-    //         throw new ErrorResponse(
-    //             error?.code || 5416,
-    //             `Failed to create voucher details: ${error.message}`
-    //         );
-    //     }
-    // }
-
     async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
-
         try {
+            console.log(voucherDto, "?????????????????");
 
-            console.log(voucherDto, "?????????????????")
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
 
             let fromAccount: AccountEntity | null = null;
-
             let productDetails: ProductDetailDto[] = [];
-            if (voucherEntity.voucherType === VoucherTypeEnum.PURCHASE) {
+            let totalCost = 0;
+
+            // Extract product details and calculate totalCost
+            if (voucherDto.productDetails) {
                 const productDetailsArray: ProductDetailDto[] =
                     typeof voucherDto.productDetails === "string"
                         ? JSON.parse(voucherDto.productDetails)
@@ -231,303 +139,356 @@ export class VoucherService {
                     throw new Error("Invalid productDetails format. Expected an array.");
                 }
 
-                productDetails = await Promise.all(
-                    productDetailsArray.map(async (productDetail) => {
-                        const product = await this.productRepository.findOne({
-                            where: { id: productDetail.productId },
-                        });
-                        if (!product) {
-                            throw new Error(`Product with ID ${productDetail.productId} not found`);
-                        }
+                productDetails = productDetailsArray.map((productDetail) => {
+                    const quantity = productDetail.quantity ? parseInt(productDetail.quantity.toString(), 10) : 0;
+                    const costPerUnit = parseFloat(productDetail.rate.toString()) || 0;
+                    const totalProductCost = costPerUnit * quantity;
 
-                        const quantity = productDetail.quantity ? parseInt(productDetail.quantity.toString(), 10) : 0;
-                        if (quantity <= 0) {
-                            throw new Error(`Quantity for product ${product.productName} must be greater than 0`);
-                        }
+                    totalCost += totalProductCost; // ✅ Accumulate totalCost first
 
-                        const costPerUnit = parseFloat(product.price.toString()) || 0;
-                        if (costPerUnit <= 0) {
-                            throw new Error(`Cost per unit for product ${product.productName} must be greater than 0`);
-                        }
+                    return {
+                        type: productDetail.type || TypeEnum.Product_Sales,
+                        productName: productDetail.productName,
+                        quantity: quantity,
+                        rate: costPerUnit,
+                        totalCost: totalProductCost,
+                        description: productDetail.description,
+                    };
+                });
+                // ✅ Apply GST, TDS, and TCS on totalCost, not per product
+                const cgstRate = parseFloat(voucherDto.CGST?.toString() || "0");
+                const sgstRate = parseFloat(voucherDto.SCST?.toString() || "0");
+                const igstRate = parseFloat(voucherDto.IGST?.toString() || "0");
+                const tdsRate = parseFloat(voucherDto.TDS?.toString() || "0");
+                const tcsRate = parseFloat(voucherDto.TCS?.toString() || "0");
 
-                        return {
-                            productId: product.id,
-                            productName: product.productName,
-                            quantity: quantity,
-                            totalCost: costPerUnit * quantity || 0,
-                        };
-                    })
-                );
+                let totalGST = 0;
+                if (igstRate > 0) {
+                    totalGST = (igstRate * totalCost) / 100;
+                } else {
+                    totalGST = ((cgstRate + sgstRate) * totalCost) / 100;
+                }
+
+                const totalTDS = (tdsRate * totalCost) / 100;
+                const totalTCS = (tcsRate * totalCost) / 100;
+                voucherEntity.amount = totalCost + totalGST - totalTDS + totalTCS;
+                console.log("Processed Product Details:", productDetails);
             }
-
-            // Assign productDetails to voucherEntity
+            // ✅ Final Amount Calculation
             voucherEntity.productDetails = productDetails;
-            //![VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT].includes(voucherEntity.voucherType) || 
-            // Fetch From Account (Mandatory for some transactions)
-            if (voucherDto.paymentType !== PaymentType.CASH) {
 
+            // Handle Account Transactions
+            if (voucherDto.paymentType) {
                 if (voucherDto.fromAccount) {
-                    fromAccount = await this.accountRepository.findOne({
-                        where: { id: voucherDto.fromAccount },
-                    });
+                    fromAccount = await this.accountRepository.findOne({ where: { id: voucherDto.fromAccount } });
                     if (!fromAccount) {
                         throw new Error('From account not found.');
                     }
-                    const voucherAmount = Number(voucherDto.amount); // Ensure it's a number
-                    const accountBalance = Number(fromAccount.totalAmount); // Ensure it's a number
-                    console.log(`Voucher Amount: ${voucherAmount}, Account Balance: ${accountBalance}`);
+
+                    const voucherAmount = Number(voucherEntity.amount);
+                    const accountBalance = Number(fromAccount.totalAmount);
 
                     if (voucherAmount > accountBalance) {
                         throw new Error('Insufficient funds in the from account.');
                     }
-
-
-                    if (
-                        [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.JOURNAL, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.CONTRA].includes(voucherEntity.voucherType)
-                        && accountBalance < voucherAmount
-                    ) {
-                        throw new Error('Insufficient funds in the from account.');
-                    }
                 }
 
+                if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.RECEIPT].includes(voucherEntity.voucherType)) {
+                    let totalPaidAmount = 0;
 
+                    if (voucherDto.pendingInvoices?.length > 0) {
+                        console.log("Pending invoices before update:", voucherDto.pendingInvoices);
+
+                        const invoiceIds = voucherDto.pendingInvoices.map(v => v.invoiceId);
+                        const pendingVouchers = await this.voucherRepository.find({ where: { invoiceId: In(invoiceIds) } });
+                        const pendingVoucherMap = new Map(pendingVouchers.map(v => [v.invoiceId, v]));
+
+                        await Promise.all(
+                            voucherDto.pendingInvoices.map(async (invoice) => {
+                                const pendingVoucher = pendingVoucherMap.get(invoice.invoiceId);
+                                if (pendingVoucher) {
+                                    pendingVoucher.amount = invoice.amount;
+                                    pendingVoucher.paidAmount = invoice.paidAmount;
+                                    pendingVoucher.reminigAmount = invoice.reminigAmount;
+                                    pendingVoucher.paymentStatus = pendingVoucher.reminigAmount === 0
+                                        ? PaymentStatus.COMPLETED
+                                        : PaymentStatus.PENDING;
+
+                                    await this.voucherRepository.save(pendingVoucher);
+                                }
+                                const paidAmount = parseFloat(invoice.paidAmount.toString()) || 0;
+                                totalPaidAmount += paidAmount
+                            })
+                        );
+
+                        console.log("Updated pending invoices:", voucherDto.pendingInvoices);
+                    }
+                    voucherEntity.amount = totalPaidAmount
+                }
 
                 let toAccount: AccountEntity | null = null;
-
-                // For CONTRA transactions, To Account is mandatory
-                if (voucherEntity.voucherType === VoucherTypeEnum.CONTRA) {
-                    if (!voucherDto.toAccount) {
-                        throw new Error('To account is required for CONTRA transactions.');
-                    }
-
-                    toAccount = await this.accountRepository.findOne({
-                        where: { id: voucherDto.toAccount },
-                    });
-
+                if (voucherDto.toAccount) {
+                    toAccount = await this.accountRepository.findOne({ where: { id: voucherDto.toAccount } });
                     if (!toAccount) {
                         throw new Error('To account not found for CONTRA transaction.');
                     }
                 }
 
-                const voucherAmount = voucherDto.amount;
-                let accountBalance = Number(fromAccount.totalAmount);
+                const voucherAmount = Number(voucherEntity.amount);
+                let accountBalance = Number(fromAccount?.totalAmount || 0);
+
                 switch (voucherEntity.voucherType) {
                     case VoucherTypeEnum.RECEIPT:
-                        console.log('Before updating totalAmount:', accountBalance);
-                        if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance + Number(voucherAmount);  // Directly update the entity
-                        }
-                        console.log('After updating totalAmount:', fromAccount.totalAmount);
+                        if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
+                        break;
+
+                    case VoucherTypeEnum.DEBITNOTE:
+                        if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
                         break;
 
                     case VoucherTypeEnum.PAYMENT:
-                    case VoucherTypeEnum.JOURNAL:
-                    case VoucherTypeEnum.PURCHASE:
-                        console.log('Before updating totalAmount:', accountBalance);
-                        if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance - Number(voucherAmount);  // Directly update the entity
-                        }
-                        console.log('After updating totalAmount:', fromAccount.totalAmount);
+                        if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
+                        break;
+
+                    case VoucherTypeEnum.CREDITNOTE:
+                        if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
                         break;
 
                     case VoucherTypeEnum.CONTRA:
-                        if (fromAccount) {
-                            fromAccount.totalAmount = accountBalance - Number(voucherAmount);  // Debit from source
+                        if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
+                        if (toAccount) toAccount.totalAmount += voucherAmount;
+                        break;
+
+                    case VoucherTypeEnum.JOURNAL:
+                        if (voucherDto.journalType === DebitORCreditEnum.Credit) {
+                            fromAccount.totalAmount = accountBalance - voucherAmount;
                         }
-                        console.log('After updating totalAmount from source:', fromAccount.totalAmount);
-                        if (toAccount) {
-                            toAccount.totalAmount += Number(voucherAmount);  // Credit to destination
+                        else {
+                            toAccount.totalAmount += voucherAmount;
                         }
-                        console.log('After updating totalAmount for destination:', toAccount.totalAmount);
                         break;
 
                     default:
                         throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
                 }
 
-                // Save updated accounts
                 const accountsToSave = [fromAccount, toAccount].filter(account => account !== null) as AccountEntity[];
-                await this.accountRepository.save(accountsToSave);  // Ensure these changes are saved
-
-
-                // Set Voucher ID
-
-
-                // Handle Invoice Payment (only for RECEIPT type)
-
+                await this.accountRepository.save(accountsToSave);
             }
+
             voucherEntity.voucherId = generatedVoucherId;
 
             if (voucherDto.invoiceId && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
                 console.log("Attempting to find estimate for invoice:", voucherDto.invoiceId);
                 const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoiceId } });
 
-                if (!estimate) {
-                    throw new ErrorResponse(4001, 'Estimate not found.');
-                }
-                voucherEntity.estimate = estimate
-
-                console.log("Estimate found:", estimate);
-                if (receiptPdf) {
-                    console.log("Updating receiptPdfUrl with:", receiptPdf);
-                    estimate.receiptPdfUrl = receiptPdf;
-                    await this.estimateRepo.save(estimate);
+                if (estimate) {
+                    voucherEntity.estimate = estimate;
+                    if (receiptPdf) {
+                        console.log("Updating receiptPdfUrl with:", receiptPdf);
+                        estimate.receiptPdfUrl = receiptPdf;
+                        await this.estimateRepo.save(estimate);
+                    }
                 }
             }
-            // Insert the voucher record
+
+            voucherEntity.invoiceId = voucherDto.invoiceId;
             await this.voucherRepository.insert(voucherEntity);
 
-            return new CommonResponse(
-                true,
-                65152,
-                `Voucher Created Successfully with ID: ${generatedVoucherId}`
-            );
-
+            return new CommonResponse(true, 65152, `Voucher Created Successfully with ID: ${generatedVoucherId}`);
         } catch (error) {
             console.error(`Error creating voucher details: ${error.message}`, error.stack);
-            throw new ErrorResponse(
-                error?.code || 5416,
-                `Failed to create voucher details: ${error.message}`
-            );
+            throw new ErrorResponse(error?.code || 5416, `Failed to create voucher details: ${error.message}`);
         }
     }
 
 
 
-    private calculateNextDueDate(lastPaidDate: Date): Date {
-        const nextDueDate = new Date(lastPaidDate);
-        nextDueDate.setMonth(nextDueDate.getMonth() + 1);
-        return nextDueDate;
-    }
+    async getPendingVouchers(req: { ledgerId: number }) {
+        const ledger = await this.ledgerRepo.findOne({ where: { id: req.ledgerId } });
 
-    async createOrPayEmi(voucherDto: VoucherDto): Promise<CommonResponse> {
-        try {
-            console.log('Received voucherDto:', voucherDto);
-
-            const { amount, initialPayment, numberOfEmi, amountPaid, voucherId, paymentType, fromAccount, companyCode, unitCode } = voucherDto;
-
-            // Validate EMI count
-            if (numberOfEmi <= 0) {
-                return new CommonResponse(false, 4005, 'Invalid EMI count.');
-            }
-
-            console.log('Fetching voucher with ID:', voucherId);
-            // Fetch account details if required
-            let account: AccountEntity | null = null;
-            if (fromAccount && paymentType !== PaymentType.CASH) {
-                account = await this.accountRepository.findOne({
-                    where: { companyCode, unitCode, id: fromAccount },
-                });
-
-                if (!account) {
-                    return new CommonResponse(false, 4004, 'From account not found.');
-                }
-            }
-
-            // Handle voucher fetching and creation
-            let voucher: VoucherEntity | null = null;
-            if (voucherDto.voucherId) {
-                voucher = await this.voucherRepository.findOne({
-                    where: { voucherId: voucherDto.voucherId },
-                });
-
-            }
-            console.log(voucher, "XXXXXXXXXXXXX")
-
-            // If no voucher found, create a new one
-            if (!voucher || voucher === undefined) {
-                const newVoucherId = await this.generateVoucherNumber(VoucherTypeEnum.EMI);
-                console.log('Generated new voucher ID:', newVoucherId);
-
-                const emiAmount = (amount - initialPayment) / numberOfEmi;
-
-                if (account) {
-                    account.totalAmount -= initialPayment;
-                    await this.accountRepository.save(account);
-                }
-
-                // Create new voucher details
-                voucher = new VoucherEntity();
-                voucher.name = voucherDto.name
-                voucher.voucherId = newVoucherId;
-                voucher.companyCode = voucherDto.companyCode
-                voucher.unitCode = voucherDto.unitCode
-                voucher.paymentType = paymentType;
-                voucher.amount = Number(amount);
-                voucher.initialPayment = Number(initialPayment);
-                voucher.remainingAmount = Number(amount) - Number(initialPayment);
-                voucher.numberOfEmi = numberOfEmi;
-                voucher.emiAmount = Number(emiAmount);
-                voucher.emiNumber = 1;
-                voucher.paymentStatus = PaymentStatus.PARTIALLY_PAID;
-                voucher.lastPaidDate = new Date();
-                voucher.nextDueDate = this.calculateNextDueDate(new Date());
-
-                console.log('Saving new voucher:', voucher);
-                await this.voucherRepository.save(voucher);
-
-                const emiPayment = new EmiPaymentEntity();
-                emiPayment.voucherId = newVoucherId;
-                emiPayment.emiNumber = 1;
-                emiPayment.paidAmount = Number(initialPayment);
-                emiPayment.paymentDate = new Date();
-                emiPayment.remainingBalance = Number(voucher.remainingAmount);
-
-                console.log('Saving first EMI payment:', emiPayment);
-                await this.emiPaymentRepository.save(emiPayment);
-
-                return new CommonResponse(true, 65151, `EMI plan created successfully with Voucher ID: ${newVoucherId}`);
-            }
-
-            // Process subsequent EMI payments
-            const lastPayment = await this.emiPaymentRepository.findOne({
-                where: { voucherId: voucher.voucherId },
-                order: { emiNumber: 'DESC' },
-            });
-            console.log(lastPayment, "lastPayment")
-            const newEmiNumber = lastPayment ? Number(lastPayment.emiNumber) + 1 : 1;
-
-            if (newEmiNumber !== voucher.emiNumber + 1) {
-                return new CommonResponse(false, 4003, 'Invalid EMI payment sequence.');
-            }
-            console.log(newEmiNumber, "newEmiNumber")
-
-            if (account) {
-                account.totalAmount -= amountPaid;
-                await this.accountRepository.save(account);
-            }
-            console.log(account, "account")
-
-            voucher.remainingAmount = Number(voucher.remainingAmount) - Number(amountPaid);
-            voucher.paidAmount = Number(voucher.paidAmount || 0) + Number(amountPaid);
-            voucher.emiNumber = Number(newEmiNumber);
-            voucher.lastPaidDate = new Date();
-            voucher.nextDueDate = this.calculateNextDueDate(voucher.lastPaidDate);
-            voucher.paymentStatus = Number(voucher.remainingAmount) <= 0 ? PaymentStatus.COMPLETED : PaymentStatus.PARTIALLY_PAID;
-
-            console.log('Updating voucher:', voucher);
-            await this.voucherRepository.save(voucher);
-
-            const emiPayment = new EmiPaymentEntity();
-            emiPayment.voucherId = voucher.voucherId;
-            emiPayment.emiNumber = Number(newEmiNumber);
-            emiPayment.paidAmount = Number(amountPaid);
-            emiPayment.paymentDate = new Date();
-            emiPayment.remainingBalance = Number(voucher.remainingAmount);
-
-            console.log('Saving EMI payment:', emiPayment);
-            await this.emiPaymentRepository.save(emiPayment);
-
-            return new CommonResponse(
-                true,
-                65153,
-                `EMI number ${newEmiNumber} paid successfully. Remaining amount: ${voucher.remainingAmount}`
-            );
-        } catch (error) {
-            console.error('Error processing EMI:', error);
-            throw new ErrorResponse(5416, `Failed to process EMI: ${error.message}`);
+        if (!ledger) {
+            throw new NotFoundException('Ledger not found.');
         }
+
+        const pendingVouchers = await this.voucherRepository.find({
+            where: {
+                ledgerId: ledger, // Use the full entity instead of ledger.id
+                paymentStatus: PaymentStatus.PENDING,
+            },
+            select: ['invoiceId', 'amount', 'paidAmount', 'reminigAmount'], // Return only invoiceId and amount
+        });
+
+        return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
+
+    async getBankAmount(req: VoucherDto) {
+        let fromAccount: AccountEntity | null = null;
+        let toAccount: AccountEntity | null = null;
+
+        // Fetch accounts if they exist in the request
+        if (req.fromAccount) {
+            fromAccount = await this.accountRepository.findOne({ where: { id: req.fromAccount } });
+        }
+        if (req.toAccount) {
+            toAccount = await this.accountRepository.findOne({ where: { id: req.toAccount } });
+        }
+
+        // If neither account exists, throw an error
+        if (!fromAccount && !toAccount) {
+            throw new NotFoundException('Accounts not found.');
+        }
+
+        return {
+            status: true,
+            errorCode: 201,
+            data: {
+                fromAccountAmount: fromAccount?.totalAmount || 0,
+                toAccountAmount: toAccount?.totalAmount || 0
+            },
+            internalMessage: ""
+        };
+    }
+
+
+
+
+
+
+    // private calculateNextDueDate(lastPaidDate: Date): Date {
+    //     const nextDueDate = new Date(lastPaidDate);
+    //     nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+    //     return nextDueDate;
+    // }
+
+    // async createOrPayEmi(voucherDto: VoucherDto): Promise<CommonResponse> {
+    //     try {
+    //         console.log('Received voucherDto:', voucherDto);
+
+    //         const { amount, initialPayment, numberOfEmi, amountPaid, voucherId, paymentType, fromAccount, companyCode, unitCode } = voucherDto;
+
+    //         // Validate EMI count
+    //         if (numberOfEmi <= 0) {
+    //             return new CommonResponse(false, 4005, 'Invalid EMI count.');
+    //         }
+
+    //         console.log('Fetching voucher with ID:', voucherId);
+    //         // Fetch account details if required
+    //         let account: AccountEntity | null = null;
+    //         if (fromAccount && paymentType !== PaymentType.CASH) {
+    //             account = await this.accountRepository.findOne({
+    //                 where: { companyCode, unitCode, id: fromAccount },
+    //             });
+
+    //             if (!account) {
+    //                 return new CommonResponse(false, 4004, 'From account not found.');
+    //             }
+    //         }
+
+    //         // Handle voucher fetching and creation
+    //         let voucher: VoucherEntity | null = null;
+    //         if (voucherDto.voucherId) {
+    //             voucher = await this.voucherRepository.findOne({
+    //                 where: { voucherId: voucherDto.voucherId },
+    //             });
+
+    //         }
+    //         console.log(voucher, "XXXXXXXXXXXXX")
+
+    //         // If no voucher found, create a new one
+    //         // if (!voucher || voucher === undefined) {
+    //         //     const newVoucherId = await this.generateVoucherNumber(VoucherTypeEnum.EMI);
+    //         //     console.log('Generated new voucher ID:', newVoucherId);
+
+    //         //     const emiAmount = (amount - initialPayment) / numberOfEmi;
+
+    //         //     if (account) {
+    //         //         account.totalAmount -= initialPayment;
+    //         //         await this.accountRepository.save(account);
+    //         //     }
+
+    //         //     // Create new voucher details
+    //         //     voucher = new VoucherEntity();
+    //         //     voucher.name = voucherDto.name
+    //         //     voucher.voucherId = newVoucherId;
+    //         //     voucher.companyCode = voucherDto.companyCode
+    //         //     voucher.unitCode = voucherDto.unitCode
+    //         //     voucher.paymentType = paymentType;
+    //         //     voucher.amount = Number(amount);
+    //         //     voucher.initialPayment = Number(initialPayment);
+    //         //     voucher.remainingAmount = Number(amount) - Number(initialPayment);
+    //         //     voucher.numberOfEmi = numberOfEmi;
+    //         //     voucher.emiAmount = Number(emiAmount);
+    //         //     voucher.emiNumber = 1;
+    //         //     voucher.paymentStatus = PaymentStatus.PARTIALLY_PAID;
+    //         //     voucher.lastPaidDate = new Date();
+    //         //     voucher.nextDueDate = this.calculateNextDueDate(new Date());
+
+    //         //     console.log('Saving new voucher:', voucher);
+    //         //     await this.voucherRepository.save(voucher);
+
+    //         //     const emiPayment = new EmiPaymentEntity();
+    //         //     emiPayment.voucherId = newVoucherId;
+    //         //     emiPayment.emiNumber = 1;
+    //         //     emiPayment.paidAmount = Number(initialPayment);
+    //         //     emiPayment.paymentDate = new Date();
+    //         //     emiPayment.remainingBalance = Number(voucher.remainingAmount);
+
+    //         //     console.log('Saving first EMI payment:', emiPayment);
+    //         //     await this.emiPaymentRepository.save(emiPayment);
+
+    //         //     return new CommonResponse(true, 65151, `EMI plan created successfully with Voucher ID: ${newVoucherId}`);
+    //         // }
+
+    //         // Process subsequent EMI payments
+    //         const lastPayment = await this.emiPaymentRepository.findOne({
+    //             where: { voucherId: voucher.voucherId },
+    //             order: { emiNumber: 'DESC' },
+    //         });
+    //         console.log(lastPayment, "lastPayment")
+    //         const newEmiNumber = lastPayment ? Number(lastPayment.emiNumber) + 1 : 1;
+
+    //         if (newEmiNumber !== voucher.emiNumber + 1) {
+    //             return new CommonResponse(false, 4003, 'Invalid EMI payment sequence.');
+    //         }
+    //         console.log(newEmiNumber, "newEmiNumber")
+
+    //         if (account) {
+    //             account.totalAmount -= amountPaid;
+    //             await this.accountRepository.save(account);
+    //         }
+    //         console.log(account, "account")
+
+    //         voucher.remainingAmount = Number(voucher.remainingAmount) - Number(amountPaid);
+    //         voucher.paidAmount = Number(voucher.paidAmount || 0) + Number(amountPaid);
+    //         voucher.emiNumber = Number(newEmiNumber);
+    //         voucher.lastPaidDate = new Date();
+    //         voucher.nextDueDate = this.calculateNextDueDate(voucher.lastPaidDate);
+    //         voucher.paymentStatus = Number(voucher.remainingAmount) <= 0 ? PaymentStatus.COMPLETED : PaymentStatus.PARTIALLY_PAID;
+
+    //         console.log('Updating voucher:', voucher);
+    //         await this.voucherRepository.save(voucher);
+
+    //         const emiPayment = new EmiPaymentEntity();
+    //         emiPayment.voucherId = voucher.voucherId;
+    //         emiPayment.emiNumber = Number(newEmiNumber);
+    //         emiPayment.paidAmount = Number(amountPaid);
+    //         emiPayment.paymentDate = new Date();
+    //         emiPayment.remainingBalance = Number(voucher.remainingAmount);
+
+    //         console.log('Saving EMI payment:', emiPayment);
+    //         await this.emiPaymentRepository.save(emiPayment);
+
+    //         return new CommonResponse(
+    //             true,
+    //             65153,
+    //             `EMI number ${newEmiNumber} paid successfully. Remaining amount: ${voucher.remainingAmount}`
+    //         );
+    //     } catch (error) {
+    //         console.error('Error processing EMI:', error);
+    //         throw new ErrorResponse(5416, `Failed to process EMI: ${error.message}`);
+    //     }
+    // }
 
     async handleVoucher(voucherDto: VoucherDto, pdf?: Express.Multer.File): Promise<CommonResponse> {
         try {
@@ -558,10 +519,10 @@ export class VoucherService {
                 return await this.updateVoucher(voucherDto);
             }
 
-            if (voucherDto.voucherType === VoucherTypeEnum.EMI) {
-                console.log(`💳 Handling EMI voucher for ID: ${voucherDto.voucherId}`);
-                return await this.createOrPayEmi(voucherDto);
-            }
+            // if (voucherDto.voucherType === VoucherTypeEnum.EMI) {
+            //     console.log(`💳 Handling EMI voucher for ID: ${voucherDto.voucherId}`);
+            //     return await this.createOrPayEmi(voucherDto);
+            // }
 
             console.log(`🆕 Creating new voucher with ID: ${voucherDto.voucherId}`);
             return await this.createVoucher(voucherDto, filePath);

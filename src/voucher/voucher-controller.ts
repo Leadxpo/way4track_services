@@ -40,6 +40,16 @@ export class VoucherController {
         }
     }
 
+    @Post('getPendingVouchers')
+    async getPendingVouchers(@Body() dto: { ledgerId: number }): Promise<CommonResponse> {
+        try {
+            return await this.voucherService.getPendingVouchers(dto);
+        } catch (error) {
+            console.error('Error in delete voucher details:', error);
+            return new CommonResponse(false, 500, 'Error deleting voucher details', error.message);
+        }
+    }
+
     @Post('getAllVouchers')
     async getAllVouchers(): Promise<CommonResponse> {
         try {
@@ -59,4 +69,8 @@ export class VoucherController {
             return new CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
+
+   
+
+    
 }

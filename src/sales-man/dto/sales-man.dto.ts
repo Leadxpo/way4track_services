@@ -26,4 +26,6 @@ export class SalesWorksDto {
     address?: string;
     requirementDetails?: RequirementDetailDto[]
     service?: ServiceDto[];
+    visitingNumber?: string;
+
 }

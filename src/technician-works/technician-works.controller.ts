@@ -26,6 +26,8 @@ export class TechnicianController {
                 { name: 'photo2', maxCount: 1 },
                 { name: 'photo3', maxCount: 1 },
                 { name: 'photo4', maxCount: 1 },
+                { name: 'screenShot', maxCount: 1 },
+
             ],
             multerOptions
         )
@@ -37,7 +39,8 @@ export class TechnicianController {
             photo1?: Express.Multer.File[],
             photo2?: Express.Multer.File[],
             photo3?: Express.Multer.File[],
-            photo4?: Express.Multer.File[]
+            photo4?: Express.Multer.File[],
+            screenShot?: Express.Multer.File[]
         }
     ): Promise<CommonResponse> {
         if (dto.id) {

@@ -10,6 +10,7 @@ import { VoucherResDto } from "./dto/voucher-res.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { ProductEntity } from "src/product/entity/product.entity";
 import { EstimateEntity } from "src/estimate/entity/estimate.entity";
+import { LedgerEntity } from "src/ledger/entity/ledger.entity";
 
 @Injectable()
 export class VoucherAdapter {
@@ -21,6 +22,8 @@ export class VoucherAdapter {
     const branch = new BranchEntity();
     branch.id = dto.branchId;
     entity.branchId = branch;
+
+    entity.invoiceId = dto.invoiceId
 
     // Accounts
     if (dto.toAccount) {
@@ -40,9 +43,9 @@ export class VoucherAdapter {
     } else {
       entity.productDetails = dto.productDetails.map((productDetail) => {
         return {
-          productId: productDetail.productId,
           productName: productDetail.productName,
           quantity: productDetail.quantity,
+          rate: productDetail.rate,
           totalCost: productDetail.totalCost || 0,
         };
       });
@@ -74,10 +77,11 @@ export class VoucherAdapter {
     entity.vendorId = vendor
 
     const estimatePayment = new EstimateEntity()
-    estimatePayment.invoiceId = dto.invoiceId
+    estimatePayment.id = dto.estimate
     entity.estimate = estimatePayment
+    entity.invoiceId = dto.invoiceId
     // Basic fields
-    entity.role = dto.role;
+    // entity.role = dto.role;
     entity.purpose = dto.purpose;
     entity.creditAmount = dto.creditAmount;
     entity.paymentType = dto.paymentType;
@@ -90,20 +94,20 @@ export class VoucherAdapter {
 
     // Tax fields
     entity.hsnCode = dto.hsnCode;
-    entity.GSTORTDS = dto.GSTORTDS;
+    entity.journalType = dto.journalType;
     entity.SCST = dto.SCST;
     entity.CGST = dto.CGST;
     entity.amount = dto.amount;
     if (dto.creditAmount && dto.amount) {
-      entity.remainingAmount = dto.creditAmount - dto.amount;
+      entity.reminigAmount = dto.creditAmount - dto.amount;
     } else {
-      entity.remainingAmount = dto.remainingAmount;
+      entity.reminigAmount = dto.reminigAmount;
     }
 
     // EMI-related fields
-    entity.initialPayment = dto.initialPayment;
-    entity.numberOfEmi = dto.numberOfEmi;
-    entity.emiNumber = dto.emiNumber;
+    // entity.initialPayment = dto.initialPayment;
+    // entity.numberOfEmi = dto.numberOfEmi;
+    // entity.emiNumber = dto.emiNumber;
     // entity.emiAmount = dto.emiAmount;
 
     // Company and unit info
@@ -119,7 +123,18 @@ export class VoucherAdapter {
     if (dto.id) {
       entity.id = dto.id;
     }
+    if (dto.ledgerId) {
+      const ledger = new LedgerEntity();
+      ledger.id = dto.ledgerId
+      entity.ledgerId = ledger
+    }
+    entity.voucherGST = dto.voucherGST
+    entity.supplierLocation = dto.supplierLocation
 
+    entity.paidAmount = dto.paidAmount
+    entity.TDS = dto.TDS
+    entity.TCS = dto.TCS
+    entity.pendingInvoices = dto.pendingInvoices
     return entity;
   }
 
@@ -131,7 +146,7 @@ export class VoucherAdapter {
           voucher.name,
           voucher.branchId?.id || 0,
           voucher.branchId?.branchName || "Unknown",
-          voucher.role,
+          // voucher.role,
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
@@ -154,9 +169,9 @@ export class VoucherAdapter {
           voucher.expireDate,
           voucher.shippingAddress,
           voucher.buildingAddress,
-          voucher.remainingAmount,
+          voucher.reminigAmount,
           voucher.hsnCode,
-          voucher.GSTORTDS,
+          voucher.journalType,
           voucher.SCST,
           voucher.CGST,
           voucher.amount,
@@ -165,9 +180,9 @@ export class VoucherAdapter {
           voucher.upiId,
           voucher.checkNumber,
           voucher.cardNumber,
-          voucher.initialPayment,
-          voucher.numberOfEmi,
-          voucher.emiNumber,
+          // voucher.initialPayment,
+          // voucher.numberOfEmi,
+          // voucher.emiNumber,
           // voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",
@@ -188,7 +203,7 @@ export class VoucherAdapter {
           voucher.name,
           voucher.branchId?.id || 0,
           voucher.branchId?.branchName || "Unknown",
-          voucher.role,
+          // voucher.role,
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
@@ -211,9 +226,9 @@ export class VoucherAdapter {
           voucher.expireDate,
           voucher.shippingAddress,
           voucher.buildingAddress,
-          voucher.remainingAmount,
+          voucher.reminigAmount,
           voucher.hsnCode,
-          voucher.GSTORTDS,
+          voucher.journalType,
           voucher.SCST,
           voucher.CGST,
           voucher.amount,
@@ -222,9 +237,9 @@ export class VoucherAdapter {
           voucher.upiId,
           voucher.checkNumber,
           voucher.cardNumber,
-          voucher.initialPayment,
-          voucher.numberOfEmi,
-          voucher.emiNumber,
+          // voucher.initialPayment,
+          // voucher.numberOfEmi,
+          // voucher.emiNumber,
           // voucher.emiAmount,
           voucher.fromAccount?.accountNumber || "",
           voucher.toAccount?.accountNumber || "",

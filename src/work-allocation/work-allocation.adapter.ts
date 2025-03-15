@@ -42,8 +42,9 @@ export class WorkAllocationAdapter {
         const voucher = new VoucherEntity();
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
-
+        entity.amount = dto.amount
         entity.productName = dto.productName
+        entity.visitingNumber = dto.visitingNumber
         // if (!dto.productDetails || dto.productDetails.length === 0) {
         //     entity.productDetails = [];
         // } else {
@@ -92,6 +93,9 @@ export class WorkAllocationAdapter {
                 product?.vendorEmailId || '',
                 voucher?.id || null,
                 voucher?.name || '',
+                entity.workStatus,
+                entity.description,
+                entity.amount
                 // Mapping productDetails array
                 // entity.productDetails?.map(productDetail => ({
                 //     productName: productDetail.productName,

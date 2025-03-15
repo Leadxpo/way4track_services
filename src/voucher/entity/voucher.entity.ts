@@ -16,17 +16,26 @@ import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { AppointmentEntity, AppointmentStatus } from 'src/appointment/entity/appointement.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 
-export enum GSTORTDSEnum {
-    GST = "GST",
-    TDS = "TDS"
+export enum DebitORCreditEnum {
+    Debit = "Debit",
+    Credit = "Credit"
+}
+
+export enum TypeEnum {
+    Rectifications = "Rectifications",
+    Renewables = "Renewables",
+    Replacements = "Replacements",
+    Product_Sales = "ProductSales",
+    Others = "Others"
 }
 @Entity('voucher')
 export class VoucherEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ name: 'name', type: 'varchar', length: 100 })
+    @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
     @Column({ name: 'quantity', type: 'int', nullable: true })
@@ -59,8 +68,12 @@ export class VoucherEntity {
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 
-    @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT, nullable: true })
-    role: RoleEnum;
+    @ManyToOne(() => LedgerEntity, (branch) => branch.voucher, { nullable: true })
+    @JoinColumn({ name: 'ledger_id' })
+    ledgerId: LedgerEntity;
+
+    // @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT, nullable: true })
+    // role: RoleEnum;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;
@@ -75,22 +88,22 @@ export class VoucherEntity {
         type: 'enum',
         name: 'payment_type',
         enum: PaymentType,
-        default: PaymentType.CASH,
+        // default: PaymentType.CASH,
         nullable: true
     })
     paymentType: PaymentType;
 
-    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum, default: VoucherTypeEnum.EMI })
+    @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum })
     voucherType: VoucherTypeEnum;
 
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     generationDate: Date;
 
-    @Column({ name: 'next_due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
-    nextDueDate: Date;
+    // @Column({ name: 'next_due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    // nextDueDate: Date;
 
-    @Column({ name: 'last_paid_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
-    lastPaidDate: Date;
+    // @Column({ name: 'last_paid_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    // lastPaidDate: Date;
 
     @Column({ name: 'expire_date', type: 'timestamp', nullable: true })
     expireDate: Date;
@@ -98,20 +111,35 @@ export class VoucherEntity {
     @Column({ name: 'shipping_address', type: 'varchar', length: 255, nullable: true, default: null })
     shippingAddress: string;
 
+    @Column({ name: 'supplier_location', type: 'varchar', length: 255, nullable: true, default: null })
+    supplierLocation: string;
+
     @Column({ name: 'building_address', type: 'varchar', length: 255, nullable: true, default: null })
     buildingAddress: string;
 
     @Column({ name: 'hsn_code', type: 'varchar', length: 20, nullable: true })
     hsnCode: string;
 
-    @Column({ name: 'gst/tds', type: 'enum', nullable: true, enum: GSTORTDSEnum })
-    GSTORTDS: GSTORTDSEnum;
+    @Column({ name: 'journal_type', type: 'enum', nullable: true, enum: DebitORCreditEnum })
+    journalType: DebitORCreditEnum;
 
     @Column({ name: 'scst', type: 'float', nullable: true })
     SCST: number;
 
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;
+
+    @Column({ name: 'voucher_gst', type: 'float', nullable: true })
+    voucherGST: number;
+
+    @Column({ name: 'igst', type: 'float', nullable: true })
+    IGST: number;
+
+    @Column({ name: 'tds', type: 'float', nullable: true })
+    TDS: number;
+
+    @Column({ name: 'tcs', type: 'float', nullable: true })
+    TCS: number;
 
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
@@ -120,10 +148,10 @@ export class VoucherEntity {
     creditAmount: number;
 
     @Column({ name: 'remining_amount', type: 'float', nullable: true })
-    remainingAmount: number;
+    reminigAmount: number;
 
-    @Column({ name: 'emi_mount', type: 'float', nullable: true })
-    emiAmount: number;
+    // @Column({ name: 'emi_mount', type: 'float', nullable: true })
+    // emiAmount: number;
 
     @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'product_id' })
@@ -133,7 +161,7 @@ export class VoucherEntity {
         type: 'enum',
         enum: PaymentStatus,
         name: 'payment_status',
-        default: PaymentStatus.ACCEPTED,
+        default: PaymentStatus.PENDING,
         nullable: true
     })
     paymentStatus: PaymentStatus;
@@ -142,7 +170,7 @@ export class VoucherEntity {
         type: 'enum',
         enum: ProductType,
         name: 'product_type',
-        default: ProductType.product,
+        // default: ProductType.product,
         nullable: true
     })
     productType: ProductType;
@@ -164,14 +192,14 @@ export class VoucherEntity {
     @JoinColumn({ name: 'payment_to' })
     paymentTo: StaffEntity;
 
-    @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
-    initialPayment: number;
+    // @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
+    // initialPayment: number;
 
-    @Column('int', { name: 'emi_count', nullable: true })
-    numberOfEmi: number;
+    // @Column('int', { name: 'emi_count', nullable: true })
+    // numberOfEmi: number;
 
-    @Column('int', { name: 'emi_number', nullable: true })
-    emiNumber: number;
+    // @Column('int', { name: 'emi_number', nullable: true })
+    // emiNumber: number;
 
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
@@ -193,8 +221,11 @@ export class VoucherEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @ManyToOne(() => EstimateEntity, (EstimateEntity) => EstimateEntity.invoice, { nullable: true })
-    @JoinColumn({ name: 'invoice_id' })
+    @Column('varchar', { name: 'invoice_id', length: 20, nullable: true })
+    invoiceId: string;
+
+    @ManyToOne(() => EstimateEntity, (Estimate) => Estimate.invoice, { nullable: true })
+    @JoinColumn({ name: 'invoice', referencedColumnName: 'id' })
     estimate: EstimateEntity;
 
     @Column('decimal', { name: 'paid_amount', nullable: true })
@@ -202,9 +233,20 @@ export class VoucherEntity {
 
     @Column({ type: 'json', name: 'product_details', nullable: true })
     productDetails: {
-        productId: number;
+        type?: TypeEnum;
         productName: string;
         quantity: number;
+        rate: number;
         totalCost: number;
+        description?: string
+    }[];
+
+    @Column({ type: 'json', name: 'pending_invoices', nullable: true })
+    pendingInvoices: {
+        invoiceId: string;
+        paidAmount: number;
+        amount: number;
+        reminigAmount: number;
+        // description?: string
     }[];
 }

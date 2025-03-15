@@ -3,6 +3,6 @@ export enum PaymentType {
   UPI = 'upi',
   BANK = 'bank',
   cheque = 'cheque',
-  EMI = 'emi',
+  // EMI = 'emi',
   CARD = 'card',
 }

@@ -1,5 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -67,6 +68,9 @@ export class SubDealerEntity {
 
   @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.subDealerId)
   permissions: PermissionEntity[];
+
+  @OneToMany(() => LedgerEntity, (LedgerEntity) => LedgerEntity.subDealerId)
+  ledger: LedgerEntity[];
 
   @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.subDealerId)
   dispatch: DispatchEntity[];

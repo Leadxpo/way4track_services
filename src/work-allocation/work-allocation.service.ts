@@ -14,6 +14,7 @@ import { TechnicianService } from 'src/technician-works/technician-works.service
 import { WorkStatusEnum } from './enum/work-status-enum';
 import { PaymentStatus } from 'src/product/dto/payment-status.enum';
 import { TechnicianWorksDto } from 'src/technician-works/dto/technician-works.dto';
+import { SalesworkRepository } from 'src/sales-man/repo/sales-man.repo';
 
 @Injectable()
 export class WorkAllocationService {
@@ -22,7 +23,8 @@ export class WorkAllocationService {
         private readonly workAllocationRepository: WorkAllocationRepository,
         private readonly notificationService: NotificationService,
         private readonly productRepo: ProductRepository,
-        private readonly service: TechnicianService
+        private readonly service: TechnicianService,
+        private readonly salesworkRepository: SalesworkRepository
     ) { }
 
     async updateWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
@@ -72,15 +74,29 @@ export class WorkAllocationService {
             throw new ErrorResponse(500, `Failed to update work allocation: ${error.message}`);
         }
     }
- 
+
     async createWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
         let newWorkAllocation: WorkAllocationEntity;
         try {
-          
+
             newWorkAllocation = this.workAllocationAdapter.convertDtoToEntity(dto);
             newWorkAllocation.workAllocationNumber = `#VOU-${(await this.workAllocationRepository.count() + 1)
                 .toString()
                 .padStart(5, '0')}`;
+            let salesEntity = null;
+            if (dto.sales_id) {
+                salesEntity = await this.salesworkRepository.findOne({
+                    where: { id: dto.sales_id }
+                });
+
+                if (!salesEntity) {
+                    throw new Error(`sales with ID '${dto.sales_id}' not found.`);
+                }
+                console.log(salesEntity, 'salesEntity');
+
+                newWorkAllocation.visitingNumber = salesEntity.visitingNumber; // Store name
+                newWorkAllocation.salesRelation = salesEntity; // Store relation
+            }
             await this.workAllocationRepository.insert(newWorkAllocation);
             const technicianDto: TechnicianWorksDto = {
                 service: "",
@@ -107,7 +123,8 @@ export class WorkAllocationService {
                 phoneNumber: "",
                 simNumber: "",
                 address: "",
-                requirementDetails: []
+                amount: dto.amount || 0
+                // requirementDetails: []
             };
 
             await this.service.createTechnicianDetails(technicianDto);

@@ -59,8 +59,9 @@ export class AssertsEntity {
         enum: PaymentType,
     })
     paymentType: PaymentType;
-    @Column('int', { name: 'emi_number', nullable: true })
-    emiNumber: number;
+
+    // @Column('int', { name: 'emi_number', nullable: true })
+    // emiNumber: number;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

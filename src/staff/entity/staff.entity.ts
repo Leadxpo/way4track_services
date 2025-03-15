@@ -14,6 +14,7 @@ import { LettersEntity } from '../../letters/entity/letters.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { OtpEntity } from 'src/otp-generation/entity/otp-generation.entity';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
+import { StaffStatus } from '../enum/staff-status';
 
 
 export enum Gender {
@@ -51,11 +52,11 @@ export enum AccountType {
   CURRENT = 'current',
 }
 
-export enum SalaryStatus {
-  PAID = 'Paid',
-  HOLD = 'Hold',
-  OTHER = 'Other Reason',
-}
+
+
+
+
+
 
 @Entity({ name: 'st' })
 export class StaffEntity extends BaseEntity {
@@ -172,11 +173,20 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'monthly_salary', type: 'decimal', precision: 10, scale: 2, nullable: true })
   monthlySalary: number;
 
+  // @Column({ name: 'professional_tax', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  // professionalTax: number;
+
   @Column({ name: 'salary_date', type: 'date', nullable: true })
   salaryDate: Date;
 
-  @Column({ name: 'salary_status', type: 'enum', enum: SalaryStatus })
-  salaryStatus: SalaryStatus;
+  @Column({
+    type: 'enum',
+    name: 'staff_status',
+    enum: StaffStatus,
+    nullable: true,
+    default: StaffStatus.ACTIVE
+  })
+  status: StaffStatus;
 
   @Column({ name: 'bike_allocation', type: 'enum', enum: YesNo })
   bikeAllocation: YesNo;
@@ -307,6 +317,6 @@ export class StaffEntity extends BaseEntity {
   @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
   designationRelation: DesignationEntity;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 0, name: "carry_forward_leaves" })
   carryForwardLeaves: number;
 }

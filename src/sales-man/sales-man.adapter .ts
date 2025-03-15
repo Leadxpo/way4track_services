@@ -4,7 +4,7 @@ import { SalesWorksEntity } from './entity/sales-man.entity';
 import { SalesWorksDto } from './dto/sales-man.dto';
 
 export class SalesWorksAdapter {
-     convertEntityToDto(entity: SalesWorksEntity): SalesWorksDto {
+    convertEntityToDto(entity: SalesWorksEntity): SalesWorksDto {
         return {
             id: entity.id,
             visitingCard: entity.visitingCard,
@@ -21,10 +21,11 @@ export class SalesWorksAdapter {
             address: entity.address,
             requirementDetails: entity.requirementDetails,
             service: entity.service,
+            visitingNumber: entity.visitingNumber
         };
     }
 
-     convertDtoToEntity(dto: SalesWorksDto): SalesWorksEntity {
+    convertDtoToEntity(dto: SalesWorksDto): SalesWorksEntity {
         const entity = new SalesWorksEntity();
         if (entity.id) {
             entity.id = dto.id;
@@ -49,7 +50,7 @@ export class SalesWorksAdapter {
         entity.address = dto.address;
         entity.requirementDetails = dto.requirementDetails;
         entity.service = dto.service
-
+        entity.visitingNumber = dto.visitingNumber
         return entity;
     }
 }

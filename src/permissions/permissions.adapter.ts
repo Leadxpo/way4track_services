@@ -22,13 +22,15 @@ export class PermissionAdapter {
         const staff = new StaffEntity();
         staff.staffId = dto.staffId;
         entity.staffId = staff;
-
+        entity.startDate = dto.startDate
+        entity.endDate = dto.endDate
         // const des = new DesignationEntity();
         // des.designation = dto.designations;
         // entity.designations = des;
         if (entity.id) {
             entity.id = dto.id;
         }
+        entity.staffStatus = dto.staffStatus
         return entity;
     }
 }

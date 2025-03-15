@@ -44,7 +44,7 @@ import { NotificationModule } from './notifications/notification.module';
 import { NotificationEntity } from './notifications/entity/notification.entity';
 import { EmiPaymentRepository } from './voucher/repo/emi-payment-repo';
 import { EmiPaymentEntity } from './voucher/entity/emi-payments';
-import { EMIModule } from './voucher/emi-module';
+// import { EMIModule } from './voucher/emi-module';
 import { TechnicianWorksEntity } from './technician-works/entity/technician-works.entity';
 import { TechnicianModule } from './technician-works/technician-work.module';
 import { LettersEntity } from './letters/entity/letters.entity';
@@ -57,6 +57,12 @@ import { DesignationModule } from './designation/designation.module';
 import { DesignationEntity } from './designation/entity/designation.entity';
 import { SalesworkModule } from './sales-man/sales-man.module';
 import { SalesWorksEntity } from './sales-man/entity/sales-man.entity';
+import { PayRollModule } from './payRoll/pay-roll.module';
+import { PayrollEntity } from './payRoll/entity/pay-roll.entity';
+import { LedgerModule } from './ledger/ledger.module';
+import { LedgerEntity } from './ledger/entity/ledger.entity';
+import { GroupsModule } from './groups/groups.module';
+import { GroupsEntity } from './groups/entity/groups.entity';
 
 @Module({
   imports: [
@@ -67,11 +73,11 @@ import { SalesWorksEntity } from './sales-man/entity/sales-man.entity';
       username: 'root',
       password: 'root',
       database: 'localdb',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, EmiPaymentEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -94,14 +100,17 @@ import { SalesWorksEntity } from './sales-man/entity/sales-man.entity';
     PermissionModule,
     AccountModule,
     NotificationModule,
-    EMIModule,
+    // EMIModule,
     TechnicianModule,
     LettersModule,
     DispatchModule,
     ProductTypeModule,
     OTPModule,
     DesignationModule,
-    SalesworkModule
+    SalesworkModule,
+    PayRollModule,
+    LedgerModule,
+    GroupsModule
   ],
   controllers: [],
   providers: [],

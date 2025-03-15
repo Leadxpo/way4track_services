@@ -13,7 +13,6 @@ export class DesignationController {
   async createDesignation(@Body() dto: CreateDesignationDto): Promise<DesignationEntity> {
     return this.designationService.createDesignation(dto);
   }
-
   
     @Post('getDesignation')
     async getDesignation(@Body() req: CreateDesignationDto): Promise<CommonResponse> {

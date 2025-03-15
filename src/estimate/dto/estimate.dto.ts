@@ -1,4 +1,3 @@
-import { GSTORTDSEnum } from "src/voucher/entity/voucher.entity";
 
 export class EstimateDto {
     id: number;
@@ -14,7 +13,7 @@ export class EstimateDto {
     unitCode: string;
     estimateId?: string;
     invoiceId?: string;
-    GSTORTDS?: GSTORTDSEnum;
+    // GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
     quantity: number;  // The total quantity for all products

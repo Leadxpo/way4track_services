@@ -7,7 +7,7 @@ import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('sales')
 export class SalesWorksEntity extends BaseEntity {
@@ -66,4 +66,11 @@ export class SalesWorksEntity extends BaseEntity {
     @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.sales, { nullable: true })
     @JoinColumn({ name: 'product_id' })
     productId: ProductEntity;
+
+    @Column({ name: 'visiting_number', type: 'varchar', unique: true })
+    visitingNumber: string;
+
+    
+    @OneToMany(() => WorkAllocationEntity, (WorkAllocationEntity) => WorkAllocationEntity.salesRelation)
+    sales: WorkAllocationEntity[];
 }

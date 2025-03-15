@@ -7,6 +7,7 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { WorkStatusEnum } from '../enum/work-status-enum';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -79,4 +80,13 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column('varchar', { name: 'product_name', nullable: true })
     productName: string
 
+    @Column({ name: 'amount', type: 'float', nullable: true })
+    amount: number;
+
+    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: false })
+    visitingNumber: string;
+
+    @ManyToOne(() => SalesWorksEntity, (designation) => designation.sales, { nullable: true })
+    @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of SalesWorksEntity
+    salesRelation: SalesWorksEntity;
 }
