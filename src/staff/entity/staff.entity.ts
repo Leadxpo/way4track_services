@@ -58,7 +58,7 @@ export enum AccountType {
 
 
 
-@Entity({ name: 'st' })
+@Entity({ name: 'staff' })
 export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
