@@ -658,13 +658,11 @@ export class StaffService {
                     designation: req.designation  // Fix: Compare by designation name
                 },
             });
-
-            if (!staff.length) {
+            if (!staff || staff.length === 0) {
                 return new CommonResponse(false, 404, 'Staff not found');
-            } else {
-                const data = this.adapter.convertEntityToDto(staff);
-                return new CommonResponse(true, 200, 'Staff details fetched successfully', data);
             }
+            // const data = this.adapter.convertEntityToDto(staff);
+            return new CommonResponse(true, 200, 'Staff details fetched successfully', staff)
         } catch (error) {
             console.error("Error in getStaffProfileDetails service:", error);
             return new CommonResponse(false, 500, 'Error fetching staff details');

@@ -148,7 +148,7 @@ export class StaffRepository extends Repository<StaffEntity> {
     //     return groupedData;
     // }
 
-    async payRoll(req: { branch?: string; companyCode: string; unitCode: string }) {
+    async payRoll(req: { branch?: string; companyCode: string; unitCode: string, date: string }) {
         const query = this.createQueryBuilder('sf')
             .select([
                 'sf.staff_id AS staffId',
@@ -164,7 +164,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
                 'sf.monthly_salary AS actualSalary',
                 // 'sf.salary_status AS salaryStatus',
-
+                'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
                 // Total OT minutes
                 'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOTMinutes',
 
@@ -192,7 +192,9 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .leftJoin('sf.attendance', 'a')
             .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode });
+            .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('MONTH(a.day) = MONTH(:date)', { date: req.date })
+            .andWhere('YEAR(a.day) = YEAR(:date)', { date: req.date });
 
         if (req.branch) {
             query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
@@ -221,10 +223,13 @@ export class StaffRepository extends Repository<StaffEntity> {
             let totalOutLateOTMinutes = Number(record.totalOTHours) || 0;
             const daysWith6HoursOutLate = Number(record.daysWith6HoursOutLate) || 0;
 
+
             totalOutLateOTMinutes -= daysWith6HoursOutLate * 6 * 60;
             let totalOTPayableMinutes = totalOTMinutes + totalOutLateOTMinutes;
             let totalOTHoursWorked = totalOTPayableMinutes / 60;
-
+            if (totalOutLateOTMinutes < 6 * 60) {
+                totalOTHoursWorked += totalOutLateOTMinutes / 60;
+            }
             if (totalOTHoursWorked >= 8 && Number(record.lateDays) < 2) {
                 totalOTHoursWorked *= 1.5;
             } else if (totalOTHoursWorked >= 8 && Number(record.lateDays) > 2) {
@@ -254,35 +259,34 @@ export class StaffRepository extends Repository<StaffEntity> {
                 branch: record.branch,
                 designation: record.designation,
                 staffPhoto: record.staffPhoto,
-                salaryDetails: [
-                    {
-                        year: record.year || 0,
-                        month: record.month || 0,
-                        monthDays,
-                        presentDays: Number(record.presentDays) || 0,
-                        leaveDays: Number(record.leaveDays) || 0,
-                        actualSalary: Number(record.actualSalary),
-                        totalEarlyMinutes: Number(record.totalLateDeductionMinutes) || 0,
-                        totalLateMinutes: Number(record.totalLateMinutes) || 0,
-                        lateDays: Number(record.lateDays) || 0,
-                        perDaySalary,
-                        perHourSalary,
-                        totalOTHours: totalOTHoursWorked,
-                        OTAmount: isNaN(finalOTAmount) ? 0 : finalOTAmount,
-                        lateDeductions: isNaN(lateDeductions) ? 0 : lateDeductions,
-                        grossSalary: isNaN(grossSalary) ? 0 : grossSalary,
-                        ESIC_Employee,
-                        ESIC_Employer,
-                        PF_Employee,
-                        PF_Employer1,
-                        PF_Employer2,
-                        extraHalfSalary,
-                        daysOutLate6HoursOrMore: daysWith6HoursOutLate,
-                        netSalary: isNaN(updatedNetSalary) ? 0 : updatedNetSalary,
-                        // salaryStatus: record.salaryStatus,
-                        carryForwardLeaves
-                    }
-                ]
+
+                year: record.year || 0,
+                month: record.month || 0,
+                monthDays,
+                presentDays: Number(record.presentDays) || 0,
+                leaveDays: Number(record.leaveDays) || 0,
+                actualSalary: Number(record.actualSalary),
+                totalEarlyMinutes: Number(record.totalLateDeductionMinutes) || 0,
+                totalLateMinutes: Number(record.totalLateMinutes) || 0,
+                lateDays: Number(record.lateDays) || 0,
+                perDaySalary,
+                perHourSalary,
+                totalOTHours: totalOTHoursWorked,
+                OTAmount: isNaN(finalOTAmount) ? 0 : finalOTAmount,
+                lateDeductions: isNaN(lateDeductions) ? 0 : lateDeductions,
+                grossSalary: isNaN(grossSalary) ? 0 : grossSalary,
+                ESIC_Employee,
+                ESIC_Employer,
+                PF_Employee,
+                PF_Employer1,
+                PF_Employer2,
+                extraHalfSalary,
+                daysOutLate6HoursOrMore: daysWith6HoursOutLate,
+                netSalary: isNaN(updatedNetSalary) ? 0 : updatedNetSalary,
+                // salaryStatus: record.salaryStatus,
+                carryForwardLeaves
+
+
             };
         });
 

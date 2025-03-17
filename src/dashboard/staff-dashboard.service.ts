@@ -20,34 +20,40 @@ export class StaffDashboardService {
         private service: PayrollService,
         private payrollRepo: PayrollRepository
     ) { }
-    async payRoll(req: { branch?: string; companyCode: string; unitCode: string }): Promise<CommonResponse> {
+
+    async payRoll(req: { branch?: string; companyCode: string; unitCode: string, date: string }): Promise<CommonResponse> {
         const staffData = await this.staffRepository.payRoll(req);
 
         if (!staffData || staffData.length === 0) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", []);
         }
 
-        // Extract year and month from staff data
-        const { year, month } = staffData[0]?.salaryDetails[0] || {};
+        // Extract year and month from the first staff record
+        const { year, month } = staffData[0] || {};
         if (!year || !month) {
             return new CommonResponse(false, 400, "Invalid Salary Details", []);
         }
 
         // Fetch existing payroll data
         const existingPayrollRecords = await this.payrollRepo.find({
-            where: {
-                year,
-                month,
-            },
+            where: { year, month },
         });
-        // Convert existing payroll records into a map for easy lookup
+
+        // Convert existing payroll records into a Map (staffId -> record) for easy lookup
         const existingPayrollMap = new Map(existingPayrollRecords.map(record => [record.staffId, record]));
 
-        // Prepare payroll entries (new or updated)
-        const payrollEntries: PayrollDto[] = staffData.map(record => {
-            const existingPayroll = existingPayrollMap.get(record.staffId);
+        // If payroll data already exists for all staff, return
+        if (existingPayrollRecords.length === staffData.length) {
+            return new CommonResponse(true, 200, "Payroll data already exists", existingPayrollRecords);
+        }
 
-            const payrollEntry: PayrollDto = {
+        // Remove duplicate staff entries
+        const uniqueStaffData = Array.from(new Map(staffData.map(record => [record.staffId, record])).values());
+
+        // Filter only new staff who are not in existing payroll
+        const newPayrollEntries: PayrollDto[] = uniqueStaffData
+            .filter(record => !existingPayrollMap.has(record.staffId))
+            .map(record => ({
                 staffId: record.staffId,
                 staffName: record.staffName,
                 branch: record.branch,
@@ -55,44 +61,45 @@ export class StaffDashboardService {
                 staffPhoto: record.staffPhoto,
                 year,
                 month,
-                monthDays: record.salaryDetails[0]?.monthDays,
-                presentDays: record.salaryDetails[0]?.presentDays,
-                leaveDays: record.salaryDetails[0]?.leaveDays,
-                actualSalary: record.salaryDetails[0]?.actualSalary,
-                totalEarlyMinutes: record.salaryDetails[0]?.totalEarlyMinutes,
-                totalLateMinutes: record.salaryDetails[0]?.totalLateMinutes,
-                lateDays: record.salaryDetails[0]?.lateDays,
-                perDaySalary: record.salaryDetails[0]?.perDaySalary,
-                perHourSalary: record.salaryDetails[0]?.perHourSalary,
-                totalOTHours: record.salaryDetails[0]?.totalOTHours,
-                OTAmount: record.salaryDetails[0]?.OTAmount,
-                lateDeductions: record.salaryDetails[0]?.lateDeductions,
-                grossSalary: record.salaryDetails[0]?.grossSalary,
-                ESIC_Employee: record.salaryDetails[0]?.ESIC_Employee,
-                ESIC_Employer: record.salaryDetails[0]?.ESIC_Employer,
-                PF_Employee: record.salaryDetails[0]?.PF_Employee,
-                PF_Employer1: record.salaryDetails[0]?.PF_Employer1,
-                PF_Employer2: record.salaryDetails[0]?.PF_Employer2,
-                extraHalfSalary: record.salaryDetails[0]?.extraHalfSalary,
-                daysOutLate6HoursOrMore: record.salaryDetails[0]?.daysOutLate6HoursOrMore,
-                netSalary: record.salaryDetails[0]?.netSalary,
-                salaryStatus: existingPayroll.salaryStatus || SalaryStatus.PAID,
-                carryForwardLeaves: existingPayroll?.carryForwardLeaves ?? 0, // Preserve previous value if exists
-                professionalTax: existingPayroll?.professionalTax ?? 0,
-                incentives: existingPayroll?.incentives ?? 0,
-                foodAllowance: existingPayroll?.foodAllowance ?? 0,
-                leaveEncashment: existingPayroll?.leaveEncashment ?? 0,
-                plBikeNeedToPay: existingPayroll?.plBikeNeedToPay ?? 0,
-                plBikeAmount: existingPayroll?.plBikeAmount ?? 0,
-            };
+                monthDays: record.monthDays,
+                presentDays: record.presentDays,
+                leaveDays: record.leaveDays,
+                actualSalary: record.actualSalary,
+                totalEarlyMinutes: record.totalEarlyMinutes,
+                totalLateMinutes: record.totalLateMinutes,
+                lateDays: record.lateDays,
+                perDaySalary: record.perDaySalary,
+                perHourSalary: record.perHourSalary,
+                totalOTHours: record.totalOTHours,
+                OTAmount: record.OTAmount,
+                lateDeductions: record.lateDeductions,
+                grossSalary: record.grossSalary,
+                ESIC_Employee: record.ESIC_Employee,
+                ESIC_Employer: record.ESIC_Employer,
+                PF_Employee: record.PF_Employee,
+                PF_Employer1: record.PF_Employer1,
+                PF_Employer2: record.PF_Employer2,
+                extraHalfSalary: record.extraHalfSalary,
+                daysOutLate6HoursOrMore: record.daysOutLate6HoursOrMore,
+                netSalary: record.netSalary,
+                salaryStatus: SalaryStatus.PAID,
+                carryForwardLeaves: 0,
+                professionalTax: 0,
+                incentives: 0,
+                foodAllowance: 0,
+                leaveEncashment: 0,
+                plBikeNeedToPay: 0,
+                plBikeAmount: 0,
+            }));
 
-            return payrollEntry;
-        });
-        // Save or update payroll records
-        await this.service.createOrUpdatePayroll(payrollEntries);
+        // Save only new payroll entries
+        if (newPayrollEntries.length > 0) {
+            await this.service.createOrUpdatePayroll(newPayrollEntries);
+        }
 
-        return new CommonResponse(true, 200, "Payroll processed successfully", payrollEntries);
+        return new CommonResponse(true, 200, "Payroll processed successfully", [...staffData, ...newPayrollEntries]);
     }
+
 
 
 

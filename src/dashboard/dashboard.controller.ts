@@ -200,6 +200,7 @@ export class DashboardController {
         branch?: string;
         companyCode: string;
         unitCode: string;
+        date: string
     }): Promise<CommonResponse> {
         try {
             return await this.staffDashboardService.payRoll(req)
@@ -607,7 +608,7 @@ export class DashboardController {
         }
     }
 
-  
+
 
     @Post('getClientPurchaseOrderDataTable')
     async getClientPurchaseOrderDataTable(@Body() req: {
