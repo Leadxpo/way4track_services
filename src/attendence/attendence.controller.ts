@@ -49,7 +49,7 @@ export class AttendanceController {
 
     @Post('getStaffAttendance')
     async getStaffAttendance(
-        @Body() req: { staffId?: string }
+        @Body() req: { staffId?: string; date?: string; branchName?: string; companyCode?: string; unitCode?: string }
     ) {
         try {
             return this.attendanceService.getStaffAttendance(req);

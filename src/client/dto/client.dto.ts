@@ -1,4 +1,4 @@
-import { ClientStatusEnum } from "../enum/client-status.enum";
+import { ClientStatus, ClientStatusEnum } from "../enum/client-status.enum";
 
 export class ClientDto {
     id?: number;
@@ -19,5 +19,6 @@ export class ClientDto {
     tds: boolean;
     tcs: boolean;
     billWiseDate: boolean;
+    status: ClientStatus
 
 }

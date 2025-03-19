@@ -24,7 +24,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                 'vendor.name AS vendorName',
                 'pr.imei_number AS imeiNumber',
                 'pr.location as location',
-                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock'
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock',
+                'pr.product_status as productStatus'
             ])
             .leftJoin('pr.vendorId', 'vendor')
             .leftJoin('pr.voucherId', 'voucher')

@@ -1,3 +1,4 @@
+import { ClientStatus } from "../enum/client-status.enum";
 
 export class ClientResDto {
     id: number;
@@ -13,6 +14,8 @@ export class ClientResDto {
     joiningDate: string;
     companyCode: string;
     unitCode: string
+    status: ClientStatus
+
     constructor(
         id: number,
         name: string,
@@ -26,7 +29,9 @@ export class ClientResDto {
         address: string,
         joiningDate: string,
         companyCode: string,
-        unitCode: string
+        unitCode: string,
+        status: ClientStatus
+
     ) {
         this.id = id;
         this.name = name;
@@ -41,5 +46,6 @@ export class ClientResDto {
         this.joiningDate = joiningDate;
         this.companyCode = companyCode
         this.unitCode = unitCode
+        this.status = status
     }
 }

@@ -4,7 +4,7 @@ import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
-import { ClientStatusEnum } from '../enum/client-status.enum';
+import { ClientStatus, ClientStatusEnum } from '../enum/client-status.enum';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
@@ -90,4 +90,7 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'sac_code', type: 'varchar', length: 20, nullable: true })
     SACCode: string;
+
+    @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })
+    status: ClientStatus
 }

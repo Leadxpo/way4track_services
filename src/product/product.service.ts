@@ -268,10 +268,26 @@ export class ProductService {
         }
         console.log(jsonData, "...........")
         // Validate Product Type
-        const productType = await this.productTypeRepo.findOne({ where: { id: productDto.productTypeId } });
-        if (!productType) {
-            return new CommonResponse(false, 404, 'Product type not found');
+        // const productType = await this.productTypeRepo.findOne({ where: { id: productDto.productTypeId } });
+        // if (!productType) {
+        //     return new CommonResponse(false, 404, 'Product type not found');
+        // }
+
+        let designationEntity = null;
+        if (productDto.productTypeId) {
+            designationEntity = await this.productTypeRepo.findOne({
+                where: { id: productDto.productTypeId }
+            });
+
+            if (!designationEntity) {
+                throw new Error(`Designation with ID '${productDto.productTypeId}' not found.`);
+            }
+            console.log(designationEntity, 'designationEntity');
+
+            productDto.productType = designationEntity.name; // Store name
+            productDto.productTypeId = designationEntity; // Store relation
         }
+        console.log(designationEntity, "}}}}}")
         if (productDto.vendorEmailId) {
             let vendor = await this.vendorRepository.findOne({
                 where: { emailId: productDto.vendorEmailId },
@@ -350,7 +366,8 @@ export class ProductService {
         const finalProductData = jsonData.map((excelRow) => ({
             ...excelRow,
             ...productDto,
-            productTypeId: productDto.productTypeId,  // Merging the DTO directly
+            productTypeId: productDto.productTypeId,
+            productType: productDto.productType // Merging the DTO directly
         }));
 
         console.log(finalProductData, "/////")

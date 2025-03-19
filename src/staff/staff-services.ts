@@ -6,7 +6,7 @@ import { CommonReq } from 'src/models/common-req';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { StaffIdDto } from './dto/staff-id.dto';
-import { Qualifications, StaffDto } from './dto/staff.dto';
+import { Experience, Qualifications, StaffDto } from './dto/staff.dto';
 import { Qualification, StaffEntity } from './entity/staff.entity';
 import { StaffRepository } from './repo/staff-repo';
 import { StaffAdapter } from './staff.adaptert';
@@ -18,6 +18,7 @@ import { LettersService } from 'src/letters/letters.service';
 import { LettersRepository } from 'src/letters/repo/letters.repo';
 import { LettersEntity } from 'src/letters/entity/letters.entity';
 import { DesignationRepository } from 'src/designation/repo/designation.repo';
+import { Letters } from './enum/qualifications.enum';
 
 
 @Injectable()
@@ -57,103 +58,127 @@ export class StaffService {
             throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
         }
     }
-    async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
-        try {
-            const newStaff = this.adapter.convertDtoToEntity(req);
-            console.log(req, "req");
+    // async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    //     try {
+    //         const newStaff = this.adapter.convertDtoToEntity(req);
+    //         console.log(req, "req");
 
-            // Fetch DesignationEntity based on designation_id
-            let designationEntity = null;
-            if (req.designation_id) {
-                designationEntity = await this.designationRepository.findOne({
-                    where: { id: req.designation_id }
-                });
+    //         // Fetch DesignationEntity based on designation_id
+    //         let designationEntity = null;
+    //         if (req.designation_id) {
+    //             designationEntity = await this.designationRepository.findOne({
+    //                 where: { id: req.designation_id }
+    //             });
 
-                if (!designationEntity) {
-                    throw new Error(`Designation with ID '${req.designation_id}' not found.`);
-                }
-                console.log(designationEntity, 'designationEntity');
+    //             if (!designationEntity) {
+    //                 throw new Error(`Designation with ID '${req.designation_id}' not found.`);
+    //             }
+    //             console.log(designationEntity, 'designationEntity');
 
-                newStaff.designation = designationEntity.designation; // Store name
-                newStaff.designationRelation = designationEntity; // Store relation
-            }
+    //             newStaff.designation = designationEntity.designation; // Store name
+    //             newStaff.designationRelation = designationEntity; // Store relation
+    //         }
 
-            // Generate Staff ID
-            newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+    //         // Generate Staff ID
+    //         newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
 
-            // Upload Staff Photo
-            if (files?.photo?.[0]) {
-                newStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${newStaff.staffId}.jpg`);
-            }
+    //         // Upload Staff Photo
+    //         if (files?.photo?.[0]) {
+    //             newStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${newStaff.staffId}.jpg`);
+    //         }
 
-            // Upload Vehicle Photo
-            if (files?.vehiclePhoto?.[0]) {
-                newStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${newStaff.staffId}.jpg`);
-            }
+    //         // Upload Vehicle Photo
+    //         if (files?.vehiclePhoto?.[0]) {
+    //             newStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${newStaff.staffId}.jpg`);
+    //         }
 
-            // Upload Resume
-            if (files?.resume?.[0]) {
-                newStaff.resume = await this.uploadFile(files.resume[0], `resume/${newStaff.staffId}.jpg`);
-            }
+    //         // Upload Resume
+    //         if (files?.resume?.[0]) {
+    //             newStaff.resume = await this.uploadFile(files.resume[0], `resume/${newStaff.staffId}.jpg`);
+    //         }
 
-            // Handle Qualifications and Qualification Files
-            let qualifications: Qualifications[] = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
+    //         // Handle Qualifications and Qualification Files
+    //         let qualifications: Qualifications[] = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
+    //         let experience: Experience[] = Array.isArray(req.experience) ? [...req.experience] : [];
 
-            if (files?.qualificationFiles) {
-                for (let i = 0; i < files.qualificationFiles.length; i++) {
-                    const file = files.qualificationFiles[i];
-                    const filePath = await this.uploadFile(file, `qualification_files/${newStaff.staffId}_${file.originalname}`);
+    //         if (files?.qualificationFiles) {
+    //             for (let i = 0; i < files.qualificationFiles.length; i++) {
+    //                 const file = files.qualificationFiles[i];
+    //                 const filePath = await this.uploadFile(file, `qualification_files/${newStaff.staffId}_${file.originalname}`);
 
-                    if (qualifications[i]) {
-                        qualifications[i].file = filePath;
-                    } else {
-                        console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
-                        qualifications.push({
-                            qualificationName: Qualification.TENTH,
-                            marksOrCgpa: null,
-                            file: filePath
-                        });
-                    }
-                }
-            }
+    //                 if (qualifications[i]) {
+    //                     qualifications[i].file = filePath;
+    //                 } else {
+    //                     console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
+    //                     qualifications.push({
+    //                         qualificationName: Qualification.TENTH,
+    //                         marksOrCgpa: null,
+    //                         file: filePath
+    //                     });
+    //                 }
+    //             }
+    //         }
 
-            newStaff.qualifications = qualifications;
-            console.log(newStaff, ">>>>>>>>>>")
-            // Save Staff Record
-            await this.staffRepository.save(newStaff);
+    //         if (files?.experience) {
+    //             for (let i = 0; i < files.experience.length; i++) {
+    //                 const file = files.experience[i];
+    //                 const filePath = await this.uploadFile(file, `qualification_files/${newStaff.staffId}_${file.originalname}`);
 
-            // Assign Permissions
-            const permissionsDto: PermissionsDto = {
-                staffId: newStaff.staffId,
-                companyCode: req.companyCode,
-                unitCode: req.unitCode
-            };
-            console.log(permissionsDto, "><<<<<<<<<<<")
-            await this.service.savePermissionDetails(permissionsDto);
+    //                 if (experience[i]) {
+    //                     experience[i].uploadLetters = filePath;
+    //                 } else {
+    //                     console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
+    //                     experience.push({
 
-            // Upload Letter Documents
-            const lettersDto: LettersDto = {
-                staffId: newStaff.staffId,
-                companyCode: req.companyCode,
-                unitCode: req.unitCode,
-                offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
-                resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
-                terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
-                appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
-                leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
-                relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
-                experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
-            };
-            console.log(lettersDto, "=====<<<<")
+    //                          previousCompany: '',
+    //                             previous_designation: 'string',
+    //                             total_experience: '',
+    //                             previous_salary: '',
+    //                             letter: Letters,
+    //                             uploadLetters: filePath,
 
-            await this.lettersService.saveLetterDetails(lettersDto);
+    //                     });
+    //                 }
+    //             }
+    //         }
 
-            return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
-        } catch (error) {
-            console.error(`Error creating staff details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
-        }
-    }
+    //         newStaff.qualifications = qualifications;
+    //         console.log(newStaff, ">>>>>>>>>>")
+    //         // Save Staff Record
+    //         await this.staffRepository.save(newStaff);
+
+    //         // Assign Permissions
+    //         const permissionsDto: PermissionsDto = {
+    //             staffId: newStaff.staffId,
+    //             companyCode: req.companyCode,
+    //             unitCode: req.unitCode
+    //         };
+    //         console.log(permissionsDto, "><<<<<<<<<<<")
+    //         await this.service.savePermissionDetails(permissionsDto);
+
+    //         // Upload Letter Documents
+    //         const lettersDto: LettersDto = {
+    //             staffId: newStaff.staffId,
+    //             companyCode: req.companyCode,
+    //             unitCode: req.unitCode,
+    //             offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
+    //             resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
+    //             terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
+    //             appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
+    //             leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
+    //             relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
+    //             experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
+    //         };
+    //         console.log(lettersDto, "=====<<<<")
+
+    //         await this.lettersService.saveLetterDetails(lettersDto);
+
+    //         return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
+    //     } catch (error) {
+    //         console.error(`Error creating staff details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
+    //     }
+    // }
 
 
     // async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
@@ -464,6 +489,154 @@ export class StaffService {
     //         throw new ErrorResponse(5416, `Failed to update staff details: ${error.message}`);
     //     }
     // }
+
+
+    async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+        try {
+            const newStaff = this.adapter.convertDtoToEntity(req);
+            console.log(req, "req");
+
+            // Fetch DesignationEntity based on designation_id
+            let designationEntity = null;
+            if (req.designation_id) {
+                designationEntity = await this.designationRepository.findOne({
+                    where: { id: req.designation_id }
+                });
+
+                if (!designationEntity) {
+                    throw new Error(`Designation with ID '${req.designation_id}' not found.`);
+                }
+                console.log(designationEntity, 'designationEntity');
+
+                newStaff.designation = designationEntity.designation; // Store name
+                newStaff.designationRelation = designationEntity; // Store relation
+            }
+
+            // Generate Staff ID
+            newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+
+            // Upload Staff Photo
+            if (files?.photo?.[0]) {
+                newStaff.staffPhoto = await this.uploadFile(files.photo[0], `staff_photos/${newStaff.staffId}.jpg`);
+            }
+
+            // Upload Vehicle Photo
+            if (files?.vehiclePhoto?.[0]) {
+                newStaff.vehiclePhoto = await this.uploadFile(files.vehiclePhoto[0], `vehicle_photos/${newStaff.staffId}.jpg`);
+            }
+
+            // Upload Resume
+            if (files?.resume?.[0]) {
+                newStaff.resume = await this.uploadFile(files.resume[0], `resume/${newStaff.staffId}.jpg`);
+            }
+
+            // Handle Qualifications and Qualification Files
+            let qualifications: Qualifications[] = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
+            let experience: Experience[] = Array.isArray(req.experience) ? [...req.experience] : [];
+
+
+            if (files?.qualificationFiles) {
+                for (let i = 0; i < files.qualificationFiles.length; i++) {
+                    const file = files.qualificationFiles[i];
+                    const filePath = await this.uploadFile(file, `qualification_files/${newStaff.staffId}_${file.originalname}`);
+
+                    if (qualifications[i]) {
+                        qualifications[i].file = filePath;
+                    } else {
+                        console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
+                        qualifications.push({
+                            qualificationName: Qualification.TENTH,
+                            marksOrCgpa: null,
+                            file: filePath
+                        });
+                    }
+                }
+            }
+
+            // if (files?.experience) {
+            //     for (let i = 0; i < files.experience.length; i++) {
+            //         const file = files.experience[i];
+            //         const filePath = await this.uploadFile(file, `experience_files/${newStaff.staffId}_${file.originalname}`);
+
+            //         if (experience[i]) {
+            //             experience[i].uploadLetters = filePath;
+            //         } else {
+            //             console.warn(`No matching experience entry found for file: ${file.originalname}. Adding default entry.`);
+            //             experience.push({
+            //                 previousCompany: '',
+            //                 previous_designation: 'Unknown',
+            //                 total_experience: '',
+            //                 previous_salary: '',
+            //                 letter: Letters.OFFER_LETTER, // ✅ Assigning a specific enum value
+            //                 uploadLetters: filePath,
+            //             });
+            //         }
+            //     }
+            // }
+
+            if (files?.experience) {
+                for (let i = 0; i < files.experience.length; i++) {
+                    const file = files.experience[i];
+                    const filePath = await this.uploadFile(file, `experience_files/${newStaff.staffId}_${file.originalname}`);
+
+                    // Ensure experience[i] exists or push a new one
+                    if (experience[i]) {
+                        experience[i].uploadLetters = filePath;
+                    } else {
+                        experience.push({
+                            previousCompany: '',
+                            previous_designation: '',
+                            total_experience: '',
+                            previous_salary: '',
+                            letter: Letters.OFFER_LETTER, // Adjust as needed
+                            uploadLetters: filePath,
+                        });
+                    }
+                }
+            }
+
+
+            newStaff.qualifications = qualifications;
+            newStaff.experience = experience;
+
+            console.log(newStaff, ">>>>>>>>>>");
+
+            // Save Staff Record
+            await this.staffRepository.save(newStaff);
+
+            // Assign Permissions
+            const permissionsDto: PermissionsDto = {
+                staffId: newStaff.staffId,
+                companyCode: req.companyCode,
+                unitCode: req.unitCode
+            };
+            console.log(permissionsDto, "><<<<<<<<<<<");
+            await this.service.savePermissionDetails(permissionsDto);
+
+            // Upload Letter Documents
+            const lettersDto: LettersDto = {
+                staffId: newStaff.staffId,
+                companyCode: req.companyCode,
+                unitCode: req.unitCode,
+                offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
+                resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
+                terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
+                appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
+                leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
+                relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
+                experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
+            };
+            console.log(lettersDto, "=====<<<<");
+
+            await this.lettersService.saveLetterDetails(lettersDto);
+
+            return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
+        } catch (error) {
+            console.error(`Error creating staff details: ${error.message}`, error.stack);
+            throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
+        }
+    }
+
 
 
     async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {

@@ -17,6 +17,9 @@ import { VoucherEntity } from "../entity/voucher.entity";
 import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { AccountDto } from "src/account/dto/account.dto";
+import { PaymentType } from "src/asserts/enum/payment-type.enum";
+import { LedgerEntity } from "src/ledger/entity/ledger.entity";
+import { UnderSecondary } from "src/groups/entity/groups.entity";
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -301,7 +304,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-
     // async getLedgerDataById(req: {
     //     subDealerId?: number; clientId?: number; vendorId?: number; companyCode?: string; unitCode?: string
     // }) {
@@ -512,7 +514,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-
     async getMonthWiseBalance(req: BranchChartDto) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -560,7 +561,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
 
     }
-
 
     async getYearWiseCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
         const year = Number(req.date);
@@ -641,8 +641,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query;
     }
-
-
 
     async getTotalProductAndServiceSales(req: CommonReq) {
         const query = await this.createQueryBuilder('ve')
@@ -846,7 +844,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         };
     }
 
-
     async getExpansesTableData(req: InvoiceDto) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -944,127 +941,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query.getRawMany();
     }
 
-
-
-    // async getSolidLiquidCash(req: CommonReq) {
-    //     const result = await this.dataSource
-    //         .getRepository(VoucherEntity)
-    //         .createQueryBuilder('ve')
-    //         .select([
-    //             `SUM(CASE 
-    //                 WHEN ve.voucher_type = :receipt 
-    //                 AND ve.payment_type = :cash 
-    //                 AND ve.product_type IN ('service', 'product', 'sales') 
-    //                 THEN ve.amount ELSE 0 END) AS solidCash`,
-    //             `SUM(CASE 
-    //                 WHEN ve.voucher_type = :contra 
-    //                 AND ve.payment_type = :cash 
-    //                 THEN ve.amount ELSE 0 END) AS solidCashFromContra`,
-    //             `SUM(CASE 
-    //                 WHEN ve.voucher_type = :contra 
-    //                 AND ve.from_account_id IS NOT NULL 
-    //                 THEN ve.amount ELSE 0 END) AS liquidCash`,
-    //             'br.name AS branchName',
-    //             'ac.account_name AS paymentTo',
-    //             'ac.account_number AS accountNumber',
-    //         ])
-    //         .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-    //         .leftJoin('accounts', 'ac', 'ac.id = ve.to_account_id')
-    //         .where('ve.voucher_type IN (:...voucherTypes)', {
-    //             voucherTypes: ['receipt', 'contra'],
-    //         })
-    //         .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-    //         .groupBy('br.name, ac.account_name, ac.account_number') // Grouping by non-aggregated columns
-    //         .setParameters({
-    //             receipt: 'receipt',
-    //             contra: 'contra',
-    //             cash: 'cash',
-    //         })
-    //         .getRawMany();
-
-    //     // Aggregate the result
-    //     const aggregatedResult = result.reduce(
-    //         (acc, row) => {
-    //             acc.solidCash += parseFloat(row.solidCash || 0);
-    //             acc.solidCashFromContra += parseFloat(row.solidCashFromContra || 0);
-    //             acc.liquidCash += parseFloat(row.liquidCash || 0);
-
-    //             acc.details.push({
-    //                 branchName: row.branchName,
-    //                 paymentTo: row.paymentTo,
-    //                 accountNumber: row.accountNumber,
-    //             });
-
-    //             return acc;
-    //         },
-    //         { solidCash: 0, solidCashFromContra: 0, liquidCash: 0, details: [] },
-    //     );
-
-    //     return {
-    //         solidCash: aggregatedResult.solidCash + aggregatedResult.solidCashFromContra,
-    //         liquidCash: aggregatedResult.liquidCash,
-    //         details: aggregatedResult.details,
-    //     };
-    // }
-
-    async getSolidLiquidCash(req: CommonReq) {
-        // Fetch the liquid cash by summing all account totalAmount
-        const liquidCashResult = await this.dataSource
-            .getRepository(AccountEntity)
-            .createQueryBuilder('ac')
-            .select('SUM(ac.total_amount)', 'liquidCash')
-            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
-            .getRawOne();
-
-        // Fetch the solid cash based on vouchers
-        const solidCashResult = await this.dataSource
-            .getRepository(VoucherEntity)
-            .createQueryBuilder('ve')
-            .select([
-                `SUM(CASE 
-                    WHEN ve.payment_type = :cash 
-                    AND ve.product_type IN ('service', 'product', 'sales') 
-                    THEN ve.amount 
-                    WHEN ve.payment_type = :cash 
-                    AND ve.product_type IN ('expanses', 'salaries') 
-                    THEN -ve.amount ELSE 0 END) AS solidCash`,
-                'br.name AS branchName',
-                'ac.account_name AS paymentTo',
-                'ac.account_number AS accountNumber',
-            ])
-            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-            .leftJoin(AccountEntity, 'ac', 'ac.id = ve.to_account_id')
-            .where('ve.payment_type = :cash', { cash: 'cash' })
-            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name, ac.account_name, ac.account_number')
-            .getRawMany();
-
-        // Aggregate the solid cash results
-        const aggregatedResult = solidCashResult.reduce(
-            (acc, row) => {
-                acc.solidCash += parseFloat(row.solidCash || 0);
-                acc.details.push({
-                    branchName: row.branchName,
-                    paymentTo: row.paymentTo,
-                    accountNumber: row.accountNumber,
-                });
-                return acc;
-            },
-            { solidCash: 0, details: [] }
-        );
-
-        return {
-            solidCash: aggregatedResult.solidCash,
-            liquidCash: parseFloat(liquidCashResult?.liquidCash || 0),
-            details: aggregatedResult.details,
-        };
-    }
-
-
-
     async getProductsPhotos(req: {
         subDealerId?: string;
         vendorId?: string;
@@ -1096,111 +972,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             productName: result.productName,
             productPhoto: result.productPhoto
         }));
-    }
-
-    // async getBranchWiseSolidLiquidCash(req: CommonReq) {
-    //     const result = await this.dataSource
-    //         .getRepository(VoucherEntity)
-    //         .createQueryBuilder('ve')
-    //         .select([
-    //             'br.name AS branchName',
-    //             `SUM(CASE 
-    //                 WHEN ve.voucher_type = :receipt 
-    //                 AND ve.payment_type = :cash 
-    //                 AND ve.product_type IN ('service', 'product', 'sales') 
-    //                 THEN ve.amount ELSE 0 END) AS solidCash`,
-    //             `SUM(CASE 
-    //                 WHEN ve.voucher_type = :contra 
-    //                 AND ve.from_account_id IS NOT NULL 
-    //                 THEN ve.amount ELSE 0 END) AS liquidCash`,
-    //         ])
-    //         .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-    //         .where('ve.voucher_type IN (:...voucherTypes)', {
-    //             voucherTypes: ['receipt', 'contra'],
-    //         })
-    //         .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-    //         .groupBy('br.name') // Group by branch name
-    //         .setParameters({
-    //             receipt: 'receipt',
-    //             contra: 'contra',
-    //             cash: 'cash',
-    //         })
-    //         .getRawMany();
-
-    //     // Format the response
-    //     return result.map(row => ({
-    //         branchName: row.branchName || 'Unknown Branch',
-    //         solidCash: parseFloat(row.solidCash || 0),
-    //         liquidCash: parseFloat(row.liquidCash || 0),
-    //     }));
-    // }
-
-    async getBranchWiseSolidLiquidCash(req: CommonReq) {
-        // Fetch branch-wise liquid cash from AccountEntity
-        const liquidCashResults = await this.dataSource
-            .getRepository(AccountEntity)
-            .createQueryBuilder('ac')
-            .select([
-                'br.name AS branchName',
-                'SUM(ac.total_amount) AS liquidCash',
-            ])
-            .leftJoin('branches', 'br', 'br.id = ac.branch_id') // Assuming `branch_id` exists in AccountEntity
-            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name')
-            .getRawMany();
-
-        // Fetch branch-wise solid cash from VoucherEntity
-        const solidCashResults = await this.dataSource
-            .getRepository(VoucherEntity)
-            .createQueryBuilder('ve')
-            .select([
-                'br.name AS branchName',
-                `SUM(CASE 
-                    WHEN ve.payment_type = :cash 
-                    AND ve.product_type IN ('service', 'product', 'sales') 
-                    THEN ve.amount 
-                    WHEN ve.payment_type = :cash 
-                    AND ve.product_type IN ('expanses', 'salaries') 
-                    THEN -ve.amount 
-                    ELSE 0 END) AS solidCash`
-            ])
-            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-            .where('ve.voucher_type = :receipt', { receipt: 'receipt' })
-            .andWhere('ve.payment_type = :cash', { cash: 'cash' })
-            .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name')
-            .getRawMany();
-
-        // Create a map to merge solid and liquid cash results
-        const branchWiseData = new Map();
-
-        // Populate liquid cash data
-        liquidCashResults.forEach(row => {
-            branchWiseData.set(row.branchName, {
-                branchName: row.branchName || 'Unknown Branch',
-                liquidCash: parseFloat(row.liquidCash || '0'),
-                solidCash: 0,
-            });
-        });
-
-        // Populate solid cash data
-        solidCashResults.forEach(row => {
-            if (!branchWiseData.has(row.branchName)) {
-                branchWiseData.set(row.branchName, {
-                    branchName: row.branchName || 'Unknown Branch',
-                    solidCash: 0,
-                    liquidCash: 0,
-                });
-            }
-            const branchData = branchWiseData.get(row.branchName);
-            branchData.solidCash += parseFloat(row.solidCash || '0');
-        });
-
-        // Return the response in the same structure as before
-        return Array.from(branchWiseData.values());
     }
 
     async getProductTypeCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
@@ -1359,8 +1130,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query;
     }
 
-
-
     async getPurchaseOrderDataTable(req: {
         companyCode?: string;
         unitCode?: string;
@@ -1514,9 +1283,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query;
     }
+
     //current year against current month payble and recible amounts
     async getTotalPayableAndReceivablePercentage(req: BranchChartDto) {
-        const query = await this.createQueryBuilder('ve')
+        const query = this.createQueryBuilder('ve')
             .select([
                 `branch.id AS id`,
                 `branch.name AS branchName`,
@@ -1525,25 +1295,37 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.voucher_type = 'Sales' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) AS receivables`,
                 `SUM(CASE WHEN ve.voucher_type = 'Purchase' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) AS payables`,
                 `ROUND(
-                    (SUM(CASE WHEN ve.voucher_type = 'Sales' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) /
-                    NULLIF(SUM(CASE WHEN ve.voucher_type = 'Sales' THEN ve.amount ELSE 0 END), 0)) * 100, 2
+                    COALESCE(
+                        (SUM(CASE WHEN ve.voucher_type = 'Sales' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) /
+                        NULLIF(SUM(CASE WHEN ve.voucher_type = 'Sales' THEN ve.amount ELSE 0 END), 0)) * 100, 0
+                    ), 2
                 ) AS receivablePercentage`,
                 `ROUND(
-                    (SUM(CASE WHEN ve.voucher_type = 'Purchase' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) /
-                    NULLIF(SUM(CASE WHEN ve.voucher_type = 'Purchase' THEN ve.amount ELSE 0 END), 0)) * 100, 2
+                    COALESCE(
+                        (SUM(CASE WHEN ve.voucher_type = 'Purchase' AND ve.payment_status = :pendingStatus THEN ve.amount ELSE 0 END) /
+                        NULLIF(SUM(CASE WHEN ve.voucher_type = 'Purchase' THEN ve.amount ELSE 0 END), 0)) * 100, 0
+                    ), 2
                 ) AS payablePercentage`
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
-            .where(`YEAR(ve.generation_date) = :year`, { year: req.date }) // Dynamic year selection
-            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            .groupBy('branch.id, branch.name')
-            .orderBy('branch.name', 'ASC')
-            .setParameter('pendingStatus', PaymentStatus.PENDING)
-            .getRawMany();
+            .where(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode });
 
-        return query;
+        // Apply optional filters
+        if (req.date) {
+            query.andWhere(`YEAR(ve.generation_date) = :year`, { year: req.date });
+        }
+        if (req.branchName) {
+            query.andWhere(`LOWER(branch.name) = LOWER(:branchName)`, { branchName: req.branchName });
+        }
+
+        query.groupBy('branch.id, branch.name')
+            .orderBy('branch.name', 'ASC')
+            .setParameter('pendingStatus', PaymentStatus.PENDING);
+
+        return query.getRawMany();
     }
+
 
 
     async getSalesBreakdown(req: BranchChartDto) {
@@ -1692,12 +1474,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `DATE(ve.generation_date) AS date`,
                 `ve.voucher_id AS "voucherId"`,
                 `ve.purpose AS "purpose"`,
-                `ve.payment_type AS "paymentType"`,
                 `branch.name AS branchName`,
                 've.amount AS "amount"',
-
+                'ledger.name AS ledgerName'
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere(`ve.payment_status = :pendingStatus`, { pendingStatus: PaymentStatus.PENDING })
@@ -1768,8 +1550,396 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return data;
     }
 
+    async getAmountDetails(req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END) AS ReceivableAmount`,
+                `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END) AS PayableAmount`
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // Apply branch name filter only if provided
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        return query.getRawOne(); // Returns a single object instead of an array
+    }
+
+    async getVoucherAmountDetails(req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `SUM(CASE WHEN ve.payment_status = 'PENDING' THEN ve.amount ELSE 0 END) AS pendingAmount`,
+                `SUM(CASE WHEN ve.payment_status = 'COMPLETED' THEN ve.amount ELSE 0 END) AS receivedAmount`
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // Apply branch name filter only if provided
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        return query.getRawOne(); // Returns a single object instead of an array
+    }
 
 
+    async getSolidLiquidCash(req: CommonReq) {
+        // 1️⃣ Get total balance in all accounts from `AccountEntity` (No need for payment type filtering)
+        const bankBalanceResult = await this.dataSource
+            .getRepository(AccountEntity)
+            .createQueryBuilder('ac')
+            .select('SUM(ac.total_amount)', 'bankBalance')
+            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
+            .getRawOne();
+
+        // 2️⃣ Get transactions from vouchers that affect banks (receipt & payment)
+        const bankTransactions = await this.dataSource
+            .getRepository(VoucherEntity)
+            .createQueryBuilder('ve')
+            .select([
+                `SUM(CASE 
+                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+                    ELSE 0 
+                END) AS bankTransactions`,
+            ])
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .setParameters({
+                bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
+                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE], // Increase bank balance
+                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE], // Decrease bank balance
+            })
+            .getRawOne();
+
+        // 3️⃣ Get solid cash (only transactions with `payment_type = cash`)
+        const solidCashResult = await this.dataSource
+            .getRepository(VoucherEntity)
+            .createQueryBuilder('ve')
+            .select([
+                `SUM(CASE 
+                    WHEN ve.payment_type = :cash AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+                    WHEN ve.payment_type = :cash AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+                    ELSE 0 
+                END) AS solidCash`,
+            ])
+            .setParameters({
+                cash: PaymentType.CASH,
+                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
+                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+            })
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .getRawOne();
+
+        return {
+            solidCash: parseFloat(solidCashResult?.solidCash || 0),
+            liquidCash: parseFloat(bankBalanceResult?.bankBalance || 0) + parseFloat(bankTransactions?.bankTransactions || 0),
+        };
+    }
+
+    async getBranchWiseSolidLiquidCash(req: CommonReq) {
+        // 1️⃣ Get branch-wise liquid cash (total balance from AccountEntity)
+        const liquidCashResults = await this.dataSource
+            .getRepository(AccountEntity)
+            .createQueryBuilder('ac')
+            .select([
+                'br.name AS branchName',
+                'SUM(ac.total_amount) AS liquidCash',
+            ])
+            .leftJoin('branches', 'br', 'br.id = ac.branch_id') // Assuming `branch_id` exists in AccountEntity
+            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name')
+            .getRawMany();
+
+        // 2️⃣ Get bank transactions from VoucherEntity (both positive & negative)
+        const bankTransactions = await this.dataSource
+            .getRepository(VoucherEntity)
+            .createQueryBuilder('ve')
+            .select([
+                'br.name AS branchName',
+                `SUM(CASE 
+                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+                    ELSE 0 
+                END) AS bankTransactions`,
+            ])
+            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name')
+            .setParameters({
+                bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
+                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
+                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+            })
+            .getRawMany();
+
+        // 3️⃣ Get branch-wise solid cash (cash transactions from VoucherEntity)
+        const solidCashResults = await this.dataSource
+            .getRepository(VoucherEntity)
+            .createQueryBuilder('ve')
+            .select([
+                'br.name AS branchName',
+                `SUM(CASE 
+                    WHEN ve.payment_type = :cash AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+                    WHEN ve.payment_type = :cash AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+                    ELSE 0 
+                END) AS solidCash`,
+            ])
+            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name')
+            .setParameters({
+                cash: PaymentType.CASH,
+                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
+                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+            })
+            .getRawMany();
+
+        // 4️⃣ Merge results into a single structure
+        const branchWiseData = new Map<string, { branchName: string; solidCash: number; liquidCash: number }>();
+
+        // Populate liquid cash data
+        liquidCashResults.forEach(row => {
+            branchWiseData.set(row.branchName, {
+                branchName: row.branchName || 'Unknown Branch',
+                liquidCash: parseFloat(row.liquidCash || '0'),
+                solidCash: 0,
+            });
+        });
+
+        // Add bank transactions to liquid cash
+        bankTransactions.forEach(row => {
+            if (!branchWiseData.has(row.branchName)) {
+                branchWiseData.set(row.branchName, {
+                    branchName: row.branchName || 'Unknown Branch',
+                    liquidCash: 0,
+                    solidCash: 0,
+                });
+            }
+            branchWiseData.get(row.branchName)!.liquidCash += parseFloat(row.bankTransactions || '0');
+        });
+
+        // Populate solid cash data
+        solidCashResults.forEach(row => {
+            if (!branchWiseData.has(row.branchName)) {
+                branchWiseData.set(row.branchName, {
+                    branchName: row.branchName || 'Unknown Branch',
+                    solidCash: 0,
+                    liquidCash: 0,
+                });
+            }
+            branchWiseData.get(row.branchName)!.solidCash += parseFloat(row.solidCash || '0');
+        });
+
+        return Array.from(branchWiseData.values());
+    }
+
+    async getBranchWiseAccountAmounts(req: CommonReq) {
+        // Fetch account-wise amounts grouped by branch
+        const accountWiseAmounts = await this.dataSource
+            .getRepository(AccountEntity)
+            .createQueryBuilder('ac')
+            .select([
+                'br.name AS branchName',
+                'ac.account_name AS accountName',
+                'SUM(ac.total_amount) AS accountAmount',
+            ])
+            .leftJoin('branches', 'br', 'br.id = ac.branch_id')
+            .where('ac.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ac.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('br.name, ac.account_name')
+            .getRawMany();
+
+        // Transform data into the required format
+        const branchAccountData: Record<string, Record<string, number>> = {};
+
+        accountWiseAmounts.forEach(row => {
+            const branchName = row.branchName || 'Unknown Branch';
+            const accountName = row.accountName || 'Unknown Account';
+            const accountAmount = parseFloat(row.accountAmount || '0');
+
+            if (!branchAccountData[branchName]) {
+                branchAccountData[branchName] = {};
+            }
+
+            branchAccountData[branchName][accountName] = accountAmount;
+        });
+
+        // Convert object into array format
+        return Object.entries(branchAccountData).map(([branch, accounts]) => ({
+            [branch]: accounts,
+        }));
+    }
+
+    async getTrialBalance(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        // Fetch all ledger transactions within the date range
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'ledger.group AS groupName',
+                // 'ledger.name AS ledgerName',
+                `SUM(CASE 
+                    WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount 
+                    ELSE 0 
+                END) AS debitAmount`,
+                `SUM(CASE 
+                    WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount 
+                    ELSE 0 
+                END) AS creditAmount`
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+        // .andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
+        //     fromDate: req.fromDate,
+        //     toDate: req.toDate
+        // });
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        // Apply branch name filter if provided
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        const ledgerTransactions = await query
+            .groupBy('ledger.group')
+            .setParameters({
+                debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+            })
+            .getRawMany();
+        console.log(ledgerTransactions, ">>>>>>>>")
+        // Define the structure of the Trial Balance
+        const trialBalance = {
+            assets: [],
+            liabilities: [],
+            expenses: [],
+            income: [],
+            suspenseAccount: []
+        };
+
+        // Categorize Ledgers
+        ledgerTransactions.forEach(({ groupName, ledgerName, debitAmount, creditAmount }) => {
+            if ([
+                UnderSecondary.CURRENT_ASSETS,
+                UnderSecondary.LOANS_AND_ADVANCES,
+                UnderSecondary.CASH_IN_HAND,
+                UnderSecondary.BANK_ACCOUNTS,
+                UnderSecondary.DEPOSITS,
+                UnderSecondary.STOCK_IN_HAND,
+                UnderSecondary.SUNDRY_DEBTORS,
+                UnderSecondary.FIXED_ASSETS,
+                UnderSecondary.INVESTMENTS,
+                UnderSecondary.Miscellaneous_EXPENSES
+            ].includes(groupName)) {
+                trialBalance.assets.push({ ledgerName, groupName, debitAmount, creditAmount });
+            } else if ([
+                UnderSecondary.CURRENT_LIABILITIES,
+                UnderSecondary.DUTIES_AND_TAXES,
+                UnderSecondary.PROVISIONS,
+                UnderSecondary.SUNDRY_CREDITORS,
+                UnderSecondary.BRANCH_DIVISION,
+                UnderSecondary.CAPITAL_ACCOUNT,
+                UnderSecondary.LOANS,
+                UnderSecondary.BANK_OD,
+                UnderSecondary.SECURED_LOANS,
+                UnderSecondary.UNSECURED_LOANS,
+                UnderSecondary.RESERVES_AND_SURPLUS
+            ].includes(groupName)) {
+                trialBalance.liabilities.push({ ledgerName, groupName, debitAmount, creditAmount });
+            } else if ([
+                UnderSecondary.PURCHASE_ACCOUNT,
+                UnderSecondary.Manufacturing_Expenses,
+                UnderSecondary.INDIRECT_EXPENSES,
+                UnderSecondary.DIRECT_EXPENSES
+            ].includes(groupName)) {
+                trialBalance.expenses.push({ ledgerName, groupName, debitAmount, creditAmount });
+            } else if ([
+                UnderSecondary.SALES_ACCOUNT,
+                UnderSecondary.RETAINED_EARNINGS,
+                UnderSecondary.Rental_Income,
+                UnderSecondary.Interest_Income,
+                UnderSecondary.Commission_Received,
+                UnderSecondary.DIRECT_INCOMES
+            ].includes(groupName)) {
+                trialBalance.income.push({ ledgerName, groupName, debitAmount, creditAmount });
+            } else if (groupName === UnderSecondary.SUSPENSE_ACCOUNT) {
+                trialBalance.suspenseAccount.push({ ledgerName, debitAmount, creditAmount });
+            }
+        });
+        console.log(trialBalance, "????????????????")
+        return trialBalance;
+    }
+
+    // async getBalanceSheet(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
+    //     const query = this.createQueryBuilder('ve')
+    //         .select([
+    //             'ledger.group AS groupName',
+    //             'SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount',
+    //             'SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount'
+    //         ])
+    //         .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+    //         .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
+    //             fromDate: req.fromDate,
+    //             toDate: req.toDate
+    //         })
+    //         .groupBy('ledger.group')
+    //         .setParameters({
+    //             debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+    //             creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+    //         });
+
+    //     const ledgerTransactions = await query.getRawMany();
+
+    //     const balanceSheet = {
+    //         assets: [],
+    //         liabilities: [],
+    //         equity: []
+    //     };
+
+    //     ledgerTransactions.forEach(({ groupName, debitAmount, creditAmount }) => {
+    //         const netAmount = debitAmount - creditAmount; // Adjust based on accounting rules
+
+    //         if ([UnderSecondary.CURRENT_ASSETS, UnderSecondary.FIXED_ASSETS, UnderSecondary.INVESTMENTS].includes(groupName)) {
+    //             balanceSheet.assets.push({ groupName, amount: netAmount });
+    //         } else if ([UnderSecondary.CURRENT_LIABILITIES, UnderSecondary.LONG_TERM_LIABILITIES].includes(groupName)) {
+    //             balanceSheet.liabilities.push({ groupName, amount: netAmount });
+    //         } 
+    //     });
+
+    //     // Ensure Assets = Liabilities + Equity
+    //     const totalAssets = balanceSheet.assets.reduce((sum, item) => sum + item.amount, 0);
+    //     const totalLiabilities = balanceSheet.liabilities.reduce((sum, item) => sum + item.amount, 0);
+
+    //     if (totalAssets !== totalLiabilities + totalEquity) {
+    //         throw new Error("Balance Sheet is not balanced!");
+    //     }
+
+    //     return balanceSheet;
+    // }
 
 
 

@@ -41,6 +41,7 @@ export class ClientAdapter {
         entity.tcs = dto.tcs
         entity.tds = dto.tds
         entity.billWiseDate = dto.billWiseDate
+        entity.status = dto.status
         return entity;
     }
 
@@ -59,7 +60,8 @@ export class ClientAdapter {
                 client.address,
                 client.joiningDate,
                 client.companyCode,
-                client.unitCode
+                client.unitCode,
+                client.status
             );
         });
     }

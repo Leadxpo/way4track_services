@@ -29,7 +29,9 @@ export class StaffController {
             { name: 'appointmentLetter', maxCount: 1 },
             { name: 'leaveFormat', maxCount: 1 },
             { name: 'relievingLetter', maxCount: 1 },
-            { name: 'experienceLetter', maxCount: 1 }
+            { name: 'experienceLetter', maxCount: 1 },
+            { name: 'experience', maxCount: 5 }
+
         ], multerOptions)
     )
     @Post('handleStaffDetails')
@@ -46,7 +48,8 @@ export class StaffController {
             appointmentLetter?: Express.Multer.File[],
             leaveFormat?: Express.Multer.File[],
             relievingLetter?: Express.Multer.File[],
-            experienceLetter?: Express.Multer.File[]
+            experienceLetter?: Express.Multer.File[],
+            experience?: Express.Multer.File[]
         }
     ): Promise<CommonResponse> {
         if (dto.id) {

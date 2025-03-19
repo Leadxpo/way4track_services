@@ -5,6 +5,8 @@ export class OTPDto {
   otp: string;
   expiresAt: Date;
   phoneNumber: string;
+  companyCode: string
+  unitCode: string
 
 }
 

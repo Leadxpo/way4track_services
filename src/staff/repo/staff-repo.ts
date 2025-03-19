@@ -212,7 +212,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             const perHourSalary = perDaySalary / 9 || 0;
 
             let carryForwardLeaves = 12;
-            if (Number(record.leaveDays) > 1) {
+            if (Number(record.leaveDays) >= 1) {
                 carryForwardLeaves -= 1;
             }
 
@@ -434,7 +434,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         return staffDetails;
     }
 
-    async getStaff(req: CommonReq) {
+    async getStaff(req: { companyCode: string, unitCode: string, staffId?: string }) {
         const query = this.createQueryBuilder('staff')
             // .leftJoin(DesignationEntity,'staff.designationRelation', 'designation') // Join designation table
             .select([
@@ -450,7 +450,10 @@ export class StaffRepository extends Repository<StaffEntity> {
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.designation IN (:...designations)', {
                 designations: ['Accountant', 'Warehouse Manager', 'HR'], // Direct values
-            });
+            })
+        if (req.staffId) {
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
 
         return await query.getRawMany();
     }

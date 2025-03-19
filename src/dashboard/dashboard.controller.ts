@@ -477,10 +477,95 @@ export class DashboardController {
         }
     }
 
+
+    @Post('getReceivableAmountForTable')
+    async getReceivableAmountForTable(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getReceivableAmountForTable(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getSalesForTable')
+    async getSalesForTable(@Body() req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getSalesForTable(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+
+    @Post('getPayableAmountForTable')
+    async getPayableAmountForTable(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getPayableAmountForTable(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getPurchaseDataForTable')
+    async getPurchaseDataForTable(@Body() req:
+        {
+            fromDate?: string;
+            toDate?: string;
+            branchName?: string;
+            companyCode?: string;
+            unitCode?: string;
+        }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getPurchaseDataForTable(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getAmountDetails')
+    async getAmountDetails(@Body() req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getAmountDetails(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Post('getBranchWiseSolidLiquidCash')
     async getBranchWiseSolidLiquidCash(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getBranchWiseSolidLiquidCash(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
+    @Post('getBranchWiseAccountAmounts')
+    async getBranchWiseAccountAmounts(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getBranchWiseAccountAmounts(req)
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
@@ -559,6 +644,19 @@ export class DashboardController {
     }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getProductsPhotos(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getTrialBalance')
+    async getTrialBalance(@Body() req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getTrialBalance(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

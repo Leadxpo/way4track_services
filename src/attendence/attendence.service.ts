@@ -279,7 +279,7 @@ export class AttendanceService {
     }
 
 
-    async getStaffAttendance(req: { staffId?: string }): Promise<CommonResponse> {
+    async getStaffAttendance(req: { staffId?: string; date?: string; branchName?: string; companyCode?: string; unitCode?: string }): Promise<CommonResponse> {
         const branch = await this.attendanceRepo.getStaffAttendance(req)
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");

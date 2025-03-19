@@ -15,6 +15,8 @@ import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { OtpEntity } from 'src/otp-generation/entity/otp-generation.entity';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
 import { StaffStatus } from '../enum/staff-status';
+import { Letters } from '../enum/qualifications.enum';
+import { Experience } from '../dto/staff.dto';
 
 
 export enum Gender {
@@ -51,14 +53,7 @@ export enum AccountType {
   SAVINGS = 'savings',
   CURRENT = 'current',
 }
-
-
-
-
-
-
-
-@Entity({ name: 'staff' })
+@Entity({ name: 'st' })
 export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -319,4 +314,8 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ type: 'int', default: 0, name: "carry_forward_leaves" })
   carryForwardLeaves: number;
+
+  @Column({ type: 'json', name: 'experience', nullable: true })
+  experience: Experience[];  
+
 }

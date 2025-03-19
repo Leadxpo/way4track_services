@@ -82,7 +82,7 @@ export class StaffAdapter {
             branchEntity.id = dto.branch;
             entity.branch = branchEntity;
         }
-
+        entity.experience = dto.experience
         return entity;
     }
 

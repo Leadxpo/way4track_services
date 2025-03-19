@@ -85,6 +85,18 @@ export class VoucherDashboardService {
 
     }
 
+    async getTrialBalance(req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getTrialBalance(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getTotalSalesForReport(req: {
         fromDate?: string;
         toDate?: string;
@@ -168,6 +180,22 @@ export class VoucherDashboardService {
     }): Promise<CommonResponse> {
         try {
             const voucherData = await this.voucherRepository.getPurchaseDataForTable(req);
+            return new CommonResponse(true, 200, 'Data retrieved successfully', voucherData);
+        } catch (err) {
+            console.error('Error in getSalesForTable:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
+        }
+    }
+
+
+    async getAmountDetails(req: {
+
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            const voucherData = await this.voucherRepository.getAmountDetails(req);
             return new CommonResponse(true, 200, 'Data retrieved successfully', voucherData);
         } catch (err) {
             console.error('Error in getSalesForTable:', err);
@@ -493,6 +521,16 @@ export class VoucherDashboardService {
 
     async getBranchWiseSolidLiquidCash(req: CommonReq): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getBranchWiseSolidLiquidCash(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getBranchWiseAccountAmounts(req: CommonReq): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getBranchWiseAccountAmounts(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

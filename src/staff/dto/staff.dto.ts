@@ -1,6 +1,6 @@
 import { AccountType, Gender, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
-import { Qualification } from "../enum/qualifications.enum";
+import { Letters, Qualification } from "../enum/qualifications.enum";
 import { StaffStatus } from "../enum/staff-status";
 export class StaffDto {
     id?: number;
@@ -66,7 +66,7 @@ export class StaffDto {
     mailAllocation: YesNo;
     designation_id?: number
     carryForwardLeaves: number;
-
+    experience?: Experience[]
 }
 
 export class Qualifications {
@@ -74,3 +74,13 @@ export class Qualifications {
     marksOrCgpa: number;
     file?: string;
 }
+
+export class Experience {
+    previousCompany: string;
+    previous_designation: string;
+    total_experience?: string;
+    previous_salary?: string;
+    letter?: Letters;
+    uploadLetters?: string;
+}
+

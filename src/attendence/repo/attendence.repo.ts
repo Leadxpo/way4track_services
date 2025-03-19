@@ -12,8 +12,8 @@ export class AttendenceRepository extends Repository<AttendanceEntity> {
         super(AttendanceEntity, dataSource.createEntityManager());
     }
 
-    async getStaffAttendance(req: { staffId?: string }) {
-        const query = await this.createQueryBuilder('a')
+    async getStaffAttendance(req: { staffId?: string; date?: string; branchName?: string; companyCode?: string; unitCode?: string }) {
+        const query = this.createQueryBuilder('a')
             .select([
                 'a.id AS id',
                 'a.staff_id AS staffId',
@@ -27,10 +27,25 @@ export class AttendenceRepository extends Repository<AttendanceEntity> {
                 'staff.name AS staffName',
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = a.staff_id')
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
-            .getRawMany();
+            .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        return query;
+        if (req.staffId) {
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+
+        if (req.branchName) {
+            query.andWhere('a.branch_name = :branchName', { branchName: req.branchName });
+        }
+
+        if (req.date) {
+            const formattedDate = new Date(req.date).toISOString().split('T')[0];
+            query.andWhere('DATE(a.day) = :date', { date: formattedDate });
+
+        }
+
+        return await query.getRawMany(); // Ensure you await the query execution
     }
+
 
 }

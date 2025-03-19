@@ -25,6 +25,8 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.payment_status AS paymentStatus',
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
+                'cl.status as status'
+
             ])
             .leftJoin('cl.voucherId', 'vr')
             .where(`cl.company_code = "${req.companyCode}"`)
@@ -51,6 +53,8 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.name AS voucherName',
                 'vr.generation_date AS generationDate',
                 'vr.product_type AS productType',
+                'cl.status as status'
+
             ])
             .leftJoin('cl.voucherId', 'vr')
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
@@ -80,6 +84,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.name AS voucherName',
                 'vr.generation_date AS generationDate',
                 'vr.product_type AS productType',
+                'cl.status as status'
             ])
             .leftJoin('cl.voucherId', 'vr')
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')

@@ -1,3 +1,4 @@
+import { ProductStatusEnum } from "../enum/product-status.enum";
 
 export class ProductDto {
   id?: number;
@@ -35,7 +36,10 @@ export class ProductDto {
   SIM_IMSI: string;
   SIM_NO: string;
   MOBILE_NUMBER: string;
-  productTypeId?:number
+  productTypeId?: number
+  productStatus?: ProductStatusEnum
+  productType?: string
+
 }
 
 

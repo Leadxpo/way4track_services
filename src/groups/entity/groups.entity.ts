@@ -21,6 +21,7 @@ export enum UnderSecondary {
     CASH_IN_HAND = "cash_in_hand",
     CURRENT_ASSETS = "current_assets",
     CURRENT_LIABILITIES = "current_liabilities",
+    Commission_Received="Commission Received",
     DEPOSITS = "deposits",
     DIRECT_EXPENSES = "direct_expenses",
     DIRECT_INCOMES = "direct_incomes",
@@ -29,20 +30,23 @@ export enum UnderSecondary {
     INDIRECT_INCOME = "indirect_income",
     FIXED_ASSETS = "fixed_assets",
     INVESTMENTS = "investments",
-    LOANS_ADVANCES_ASSETS = "loans_advances_assets",
-    LOANS_LIABILITY = "loans_liability",
-    MISC_EXPENSES_ASSET = "misc_expenses_asset",
+    Interest_Income="Interest Income",
+    LOANS_AND_ADVANCES = "loans_and_advances",
+    LOANS= "loans",
+    Miscellaneous_EXPENSES = "Miscellaneous_expenses",
     PROVISIONS = "provisions",
     PURCHASE_ACCOUNT = "purchase_account",
     RESERVES_AND_SURPLUS = "reserves_and_surplus",
     RETAINED_EARNINGS = "retained_earnings",
+    Rental_Income="Rental Income",
     SALES_ACCOUNT = "sales_account",
     SECURED_LOANS = "secured_loans",
     STOCK_IN_HAND = "stock_in_hand",
     SUNDRY_CREDITORS = "sundry_creditors",
     SUNDRY_DEBTORS = "sundry_debtors",
     SUSPENSE_ACCOUNT = "suspense_account",
-    UNSECURED_LOANS = "unsecured_loans"
+    UNSECURED_LOANS = "unsecured_loans",
+    Manufacturing_Expenses="Manufacturing_Expenses"
 }
 
 @Entity('groups')

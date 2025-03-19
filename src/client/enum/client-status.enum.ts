@@ -6,3 +6,8 @@ export enum ClientStatusEnum {
   DECLINED = 'declined',
   pending = 'pending'
 }
+
+export enum ClientStatus {
+  Active = "Active",
+  InActive = "InActive"
+}

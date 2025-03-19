@@ -25,16 +25,19 @@ export class ProductTypeService {
 
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
-    async handleProductTypeDetails(dto: ProductTypeDto, photos: {
+    async handleProductTypeDetails(dto: ProductTypeDto, photos?: {
         photo?: Express.Multer.File[];
         image?: Express.Multer.File[];
     }): Promise<CommonResponse> {
         try {
+            // Ensure photos is always an object
+            photos = photos ?? { photo: [], image: [] };
 
             let filePaths: Record<keyof typeof photos, string | undefined> = {
                 photo: undefined,
                 image: undefined
             };
+
             for (const [key, fileArray] of Object.entries(photos)) {
                 if (fileArray && fileArray.length > 0) {
                     const file = fileArray[0]; // Get the first file
@@ -45,14 +48,15 @@ export class ProductTypeService {
                         resumable: false,
                     });
                     console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                    filePaths[key] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                    filePaths[key as keyof typeof photos] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
                 }
             }
-            const existingStaff = dto.id ? await this.productTypeRepository.findOne({ where: { id: dto.id } }) : null;
-            if (existingStaff) {
+
+            // const existingStaff = dto.id ? await this.productTypeRepository.findOne({ where: { id: dto.id } }) : null;
+            if (dto.id) {
                 return await this.updateProductTypeDetails(dto, filePaths);
             } else {
-
+                console.log("+++++++")
                 return await this.createProductTypeDetails(dto, filePaths);
             }
         } catch (error) {
@@ -60,6 +64,7 @@ export class ProductTypeService {
             throw new ErrorResponse(500, `Failed to handle ProductType details: ${error.message}`);
         }
     }
+
 
     async createProductTypeDetails(dto: ProductTypeDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
         try {
@@ -177,7 +182,7 @@ export class ProductTypeService {
 
     async getProductTypeDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const ProductType = await this.productTypeRepository.find({where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const ProductType = await this.productTypeRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!ProductType) {
                 return new CommonResponse(false, 404, 'ProductType not found');
             }

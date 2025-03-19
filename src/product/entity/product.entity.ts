@@ -7,6 +7,7 @@ import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany, ManyToMany } from 'typeorm';
+import { ProductStatusEnum } from '../enum/product-status.enum';
 
 @Entity('products')
 export class ProductEntity extends BaseEntity {
@@ -50,6 +51,9 @@ export class ProductEntity extends BaseEntity {
   @ManyToOne(() => ProductTypeEntity, (ProductTypeEntity) => ProductTypeEntity.productType, { nullable: true })
   @JoinColumn({ name: 'product_type_id' })
   productTypeId: ProductTypeEntity;
+
+  @Column({ name: 'product_type', type: 'varchar', length: 100, nullable: true })
+  productType: string;
 
   @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, nullable: true })
   vendorPhoneNumber: string;
@@ -144,6 +148,9 @@ export class ProductEntity extends BaseEntity {
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.productId)
   technician: TechnicianWorksEntity[];
+
+  @Column({ name: 'product_status', type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.available })
+  productStatus: ProductStatusEnum
 
 
 }
