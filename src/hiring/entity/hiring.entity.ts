@@ -56,7 +56,7 @@ export class HiringEntity extends BaseEntity {
     @Column({ name: 'date_of_upload', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dateOfUpload: Date;
 
-    @Column({ name: 'status', type: 'enum', enum: HiringStatus, default: HiringStatus.INTERVIEWED })
+    @Column({ name: 'status', type: 'enum', enum: HiringStatus, default: HiringStatus.PENDING })
     status: HiringStatus;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })

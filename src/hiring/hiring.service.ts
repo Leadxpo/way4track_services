@@ -155,9 +155,13 @@ export class HiringService {
                 'hiring.unit_code AS unitCode',
                 'hiring.hiring_level AS hiringLevel',
             ])
-            .where(`hiring.company_code = "${req.companyCode}"`)
-            .andWhere(`hiring.unit_code = "${req.unitCode}"`)
-            .andWhere('hiring.status != :status', { status: 'Qualified' });
+            .where('hiring.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('hiring.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.status) {
+            query.andWhere('hiring.status = :status', { status: req.status });
+        }
+
         if (req.hiringId) {
             query.andWhere('hiring.id = :hiringId', { hiringId: req.hiringId });
         }
@@ -168,13 +172,12 @@ export class HiringService {
             });
         }
 
-        if (req.status) {
-            query.andWhere('hiring.status = :status', { status: req.status });
-        }
-
+        console.log(req.status, "????????");
         const result = await query.getRawMany();
-        return new CommonResponse(true, 200, 'hiring details  successfully', result);
+        console.log(result, "PPPPPPPPPPP");
+        return new CommonResponse(true, 200, 'Hiring details retrieved successfully', result);
     }
+
 
     async getCandidatesStatsLast30Days(req: CommonReq): Promise<{ totalAttended: number, totalQualified: number }> {
         const thirtyDaysAgo = new Date();
