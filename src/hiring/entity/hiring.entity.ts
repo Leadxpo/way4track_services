@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
 import { HiringStatus } from '../enum/hiring-status.enum';
 import { HiringLevel } from '../enum/hiring-level.enum';
-import {  YesNo } from 'src/staff/entity/staff.entity';
+import { YesNo } from 'src/staff/entity/staff.entity';
 
 export enum InterviewWith {
     Sunil = "Sunil",
@@ -41,6 +41,7 @@ export class HiringEntity extends BaseEntity {
         conductorPlace: string,
         result: string,
         review: string,
+        type?: string,
     }[];
 
     @Column({ name: 'resume_path', type: 'varchar', nullable: true })

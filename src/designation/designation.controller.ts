@@ -7,20 +7,30 @@ import { CommonResponse } from 'src/models/common-response';
 
 @Controller('designations')
 export class DesignationController {
-  constructor(private readonly designationService: DesignationService) {}
+  constructor(private readonly designationService: DesignationService) { }
 
   @Post('createDesignation')
   async createDesignation(@Body() dto: CreateDesignationDto): Promise<DesignationEntity> {
     return this.designationService.createDesignation(dto);
   }
-  
-    @Post('getDesignation')
-    async getDesignation(@Body() req: CreateDesignationDto): Promise<CommonResponse> {
-      try {
-        return await this.designationService.getDesignation(req);
-      } catch (error) {
-        console.error('Error in get vendor details:', error);
-        return new CommonResponse(false, 500, 'Error fetching vendor details');
-      }
+
+  @Post('getDesignation')
+  async getDesignation(@Body() req: CreateDesignationDto): Promise<CommonResponse> {
+    try {
+      return await this.designationService.getDesignation(req);
+    } catch (error) {
+      console.error('Error in get vendor details:', error);
+      return new CommonResponse(false, 500, 'Error fetching vendor details');
     }
+  }
+
+  @Post('getAllDesignation')
+  async getAllDesignation(): Promise<CommonResponse> {
+    try {
+      return await this.designationService.getAllDesignation();
+    } catch (error) {
+      console.error('Error in get vendor details:', error);
+      return new CommonResponse(false, 500, 'Error fetching vendor details');
+    }
+  }
 }

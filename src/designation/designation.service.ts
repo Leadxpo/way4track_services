@@ -12,10 +12,10 @@ import { CommonResponse } from 'src/models/common-response';
 @Injectable()
 export class DesignationService {
   constructor(
-   
+
     private readonly designationRepository: DesignationRepository,
-    private readonly adapter:DesignationAdapter
-  ) {}
+    private readonly adapter: DesignationAdapter
+  ) { }
 
   async createDesignation(dto: CreateDesignationDto): Promise<DesignationEntity> {
     const newDesignation = this.adapter.convertDtoToEntity(dto);
@@ -24,18 +24,32 @@ export class DesignationService {
 
   async getDesignation(dto: CreateDesignationDto): Promise<CommonResponse> {
     try {
-        const des = await this.designationRepository.findOne({
-            where: { designation: dto.designation, companyCode: dto.companyCode, unitCode: dto.unitCode }
-        });
+      const des = await this.designationRepository.findOne({
+        where: { designation: dto.designation, companyCode: dto.companyCode, unitCode: dto.unitCode }
+      });
 
-        if (!des) {
-            return new CommonResponse(false, 404, 'Designation not found');
-        }
+      if (!des) {
+        return new CommonResponse(false, 404, 'Designation not found');
+      }
 
-        return new CommonResponse(true, 200, 'Designation details fetched successfully', des);
+      return new CommonResponse(true, 200, 'Designation details fetched successfully', des);
     } catch (error) {
-        throw new ErrorResponse(500, error.message);
+      throw new ErrorResponse(500, error.message);
     }
-}
+  }
+
+  async getAllDesignation(): Promise<CommonResponse> {
+    try {
+      const des = await this.designationRepository.find();
+
+      if (!des) {
+        return new CommonResponse(false, 404, 'Designation not found');
+      }
+
+      return new CommonResponse(true, 200, 'Designation details fetched successfully', des);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
 
 }

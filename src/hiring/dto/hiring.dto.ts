@@ -17,6 +17,8 @@ export class HiringDto {
         conductorPlace: string,
         result: string,
         review: string,
+        type?: string,
+
     }[];
     resumePath?: string;
     dateOfUpload: Date;
