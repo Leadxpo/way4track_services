@@ -20,4 +20,14 @@ export class PayRollController {
             return new CommonResponse(false, 500, 'Error saving ticket details');
         }
     }
+
+    @Post('getPayRollStaffDetails')
+    async getPayRollStaffDetails(@Body() req: { staffId: string; month: string; year: string }): Promise<CommonResponse> {
+        try {
+            return this.ticketsService.getPayRollStaffDetails(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
 }
