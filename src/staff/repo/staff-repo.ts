@@ -283,8 +283,14 @@ export class StaffRepository extends Repository<StaffEntity> {
                 extraHalfSalary,
                 daysOutLate6HoursOrMore: daysWith6HoursOutLate,
                 netSalary: isNaN(updatedNetSalary) ? 0 : updatedNetSalary,
-                // salaryStatus: record.salaryStatus,
-                carryForwardLeaves
+                salaryStatus: '',
+                carryForwardLeaves,
+                professionalTax: 0,
+                incentives: 0,
+                foodAllowance: 0,
+                leaveEncashment: 0,
+                plBikeNeedToPay: 0,
+                plBikeAmount: 0,
 
 
             };
