@@ -11,7 +11,7 @@ export class DesignationController {
 
   @Post('createDesignation')
   async createDesignation(@Body() dto: CreateDesignationDto): Promise<DesignationEntity> {
-    return this.designationService.createDesignation(dto);
+    return this.designationService.createOrUpdateDesignation(dto);
   }
 
   @Post('getDesignation')

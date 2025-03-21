@@ -36,7 +36,7 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'number_of_products', type: 'int' })
   numberOfProducts: number;
 
-  @ManyToOne(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign)
+  @ManyToOne(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'request_id' })
   requestId: RequestRaiseEntity;
 

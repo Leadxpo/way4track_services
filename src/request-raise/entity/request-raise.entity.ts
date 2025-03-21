@@ -6,7 +6,12 @@ import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.en
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, BeforeInsert, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
-
+import { RequestTypeProducts } from '../dto/request-raise.dto';
+export enum RequestType {
+    assets = "assets",
+    money = "money",
+    products = "products"
+}
 @Entity('requests')
 export class RequestRaiseEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -15,8 +20,8 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'request_id', type: 'varchar', unique: true })
     requestId: string;
 
-    @Column({ name: 'request_type', type: 'varchar', length: 50 })
-    requestType: string;
+    @Column({ name: 'request_type', type: 'enum', enum: RequestType, default: RequestType.money })
+    requestType: RequestType
 
     @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.pending })
     status: ClientStatusEnum
@@ -64,4 +69,7 @@ export class RequestRaiseEntity extends BaseEntity {
 
     @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.request)
     notifications: NotificationEntity[];
+
+    @Column({ type: 'json', name: 'products', nullable: true })
+    products: RequestTypeProducts[];
 }

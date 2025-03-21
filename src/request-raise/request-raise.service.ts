@@ -147,8 +147,8 @@ export class RequestRaiseService {
         }
     }
 
-    async getTodayRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }): Promise<CommonResponse> {
-        const data = await this.requestRepository.getTodayRequestBranchWise(req);
+    async getRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }): Promise<CommonResponse> {
+        const data = await this.requestRepository.getRequestBranchWise(req);
         return data.length
             ? new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
             : new CommonResponse(true, 4579, "There are no branch names", data);

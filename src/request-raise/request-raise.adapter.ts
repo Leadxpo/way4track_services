@@ -35,6 +35,7 @@ export class RequestRaiseAdapter {
 
         entity.description = dto.description;
         entity.createdDate = dto.createdDate;
+        entity.products = dto.products
         if (dto.id) {
             entity.id = dto.id;
         }

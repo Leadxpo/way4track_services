@@ -12,5 +12,7 @@ export class ProductTypeRepository extends Repository<ProductTypeEntity> {
         super(ProductTypeEntity, dataSource.createEntityManager());
     }
 
+    
+
 
 }

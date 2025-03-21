@@ -77,10 +77,10 @@ export class RequestRaiseController {
         }
     }
 
-    @Post('getTodayRequestBranchWise')
-    async getTodayRequestBranchWise(@Body() req: { companyCode: string, unitCode: string, branch?: string }) {
+    @Post('getRequestBranchWise')
+    async getRequestBranchWise(@Body() req: { companyCode: string, unitCode: string, branch?: string }) {
         try {
-            return await this.requestService.getTodayRequestBranchWise(req);
+            return await this.requestService.getRequestBranchWise(req);
         } catch (error) {
             console.error('Error in getTodayRequestBranchWise:', error);
             return new CommonResponse(false, 500, "Error fetching today's requests");

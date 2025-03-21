@@ -74,7 +74,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         // Return the grouped and detailed results
         return { result, rawResults };
     }
-    
+
     async getSearchDetailProduct(req: ProductIdDto) {
         const query = this.createQueryBuilder('productAssign')
             .select([
@@ -394,6 +394,29 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             console.error('Error fetching product details:', error);
             throw new Error('Failed to fetch product details');
         }
+    }
+
+
+
+    //New APIS
+
+
+    async getBranchManagerDetailProduct(req: CommonReq) {
+        console.log('Request Object:', req);
+
+        const query = this.createQueryBuilder('pr')
+            .select([
+                'pt.name AS productName',  // Assuming you want the name from ProductTypeEntity
+                'SUM(CASE WHEN pr.status = \'assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock',
+            ])
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pr.product_type_id')
+            .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+            .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('pt.name'); // Grouping by the correct alias
+
+        const result = await query.getRawMany();
+        return result;
     }
 }
 

@@ -17,10 +17,27 @@ export class DesignationService {
     private readonly adapter: DesignationAdapter
   ) { }
 
-  async createDesignation(dto: CreateDesignationDto): Promise<DesignationEntity> {
-    const newDesignation = this.adapter.convertDtoToEntity(dto);
-    return await this.designationRepository.save(newDesignation);
+  async createOrUpdateDesignation(dto: CreateDesignationDto): Promise<DesignationEntity> {
+    let designation: DesignationEntity;
+
+    if (dto.id) {
+      // If ID is present, find the existing designation
+      designation = await this.designationRepository.findOne({ where: { id: dto.id } });
+
+      if (!designation) {
+        throw new Error(`Designation with ID ${dto.id} not found.`);
+      }
+
+      // Update existing designation
+      Object.assign(designation, dto);
+    } else {
+      // Create new designation
+      designation = this.adapter.convertDtoToEntity(dto);
+    }
+
+    return await this.designationRepository.save(designation);
   }
+
 
   async getDesignation(dto: CreateDesignationDto): Promise<CommonResponse> {
     try {

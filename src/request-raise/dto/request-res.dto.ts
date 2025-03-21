@@ -1,8 +1,10 @@
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
+import { RequestType } from "../entity/request-raise.entity";
+import { RequestTypeProducts } from "./request-raise.dto";
 
 export class RequestResDto {
     id: number;
-    requestType: string;
+    requestType: RequestType;
     staffID: string;
     requestBY: string;
     requestTo: string;
@@ -15,9 +17,11 @@ export class RequestResDto {
     unitCode: string
     subDealerId?: number
     subDealerName?: string
+    products?: RequestTypeProducts[];
+
     constructor(
         id: number,
-        requestType: string,
+        requestType: RequestType,
         staffID: string,
 
         requestBY: string,
@@ -30,7 +34,9 @@ export class RequestResDto {
         companyCode: string,
         unitCode: string,
         subDealerId?: number,
-        subDealerName?: string
+        subDealerName?: string,
+        products?: RequestTypeProducts[]
+
     ) {
         this.id = id;
         this.requestType = requestType;
@@ -46,5 +52,6 @@ export class RequestResDto {
         this.unitCode = unitCode
         this.subDealerId = subDealerId
         this.subDealerName = subDealerName
+        this.products = products
     }
 }

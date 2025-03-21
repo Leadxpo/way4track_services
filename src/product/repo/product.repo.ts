@@ -3,6 +3,7 @@ import { DataSource, Repository } from "typeorm";
 import { ProductEntity } from "../entity/product.entity";
 import { ProductIdDto } from "../dto/product.id.dto";
 import { CommonReq } from "src/models/common-req";
+import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
 
 
 
@@ -54,23 +55,21 @@ export class ProductRepository extends Repository<ProductEntity> {
 
     async getDetailProduct(req: CommonReq) {
         console.log('Request Object:', req);
-        console.log('Company Code:', req.companyCode);
-        console.log('Unit Code:', req.unitCode);
 
         const query = this.createQueryBuilder('pr')
             .select([
-                'pr.product_name AS productName',
-                'SUM(pr.quantity) AS presentStock'
+                'pt.name AS productName',  // Assuming you want the name from ProductTypeEntity
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock',
             ])
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pr.product_type_id')
             .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('pr.product_name');
+            .groupBy('pt.name'); // Grouping by the correct alias
 
         const result = await query.getRawMany();
-
-        // Return the aggregated results
         return result;
     }
+
 
 
 
