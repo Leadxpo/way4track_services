@@ -401,13 +401,14 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
     //New APIS
 
 
-    async getBranchManagerDetailProduct(req: CommonReq) {
+    async getBranchManagerDetailProduct(req: {companyCode:string,unitCode:string,branchName?:string}) {
         console.log('Request Object:', req);
 
-        const query = this.createQueryBuilder('pr')
+        const query = this.createQueryBuilder('pa')
             .select([
-                'pt.name AS productName',  // Assuming you want the name from ProductTypeEntity
-                'SUM(CASE WHEN pr.status = \'assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock',
+                'pt.name AS productName',  
+                'SUM((pa.number_of_products, 0) ) AS presentStock',
+                'br.name as branchName'
             ])
             .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pr.product_type_id')
             .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
