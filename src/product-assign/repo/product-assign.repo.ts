@@ -401,12 +401,12 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
     //New APIS
 
 
-    async getBranchManagerDetailProduct(req: {companyCode:string,unitCode:string,branchName?:string}) {
+    async getBranchManagerDetailProduct(req: { companyCode: string, unitCode: string, branchName?: string }) {
         console.log('Request Object:', req);
 
         const query = this.createQueryBuilder('pa')
             .select([
-                'pt.name AS productName',  
+                'pt.name AS productName',
                 'SUM((pa.number_of_products, 0) ) AS presentStock',
                 'br.name as branchName'
             ])
@@ -419,5 +419,157 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         const result = await query.getRawMany();
         return result;
     }
+
+    // async getWareHouseProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string, fromDate: string, toDate: string }) {
+    //     try {
+    //         // Base query for grouping products by branch
+    //         const groupedProductQuery = this.createQueryBuilder('productAssign')
+    //             .select([
+    //                 'pa.id AS productId',
+    //                 'pa.product_name AS productName',
+    //                 'pt.name AS productType',
+    //                 'SUM(CASE WHEN pa.status = isAssign THEN pa.quantity ELSE 0 END) AS inAssignStock',
+    //                 'SUM(CASE WHEN pa.status = inHand THEN pa.quantity ELSE 0 END) AS inHandStock',
+    //                 'SUM(CASE WHEN pa.status = not_assigned THEN pa.quantity ELSE 0 END) AS presentStock',
+    //                 'pa.product_status AS status'
+    //             ])
+    //             .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+    //             .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+    //             .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
+    //             .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+    //             .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+
+    //         // If a specific branch is selected, filter for that branch
+    //         if (req.branch) {
+    //             groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+    //         }
+
+    //         if (req.fromDate) {
+    //             groupedProductQuery.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+    //         }
+
+    //         if (req.toDate) {
+    //             groupedProductQuery.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
+    //         }
+
+
+    //         // Group by all selected non-aggregated fields
+    //         groupedProductQuery.groupBy('pa.id, pa.product_name, pt.name, br.name, pa.product_status');
+
+    //         // Execute query to fetch products grouped by branch
+    //         const productDetails = await groupedProductQuery.getRawMany();
+
+    //         // Transform data into the required format
+    //         const branchesMap = new Map<string, any>();
+
+    //         productDetails.forEach((product) => {
+    //             const { productId, productName, productType, branchName, totalProducts, totalInHandsQty } = product;
+
+    //             // If the branch is not yet added in the map, initialize it
+    //             if (!branchesMap.has(branchName)) {
+    //                 branchesMap.set(branchName, {
+    //                     branchName: branchName || 'N/A',
+    //                     products: []
+    //                 });
+    //             }
+
+    //             // Push the product details into the respective branch
+    //             branchesMap.get(branchName)?.products.push({
+    //                 id: Number(productId) || 0,
+    //                 name: productName || 'N/A',
+    //                 type: productType || 'N/A',
+    //                 totalProducts: Number(totalProducts) || 0,
+    //                 totalInHandsQty: Number(totalInHandsQty) || 0 // Add in-hands quantity
+    //             });
+    //         });
+
+    //         // Convert the map to an array of branch objects
+    //         const results = Array.from(branchesMap.values());
+
+    //         return results
+    //     } catch (error) {
+    //         console.error('Error fetching product details by branch:', error);
+    //         throw new Error('Failed to fetch product details by branch');
+    //     }
+    // }
+
+    async getWareHouseProductDetailsByBranch(req: {
+        unitCode: string;
+        companyCode: string;
+        branch?: string;
+        fromDate?: string;
+        toDate?: string;
+    }) {
+        try {
+            // Base query
+            const groupedProductQuery = this.createQueryBuilder('productAssign')
+                .select([
+                    'pa.id AS productId',
+                    'pa.product_name AS productName',
+                    'pt.name AS productType',
+                    'br.name AS branchName',
+                    'SUM(CASE WHEN pa.status = \'isAssign\' THEN pa.quantity ELSE 0 END) AS inAssignStock',
+                    'SUM(CASE WHEN pa.status = \'inHand\' THEN pa.quantity ELSE 0 END) AS inHandStock',
+                    'SUM(CASE WHEN pa.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock'
+                ])
+                .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+                .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pa.product_type_id')
+                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+
+            // Apply filters dynamically
+            if (req.branch) {
+                groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
+            if (req.fromDate) {
+                groupedProductQuery.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+            }
+            if (req.toDate) {
+                groupedProductQuery.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
+            }
+
+            // Grouping fields
+            groupedProductQuery.groupBy('pa.id, pa.product_name, pt.name, br.name');
+
+            // Execute query
+            const productDetails = await groupedProductQuery.getRawMany();
+
+            // Transform data into required format
+            const branchesMap = new Map<string, any>();
+
+            productDetails.forEach((product) => {
+                const { productId, productName, productType, branchName, inAssignStock, inHandStock, presentStock } = product;
+
+                const branchKey = branchName || 'N/A';
+
+                // Initialize branch in map
+                if (!branchesMap.has(branchKey)) {
+                    branchesMap.set(branchKey, {
+                        branchName: branchKey,
+                        products: []
+                    });
+                }
+
+                // Push product details into respective branch
+                branchesMap.get(branchKey)?.products.push({
+                    id: Number(productId) || 0,
+                    name: productName || 'N/A',
+                    type: productType || 'N/A',
+                    inAssignStock: Number(inAssignStock) || 0,
+                    inHandStock: Number(inHandStock) || 0,
+                    presentStock: Number(presentStock) || 0
+                });
+            });
+
+            // Convert map to array
+            return Array.from(branchesMap.values());
+        } catch (error) {
+            console.error('Error fetching product details by branch:', error);
+            throw new Error('Failed to fetch product details by branch');
+        }
+    }
+
+
 }
 

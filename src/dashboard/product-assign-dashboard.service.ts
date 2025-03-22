@@ -23,7 +23,7 @@ export class ProductAssignDashboardService {
         }
     }
 
-    async getSearchDetailProduct(req: 
+    async getSearchDetailProduct(req:
         ProductIdDto
     ): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.getSearchDetailProduct(req)
@@ -67,6 +67,21 @@ export class ProductAssignDashboardService {
 
     async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.getProductWareHouseDetails(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
+    async getWareHouseProductDetailsByBranch(req: {
+        unitCode: string;
+        companyCode: string;
+        branch?: string;
+        fromDate?: string;
+        toDate?: string;
+    }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getWareHouseProductDetailsByBranch(req)
         if (!productData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

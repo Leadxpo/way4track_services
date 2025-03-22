@@ -67,6 +67,8 @@ export class StaffDto {
     designation_id?: number
     carryForwardLeaves: number;
     experience?: Experience[]
+    accountBranch?: string;
+
 }
 
 export class Qualifications {

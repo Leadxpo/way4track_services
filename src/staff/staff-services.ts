@@ -508,7 +508,8 @@ export class StaffService {
                 }
                 console.log(designationEntity, 'designationEntity');
 
-                newStaff.designation = designationEntity.designation; // Store name
+                newStaff.designation = designationEntity.designation;
+                console.log(newStaff.designation, "::::::::::::::::::::::::") // Store name
                 newStaff.designationRelation = designationEntity; // Store relation
             }
 

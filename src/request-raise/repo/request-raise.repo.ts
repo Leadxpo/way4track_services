@@ -16,7 +16,7 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
     constructor(private dataSource: DataSource) {
         super(RequestRaiseEntity, dataSource.createEntityManager());
     }
-//New APi
+//New APi ware house manager 
     async getRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }) {
         const query = this.createQueryBuilder('re')
             .select([

@@ -58,10 +58,10 @@ export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ name: 'name', type: 'varchar', length: 100 })
+  @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
   name: string;
 
-  @Column({ name: 'phone_number', type: 'varchar', length: 15 })
+  @Column({ name: 'phone_number', type: 'varchar', length: 15, nullable: true })
   phoneNumber: string;
 
   @Column({ name: 'office_phone_number', type: 'varchar', length: 15, nullable: true })
@@ -96,7 +96,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'location', type: 'varchar', length: 255, nullable: true })
   location: string;
 
-  @Column({ name: 'dob', type: 'date' })
+  @Column({ name: 'dob', type: 'date', nullable: true })
   dob: Date;
 
   @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
@@ -105,13 +105,13 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'office_email', type: 'varchar', length: 150, unique: true, nullable: true })
   officeEmail: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })
   aadharNumber: string;
 
   @Column({ name: 'pan_card_number', type: 'varchar', length: 20, unique: true, nullable: true })
   panCardNumber: string;
 
-  @Column({ name: 'driving_licence', type: 'enum', enum: YesNo })
+  @Column({ name: 'driving_licence', type: 'enum', enum: YesNo, nullable: true })
   drivingLicence: YesNo;
 
   @Column({ name: 'driving_licence_number', type: 'varchar', length: 20, nullable: true })
@@ -126,10 +126,10 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'blood_group', type: 'varchar', length: 5, nullable: true })
   bloodGroup: string;
 
-  @Column({ name: 'joining_date', type: 'date' })
+  @Column({ name: 'joining_date', type: 'date', nullable: true })
   joiningDate: string;
 
-  @Column({ name: 'before_experience', type: 'int', comment: 'Experience in years' })
+  @Column({ name: 'before_experience', type: 'int', comment: 'Experience in years', nullable: true })
   beforeExperience: number;
 
   @Column({ name: 'previous_company', type: 'varchar', length: 255, nullable: true })
@@ -150,16 +150,19 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'account_number', type: 'varchar', length: 20, nullable: true })
   accountNumber: string;
 
+  @Column({ name: 'account_branch', type: 'varchar', length: 20, nullable: true })
+  accountBranch: string;
+
   @Column({ name: 'ifsc_code', type: 'varchar', length: 20, nullable: true })
   ifscCode: string;
 
-  @Column({ name: 'address', type: 'text' })
+  @Column({ name: 'address', type: 'text', nullable: true })
   address: string;
 
   @Column({ name: 'branch_name', type: 'varchar', length: 255, nullable: true })
   branchName: string;
 
-  @Column({ name: 'account_type', type: 'enum', enum: AccountType })
+  @Column({ name: 'account_type', type: 'enum', enum: AccountType, nullable: true })
   accountType: AccountType;
 
   @Column({ name: 'department', type: 'varchar', length: 255, nullable: true })
@@ -183,7 +186,7 @@ export class StaffEntity extends BaseEntity {
   })
   status: StaffStatus;
 
-  @Column({ name: 'bike_allocation', type: 'enum', enum: YesNo })
+  @Column({ name: 'bike_allocation', type: 'enum', enum: YesNo, nullable: true })
   bikeAllocation: YesNo;
 
   @Column({ name: 'vehicle_photo', type: 'text', nullable: true })
@@ -192,7 +195,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'bike_number', type: 'varchar', length: 20, nullable: true })
   bikeNumber: string;
 
-  @Column({ name: 'mobile_allocation', type: 'enum', enum: YesNo })
+  @Column({ name: 'mobile_allocation', type: 'enum', enum: YesNo, nullable: true })
   mobileAllocation: YesNo;
 
   @Column({ name: 'mail_allocation', type: 'enum', enum: YesNo, nullable: true })
@@ -253,7 +256,7 @@ export class StaffEntity extends BaseEntity {
     file?: string;
   }[];
 
-  @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.staff)
+  @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.staff, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 
@@ -312,10 +315,10 @@ export class StaffEntity extends BaseEntity {
   @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
   designationRelation: DesignationEntity;
 
-  @Column({ type: 'int', default: 0, name: "carry_forward_leaves" })
+  @Column({ type: 'int', default: 0, name: "carry_forward_leaves", nullable: true })
   carryForwardLeaves: number;
 
   @Column({ type: 'json', name: 'experience', nullable: true })
-  experience: Experience[];  
+  experience: Experience[];
 
 }

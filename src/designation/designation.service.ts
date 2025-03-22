@@ -41,10 +41,11 @@ export class DesignationService {
 
   async getDesignation(dto: CreateDesignationDto): Promise<CommonResponse> {
     try {
+      console.log(dto,dto.designation, "UUUUUUUUUUUUUUUUUU")
       const des = await this.designationRepository.findOne({
         where: { designation: dto.designation, companyCode: dto.companyCode, unitCode: dto.unitCode }
       });
-
+      console.log(des, ">>>>>>>>>>>>>>")
       if (!des) {
         return new CommonResponse(false, 404, 'Designation not found');
       }

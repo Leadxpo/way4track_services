@@ -72,7 +72,7 @@ export class StaffAdapter {
         entity.officePhoneNumber = dto.officePhoneNumber
         entity.carryForwardLeaves = dto.carryForwardLeaves
         entity.status = dto.staffStatus
-
+        entity.accountBranch = dto.accountBranch
         if (dto.id) {
             entity.id = dto.id;
         }

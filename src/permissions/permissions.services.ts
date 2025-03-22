@@ -10,6 +10,7 @@ import { Roles } from "./dto/role.enum";
 import { StaffRepository } from "src/staff/repo/staff-repo";
 import { DesignationService } from "src/designation/designation.service";
 import { StaffStatus } from "src/staff/enum/staff-status";
+import { DesignationRepository } from "src/designation/repo/designation.repo";
 
 @Injectable()
 export class PermissionsService {
@@ -17,7 +18,8 @@ export class PermissionsService {
         private adapter: PermissionAdapter,
         private repo: PermissionRepository,
         private readonly staffRepo: StaffRepository,
-        private readonly designationSerie: DesignationService
+        private readonly designationSerie: DesignationService,
+        private readonly desRepo: DesignationRepository
     ) { }
 
     // private getDefaultPermissions(designation: DesignationEnum): Permission[] {
@@ -281,19 +283,21 @@ export class PermissionsService {
             console.log("Incoming Permissions:", dto.permissions);
 
             // Ensure staff.designation is a string
-            const staffDesignation = typeof staff.designation === 'string' ? staff.designation : staff.designation;
-
+            // const staffDesignation = typeof staff.designation === 'string' ? staff.designation : staff.designation;
+            const staffDesignation = await this.desRepo.findOne({
+                where: { designation: staff.designation }
+            });
             if (!staffDesignation) {
                 throw new ErrorResponse(5419, 'Staff designation is missing or invalid');
             }
-
+            console.log(staffDesignation, "???????????????")
             // Fetch the default permissions for the staff's designation
             const designationRes = await this.designationSerie.getDesignation({
-                designation: staffDesignation,
+                designation: staffDesignation.designation,
                 companyCode: staff.companyCode,
                 unitCode: staff.unitCode
             });
-
+            console.log(designationRes, "++++++++++++++")
             if (!designationRes || !designationRes.data) {
                 throw new ErrorResponse(5418, 'Default permissions not found for designation');
             }
