@@ -14,7 +14,7 @@ export class AttendanceEntity {
     @Column({ name: 'staff_name', type: 'varchar', length: 100, nullable: false })
     staffName: string;
 
-    @Column({ name: 'branch_name', type: 'varchar', length: 100, nullable: false })
+    @Column({ name: 'branch_name', type: 'varchar', length: 100, nullable: true })
     branchName: string;
 
     @Column({ name: 'day', type: 'date', nullable: false })
@@ -31,6 +31,9 @@ export class AttendanceEntity {
 
     @Column({ name: 'out_time_remark', type: 'varchar', length: 255, nullable: true })
     outTimeRemark: string;
+
+    @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true })
+    remark: string;
 
     @Column({
         name: 'status',

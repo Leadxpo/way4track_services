@@ -156,7 +156,7 @@ export class AttendanceService {
                 const outTimeField = `Day ${day} OUT TIME`;
                 const outTimeRemarkField = `Day ${day} OUT TIME Remarks`;
                 const statusField = `Day ${day} Status`;
-
+                const remarksField = `Day ${day} Remarks`;
                 if (row[inTimeField] || row[outTimeField]) {
                     const date = new Date(year, month - 1, day); // Correct date
 
@@ -166,6 +166,8 @@ export class AttendanceService {
                     const inTimeRemark = row[inTimeRemarkField] || null;
                     const outTimeRemark = row[outTimeRemarkField] || null;
                     const status = row[statusField] as AttendanceStatus;
+                    const remarks = row[remarksField] || "";
+
 
                     // **Check if attendance already exists**
                     const existingRecord = await this.attendanceRepo.findOne({
@@ -179,6 +181,8 @@ export class AttendanceService {
                         existingRecord.outTime = actualOutTime || existingRecord.outTime;
                         existingRecord.outTimeRemark = outTimeRemark || existingRecord.outTimeRemark;
                         existingRecord.status = status || existingRecord.status;
+                        existingRecord.remark = remarks || existingRecord.remark;
+
 
                         await this.attendanceRepo.save(existingRecord);
                     } else {
@@ -193,7 +197,7 @@ export class AttendanceService {
                         attendance.outTime = actualOutTime;
                         attendance.outTimeRemark = outTimeRemark;
                         attendance.status = status;
-
+                        attendance.remark = remarks
                         attendanceRecords.push(attendance);
                     }
                 }

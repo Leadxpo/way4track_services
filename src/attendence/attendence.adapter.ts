@@ -17,6 +17,7 @@ export class AttendanceAdapter {
         entity.outTime = dto.outTime;
         entity.outTimeRemark = dto.outTimeRemark;
         entity.branchName = dto.branchName;
+        entity.remark = dto.remark
 
         return entity;
     }
@@ -33,6 +34,7 @@ export class AttendanceAdapter {
             status: attendance.status,
             staffName: attendance.staff?.name ?? 'Unknown',
             branchName: attendance.branchName,
+            remark: attendance.remark
         };
     }
 }

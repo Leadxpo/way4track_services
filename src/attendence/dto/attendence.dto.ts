@@ -12,6 +12,8 @@ export class CreateAttendanceDto {
     outTimeRemark?: string;
     status: AttendanceStatus;
     remarks?: string;
+    remark: string;
+
 }
 
 
@@ -25,4 +27,6 @@ export class GetAttendanceDto {
     status: AttendanceStatus;
     staffName: string;
     branchName: string;
+    remark: string;
+
 }
