@@ -5,4 +5,6 @@ export class ProductIdDto {
     productName?: string
     location: string;
     staffId?: string
+    fromDate?: string;
+    toDate?: string;
 }

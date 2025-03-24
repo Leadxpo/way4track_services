@@ -85,7 +85,11 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pr.imei_number AS imeiNumber',
                 'staff.staff_id as staffId',
                 'pr.location as location',
-                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS presentStock'
+                
+                'SUM(CASE WHEN pr.status = \'isAssign\' THEN pa.quantity ELSE 0 END) AS inAssignStock',
+                'SUM(CASE WHEN pr.status = \'inHand\' THEN pa.quantity ELSE 0 END) AS inHandStock',
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock',
+                'pr.product_status as productStatus'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = productAssign.staff_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = productAssign.product_id')
@@ -97,6 +101,14 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         // Apply filters if provided
         if (req.id) {
             query.andWhere('pr.id = :productId', { productId: req.id });
+        }
+         
+        
+        if (req.fromDate) {
+            query.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
         }
 
         if (req.productName) {
@@ -510,7 +522,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     'br.name AS branchName',
                     'SUM(CASE WHEN pa.status = \'isAssign\' THEN pa.quantity ELSE 0 END) AS inAssignStock',
                     'SUM(CASE WHEN pa.status = \'inHand\' THEN pa.quantity ELSE 0 END) AS inHandStock',
-                    'SUM(CASE WHEN pa.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock'
+                    'SUM(CASE WHEN pa.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock',
+                    'pa.product_status as productStatus'
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
@@ -541,7 +554,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             productDetails.forEach((product) => {
                 const { productId, productName, productType, branchName, inAssignStock, inHandStock, presentStock } = product;
 
-                const branchKey = branchName || 'N/A';
+                const branchKey = branchName || 'WareHouse';
 
                 // Initialize branch in map
                 if (!branchesMap.has(branchKey)) {

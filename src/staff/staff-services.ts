@@ -46,7 +46,7 @@ export class StaffService {
     async handleStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
 
-            if (req.id && req.id !== null || (req.staffId && req.staffId.trim() !== '')) {
+            if (req.id) {
                 console.log("🔄 Updating existing staff record...");
                 return await this.updateStaffDetails(req, files);
             } else {
@@ -553,6 +553,7 @@ export class StaffService {
                     }
                 }
             }
+            console.log(qualifications, "qualifications")
 
             // if (files?.experience) {
             //     for (let i = 0; i < files.experience.length; i++) {
@@ -595,6 +596,7 @@ export class StaffService {
                     }
                 }
             }
+            console.log(experience, "experience")
 
 
             newStaff.qualifications = qualifications;
@@ -643,13 +645,14 @@ export class StaffService {
     async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
             let existingStaff: StaffEntity | null = await this.staffRepository.findOne({
-                where: { staffId: req.staffId, companyCode: req.companyCode, unitCode: req.unitCode },
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['designationRelation']
             });
 
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
+            console.log(existingStaff, "??????????????")
 
             // Check if designation has changed
             const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;
@@ -659,7 +662,7 @@ export class StaffService {
                 ...existingStaff,
                 ...this.adapter.convertDtoToEntity(req)
             };
-
+            console.log(updatedStaff, "?>>>>>>>>>>>>>>")
             // Handle designation change
             if (designationChanged) {
                 const permissionsDto: PermissionsDto = {
@@ -670,6 +673,7 @@ export class StaffService {
 
                 await this.service.updatePermissionDetails(permissionsDto);
             }
+            console.log(designationChanged, "designationChanged")
 
             if (files?.photo?.[0]) {
                 if (existingStaff.staffPhoto) {

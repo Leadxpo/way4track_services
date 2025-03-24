@@ -7,7 +7,7 @@ export enum Qualification {
 }
 
 export enum Letters {
-    OFFER_LETTER = 'offerLetter',
+    OFFER_LETTER = 'offerLetter',   
     RESIGNATION_LETTER = 'resignationLetter',
     TERMINATION_LETTER = 'terminationLetter',
     APPOINTMENT_LETTER = 'appointmentLetter',

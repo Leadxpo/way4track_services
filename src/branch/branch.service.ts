@@ -33,7 +33,7 @@ export class BranchService {
             console.log(dto, "{{{{{{}}}}}}}}}}}}")
             // Check if this is an update and the entity already has a file
             let entity: BranchEntity | null = null;
-            if ( dto.id) {
+            if (dto.id) {
                 entity = await this.branchRepo.findOneBy({ id: dto.id });
                 if (!entity) {
                     throw new ErrorResponse(404, 'Branch not found');
@@ -113,6 +113,7 @@ export class BranchService {
         const branch = await this.branchRepo.find({
             where: { companyCode: req.companyCode, unitCode: req.unitCode }
         });
+        console.log(branch, ">>>>>")
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");
         } else {
@@ -131,6 +132,7 @@ export class BranchService {
 
     async getBranchDetailsById(req: BranchIdDto): Promise<CommonResponse> {
         try {
+            console.log(req, "}}}}}}}}}}}}}}")
             const branch = await this.branchRepo.findOne({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['staff', 'asserts'],
@@ -139,7 +141,7 @@ export class BranchService {
             if (!branch) {
                 return new CommonResponse(false, 404, 'No Branch Found');
             }
-
+            console.log(branch, "::::::::::::::::")
             const data = {
                 branchId: branch.id,
                 branchName: branch.branchName,
@@ -167,7 +169,7 @@ export class BranchService {
                     type: assert.assetType
                 })),
             };
-
+            console.log(data, "?/////////")
             return new CommonResponse(true, 200, 'Branch Retrieved Successfully', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);

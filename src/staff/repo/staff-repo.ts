@@ -353,7 +353,10 @@ export class StaffRepository extends Repository<StaffEntity> {
             const currentDate = new Date(year, month - 1, i + 1);
             const formattedDate = currentDate.toISOString().split('T')[0];
             const attendance = query.find(q => q.day === formattedDate);
-
+            let dailyHours = 0;
+            if (attendance?.inTime && attendance?.outTime) {
+                dailyHours = (new Date(attendance.outTime).getTime() - new Date(attendance.inTime).getTime()) / (1000 * 60 * 60);
+            }
             return {
                 day: formattedDate,
                 name: attendance?.name || null,
@@ -366,7 +369,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 branchName: attendance?.branchName || null,
                 inTime: attendance?.inTime || null,
                 outTime: attendance?.outTime || null,
-                status: attendance?.status || 'Absent'
+                status: attendance?.status || 'Absent',
+                totalHours: dailyHours.toFixed(2)
             };
         });
         return allDaysOfMonth;
