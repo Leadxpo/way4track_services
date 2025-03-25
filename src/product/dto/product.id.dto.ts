@@ -3,6 +3,9 @@ export class ProductIdDto {
     companyCode: string;
     unitCode: string
     productName?: string
+    productType?: string
+    status: string;
+
     location: string;
     staffId?: string
     fromDate?: string;

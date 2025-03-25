@@ -66,7 +66,7 @@ export class StaffDto {
     mailAllocation: YesNo;
     designation_id?: number
     carryForwardLeaves: number;
-    experience?: Experience[]
+    experienceDetails?: Experience[]
     accountBranch?: string;
 
 }

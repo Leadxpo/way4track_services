@@ -34,6 +34,17 @@ export class ProductAssignDashboardService {
         }
     }
 
+    async getStockSummary(req:
+        ProductIdDto
+    ): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getStockSummary(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
     async getTotalAssignedAndStockLast30Days(req: CommonReq): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.getTotalAssignedAndStockLast30Days(req)
         if (!productData) {
@@ -90,7 +101,7 @@ export class ProductAssignDashboardService {
     }
 
     async getBranchManagerDetailProduct(req: {
-        companyCode: string, unitCode: string, branchName?: string 
+        companyCode: string, unitCode: string, branchName?: string
     }): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.getBranchManagerDetailProduct(req)
         if (!productData) {

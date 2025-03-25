@@ -533,7 +533,7 @@ export class StaffService {
 
             // Handle Qualifications and Qualification Files
             let qualifications: Qualifications[] = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
-            let experience: Experience[] = Array.isArray(req.experience) ? [...req.experience] : [];
+            let experience: Experience[] = Array.isArray(req.experienceDetails) ? [...req.experienceDetails] : [];
 
 
             if (files?.qualificationFiles) {
@@ -600,7 +600,7 @@ export class StaffService {
 
 
             newStaff.qualifications = qualifications;
-            newStaff.experience = experience;
+            newStaff.experienceDetails = experience;
 
             console.log(newStaff, ">>>>>>>>>>");
 

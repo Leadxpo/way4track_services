@@ -237,6 +237,17 @@ export class DashboardController {
         }
     }
 
+    @Post('getStockSummary')
+    async getStockSummary(@Body() req: ProductIdDto): Promise<CommonResponse> {
+        try {
+            return await this.productAssignDashboardService.getStockSummary(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
     @Post('getTicketDetailsAgainstSearch')
     async getTicketDetailsAgainstSearch(@Body() req: TicketsSearchDto): Promise<CommonResponse> {
         try {
@@ -324,11 +335,13 @@ export class DashboardController {
 
 
     @Post('getWareHouseProductDetailsByBranch')
-    async getWareHouseProductDetailsByBranch(@Body() req: {  unitCode: string;
+    async getWareHouseProductDetailsByBranch(@Body() req: {
+        unitCode: string;
         companyCode: string;
         branch?: string;
         fromDate?: string;
-        toDate?: string; }): Promise<CommonResponse> {
+        toDate?: string;
+    }): Promise<CommonResponse> {
         try {
             return await this.productAssignDashboardService.getWareHouseProductDetailsByBranch(req)
         }
@@ -339,9 +352,9 @@ export class DashboardController {
     }
 
 
-    
+
     @Post('getBranchManagerDetailProduct')
-    async getBranchManagerDetailProduct(@Body() req: {   companyCode: string, unitCode: string, branchName?: string  }): Promise<CommonResponse> {
+    async getBranchManagerDetailProduct(@Body() req: { companyCode: string, unitCode: string, branchName?: string }): Promise<CommonResponse> {
         try {
             return await this.productAssignDashboardService.getBranchManagerDetailProduct(req)
         }

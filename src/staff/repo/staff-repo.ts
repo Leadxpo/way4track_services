@@ -251,7 +251,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             const PF_Employer1 = Math.round(PFDayWage * 0.0833) || 0;
             const PF_Employer2 = Math.round(PFDayWage * 0.0367) || 0;
             const extraHalfSalary = Number(record.extraHalfSalary) || 0;
-            const updatedNetSalary = grossSalary - (record.designation !== 'ceo' ? ESIC_Employer : ESIC_Employee) - lateDeductions - PF_Employee + extraHalfSalary;
+            const updatedNetSalary = grossSalary - lateDeductions - PF_Employee + extraHalfSalary;
 
             return {
                 staffId: record.staffId,
