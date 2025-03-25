@@ -50,6 +50,9 @@ export class PayrollAdapter {
             leaveEncashment: entity.leaveEncashment,
             plBikeNeedToPay: entity.plBikeNeedToPay,
             plBikeAmount: entity.plBikeAmount,
+            payableAmount:entity.payableAmount,
+            adavnceAmount:entity.adavnceAmount,
+
         };
     }
 }

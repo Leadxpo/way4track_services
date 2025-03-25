@@ -116,4 +116,10 @@ export class PayrollEntity {
 
     @Column({ name: 'pl_bike_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
     plBikeAmount: number;
+
+    @Column({ name: 'adavnce_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+    adavnceAmount: number;
+
+    @Column({ name: 'payable_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+    payableAmount: number;
 }

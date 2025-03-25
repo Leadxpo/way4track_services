@@ -97,6 +97,18 @@ export class VoucherDashboardService {
 
     }
 
+    // async calculateRcs(req: {
+    //     companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    // }): Promise<CommonResponse> {
+    //     const VoucherData = await this.voucherRepository.calculateRcs(req)
+    //     if (!VoucherData) {
+    //         return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+    //     } else {
+    //         return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+    //     }
+
+    // }
+
     async getTotalSalesForReport(req: {
         fromDate?: string;
         toDate?: string;

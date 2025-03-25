@@ -514,7 +514,7 @@ export class StaffService {
             }
 
             // Generate Staff ID
-            newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
+            // newStaff.staffId = `SF-${(await this.staffRepository.count() + 1).toString().padStart(5, '0')}`;
 
             // Upload Staff Photo
             if (files?.photo?.[0]) {

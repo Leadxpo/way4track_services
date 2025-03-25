@@ -123,8 +123,8 @@ export class VoucherEntity {
     @Column({ name: 'journal_type', type: 'enum', nullable: true, enum: DebitORCreditEnum })
     journalType: DebitORCreditEnum;
 
-    @Column({ name: 'scst', type: 'float', nullable: true })
-    SCST: number;
+    @Column({ name: 'sgst', type: 'float', nullable: true })
+    SGST: number;
 
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;

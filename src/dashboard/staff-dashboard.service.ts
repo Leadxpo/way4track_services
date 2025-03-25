@@ -90,6 +90,8 @@ export class StaffDashboardService {
                 leaveEncashment: 0,
                 plBikeNeedToPay: 0,
                 plBikeAmount: 0,
+                payableAmount: 0,
+                adavnceAmount: 0
             }));
 
         // Save only new payroll entries

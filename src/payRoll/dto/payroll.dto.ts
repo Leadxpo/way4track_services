@@ -38,4 +38,7 @@ export class PayrollDto {
     leaveEncashment?: number;
     plBikeNeedToPay?: number;
     plBikeAmount?: number;
+    payableAmount: number;
+    adavnceAmount: number;
+
 }

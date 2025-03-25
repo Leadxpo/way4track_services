@@ -291,7 +291,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 leaveEncashment: 0,
                 plBikeNeedToPay: 0,
                 plBikeAmount: 0,
-
+                advanceAmount: 0,
+                payableAmount: 0
 
             };
         });
@@ -444,29 +445,45 @@ export class StaffRepository extends Repository<StaffEntity> {
         return staffDetails;
     }
 
+    // async getStaff(req: { companyCode: string, unitCode: string, staffId?: string }) {
+    //     const query = this.createQueryBuilder('staff')
+    //         // .leftJoin(DesignationEntity,'staff.designationRelation', 'designation') // Join designation table
+    //         .select([
+    //             'staff.id as id',
+    //             'staff.staff_id AS staffId',
+    //             'staff.name AS staffName',
+    //             'staff.designation AS designation',  // Fix: Select actual designation name
+    //             'staff.phone_number AS phoneNumber',
+    //             'staff.email AS email',
+    //             'staff.monthly_salary as salary'
+    //         ])
+    //         .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('staff.designation IN (:...designations)', {
+    //             designations: ['Accountant', 'Warehouse Manager', 'HR'], // Direct values
+    //         })
+    //     if (req.staffId) {
+    //         query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+    //     }
+
+    //     return await query.getRawMany();
+    // }
+
     async getStaff(req: { companyCode: string, unitCode: string, staffId?: string }) {
         const query = this.createQueryBuilder('staff')
-            // .leftJoin(DesignationEntity,'staff.designationRelation', 'designation') // Join designation table
-            .select([
-                'staff.id as id',
-                'staff.staff_id AS staffId',
-                'staff.name AS staffName',
-                'staff.designation AS designation',  // Fix: Select actual designation name
-                'staff.phone_number AS phoneNumber',
-                'staff.email AS email',
-                'staff.monthly_salary as salary'
-            ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.designation IN (:...designations)', {
-                designations: ['Accountant', 'Warehouse Manager', 'HR'], // Direct values
-            })
+                designations: ['Accountant', 'Warehouse Manager', 'HR'],
+            });
+
         if (req.staffId) {
             query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
 
-        return await query.getRawMany();
+        return await query.getMany(); // Fetch all columns
     }
+
 
 
     async getStaffCardsDetails(req: StaffSearchDto) {

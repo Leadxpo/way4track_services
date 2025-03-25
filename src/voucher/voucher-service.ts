@@ -157,7 +157,7 @@ export class VoucherService {
                 });
                 // ✅ Apply GST, TDS, and TCS on totalCost, not per product
                 const cgstRate = parseFloat(voucherDto.CGST?.toString() || "0");
-                const sgstRate = parseFloat(voucherDto.SCST?.toString() || "0");
+                const sgstRate = parseFloat(voucherDto.SGST?.toString() || "0");
                 const igstRate = parseFloat(voucherDto.IGST?.toString() || "0");
                 const tdsRate = parseFloat(voucherDto.TDS?.toString() || "0");
                 const tcsRate = parseFloat(voucherDto.TCS?.toString() || "0");

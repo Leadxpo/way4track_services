@@ -95,7 +95,7 @@ export class VoucherAdapter {
     // Tax fields
     entity.hsnCode = dto.hsnCode;
     entity.journalType = dto.journalType;
-    entity.SCST = dto.SCST;
+    entity.SGST = dto.SGST;
     entity.CGST = dto.CGST;
     entity.amount = dto.amount;
     if (dto.creditAmount && dto.amount) {
@@ -172,7 +172,7 @@ export class VoucherAdapter {
           voucher.reminigAmount,
           voucher.hsnCode,
           voucher.journalType,
-          voucher.SCST,
+          voucher.SGST,
           voucher.CGST,
           voucher.amount,
           voucher.subDealer ? voucher.subDealer.id : null,
@@ -229,7 +229,7 @@ export class VoucherAdapter {
           voucher.reminigAmount,
           voucher.hsnCode,
           voucher.journalType,
-          voucher.SCST,
+          voucher.SGST,
           voucher.CGST,
           voucher.amount,
           voucher.subDealer ? voucher.subDealer.id : null,

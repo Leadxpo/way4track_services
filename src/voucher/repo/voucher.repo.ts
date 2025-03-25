@@ -18,8 +18,9 @@ import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { AccountDto } from "src/account/dto/account.dto";
 import { PaymentType } from "src/asserts/enum/payment-type.enum";
-import { LedgerEntity } from "src/ledger/entity/ledger.entity";
-import { UnderSecondary } from "src/groups/entity/groups.entity";
+import { LedgerEntity, RegistrationType } from "src/ledger/entity/ledger.entity";
+import { UnderPrimary, UnderSecondary } from "src/groups/entity/groups.entity";
+import { RcsReportDto } from "../dto/rcs-report.dto";
 @Injectable()
 
 export class VoucherRepository extends Repository<VoucherEntity> {
@@ -1788,6 +1789,197 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         }));
     }
 
+
+
+    // async getBalanceSheet(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
+    //     const query = this.createQueryBuilder('ve')
+    //         .select([
+    //             'ledger.group AS groupName',
+    //             'SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount',
+    //             'SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount'
+    //         ])
+    //         .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+    //         .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
+    //             fromDate: req.fromDate,
+    //             toDate: req.toDate
+    //         })
+    //         .groupBy('ledger.group')
+    //         .setParameters({
+    //             debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+    //             creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+    //         });
+
+    //     const ledgerTransactions = await query.getRawMany();
+
+    //     const balanceSheet = {
+    //         assets: [],
+    //         liabilities: [],
+    //         equity: []
+    //     };
+
+    //     ledgerTransactions.forEach(({ groupName, debitAmount, creditAmount }) => {
+    //         const netAmount = debitAmount - creditAmount; // Adjust based on accounting rules
+
+    //         if ([UnderSecondary.CURRENT_ASSETS, UnderSecondary.FIXED_ASSETS, UnderSecondary.INVESTMENTS].includes(groupName)) {
+    //             balanceSheet.assets.push({ groupName, amount: netAmount });
+    //         } else if ([UnderSecondary.CURRENT_LIABILITIES, UnderSecondary.LONG_TERM_LIABILITIES].includes(groupName)) {
+    //             balanceSheet.liabilities.push({ groupName, amount: netAmount });
+    //         } 
+    //     });
+
+    //     // Ensure Assets = Liabilities + Equity
+    //     const totalAssets = balanceSheet.assets.reduce((sum, item) => sum + item.amount, 0);
+    //     const totalLiabilities = balanceSheet.liabilities.reduce((sum, item) => sum + item.amount, 0);
+
+    //     if (totalAssets !== totalLiabilities + totalEquity) {
+    //         throw new Error("Balance Sheet is not balanced!");
+    //     }
+
+    //     return balanceSheet;
+    // }
+
+    // async calculateRcs(req: {
+    //     companyCode: string;
+    //     unitCode: string;
+    //     fromDate: string;
+    //     toDate: string;
+    //     branchName?: string
+    // }) {
+    //     // Fetch all ledger transactions within the date range
+    //     const query = this.createQueryBuilder('ve')
+    //         .select([
+    //             'ledger.name AS supplierName',
+    //             'ledger.registration_type AS registrationType',
+    //             've.amount AS amount',
+    //             've.voucher_type AS voucherType',
+    //             've.sgst AS SGST',
+    //             've.cgst AS CGST',
+    //             've.igst AS IGST',
+    //             '(ve.cgst + ve.sgst + ve.igst) AS totalTaxAmount', // Calculate total GST
+    //             // '(ve.amount * (ve.cgst + ve.sgst + ve.igst) / 100) AS rcsTaxAmount'
+    //         ])
+    //         .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+    //         .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+    //         .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+    //         .andWhere('ledger.registration_type = :registrationType', { registrationType: RegistrationType.UNREGISTERED })
+    //         .andWhere('ve.voucher_type IN (:...voucherTypes)', { voucherTypes: [VoucherTypeEnum.PURCHASE, VoucherTypeEnum.DEBITNOTE] });
+
+    //     if (req.fromDate) {
+    //         query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+    //     }
+    //     if (req.toDate) {
+    //         query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+    //     }
+    //     if (req.branchName) {
+    //         query.andWhere('br.name = :branchName', { branchName: req.branchName });
+    //     }
+
+    //     return await query.getRawMany();  // Execute query and return results
+    // }
+
+    async calculateGstReturns(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_type AS voucherType',
+                'SUM(ve.amount) AS totalAmount',
+                'SUM(ve.cgst) AS totalCGST',
+                'SUM(ve.sgst) AS totalSGST',
+                'SUM(ve.igst) AS totalIGST',
+                'br.name as branchName'
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', { fromDate: req.fromDate, toDate: req.toDate })
+
+        query.groupBy('ve.voucher_type')
+
+        const results = await query.getRawMany();
+
+        // Initialize values
+        let totalSales = 0, totalPurchase = 0, totalCreditNote = 0, totalDebitNote = 0;
+        let totalOutputGST = 0, totalInputGST = 0;
+
+        // Categorize vouchers
+        results.forEach(row => {
+            const { voucherType, totalAmount, totalCGST, totalSGST, totalIGST } = row;
+            const totalGST = totalCGST + totalSGST + totalIGST; // Total GST for this entry
+
+            if (voucherType === VoucherTypeEnum.SALES) {
+                totalSales += totalAmount;
+                totalOutputGST += totalGST;
+            } else if (voucherType === VoucherTypeEnum.PURCHASE) {
+                totalPurchase += totalAmount;
+                totalInputGST += totalGST;
+            } else if (voucherType === VoucherTypeEnum.CREDITNOTE) {
+                totalCreditNote += totalAmount;
+            } else if (voucherType === VoucherTypeEnum.DEBITNOTE) {
+                totalDebitNote += totalAmount;
+            }
+        });
+
+        // Calculate net taxable sales and purchases
+        const netSales = totalSales - totalCreditNote;  // Reduce sales by credit notes
+        const netPurchases = totalPurchase + totalDebitNote;
+
+        // Final GST Payable Calculation
+        const gstPayable = totalOutputGST - totalInputGST;
+
+        return {
+            GSTR1: {
+                totalSales,
+                totalCreditNote,
+                totalDebitNote,
+                netTaxableSales: netSales,
+                outputGST: totalOutputGST
+            },
+            GSTR3B: {
+                totalPurchase,
+                totalCreditNote,
+                totalDebitNote,
+                netPurchases,
+                inputGST: totalInputGST,
+                gstPayable
+            }
+        };
+    }
+
+    // async calculateBalanceSheet(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
+    //     let balanceSheet = {
+    //         assets: 0,
+    //         liabilities: 0,
+    //         income: 0,
+    //         expenses: 0,
+    //         capital: 0
+    //     };
+
+    //     req.forEach(txn => {
+    //         switch (txn.accountType) {
+    //             case UnderPrimary.ASSETS:
+    //                 balanceSheet.assets += txn.amount;
+    //                 break;
+    //             case UnderPrimary.LIABILITIES:
+    //                 balanceSheet.liabilities += txn.amount;
+    //                 break;
+    //             case UnderPrimary.INCOME:
+    //                 balanceSheet.income += txn.amount;
+    //                 break;
+    //             case UnderPrimary.EXPENSES:
+    //                 balanceSheet.expenses -= txn.amount;
+    //                 break;
+    //         }
+    //     });
+
+    //     balanceSheet.capital = balanceSheet.assets - balanceSheet.liabilities;
+    //     return balanceSheet;
+    // }
+
+    //Reports
+
+
     async getTrialBalance(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
         // Fetch all ledger transactions within the date range
         const query = this.createQueryBuilder('ve')
@@ -1891,57 +2083,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         console.log(trialBalance, "????????????????")
         return trialBalance;
     }
-
-    // async getBalanceSheet(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
-    //     const query = this.createQueryBuilder('ve')
-    //         .select([
-    //             'ledger.group AS groupName',
-    //             'SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount',
-    //             'SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount'
-    //         ])
-    //         .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
-    //         .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-    //         .andWhere('ve.generation_date BETWEEN :fromDate AND :toDate', {
-    //             fromDate: req.fromDate,
-    //             toDate: req.toDate
-    //         })
-    //         .groupBy('ledger.group')
-    //         .setParameters({
-    //             debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
-    //             creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
-    //         });
-
-    //     const ledgerTransactions = await query.getRawMany();
-
-    //     const balanceSheet = {
-    //         assets: [],
-    //         liabilities: [],
-    //         equity: []
-    //     };
-
-    //     ledgerTransactions.forEach(({ groupName, debitAmount, creditAmount }) => {
-    //         const netAmount = debitAmount - creditAmount; // Adjust based on accounting rules
-
-    //         if ([UnderSecondary.CURRENT_ASSETS, UnderSecondary.FIXED_ASSETS, UnderSecondary.INVESTMENTS].includes(groupName)) {
-    //             balanceSheet.assets.push({ groupName, amount: netAmount });
-    //         } else if ([UnderSecondary.CURRENT_LIABILITIES, UnderSecondary.LONG_TERM_LIABILITIES].includes(groupName)) {
-    //             balanceSheet.liabilities.push({ groupName, amount: netAmount });
-    //         } 
-    //     });
-
-    //     // Ensure Assets = Liabilities + Equity
-    //     const totalAssets = balanceSheet.assets.reduce((sum, item) => sum + item.amount, 0);
-    //     const totalLiabilities = balanceSheet.liabilities.reduce((sum, item) => sum + item.amount, 0);
-
-    //     if (totalAssets !== totalLiabilities + totalEquity) {
-    //         throw new Error("Balance Sheet is not balanced!");
-    //     }
-
-    //     return balanceSheet;
-    // }
-
-
 
 }
 

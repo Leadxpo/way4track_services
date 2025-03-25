@@ -28,7 +28,7 @@ export class VoucherDto {
     buildingAddress?: string;
     hsnCode?: string;
     journalType: DebitORCreditEnum;
-    SCST?: number;
+    SGST?: number;
     CGST?: number;
     IGST?: number;
 

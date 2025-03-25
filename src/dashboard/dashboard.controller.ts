@@ -693,6 +693,19 @@ export class DashboardController {
         }
     }
 
+    // @Post('calculateRcs')
+    // async calculateRcs(@Body() req: {
+    //     companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    // }): Promise<CommonResponse> {
+    //     try {
+    //         return await this.voucherDashboardService.calculateRcs(req)
+    //     }
+    //     catch (error) {
+    //         console.log("Error in details in service..", error);
+    //         //         return new CommonResponse(false, 500, 'Error details');
+    //     }
+    // }
+
     @Post('getTotalSalesForReport')
     async getTotalSalesForReport(@Body() req: {
         fromDate?: string;
