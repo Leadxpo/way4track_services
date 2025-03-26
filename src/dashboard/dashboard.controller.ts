@@ -531,6 +531,17 @@ export class DashboardController {
         }
     }
 
+    @Post('getAllPaymentsVouchers')
+    async getAllPaymentsVouchers(@Body() req: CommonReq): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getAllPaymentsVouchers(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Post('getSalesForTable')
     async getSalesForTable(@Body() req: {
         fromDate?: string;

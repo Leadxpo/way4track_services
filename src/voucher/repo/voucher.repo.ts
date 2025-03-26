@@ -1512,6 +1512,52 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return data;
     }
 
+    async getAllPaymentsVouchers(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.voucher_id AS ledgerId',
+                've.generation_date AS generationDate',
+                've.purpose AS purpose',
+                've.payment_status AS paymentStatus',
+                've.amount AS amount',
+                'branch.name AS branchName',
+                'ledger.name AS ledgerName',
+                've.voucher_type AS voucherType',
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        query.groupBy('ve.voucher_id')
+            .addGroupBy('branch.name')
+            .addGroupBy('ve.generation_date')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.amount')
+            .addGroupBy('ve.voucher_type')
+            .addGroupBy('ledger.name'); // Added to match SELECT fields
+
+        return await query.getRawMany();
+    }
+
+
     async getPurchaseDataForTable(req: {
         fromDate?: string;
         toDate?: string;
