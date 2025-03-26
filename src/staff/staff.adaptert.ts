@@ -34,15 +34,14 @@ export class StaffAdapter {
         entity.bloodGroup = dto.bloodGroup;
         entity.joiningDate = dto.joiningDate;
         entity.beforeExperience = dto.beforeExperience;
-        entity.previousCompany = dto.previousCompany;
-        entity.previousDesignation = dto.previousDesignation;
-        entity.totalExperience = dto.totalExperience;
-        entity.previousSalary = dto.previousSalary;
+        // entity.previousCompany = dto.previousCompany;
+        // entity.previousDesignation = dto.previousDesignation;
+        // entity.totalExperience = dto.totalExperience;
+        // entity.previousSalary = dto.previousSalary;
         entity.bankName = dto.bankName;
         entity.accountNumber = dto.accountNumber;
         entity.ifscCode = dto.ifscCode;
         entity.address = dto.address;
-        entity.branchName = dto.branchName;
         entity.accountType = dto.accountType;
         entity.department = dto.department;
         entity.monthlySalary = dto.monthlySalary;
@@ -81,6 +80,8 @@ export class StaffAdapter {
             const branchEntity = new BranchEntity();
             branchEntity.id = dto.branch;
             entity.branch = branchEntity;
+            entity.branchName = branchEntity.branchName;
+
         }
         entity.experienceDetails = dto.experienceDetails
         return entity;
@@ -114,10 +115,10 @@ export class StaffAdapter {
                 staffMember.bloodGroup,
                 staffMember.joiningDate,
                 staffMember.beforeExperience,
-                staffMember.previousCompany,
-                staffMember.previousDesignation,
-                staffMember.totalExperience,
-                staffMember.previousSalary,
+                // staffMember.previousCompany,
+                // staffMember.previousDesignation,
+                // staffMember.totalExperience,
+                // staffMember.previousSalary,
                 staffMember.bankName,
                 staffMember.accountNumber,
                 staffMember.ifscCode,

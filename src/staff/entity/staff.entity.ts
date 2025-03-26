@@ -132,17 +132,17 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'before_experience', type: 'int', comment: 'Experience in years', nullable: true })
   beforeExperience: number;
 
-  @Column({ name: 'previous_company', type: 'varchar', length: 255, nullable: true })
-  previousCompany: string;
+  // @Column({ name: 'previous_company', type: 'varchar', length: 255, nullable: true })
+  // previousCompany: string;
 
-  @Column({ name: 'previous_designation', type: 'varchar', length: 100, nullable: true })
-  previousDesignation: string;
+  // @Column({ name: 'previous_designation', type: 'varchar', length: 100, nullable: true })
+  // previousDesignation: string;
 
-  @Column({ name: 'total_experience', type: 'int', nullable: true })
-  totalExperience: number;
+  // @Column({ name: 'total_experience', type: 'int', nullable: true })
+  // totalExperience: number;
 
-  @Column({ name: 'previous_salary', type: 'decimal', precision: 10, scale: 2, nullable: true })
-  previousSalary: number;
+  // @Column({ name: 'previous_salary', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  // previousSalary: number;
 
   @Column({ name: 'bank_name', type: 'varchar', length: 255, nullable: true })
   bankName: string;

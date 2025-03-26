@@ -25,10 +25,10 @@ export class GetStaffResDto {
     bloodGroup?: string;
     joiningDate: string;
     beforeExperience: number;
-    previousCompany?: string;
-    previousDesignation?: string;
-    totalExperience?: number;
-    previousSalary?: number;
+    // previousCompany?: string;
+    // previousDesignation?: string;
+    // totalExperience?: number;
+    // previousSalary?: number;
     bankName?: string;
     accountNumber?: string;
     ifscCode?: string;
@@ -91,10 +91,10 @@ export class GetStaffResDto {
         bloodGroup: string | undefined,
         joiningDate: string,
         beforeExperience: number,
-        previousCompany: string | undefined,
-        previousDesignation: string | undefined,
-        totalExperience: number | undefined,
-        previousSalary: number | undefined,
+        // previousCompany: string | undefined,
+        // previousDesignation: string | undefined,
+        // totalExperience: number | undefined,
+        // previousSalary: number | undefined,
         bankName: string | undefined,
         accountNumber: string | undefined,
         ifscCode: string | undefined,
@@ -158,10 +158,10 @@ export class GetStaffResDto {
         this.bloodGroup = bloodGroup;
         this.joiningDate = joiningDate;
         this.beforeExperience = beforeExperience;
-        this.previousCompany = previousCompany;
-        this.previousDesignation = previousDesignation;
-        this.totalExperience = totalExperience;
-        this.previousSalary = previousSalary;
+        // this.previousCompany = previousCompany;
+        // this.previousDesignation = previousDesignation;
+        // this.totalExperience = totalExperience;
+        // this.previousSalary = previousSalary;
         this.bankName = bankName;
         this.accountNumber = accountNumber;
         this.ifscCode = ifscCode;
