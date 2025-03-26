@@ -594,6 +594,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pt.name AS productType',
                 'pr.status AS productStatus',
                 'SUM(CASE WHEN pr.status = \'isAssign\' THEN productAssign.quantity ELSE 0 END) AS inAssignStock',
+                'SUM(CASE WHEN pr.status = \'install\' THEN productAssign.quantity ELSE 0 END) AS installStock',
                 'SUM(CASE WHEN pr.status = \'inHand\' THEN productAssign.quantity ELSE 0 END) AS inHandStock',
                 'SUM(CASE WHEN pr.status = \'not_assigned\' THEN productAssign.quantity ELSE 0 END) AS presentStock'
             ])
@@ -630,8 +631,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
 
 
-  
-    
+
+
 
 
 

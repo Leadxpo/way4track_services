@@ -68,7 +68,7 @@ export class ProductAssignAdapter {
     if (dto.imeiNumberFrom && dto.imeiNumberTo) {
       entity.numberOfProducts = this.calculateNumberOfProducts(dto.imeiNumberFrom, dto.imeiNumberTo);
     } else {
-      entity.numberOfProducts = 0;
+      entity.numberOfProducts = dto.numberOfProducts
     }
 
     return entity;

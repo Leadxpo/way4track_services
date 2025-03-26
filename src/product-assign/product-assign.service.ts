@@ -39,7 +39,8 @@ export class ProductAssignService {
         imeiNumberFrom: string,
         imeiNumberTo: string,
         branchId?: number,
-        staffId?: number
+        staffId?: number,
+        numberOfProducts?: number
     ): Promise<void> {
         const imeiFrom = parseInt(imeiNumberFrom, 10);
         const imeiTo = parseInt(imeiNumberTo, 10);
@@ -58,9 +59,6 @@ export class ProductAssignService {
                 .where("CAST(product.imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
                 .getMany();
 
-            if (!products.length) {
-                throw new Error(`No products found in the IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
-            }
 
             let status = "not_assigned";
             let location = "warehouse";
@@ -113,7 +111,8 @@ export class ProductAssignService {
                 dto.imeiNumberFrom,
                 dto.imeiNumberTo,
                 dto.branchId,
-                dto.staffId
+                dto.staffId,
+                dto.numberOfProducts
             );
 
             return new CommonResponse(true, 201, 'Product details created successfully');

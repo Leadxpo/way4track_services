@@ -1207,7 +1207,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return await query.getRawMany();
     }
-    //---------------New Version APIS
+    //---------------New Version APIS------------------------------
 
     async getBranchWiseYearlySales(req: BranchChartDto): Promise<any> {
         const year = Number(req.date);
@@ -1327,8 +1327,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query.getRawMany();
     }
 
-
-
     async getSalesBreakdown(req: BranchChartDto) {
         const query = await this.createQueryBuilder('ve')
             .select([
@@ -1429,10 +1427,16 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `DATE(ve.generation_date) AS "date"`,
                 `ve.voucher_id AS "voucherId"`,
                 `ve.purpose AS "purpose"`,
-                `ve.payment_type AS "paymentType"`,
                 `branch.name AS "branchName"`,
                 `ve.amount AS "amount"`,
+                `MAX(ve.due_date) AS "lastDueDate"`,
+                `CASE  
+                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
+                    ELSE NULL  
+                END AS "overdueDays"`,
+                `ledger.name AS "ledgerName"`,
             ])
+            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id')
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
@@ -1453,7 +1457,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .groupBy('ve.voucher_id') // Ensure each voucher is uniquely grouped
             .addGroupBy('ve.generation_date')
             .addGroupBy('ve.purpose')
-            .addGroupBy('ve.payment_type')
             .addGroupBy('branch.name')
             .addGroupBy('ve.amount')
             .orderBy('ve.generation_date', 'ASC')
@@ -1594,7 +1597,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return query.getRawOne(); // Returns a single object instead of an array
     }
-
 
     async getSolidLiquidCash(req: CommonReq) {
         // 1️⃣ Get total balance in all accounts from `AccountEntity` (No need for payment type filtering)
@@ -1788,10 +1790,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             [branch]: accounts,
         }));
     }
-
-
-
-
 
     async calculateGstReturns(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string }) {
         const query = this.createQueryBuilder('ve')
@@ -1997,7 +1995,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return trialBalance;
     }
 
-
     async getBalanceSheet(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string, branchName?: string }) {
         const query = this.createQueryBuilder('ve')
             .select([
@@ -2133,7 +2130,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'sr.generation_date AS generationDate',
                 'ledger.group AS groupName',
                 'ledger.name AS ledgerName',
-                'br.name as branchName'
+                'br.name as branchName',
+                'MAX(ve.due_date) AS lastDueDate'
+
             ])
             .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id') // Fixed alias issue
             .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id') // Fixed alias issue
@@ -2155,6 +2154,407 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return await query.getRawMany();
     }
+
+    async getTDSReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.invoice_id AS invoiceNumber',
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Use SUM() to aggregate amounts
+                'SUM(sr.tds) AS tdsPercentage',   // Aggregate TDS percentage
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'ledger.tds_deductable AS tdsDeductable',
+                'br.name as branchName',
+                'sr.payment_type as paymentType'
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['Sales', 'PURCHASE'] })
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('sr.invoice_id')  // Group by invoice ID
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        return await query.getRawMany();
+    }
+
+    async getTCSReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.invoice_id AS invoiceNumber',
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Use SUM() to aggregate amounts
+                'SUM(sr.tcs) AS tdsPercentage',   // Aggregate TCS percentage
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'ledger.tcs_deductable AS tcsDeductable',
+                'br.name as branchName',
+                'sr.payment_type as paymentType'
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['Sales', 'PURCHASE'] })
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('sr.invoice_id')  // Group by invoice ID
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        return await query.getRawMany();
+    }
+
+    async getDEBITNOTEReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate totalAmount
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name as branchName',
+                'sr.payment_type as paymentType'
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['DEBITNOTE'] })  // Corrected condition
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Add GROUP BY for aggregation
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getCREDITNOTEReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate totalAmount
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name as branchName',
+                'sr.payment_type as paymentType'
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['CREDITNOTE'] })  // Corrected condition
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Add GROUP BY for aggregation
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getJOURNALReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate totalAmount
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name as branchName',
+                'sr.payment_type as paymentType',
+
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['JOURNAL'] })  // Corrected condition
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Add GROUP BY for aggregation
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getPURCHASEReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate totalAmount
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name as branchName',
+                'sr.payment_type as paymentType',
+                'MAX(ve.due_date) AS lastDueDate'
+
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['PURCHASE'] })  // Corrected condition
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Add GROUP BY for aggregation
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getSALESReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate totalAmount
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name as branchName',
+                'sr.payment_type as paymentType',
+                'MAX(ve.due_date) AS lastDueDate'
+
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.voucher_type IN (:...voucherTypes)', { voucherTypes: ['SALES'] })  // Corrected condition
+            .andWhere('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Add GROUP BY for aggregation
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getLedgerReport(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_id AS voucherId',
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',  // Aggregate total amount per ledger
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name AS branchName',
+                'sr.payment_type AS paymentType',
+                'MAX(ve.due_date) AS lastDueDate'
+
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // If aggregating, group by relevant columns
+        query.groupBy('sr.voucher_id')
+            .addGroupBy('sr.voucher_type')
+            .addGroupBy('sr.generation_date')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        return await query.getRawMany();
+    }
+
+    async getPayableAmountForReport(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS "date"`,
+                `ve.voucher_id AS "voucherId"`,
+                `ve.purpose AS "purpose"`,
+                `branch.name AS "branchName"`,
+                `ledger.name AS "ledgerName"`,
+                `SUM(ve.amount) AS "totalAmount"`,
+                `COUNT(ve.voucher_id) AS "pendingInvoices"`,
+                `MAX(ve.due_date) AS "lastDueDate"`,
+                `CASE  
+                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
+                    ELSE NULL  
+                END AS "overdueDays"` // Calculate overdue days only for past due dates
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id') // Joining ledger to track payables
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('ve.payment_status = :pendingStatus', { pendingStatus: PaymentStatus.PENDING })
+            .andWhere('ve.voucher_type = :voucherType', { voucherType: VoucherTypeEnum.PURCHASE });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Grouping payables by branch, ledger, and date
+        query
+            .groupBy('ve.generation_date')
+            .addGroupBy('ve.voucher_id')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('branch.name')
+            .addGroupBy('ledger.name')
+            .addGroupBy('ve.due_date')
+            .orderBy('ve.generation_date', 'ASC')
+            .addOrderBy('branch.name', 'ASC');
+
+        return await query.getRawMany();
+    }
+
+
 
 
 }
