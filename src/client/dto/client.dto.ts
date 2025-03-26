@@ -20,5 +20,6 @@ export class ClientDto {
     tcs: boolean;
     billWiseDate: boolean;
     status: ClientStatus
+    branchName: string;
 
 }

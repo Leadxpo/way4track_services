@@ -48,7 +48,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.quantity as quantity',
                 'br.name AS branchName',
                 'cl.email AS email',
-                'cl.dob AS dob',
                 'cl.address AS address',
                 'vr.name AS voucherName',
                 'vr.generation_date AS generationDate',
@@ -79,7 +78,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.voucher_id AS voucherId',
                 'br.name AS branch',
                 'cl.email AS email',
-                'cl.dob AS dob',
                 'cl.address AS address',
                 'vr.name AS voucherName',
                 'vr.generation_date AS generationDate',
@@ -100,7 +98,7 @@ export class ClientRepository extends Repository<ClientEntity> {
             query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
         const result = await query
-            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name, cl.joining_date, vr.payment_status, vr.amount, br.name, cl.email, cl.dob, cl.address, vr.name, vr.generation_date, vr.product_type`)
+            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name, cl.joining_date, vr.payment_status, vr.amount, br.name, cl.email,cl.address, vr.name, vr.generation_date, vr.product_type`)
             .getRawMany();
 
         return result;

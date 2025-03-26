@@ -50,9 +50,12 @@ export class ClientService {
             // const existingStaff = await this.clientRepository.findOne({
             //     where: [{ id: dto.id }, { clientId: dto.clientId }],
             // });
-            if (dto.id || dto.id !== null || (dto.clientId && dto.clientId.trim() !== '')) {
+            if (dto.id|| (dto.clientId && dto.clientId.trim() !== '')) {
+                console.log(dto,"updateClientDetails{{{{{{{{{{{{{")
                 return await this.updateClientDetails(dto, photoPath);
+
             } else {
+                console.log(dto,"createClientDetails{{{{{{{{{{{{{")
                 // Create a new client
                 return await this.createClientDetails(dto, photoPath);
             }
@@ -123,7 +126,6 @@ export class ClientService {
             const updatedClient = {
                 ...existingClient,
                 ...entity,
-                branchId: dto.branch ?? null,
                 clientPhoto: photoPath ?? existingClient.clientPhoto,
             };
 

@@ -57,7 +57,7 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
     dispatch: DispatchEntity[];
 
-    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client)
+    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client,{nullable:true})
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
