@@ -33,7 +33,7 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'imei_number_to', type: 'varchar', length: 20 })
   imeiNumberTo: string;
 
-  @Column({ name: 'number_of_products', type: 'int' })
+  @Column({ name: 'number_of_products', type: 'int', nullable: true })
   numberOfProducts: number;
 
   @ManyToOne(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign, { nullable: true })

@@ -135,6 +135,7 @@ export class VoucherAdapter {
     entity.TDS = dto.TDS
     entity.TCS = dto.TCS
     entity.pendingInvoices = dto.pendingInvoices
+    entity.dueDate = dto.dueDate
     return entity;
   }
 

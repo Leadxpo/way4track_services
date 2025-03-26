@@ -6,8 +6,8 @@ export class ProductAssignDto {
     productId: number;
     branchId: number;
     requestId: number;
-    imeiNumberFrom: string;
-    imeiNumberTo: string;
+    imeiNumberFrom?: string;
+    imeiNumberTo?: string;
     numberOfProducts: number;
     branchOrPerson: string;
     productAssignPhoto?: string

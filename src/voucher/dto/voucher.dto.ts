@@ -23,6 +23,7 @@ export class VoucherDto {
     accountNumber?: number; // assuming this is the account number from the account entity
     voucherType: VoucherTypeEnum;
     generationDate?: Date;
+    dueDate: Date;
     expireDate?: Date;
     shippingAddress?: string;
     buildingAddress?: string;

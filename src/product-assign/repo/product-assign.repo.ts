@@ -85,7 +85,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pr.imei_number AS imeiNumber',
                 'staff.staff_id as staffId',
                 'pr.location as location',
-                
+
                 'SUM(CASE WHEN pr.status = \'isAssign\' THEN pa.quantity ELSE 0 END) AS inAssignStock',
                 'SUM(CASE WHEN pr.status = \'inHand\' THEN pa.quantity ELSE 0 END) AS inHandStock',
                 'SUM(CASE WHEN pr.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock',
@@ -102,8 +102,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         if (req.id) {
             query.andWhere('pr.id = :productId', { productId: req.id });
         }
-         
-        
+
+
         if (req.fromDate) {
             query.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
         }
@@ -582,6 +582,58 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             throw new Error('Failed to fetch product details by branch');
         }
     }
+
+
+    async getStockSummary(req: ProductIdDto) {
+        const query = this.createQueryBuilder('productAssign')
+            .select([
+                'pr.product_name AS productName',
+                'pr.product_description AS productDescription',
+                'pr.imei_number AS imeiNumber',
+                'pr.location AS location',
+                'pt.name AS productType',
+                'pr.status AS productStatus',
+                'SUM(CASE WHEN pr.status = \'isAssign\' THEN productAssign.quantity ELSE 0 END) AS inAssignStock',
+                'SUM(CASE WHEN pr.status = \'install\' THEN productAssign.quantity ELSE 0 END) AS installStock',
+                'SUM(CASE WHEN pr.status = \'inHand\' THEN productAssign.quantity ELSE 0 END) AS inHandStock',
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN productAssign.quantity ELSE 0 END) AS presentStock'
+            ])
+            .leftJoin(ProductEntity, 'pr', 'pr.id = productAssign.product_id')
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
+            .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // Apply filters conditionally
+        if (req.fromDate) {
+            query.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
+        }
+        if (req.productType) {
+            query.andWhere('pt.name LIKE :productType', { productType: `%${req.productType}%` });
+        }
+        if (req.status) {
+            query.andWhere('pr.status = :status', { status: req.status });
+        }
+
+        // Grouping by all selected fields
+        query.groupBy(' pr.product_name, pr.product_description, pr.imei_number, pr.location, pt.name, pr.status');
+
+        // Execute and return results
+        const result = await query.getRawMany();
+
+        // Debugging log
+        console.log(result);
+
+        return result;
+    }
+
+
+
+
+
+
 
 
 }

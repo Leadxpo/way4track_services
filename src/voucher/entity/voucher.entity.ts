@@ -99,8 +99,8 @@ export class VoucherEntity {
     @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     generationDate: Date;
 
-    // @Column({ name: 'next_due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
-    // nextDueDate: Date;
+    @Column({ name: 'due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    dueDate: Date;
 
     // @Column({ name: 'last_paid_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     // lastPaidDate: Date;

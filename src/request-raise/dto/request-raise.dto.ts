@@ -9,6 +9,8 @@ export class RequestRaiseDto {
     requestFrom: number;
     branch: number;
     description: string;
+    requestFor: string;
+
     createdDate: Date;
     status: ClientStatusEnum
     subDealerId: number

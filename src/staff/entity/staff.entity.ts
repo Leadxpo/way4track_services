@@ -318,7 +318,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ type: 'int', default: 0, name: "carry_forward_leaves", nullable: true })
   carryForwardLeaves: number;
 
-  @Column({ type: 'json', name: 'experience', nullable: true })
-  experience: Experience[];
+  @Column({ type: 'json', name: 'experience_details', nullable: true })
+  experienceDetails: Experience[];
 
 }

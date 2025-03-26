@@ -45,6 +45,9 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'description', type: 'text' })
     description: string;
 
+    @Column({ name: 'request_for', type: 'text' })
+    requestFor: string;
+
     @Column({ name: 'created_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdDate: Date;
 

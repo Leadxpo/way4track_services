@@ -18,6 +18,7 @@ export class RequestResDto {
     subDealerId?: number
     subDealerName?: string
     products?: RequestTypeProducts[];
+    requestFor: string;
 
     constructor(
         id: number,
@@ -35,7 +36,8 @@ export class RequestResDto {
         unitCode: string,
         subDealerId?: number,
         subDealerName?: string,
-        products?: RequestTypeProducts[]
+        products?: RequestTypeProducts[],
+        requestFor?: string
 
     ) {
         this.id = id;
@@ -53,5 +55,6 @@ export class RequestResDto {
         this.subDealerId = subDealerId
         this.subDealerName = subDealerName
         this.products = products
+        this.requestFor = requestFor
     }
 }
