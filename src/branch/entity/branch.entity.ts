@@ -112,4 +112,10 @@ export class BranchEntity extends BaseEntity {
 
   @Column('varchar', { name: 'longitude', length: 20, nullable: true })
   longitude: string;
+
+  @Column({ name: 'CIN', type: 'varchar', nullable: true })
+  CIN: string;
+
+  @Column({ name: 'GST', type: 'varchar', nullable: true })
+  GST: string;
 }

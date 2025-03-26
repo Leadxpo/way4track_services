@@ -15,4 +15,7 @@ export class BranchDto {
     unitCode: string
     latitude: string;
     longitude: string;
+    CIN: string;
+    GST: string;
+
 }
