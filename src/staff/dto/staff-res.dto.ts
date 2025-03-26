@@ -34,7 +34,7 @@ export class GetStaffResDto {
     ifscCode?: string;
     address: string;
     branchId: number;
-    branchName?: string;
+    branchName?: string
     accountType: AccountType;
     department?: string;
     monthlySalary?: number;
@@ -68,6 +68,7 @@ export class GetStaffResDto {
     mailAllocation?: YesNo;
     carryForwardLeaves?: number;
     staffStatus?: StaffStatus;
+    accountBranch?: string;
 
     constructor(
         id: number,
@@ -100,7 +101,7 @@ export class GetStaffResDto {
         ifscCode: string | undefined,
         address: string,
         branchId: number,
-        branchName: string | undefined,
+        branchName: string,
         accountType: AccountType,
         department: string | undefined,
         monthlySalary: number | undefined,
@@ -132,7 +133,9 @@ export class GetStaffResDto {
         officeEmail?: string,
         mailAllocation?: YesNo,
         carryForwardLeaves?: number,
-        staffStatus?: StaffStatus
+        staffStatus?: StaffStatus,
+        accountBranch?: string | undefined,
+
 
 
         // branch: number
@@ -167,7 +170,7 @@ export class GetStaffResDto {
         this.ifscCode = ifscCode;
         this.address = address;
         this.branchId = branchId;
-        this.branchName = branchName;
+        this.accountBranch = accountBranch;
         this.accountType = accountType;
         this.department = department;
         this.monthlySalary = monthlySalary;
@@ -201,6 +204,7 @@ export class GetStaffResDto {
         this.mailAllocation = mailAllocation
         this.carryForwardLeaves = carryForwardLeaves
         this.staffStatus = staffStatus
+        this.branchName = branchName
     }
 }
 

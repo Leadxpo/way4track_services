@@ -123,8 +123,8 @@ export class StaffAdapter {
                 staffMember.accountNumber,
                 staffMember.ifscCode,
                 staffMember.address,
-                staffMember.branch.id,
-                staffMember.branch.branchName,
+                staffMember.branch ? staffMember.branch.id : null, // ✅ Handle null branch
+                staffMember.branch ? staffMember.branch.branchName : null,
                 staffMember.accountType,
                 staffMember.department,
                 staffMember.monthlySalary,

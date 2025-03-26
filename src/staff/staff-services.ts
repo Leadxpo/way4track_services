@@ -784,13 +784,17 @@ export class StaffService {
 
     async getStaffDetails(req: CommonReq): Promise<CommonResponse> {
         const branch = await this.staffRepository.find({
-            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch', 'voucherId', 'designationRelation']
+            where: { companyCode: req.companyCode, unitCode: req.unitCode },
+            relations: ['branch']
         });
-        if (!branch.length) {
+
+        const staffDtos = this.adapter.convertEntityToDto(branch);
+
+        if (staffDtos.length === 0) {
             return new CommonResponse(false, 35416, "There Is No List");
-        } else {
-            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
         }
+
+        return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", staffDtos);
     }
 
     async getStaffDetailsById(req: StaffIdDto): Promise<CommonResponse> {
