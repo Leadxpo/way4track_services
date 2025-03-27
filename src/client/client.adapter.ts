@@ -44,6 +44,7 @@ export class ClientAdapter {
         entity.status = dto.status
         return entity;
     }
+    
 
     convertEntityToDto(entity: ClientEntity[]): ClientResDto[] {
         return entity.map((client) => {

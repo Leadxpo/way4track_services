@@ -2601,6 +2601,54 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
 
+    async generateIncomeStatement(year: number) {
+        // Revenue: Only consider SALES (not RECEIPT to avoid double counting)
+        const netSales = await this.getTotalByVoucherType(VoucherTypeEnum.SALES, year);
+
+        // Other income (Journals)
+        const otherIncome = await this.getTotalByVoucherType(VoucherTypeEnum.JOURNAL, year);
+
+        // Expenses: Only consider PURCHASE (not PAYMENT to avoid double counting)
+        const costOfSales = await this.getTotalByVoucherType(VoucherTypeEnum.PURCHASE, year);
+
+        // Adjustments
+        const debitNotes = await this.getTotalByVoucherType(VoucherTypeEnum.DEBITNOTE, year);
+        const creditNotes = await this.getTotalByVoucherType(VoucherTypeEnum.CREDITNOTE, year);
+        const interestExpense = await this.getTotalByVoucherType(VoucherTypeEnum.CONTRA, year);
+
+        // Calculations
+        const grossProfit = netSales - costOfSales;
+        const operatingExpenses = debitNotes; // Only DEBITNOTE as an extra expense
+        const incomeBeforeTaxes = grossProfit - operatingExpenses + creditNotes + otherIncome - interestExpense;
+        const incomeTaxExpense = incomeBeforeTaxes * 0.30; // 30% tax assumption
+        const netIncome = incomeBeforeTaxes - incomeTaxExpense;
+
+        // Return the generated income statement
+        return {
+            year,
+            netSales,
+            costOfSales,
+            grossProfit,
+            operatingExpenses,
+            interestExpense,
+            otherIncome,
+            incomeBeforeTaxes,
+            incomeTaxExpense,
+            netIncome,
+        };
+    }
+
+
+    private async getTotalByVoucherType(voucherType: VoucherTypeEnum, year: number): Promise<number> {
+        const result = await this
+            .createQueryBuilder('voucher')
+            .select('SUM(voucher.amount)', 'total')
+            .where('voucher.voucherType = :voucherType', { voucherType })
+            .andWhere('YEAR(voucher.date) = :year', { year })
+            .getRawOne();
+
+        return result?.total ?? 0;
+    }
 
 
 }

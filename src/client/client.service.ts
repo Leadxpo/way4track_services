@@ -50,12 +50,12 @@ export class ClientService {
             // const existingStaff = await this.clientRepository.findOne({
             //     where: [{ id: dto.id }, { clientId: dto.clientId }],
             // });
-            if (dto.id|| (dto.clientId && dto.clientId.trim() !== '')) {
-                console.log(dto,"updateClientDetails{{{{{{{{{{{{{")
+            if (dto.id || (dto.clientId && dto.clientId.trim() !== '')) {
+                console.log(dto, "updateClientDetails{{{{{{{{{{{{{")
                 return await this.updateClientDetails(dto, photoPath);
 
             } else {
-                console.log(dto,"createClientDetails{{{{{{{{{{{{{")
+                console.log(dto, "createClientDetails{{{{{{{{{{{{{")
                 // Create a new client
                 return await this.createClientDetails(dto, photoPath);
             }
@@ -119,8 +119,18 @@ export class ClientService {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-
             const entity = this.clientAdapter.convertDtoToEntity(dto);
+
+            if (dto.branch) {
+                // Fetch branch by name to get the correct ID
+                const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
+
+                if (!branchEntity) {
+                    throw new Error(`Branch with name '${dto.branch}' not found`);
+                }
+
+                entity.branch = branchEntity; // Assign the entire entity, not just an invalid string
+            }
 
             // Merge existing client details with new data
             const updatedClient = {
