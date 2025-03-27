@@ -15,6 +15,7 @@ import { WorkStatusEnum } from './enum/work-status-enum';
 import { PaymentStatus } from 'src/product/dto/payment-status.enum';
 import { TechnicianWorksDto } from 'src/technician-works/dto/technician-works.dto';
 import { SalesworkRepository } from 'src/sales-man/repo/sales-man.repo';
+import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 
 @Injectable()
 export class WorkAllocationService {
@@ -110,7 +111,7 @@ export class WorkAllocationService {
                 description: "",
                 date: dto.date,
                 staffId: dto.staffId ?? null,
-                branchId: null,
+                branchId: dto.branchId ?? null,
                 productId: dto.productId ?? null,
                 vendorId: dto.vendorId ?? null,
                 clientId: dto.clientId ?? null,
@@ -217,10 +218,24 @@ export class WorkAllocationService {
 
     }
     /**
+     * 
+     * 
      * @param sequenceNumber The sequence number for the allocation.
      */
     private generateWorkAllocationNumber(sequenceNumber: number): string {
         const paddedNumber = sequenceNumber.toString().padStart(3, '0');
         return `#VOU-${paddedNumber}`;
+    }
+
+
+
+    async getTotalPendingAndCompletedPercentage(req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.workAllocationRepository.getTotalPendingAndCompletedPercentage(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
     }
 }

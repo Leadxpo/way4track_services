@@ -3,6 +3,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { WorkAllocationIdDto } from './dto/work-allocation-id.dto';
 import { WorkAllocationDto } from './dto/work-allocation.dto';
 import { WorkAllocationService } from './work-allocation.service';
+import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 
 @Controller('work-allocations')
 export class WorkAllocationController {
@@ -78,6 +79,17 @@ export class WorkAllocationController {
     }) {
         try {
             return this.workAllocationService.getMonthTotalWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+
+    @Post('getTotalPendingAndCompletedPercentage')
+    async getTotalPendingAndCompletedPercentage(@Body() req: BranchChartDto) {
+        try {
+            return this.workAllocationService.getTotalPendingAndCompletedPercentage(req);
         } catch (error) {
             console.error('Error in delete vendor details:', error);
             return new CommonResponse(false, 500, 'Error deleting vendor details');

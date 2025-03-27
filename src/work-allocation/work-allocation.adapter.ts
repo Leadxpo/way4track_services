@@ -7,6 +7,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 @Injectable()
 export class WorkAllocationAdapter {
@@ -38,6 +39,10 @@ export class WorkAllocationAdapter {
         const vendor = new VendorEntity();
         vendor.id = dto.vendorId;
         entity.vendorId = vendor;
+
+        const branch = new BranchEntity();
+        branch.id = dto.branchId;
+        entity.branchId = branch;
 
         const voucher = new VoucherEntity();
         voucher.id = dto.voucherId
@@ -95,7 +100,9 @@ export class WorkAllocationAdapter {
                 voucher?.name || '',
                 entity.workStatus,
                 entity.description,
-                entity.amount
+                entity.amount,
+                entity.branchId.id,
+                entity.branchId.branchName
                 // Mapping productDetails array
                 // entity.productDetails?.map(productDetail => ({
                 //     productName: productDetail.productName,

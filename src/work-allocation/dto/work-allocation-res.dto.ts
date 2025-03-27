@@ -37,6 +37,9 @@ export class WorkAllocationResDto {
     workStatus?: WorkStatusEnum;
     description?: string;
     amount: number;
+    branchId?: number
+    branchName?: string
+
     constructor(
         id: number,
         workAllocationNumber: string,
@@ -71,7 +74,11 @@ export class WorkAllocationResDto {
         // }[],
         workStatus?: WorkStatusEnum,
         description?: string,
-        amount?: number
+        amount?: number,
+        branchId?: number,
+        branchName?: string
+
+
 
     ) {
         this.id = id;
@@ -106,6 +113,7 @@ export class WorkAllocationResDto {
         this.workStatus = workStatus
         this.description = description
         this.amount = amount
-
+        this.branchId = branchId
+        this.branchName = branchName
     }
 }

@@ -20,7 +20,7 @@ export class WorkAllocationDto {
     amount: number;
     sales_id: number
     visitingNumber: string;
-
+    branchId: number
 }
 export class ProductDetail {
     productName: string;

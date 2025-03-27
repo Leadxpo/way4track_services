@@ -19,6 +19,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 
 
 @Injectable()
@@ -304,12 +305,72 @@ export class TechnicianService {
 
     }
 
+    async getPaymentStatusPayments(req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getPaymentStatusPayments(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getSucessPaymentsForTable
+        (req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getSucessPaymentsForTable
+            (req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getAllPaymentsForTable
+        (req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getAllPaymentsForTable
+            (req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getPendingPaymentsForTable
+        (req: BranchChartDto): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getPendingPaymentsForTable
+            (req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getUpCommingWorkAllocation(req: {
         companyCode?: string;
         unitCode?: string
         staffId: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getUpCommingWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getUpCommingWorkAllocationDetails(req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getUpCommingWorkAllocationDetails(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

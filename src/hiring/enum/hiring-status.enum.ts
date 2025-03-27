@@ -4,4 +4,5 @@ export enum HiringStatus {
   QUALIFIED = 'Qualified',
   APPLIED = 'APPLIED',
   INTERVIEWED = 'INTERVIEWED',
+  ONBOARDED = 'Onboarded'
 }

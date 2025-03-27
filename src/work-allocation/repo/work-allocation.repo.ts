@@ -5,6 +5,8 @@ import { WorkStatusEnum } from "../enum/work-status-enum";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
+import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 
 
 @Injectable()
@@ -110,5 +112,38 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
         return result;
     }
 
+    async getTotalPendingAndCompletedPercentage(req: BranchChartDto) {
+        const year = Number(req.date);
+        if (!year || isNaN(year)) {
+            throw new Error('Invalid year provided');
+        }
+
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `YEAR(ve.date) AS year`,
+                `MONTH(ve.date) AS month`,
+                `branch.name AS branchName`,
+                `COUNT(ve.id) AS totalWorks`,
+                `SUM(CASE WHEN ve.work_status = 'pending' THEN 1 ELSE 0 END) AS totalPending`,
+                `SUM(CASE WHEN ve.work_status = 'completed' THEN 1 ELSE 0 END) AS totalCompleted`,
+                `ROUND((SUM(CASE WHEN ve.work_status = 'pending' THEN 1 ELSE 0 END) / NULLIF(COUNT(ve.id), 0)) * 100, 2) AS pendingPercentage`,
+                `ROUND((SUM(CASE WHEN ve.work_status = 'completed' THEN 1 ELSE 0 END) / NULLIF(COUNT(ve.id), 0)) * 100, 2) AS completedPercentage`
+            ])
+            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .where(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
+            .andWhere(`YEAR(ve.date) = :year`, { year });
+
+        if (req.branchName) {
+            query.andWhere(`LOWER(branch.name) = LOWER(:branchName)`, { branchName: req.branchName });
+        }
+
+        query.groupBy('branch.name, YEAR(ve.date), MONTH(ve.date)')
+            .orderBy('YEAR(ve.date)', 'ASC')
+            .addOrderBy('MONTH(ve.date)', 'ASC')
+            .addOrderBy('branch.name', 'ASC');
+
+        return query.getRawMany();
+    }
 
 }

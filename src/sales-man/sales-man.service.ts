@@ -50,6 +50,15 @@ export class SalesWorksService {
         return entities.map(this.adapter.convertEntityToDto);
     }
 
+    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: string; name?: string }) {
+        const staffData = await this.salesWorksRepository.getSalesSearchDetails(req)
+        if (!staffData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
+
     async findOne(id: number): Promise<SalesWorksDto> {
         const entity = await this.salesWorksRepository.findOne({ where: { id }, relations: ['staffId'] });
         if (!entity) {
@@ -66,7 +75,7 @@ export class SalesWorksService {
             entity.visitingCard = await this.uploadFile(files.visitingCard[0], `visiting_card__photos/${entity.staffId}.jpg`);
         }
 
-       
+
         entity.visitingNumber = `#VI-${(await this.salesWorksRepository.count() + 1)
             .toString()
             .padStart(5, '0')}`;

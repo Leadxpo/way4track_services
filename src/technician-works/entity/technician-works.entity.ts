@@ -20,7 +20,7 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
 
-    @Column({ type: 'enum', enum: PaymentStatus, name: 'payment_status', default: PaymentStatus.SENT, nullable: true })
+    @Column({ type: 'enum', enum: PaymentStatus, name: 'payment_status', default: PaymentStatus.PENDING, nullable: true })
     paymentStatus: PaymentStatus;
 
     @Column({ name: 'imei_number', type: 'varchar', length: 20, nullable: true })

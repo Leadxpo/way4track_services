@@ -12,7 +12,7 @@ const multerOptions = {
 };
 @Controller('sales-works')
 export class SalesWorksController {
-    constructor(private readonly salesWorksService: SalesWorksService) {}
+    constructor(private readonly salesWorksService: SalesWorksService) { }
 
     @Post('getAll')
     async getAll(): Promise<SalesWorksDto[]> {
@@ -24,31 +24,43 @@ export class SalesWorksController {
         return this.salesWorksService.findOne(id);
     }
 
-     @UseInterceptors(
-            FileFieldsInterceptor(
-                [
-                    { name: 'visitingCard', maxCount: 1 },
-                    { name: 'clientPhoto', maxCount: 1 },
-                ],
-                multerOptions
-            )
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'visitingCard', maxCount: 1 },
+                { name: 'clientPhoto', maxCount: 1 },
+            ],
+            multerOptions
         )
+    )
     @Post('handleSales')
     async handleSales(@Body() dto: SalesWorksDto,
- @UploadedFiles() files: {
-    visitingCard?: Express.Multer.File[],
-    clientPhoto?: Express.Multer.File[],
-           
+        @UploadedFiles() files: {
+            visitingCard?: Express.Multer.File[],
+            clientPhoto?: Express.Multer.File[],
+
         }): Promise<CommonResponse> {
-            if (dto.id) {
-                dto.id = Number(dto.id);
-            }
-        return this.salesWorksService.handleSales(dto,files);
+        if (dto.id) {
+            dto.id = Number(dto.id);
+        }
+        return this.salesWorksService.handleSales(dto, files);
     }
 
-    
+
     @Post('delete')
     async delete(@Body() id: number): Promise<void> {
         return this.salesWorksService.delete(id);
+    }
+
+
+    @Post('getSalesSearchDetails')
+    async getSalesSearchDetails(@Body() req: { companyCode: string; unitCode: string; staffId?: string; name?: string }): Promise<CommonResponse> {
+        try {
+            return await this.salesWorksService.getSalesSearchDetails(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
     }
 }

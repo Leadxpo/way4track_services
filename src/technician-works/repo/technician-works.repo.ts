@@ -8,6 +8,8 @@ import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
 import { CommonReq } from "src/models/common-req";
+import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 
 
 
@@ -205,6 +207,184 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .addGroupBy('DATE(wa.date)'); // Grouping by date ensures daily breakdown
 
         const result = await query.getRawMany();
+        return result;
+    }
+
+    //New APIS--------------------------------------
+    async getPaymentStatusPayments(req: BranchChartDto) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                `COALESCE(SUM(wa.amount), 0) AS totalPayment`,
+                `COALESCE(SUM(CASE WHEN wa.payment_status = :PENDING THEN wa.amount ELSE 0 END), 0) AS totalPendingPayment`,
+                `COALESCE(SUM(CASE WHEN wa.payment_status = :COMPLETED THEN wa.amount ELSE 0 END), 0) AS totalSuccessPayment`
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.date) {
+            const dateObj = new Date(req.date);
+            if (!isNaN(dateObj.getTime())) {  // Check if valid date
+                const year = dateObj.getFullYear();
+                const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
+
+                query.andWhere('YEAR(wa.date) = :year', { year });
+                query.andWhere('MONTH(wa.date) = :month', { month });
+            }
+        }
+        if (req.branchName) {
+            query.andWhere(`LOWER(br.name) = LOWER(:branchName)`, { branchName: req.branchName });
+        }
+
+        return query
+            .setParameter('COMPLETED', PaymentStatus.COMPLETED)
+            .setParameter('PENDING', PaymentStatus.PENDING)
+            .getRawOne();  // Fetch a single aggregated result
+    }
+
+    async getPendingPaymentsForTable(req: BranchChartDto) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.amount AS totalPayment',
+                'wa.staff_id AS staffId',
+                'staff.name AS staffName',
+                'br.name AS branchName',
+                'wa.work_status AS WorkStatus',
+                'wa.payment_status AS paymentStatus',
+                'YEAR(wa.date) AS year',
+                'MONTH(wa.date) AS month'
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('wa.payment_status = :PENDING', { PENDING: PaymentStatus.PENDING }); // Filter only pending payments
+
+        // Extract year and month from req.date if provided
+        if (req.date) {
+            const dateObj = new Date(req.date);
+            const year = dateObj.getFullYear();
+            const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
+
+            query.andWhere('YEAR(wa.date) = :year', { year });
+            query.andWhere('MONTH(wa.date) = :month', { month });
+        }
+
+        if (req.branchName) {
+            query.andWhere('LOWER(br.name) = LOWER(:branchName)', { branchName: req.branchName });
+        }
+
+        return query.getRawMany(); // Fetch the pending payment records
+    }
+
+    async getSucessPaymentsForTable(req: BranchChartDto) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.amount AS totalPayment',
+                'wa.staff_id AS staffId',
+                'staff.name AS staffName',
+                'br.name AS branchName',
+                'wa.work_status AS WorkStatus',
+                'wa.payment_status AS paymentStatus',
+                'YEAR(wa.date) AS year',
+                'MONTH(wa.date) AS month'
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('wa.payment_status = :COMPLETED', { COMPLETED: PaymentStatus.COMPLETED }); // Filter only pending payments
+
+        // Extract year and month from req.date if provided
+        if (req.date) {
+            const dateObj = new Date(req.date);
+            const year = dateObj.getFullYear();
+            const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
+
+            query.andWhere('YEAR(wa.date) = :year', { year });
+            query.andWhere('MONTH(wa.date) = :month', { month });
+        }
+
+        if (req.branchName) {
+            query.andWhere('LOWER(br.name) = LOWER(:branchName)', { branchName: req.branchName });
+        }
+
+        return query.getRawMany(); // Fetch the pending payment records
+    }
+
+    async getAllPaymentsForTable(req: BranchChartDto) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.amount AS totalPayment',
+                'wa.staff_id AS staffId',
+                'staff.name AS staffName',
+                'br.name AS branchName',
+                'wa.work_status AS WorkStatus',
+                'wa.payment_status AS paymentStatus',
+                'YEAR(wa.date) AS year',
+                'MONTH(wa.date) AS month'
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // ✅ Extract year and month from req.date (if valid)
+        if (req.date) {
+            const dateObj = new Date(req.date);
+            if (!isNaN(dateObj.getTime())) {  // Check if valid date
+                const year = dateObj.getFullYear();
+                const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
+
+                query.andWhere('YEAR(wa.date) = :year', { year });
+                query.andWhere('MONTH(wa.date) = :month', { month });
+            }
+        }
+
+        // ✅ Trim and lowercase branchName for case-insensitive comparison
+        if (req.branchName) {
+            query.andWhere('LOWER(br.name) = LOWER(:branchName)', { branchName: req.branchName.trim() });
+        }
+
+        return query.getRawMany(); // Fetch the payment records
+    }
+
+
+    async getUpCommingWorkAllocationDetails(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string;
+    }) {
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.staff_id AS staffId',
+                'staff.name AS staffName',
+                'wa.name AS clientName',
+                'wa.phone_number AS clientPhoneNumber',
+                'wa.address AS clientAddress',
+                'wa.description AS description',
+                'wa.product_name AS productName',
+                'YEAR(wa.date) AS year',
+                `FLOOR((DATEDIFF(wa.date, :today) / 7) + 1) AS weekNumber` // Adjusted week calculation
+            ])
+            .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', { today })
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+
+        if (req.companyCode) {
+            query.andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode });
+        }
+
+        if (req.unitCode) {
+            query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+        }
+
+        query.groupBy('wa.staff_id, staff.name, wa.name, wa.phone_number, wa.address, wa.description, wa.product_name, YEAR(wa.date), weekNumber');
+
+        const result = await query.getRawMany();
+        console.log(result, "{{{{{{{{{");
         return result;
     }
 

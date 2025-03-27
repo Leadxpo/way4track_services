@@ -6,6 +6,7 @@ import { CommonResponse } from 'src/models/common-response';
 import { TechnicianWorksDto } from './dto/technician-works.dto';
 import { TechnicianService } from './technician-works.service';
 import { TechIdDto } from './dto/technician-id.dto';
+import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 
 
 const multerOptions = {
@@ -124,6 +125,20 @@ export class TechnicianController {
         }
     }
 
+    @Post('getUpCommingWorkAllocationDetails')
+    async getUpCommingWorkAllocationDetails(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        staffId: string;
+    }) {
+        try {
+            return this.techService.getUpCommingWorkAllocationDetails(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getTechnicianDetails')
     async getTechnicianDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
@@ -141,6 +156,46 @@ export class TechnicianController {
     }) {
         try {
             return this.techService.getStaffWorkAllocation(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getSucessPaymentsForTable')
+    async getSucessPaymentsForTable(@Body() req: BranchChartDto) {
+        try {
+            return this.techService.getSucessPaymentsForTable(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getAllPaymentsForTable')
+    async getAllPaymentsForTable(@Body() req: BranchChartDto) {
+        try {
+            return this.techService.getAllPaymentsForTable(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getPendingPaymentsForTable')
+    async getPendingPaymentsForTable(@Body() req: BranchChartDto) {
+        try {
+            return this.techService.getPendingPaymentsForTable(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getPaymentStatusPayments')
+    async getPaymentStatusPayments(@Body() req: BranchChartDto) {
+        try {
+            return this.techService.getPaymentStatusPayments(req);
         } catch (error) {
             console.error('Error in delete vendor details:', error);
             return new CommonResponse(false, 500, 'Error deleting vendor details');
