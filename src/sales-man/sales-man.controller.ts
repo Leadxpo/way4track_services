@@ -15,14 +15,28 @@ export class SalesWorksController {
     constructor(private readonly salesWorksService: SalesWorksService) { }
 
     @Post('getAll')
-    async getAll(): Promise<SalesWorksDto[]> {
-        return this.salesWorksService.findAll();
+    async getAll(): Promise<CommonResponse> {
+        try {
+            return await this.salesWorksService.findAll();
+
+        } catch (error) {
+            console.error('Error in get request details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching request details');
+        }
     }
 
     @Post('getById')
-    async getById(@Body() id: number): Promise<SalesWorksDto> {
-        return this.salesWorksService.findOne(id);
+    async getById(@Body() dto: SalesWorksDto): Promise<CommonResponse> {
+        try {
+            return await this.salesWorksService.findOne(dto);
+
+        } catch (error) {
+            console.error('Error in get request details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching request details');
+        }
     }
+
+
 
     @UseInterceptors(
         FileFieldsInterceptor(
@@ -54,7 +68,7 @@ export class SalesWorksController {
 
 
     @Post('getSalesSearchDetails')
-    async getSalesSearchDetails(@Body() req: { companyCode: string; unitCode: string; staffId?: string; name?: string }): Promise<CommonResponse> {
+    async getSalesSearchDetails(@Body() req: { companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string }): Promise<CommonResponse> {
         try {
             return await this.salesWorksService.getSalesSearchDetails(req)
         }

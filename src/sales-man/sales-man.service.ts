@@ -45,12 +45,12 @@ export class SalesWorksService {
         }
     }
 
-    async findAll(): Promise<SalesWorksDto[]> {
-        const entities = await this.salesWorksRepository.find({ relations: ['staffId'] });
-        return entities.map(this.adapter.convertEntityToDto);
-    }
+    // async findAll(): Promise<SalesWorksDto[]> {
+    //     const entities = await this.salesWorksRepository.find({ relations: ['staffId'] });
+    //     return entities.map(this.adapter.convertEntityToDto);
+    // }
 
-    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: string; name?: string }) {
+    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string }) {
         const staffData = await this.salesWorksRepository.getSalesSearchDetails(req)
         if (!staffData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
@@ -59,12 +59,39 @@ export class SalesWorksService {
         }
     }
 
-    async findOne(id: number): Promise<SalesWorksDto> {
-        const entity = await this.salesWorksRepository.findOne({ where: { id }, relations: ['staffId'] });
-        if (!entity) {
-            throw new Error('Sales Work not found');
+    // async findOne(id: number): Promise<SalesWorksDto> {
+    //     const entity = await this.salesWorksRepository.findOne({ where: { id }, relations: ['staffId'] });
+    //     if (!entity) {
+    //         throw new Error('Sales Work not found');
+    //     }
+    //     return this.adapter.convertEntityToDto(entity);
+    // }
+
+
+    async findAll(): Promise<CommonResponse> {
+        const branch: SalesWorksEntity[] = await this.salesWorksRepository.find();
+
+        // Convert each entity in the array to DTO
+        const staffDtos = branch.map(entity => this.adapter.convertEntityToDto(entity));
+
+        if (staffDtos.length === 0) {
+            return new CommonResponse(false, 35416, "There Is No List");
         }
-        return this.adapter.convertEntityToDto(entity);
+
+        return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", staffDtos);
+    }
+
+
+    async findOne(req: SalesWorksDto): Promise<CommonResponse> {
+        try {
+            const request = await this.salesWorksRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!request) {
+                return new CommonResponse(false, 404, 'Request not found');
+            }
+            return new CommonResponse(true, 200, 'Request details fetched successfully', request);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
     }
 
     async create(dto: SalesWorksDto, files: any): Promise<CommonResponse> {

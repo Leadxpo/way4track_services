@@ -13,7 +13,10 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
     constructor(private dataSource: DataSource) {
         super(SalesWorksEntity, dataSource.createEntityManager());
     }
-    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: string; name?: string }) {
+    async getSalesSearchDetails(req: {
+        companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string
+
+    }) {
         const query = this.createQueryBuilder('sa')
             .select([
                 'sa.id as id',
@@ -37,6 +40,10 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
 
         if (req.staffId) {
             query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+
+        if (req.branch) {
+            query.andWhere('branch.name = :branch', { branch: req.branch });
         }
 
         if (req.name) {
