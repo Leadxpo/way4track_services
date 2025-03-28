@@ -752,7 +752,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.staff_id AS staffId',
                 'staff.name AS staffName',
                 'staff.phone_number AS phoneNumber',
-
+                'staff.id as id',
                 'staff.designation AS staffDesignation', // Use proper designation
                 'branch.name AS branchName',
                 // Branch manager information

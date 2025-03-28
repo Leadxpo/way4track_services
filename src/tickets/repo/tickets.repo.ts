@@ -125,7 +125,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date: string; // Logged-in staff ID
+        date?: string; // Logged-in staff ID
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -137,11 +137,14 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessTickets'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Grouping by month
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+        if (req.date) {
+            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+
+        } // Only logged-in staff can view their data
+        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Grouping by month
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name');
 

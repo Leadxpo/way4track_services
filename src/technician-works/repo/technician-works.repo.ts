@@ -25,41 +25,49 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date: string; // Logged-in staff ID
+        date?: string; // Logged-in staff ID
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
                 'DATE_FORMAT(wa.date, "%Y-%m") AS date',
-                'wa.staff_id AS staffId', // Corrected to select wa.staff_id
+                'wa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'COUNT(wa.id) AS totalAppointments',
                 'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingAppointments',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by the formatted date
+            .where('wa.staff_id = :staffId', { staffId: req.staffId });
+
+        if (req.companyCode) {
+            query.andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode });
+        }
+
+        if (req.unitCode) {
+            query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+        }
+
+        if (req.date) {
+            query.andWhere('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date });
+        }
+
+        query
+            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")')
             .addGroupBy('wa.staff_id')
-            .addGroupBy('staff.name'); // Add staff.name to the GROUP BY clause
-
-        // Set the status parameters correctly
-        const result = await query
+            .addGroupBy('staff.name')
             .setParameter('completed', WorkStatusEnum.COMPLETED)
-            .setParameter('pending', WorkStatusEnum.PENDING) // Assuming you need this for pending appointments
-            .getRawMany();
+            .setParameter('pending', WorkStatusEnum.PENDING);
 
-        return result;
+        return await query.getRawMany();
     }
+
 
 
     async getPaymentWorkAllocation(req: {
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date: string; // Logged-in staff ID
+        date?: string; // Logged-in staff ID
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -70,11 +78,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(CASE WHEN wa.payment_status = :COMPLETED THEN 1 ELSE 0 END) AS totalSuccessPayment'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by formatted date
+        if (req.date) {
+            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+
+        }
+        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by formatted date
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name'); // Add staff.name to GROUP BY
 
@@ -408,7 +419,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 've.description AS description',
                 've.product_name AS productName',
                 've.work_status AS workStatus',
-                've.quantity AS quantity',
                 'SUM(ve.amount) AS totalAmount',
                 've.id AS id'
             ])
@@ -435,7 +445,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .addGroupBy('ve.description')
             .addGroupBy('ve.product_name')
             .addGroupBy('ve.work_status')
-            .addGroupBy('ve.quantity')
             .addGroupBy('ve.id');
 
         const result = await query.getRawMany();

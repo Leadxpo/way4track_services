@@ -2730,6 +2730,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'ledger.name AS ledgerName',
                 'bank.account_name AS bankAccountName',
                 'bank.account_number AS bankAccountNumber',
+                'bank.total_amount AS amountAccount',
                 'bank.ifsc_code AS ifscCode',
                 'txn.payment_status AS transactionStatus'
             ])
@@ -2764,12 +2765,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         transactions.forEach((txn) => {
             if ([VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CREDITNOTE].includes(txn.voucherType)) {
                 totalReceipts += txn.amount;
-                if (txn.transactionStatus === 'PENDING') {
+                if (txn.transactionStatus === 'PENDING' && VoucherTypeEnum.SALES) {
                     depositsInTransit += txn.amount;
                 }
             } else if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.DEBITNOTE].includes(txn.voucherType)) {
                 totalPayments += txn.amount;
-                if (txn.transactionStatus === 'PENDING') {
+                if (txn.transactionStatus === 'PENDING' && VoucherTypeEnum.PURCHASE) {
                     outstandingChecks += txn.amount;
                 }
             } else if (txn.voucherType === VoucherTypeEnum.CONTRA && txn.paymentType === PaymentType.BANK) {
@@ -2792,6 +2793,263 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
 
+
+    async getBankStmtForReport(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        bankAccountNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS "date"`,
+                `ve.voucher_id AS "voucherId"`,
+                `ve.purpose AS "purpose"`,
+                `ve.voucher_type AS "voucherType"`,
+                `branch.name AS "branchName"`,
+                `ledger.name AS "ledgerName"`,
+                `SUM(ve.amount) AS "totalAmount"`,
+                `fromBank.account_name AS "fromBankAccountName"`,
+                `fromBank.account_number AS "fromBankAccountNumber"`,
+                `toBank.account_name AS "toBankAccountName"`,
+                `toBank.account_number AS "toBankAccountNumber"`,
+                `COUNT(ve.voucher_id) AS "pendingInvoices"`,
+                `MAX(ve.due_date) AS "lastDueDate"`,
+                `CASE  
+                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
+                    ELSE NULL  
+                 END AS "overdueDays"`
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .leftJoin(AccountEntity, 'fromBank', 've.from_account_id = fromBank.id') // Join for from_account
+            .leftJoin(AccountEntity, 'toBank', 've.to_account_id = toBank.id') // Join for to_account
+            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('ve.payment_type != :paymentType', { paymentType: PaymentType.CASH });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+        if (req.bankAccountNumber) {
+            query.andWhere('(fromBank.account_number = :bankAccountNumber OR toBank.account_number = :bankAccountNumber)', {
+                bankAccountNumber: req.bankAccountNumber
+            });
+        }
+
+        query
+            .groupBy('ve.generation_date')
+            .addGroupBy('ve.voucher_id')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.voucher_type')
+            .addGroupBy('branch.name')
+            .addGroupBy('ledger.name')
+            .addGroupBy('fromBank.account_name')
+            .addGroupBy('fromBank.account_number')
+            .addGroupBy('toBank.account_name')
+            .addGroupBy('toBank.account_number')
+            .addGroupBy('ve.due_date')
+            .orderBy('ve.generation_date', 'ASC')
+            .addOrderBy('branch.name', 'ASC');
+
+        return await query.getRawMany();
+    }
+
+
+    async getCashStmtForReport(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                `DATE(ve.generation_date) AS "date"`,
+                `ve.voucher_id AS "voucherId"`,
+                `ve.purpose AS "purpose"`,
+                `ve.voucher_type AS "voucherType"`,
+                `branch.name AS "branchName"`,
+                `ledger.name AS "ledgerName"`,
+                `SUM(ve.amount) AS "totalAmount"`,
+                `COUNT(ve.voucher_id) AS "pendingInvoices"`,
+                `MAX(ve.due_date) AS "lastDueDate"`,
+                `CASE  
+                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
+                    ELSE NULL  
+                 END AS "overdueDays"`
+            ])
+            .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
+            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id') // Ledger to track payables
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('ve.payment_type = :paymentType', { paymentType: PaymentType.CASH });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branchName });
+        }
+
+        query
+            .groupBy('ve.generation_date')
+            .addGroupBy('ve.voucher_id')
+            .addGroupBy('ve.purpose')
+            .addGroupBy('ve.voucher_type')
+            .addGroupBy('branch.name')
+            .addGroupBy('ledger.name')
+            .addGroupBy('ve.due_date')
+            .orderBy('ve.generation_date', 'ASC')
+            .addOrderBy('branch.name', 'ASC');
+
+        return await query.getRawMany();
+    }
+
+    async getLoansAndInterestsForReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'ledger.group AS "groupName"',
+                'ledger.name AS "ledgerName"',  // Uncommented to avoid undefined errors
+                `COALESCE(SUM(CASE 
+                    WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount 
+                    ELSE 0 
+                END), 0) AS "debitAmount"`,
+                `COALESCE(SUM(CASE 
+                    WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount 
+                    ELSE 0 
+                END), 0) AS "creditAmount"`
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        const ledgerTransactions = await query
+            .groupBy('ledger.group')
+            .addGroupBy('ledger.name')  // Needed to match selected fields
+            .setParameters({
+                debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+            })
+            .getRawMany();
+
+        console.log(ledgerTransactions, ">>>>>>>>");
+
+        // **Define the structured response**
+        const loansandinterstAmounts = {
+            loans: [],
+            interest: [],  // Fixed typo: "interst" -> "interest"
+        };
+
+        // **Categorize Ledgers**
+        ledgerTransactions.forEach(({ groupName, ledgerName, debitAmount, creditAmount }) => {
+            if ([
+                UnderSecondary.LOANS,
+                UnderSecondary.LOANS_AND_ADVANCES,
+                UnderSecondary.CASH_IN_HAND,
+                UnderSecondary.SECURED_LOANS,
+                UnderSecondary.UNSECURED_LOANS,
+            ].includes(groupName)) {
+                loansandinterstAmounts.loans.push({ ledgerName, groupName, debitAmount, creditAmount });
+            } else if ([UnderSecondary.Interest_Income].includes(groupName)) {
+                loansandinterstAmounts.interest.push({ ledgerName, groupName, debitAmount, creditAmount });
+            }
+        });
+
+        return loansandinterstAmounts;
+    }
+
+    async getFixedAssertsForReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'ledger.group AS "groupName"',
+                'ledger.name AS "ledgerName"',  // Uncommented to avoid undefined errors
+                `COALESCE(SUM(CASE 
+                    WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount 
+                    ELSE 0 
+                END), 0) AS "debitAmount"`,
+                `COALESCE(SUM(CASE 
+                    WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount 
+                    ELSE 0 
+                END), 0) AS "creditAmount"`
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        const ledgerTransactions = await query
+            .groupBy('ledger.group')
+            .addGroupBy('ledger.name')  // Needed to match selected fields
+            .setParameters({
+                debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+            })
+            .getRawMany();
+
+        console.log(ledgerTransactions, ">>>>>>>>");
+
+        // **Define the structured response**
+        const loansandinterstAmounts = {
+            asserts: [],
+            // interest: [],  // Fixed typo: "interst" -> "interest"
+        };
+
+        // **Categorize Ledgers**
+        ledgerTransactions.forEach(({ groupName, ledgerName, debitAmount, creditAmount }) => {
+            if ([
+                UnderSecondary.FIXED_ASSETS
+            ].includes(groupName)) {
+                loansandinterstAmounts.asserts.push({ ledgerName, groupName, debitAmount, creditAmount });
+            }
+        });
+
+        return loansandinterstAmounts;
+    }
 }
 
 

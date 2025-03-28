@@ -23,8 +23,8 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'device_model', type: 'varchar', length: 50, nullable: true })
   deviceModel: string;
 
-  @Column({ name: 'date_of_purchase', type: 'date', nullable: true })
-  dateOfPurchase: Date;
+  @Column({ name: 'in_date', type: 'date', nullable: true })
+  inDate: Date;
 
   @Column({ name: 'imei_number', type: 'varchar', length: 20, nullable: true })
   imeiNumber: string;
@@ -32,8 +32,8 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'category_name', type: 'varchar', length: 50, nullable: true })
   categoryName: string;
 
-  @Column({ name: 'price', type: 'decimal', precision: 10, scale: 2, nullable: true })
-  price: number;
+  @Column({ name: 'cost', type: 'decimal', precision: 10, scale: 2, nullable: true })
+  cost: number;
 
   @Column({ name: 'quantity', type: 'int', nullable: true })
   quantity: number;

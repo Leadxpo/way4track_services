@@ -84,20 +84,7 @@ export class WorkAllocationService {
             newWorkAllocation.workAllocationNumber = `#VOU-${(await this.workAllocationRepository.count() + 1)
                 .toString()
                 .padStart(5, '0')}`;
-            let salesEntity = null;
-            if (dto.sales_id) {
-                salesEntity = await this.salesworkRepository.findOne({
-                    where: { id: dto.sales_id }
-                });
-
-                if (!salesEntity) {
-                    throw new Error(`sales with ID '${dto.sales_id}' not found.`);
-                }
-                console.log(salesEntity, 'salesEntity');
-
-                newWorkAllocation.visitingNumber = salesEntity.visitingNumber; // Store name
-                newWorkAllocation.salesRelation = salesEntity; // Store relation
-            }
+           
             await this.workAllocationRepository.insert(newWorkAllocation);
             const technicianDto: TechnicianWorksDto = {
                 service: "",
@@ -139,7 +126,7 @@ export class WorkAllocationService {
 
     async handleWorkAllocationDetails(dto: WorkAllocationDto): Promise<CommonResponse> {
 
-        if (dto.id && dto.id !== null || (dto.workAllocationNumber && dto.workAllocationNumber.trim() !== '')) {
+        if (dto.id || (dto.workAllocationNumber && dto.workAllocationNumber.trim() !== '')) {
             return await this.updateWorkAllocationDetails(dto);
         } else {
             return await this.createWorkAllocationDetails(dto);
@@ -161,15 +148,18 @@ export class WorkAllocationService {
 
     async getWorkAllocationDetails(req: WorkAllocationIdDto): Promise<CommonResponse> {
         try {
+            console.log(req, "req")
             const allocation = await this.workAllocationRepository.find({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['staffId', 'clientId', 'voucherId']
             });
+            console.log(allocation, "allocation")
+
             if (!allocation) {
                 return new CommonResponse(false, 404, 'Work Allocation not found');
             } else {
-                const data = await this.workAllocationAdapter.convertEntityToDto(allocation)
-                return new CommonResponse(true, 200, 'Work Allocation fetched successfully', data);
+                // const data = await this.workAllocationAdapter.convertEntityToDto(allocation)
+                return new CommonResponse(true, 200, 'Work Allocation fetched successfully', allocation);
             }
         } catch (error) {
             throw new ErrorResponse(500, error.message);

@@ -3,11 +3,11 @@ import { ProductStatusEnum } from "../enum/product-status.enum";
 export class ProductDto {
   id?: number;
   productName: string;
-  dateOfPurchase: Date;
+  inDate: Date;
   vendorId: number;
   imeiNumber: string;
   categoryName: string;
-  price: number;
+  cost: number;
   productDescription: string;
   voucherId?: number;
   companyCode: string;

@@ -53,7 +53,7 @@ export class SubDealerAdapter {
                 emailId,
                 aadharNumber,
                 address,
-                voucherId,
+                password,
                 subDealerPhoto,
                 subDealerId,
                 companyCode,
@@ -70,13 +70,13 @@ export class SubDealerAdapter {
                 emailId,
                 aadharNumber,
                 address,
-            
+                password,
                 subDealerPhoto,
                 subDealerId,
                 companyCode,
                 unitCode,
-                branch?.branchName ?? '',
                 branch?.id ?? null,
+                branch?.branchName ?? '',
             );
         });
     }

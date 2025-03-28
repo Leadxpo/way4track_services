@@ -62,7 +62,7 @@ export class ProductService {
             // Define header normalization mapping
             const headerMapping: { [key: string]: string } = {
                 "product name": "productName",
-                "date of purchase": "dateOfPurchase",
+                "date of purchase": "inDate",
                 "vendor name": "vendorName",
                 "vendor email id": "vendorEmailId",
                 "vendor address": "vendorAddress",
@@ -75,7 +75,7 @@ export class ProductService {
                 "secondary network": "secondaryNetwork",
                 "category name": "categoryName",
                 "voucher id": "voucherId",
-                "price": "price",
+                "cost": "cost",
                 "product description": "productDescription",
                 "company code": "companyCode",
                 "vendor phone number": "vendorPhoneNumber",
@@ -122,7 +122,7 @@ export class ProductService {
 
                     data.push({
                         productName: getCellValueByHeader('productName'),
-                        dateOfPurchase: parseDate(getCellValueByHeader('dateOfPurchase')),
+                        inDate: parseDate(getCellValueByHeader('inDate')),
                         vendorName: getCellValueByHeader('vendorName'),
                         vendorEmailId: getCellValueByHeader('vendorEmailId'),
                         vendorAddress: getCellValueByHeader('vendorAddress'),
@@ -135,7 +135,7 @@ export class ProductService {
                         secondaryNetwork: getCellValueByHeader('secondaryNetwork'),
                         categoryName: getCellValueByHeader('categoryName'),
                         voucherId: getCellValueByHeader('voucherId'),
-                        price: parseFloat(getCellValueByHeader('price') || '0'),
+                        cost: parseFloat(getCellValueByHeader('cost') || '0'),
                         productDescription: getCellValueByHeader('productDescription'),
                         companyCode: getCellValueByHeader('companyCode'),
                         vendorPhoneNumber: getCellValueByHeader('vendorPhoneNumber'),
@@ -182,9 +182,9 @@ export class ProductService {
         Object.assign(productEntity, {
             SNO: productDto.SNO ?? productEntity.SNO,
             productName: productDto.productName ?? productEntity.productName,
-            dateOfPurchase: productDto.dateOfPurchase ?? productEntity.dateOfPurchase,
+            inDate: productDto.inDate ?? productEntity.inDate,
             categoryName: productDto.categoryName ?? productEntity.categoryName,
-            price: productDto.price ?? productEntity.price,
+            cost: productDto.cost ?? productEntity.cost,
             productDescription: productDto.productDescription ?? productEntity.productDescription,
             companyCode: productDto.companyCode ?? productEntity.companyCode,
             unitCode: productDto.unitCode ?? productEntity.unitCode,
@@ -328,9 +328,9 @@ export class ProductService {
         //     ...productDto, // Merge all productDto fields directly
         //     productTypeId: productDto.productTypeId,
         //     productName: productDto.productName,
-        //     dateOfPurchase: productDto.dateOfPurchase,
+        //     inDate: productDto.inDate,
         //     categoryName: productDto.categoryName,
-        //     price: productDto.price,
+        //     cost: productDto.cost,
         //     productDescription: productDto.productDescription,
         //     companyCode: productDto.companyCode,
         //     unitCode: productDto.unitCode,

@@ -26,6 +26,9 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
 
+    @Column({ name: 'service', type: 'text', nullable: true })
+    service: string;
+
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
 
@@ -83,10 +86,10 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
 
-    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: false })
+    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: true })
     visitingNumber: string;
 
-    @ManyToOne(() => SalesWorksEntity, (designation) => designation.sales, { nullable: true })
-    @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of SalesWorksEntity
-    salesRelation: SalesWorksEntity;
+    @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
+    @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of StaffEntity
+    salesStaffRelation: StaffEntity;
 }

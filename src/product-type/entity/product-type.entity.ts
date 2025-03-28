@@ -14,7 +14,7 @@ export class ProductTypeEntity extends BaseEntity {
     @Column({ name: 'product_photo', type: 'varchar', length: 100, nullable: true })
     productPhoto: string;
 
-    @Column({ name: 'blog_image', type: 'varchar', length: 100, nullable: true })
+    @Column({ name: 'blog_image', type: 'varchar', length: 255, nullable: true })
     blogImage: string;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
