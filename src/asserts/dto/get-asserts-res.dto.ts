@@ -13,8 +13,8 @@ export class GetAssertsResDto {
     description: string;
     purchaseDate: Date;
     assetPhoto: string;
-    voucherEntity: number;
-    voucherId: string;
+    // voucherEntity: number;
+    // voucherId: string;
     paymentType: PaymentType;
     initialPayment?: number;
     numberOfEmi?: number;
@@ -34,8 +34,8 @@ export class GetAssertsResDto {
         description: string,
         purchaseDate: Date,
         assetPhoto: string,
-        voucherEntity: number,
-        voucherId: string,
+        // voucherEntity: number,
+        // voucherId: string,
         paymentType: PaymentType,
         companyCode: string,
         unitCode: string,
@@ -56,8 +56,8 @@ export class GetAssertsResDto {
         this.description = description;
         this.purchaseDate = purchaseDate;
         this.assetPhoto = assetPhoto;
-        this.voucherId = voucherId;
-        this.voucherId = voucherId;
+        // this.voucherId = voucherId;
+        // this.voucherId = voucherId;
         this.paymentType = paymentType;
         this.initialPayment = initialPayment;
         this.numberOfEmi = numberOfEmi;

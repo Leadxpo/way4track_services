@@ -139,6 +139,20 @@ export class TechnicianController {
         }
     }
 
+    @Post('getClientDataForTechniciansTable')
+    async getClientDataForTechniciansTable(@Body() req: {
+        companyCode?: string;
+        unitCode?: string
+        clientId: string;
+    }) {
+        try {
+            return this.techService.getClientDataForTechniciansTable(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getTechnicianDetails')
     async getTechnicianDetails(@Body() req: CommonReq): Promise<CommonResponse> {
         try {

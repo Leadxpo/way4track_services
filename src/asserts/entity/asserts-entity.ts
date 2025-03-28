@@ -49,7 +49,7 @@ export class AssertsEntity {
     @Column({ name: 'purchase_date', type: 'timestamp', nullable: true })
     purchaseDate: Date;
 
-    @ManyToOne(() => VoucherEntity, (voucher) => voucher.assert)
+    @ManyToOne(() => VoucherEntity, (voucher) => voucher.assert, { nullable: true })
     @JoinColumn({ name: 'voucher_id' })
     voucherId: VoucherEntity;
 

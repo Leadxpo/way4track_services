@@ -378,4 +378,18 @@ export class TechnicianService {
         }
 
     }
+
+    async getClientDataForTechniciansTable(req: {
+        companyCode?: string;
+        unitCode?: string
+        clientId: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getClientDataForTechniciansTable(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
 }

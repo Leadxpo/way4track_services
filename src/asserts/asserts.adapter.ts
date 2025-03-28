@@ -28,8 +28,8 @@ export class AssertsAdapter {
             entity.description || '',
             entity.purchaseDate || new Date(),
             entity.assetPhoto || '',
-            entity.voucherId?.id || null,
-            entity.voucherId?.voucherId || '',
+            // entity.voucherId?.id || null,
+            // entity.voucherId?.voucherId || '',
             entity.paymentType,
             entity.companyCode,
             entity.unitCode,
@@ -37,42 +37,27 @@ export class AssertsAdapter {
         );
     }
     async convertDtoToEntity(dto: AssertsDto): Promise<AssertsEntity> {
-        const entity = new AssertsEntity();
+        const entity = new AssertsEntity()
 
-        if (dto.voucherId) {
-            const voucherEntity = await this.voucherRepository.findOne({ where: { id: Number(dto.voucherId) } });
+        entity.assertsName = dto.assertsName;
+        entity.assetPhoto = dto.assetPhoto;
+        entity.assertsAmount = dto.assertsAmount;
+        entity.assetType = dto.assetType;
+        entity.quantity = dto.quantity;
+        entity.description = dto.description;
+        entity.purchaseDate = dto.purchaseDate;
+        entity.paymentType = dto.paymentType;
+        entity.companyCode = dto.companyCode;
+        entity.unitCode = dto.unitCode;
 
-            if (!voucherEntity) {
-                throw new Error(`Voucher with ID ${dto.voucherId} not found`);
+        if (dto.branchId) {
+            const branchEntity = await this.branchRepository.findOne({ where: { id: dto.branchId } });
+
+            if (!branchEntity) {
+                throw new Error(`Branch with ID ${dto.branchId} not found`);
             }
 
-            entity.voucherId = voucherEntity;
-            entity.assertsName = dto.assertsName;
-            entity.assetPhoto = dto.assetPhoto;
-            entity.assertsAmount = dto.assertsAmount;
-            entity.assetType = dto.assetType;
-            entity.quantity = dto.quantity;
-            entity.description = dto.description;
-            entity.purchaseDate = dto.purchaseDate;
-            entity.paymentType = dto.paymentType;
-            entity.companyCode = dto.companyCode;
-            entity.unitCode = dto.unitCode;
-
-            if (dto.branchId) {
-                const branchEntity = await this.branchRepository.findOne({ where: { id: dto.branchId } });
-
-                if (!branchEntity) {
-                    throw new Error(`Branch with ID ${dto.branchId} not found`);
-                }
-
-                entity.branchId = branchEntity; // ✅ Assign full entity instead of number
-            }
-
-            // if (voucherEntity.voucherType === VoucherTypeEnum.EMI) {
-            //     entity.emiNumber = voucherEntity.emiNumber;
-            // }
-        } else {
-            throw new Error('Voucher ID is required');
+            entity.branchId = branchEntity; 
         }
 
         if (dto.id) {

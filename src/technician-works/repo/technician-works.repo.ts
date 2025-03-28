@@ -389,5 +389,57 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     }
 
 
+    async getClientDataForTechniciansTable(req: {
+        clientId?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'cl.name AS clientName',
+                'cl.phone_number AS phoneNumber',
+                'cl.client_id AS clientId',
+                'cl.address AS address',
+                've.service AS service',
+                've.payment_status AS paymentStatus',
+                've.date AS date',
+                'staff.name AS staffName',
+                've.attended_date AS attendedDate',
+                've.description AS description',
+                've.product_name AS productName',
+                've.work_status AS workStatus',
+                've.quantity AS quantity',
+                'SUM(ve.amount) AS totalAmount',
+                've.id AS id'
+            ])
+            .leftJoin(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        // Add condition for clientId only if provided
+        if (req.clientId) {
+            query.andWhere('cl.client_id = :clientId', { clientId: req.clientId });
+        }
+
+        // Grouping to aggregate SUM(ve.amount)
+        query.groupBy('cl.client_id')
+            .addGroupBy('cl.name')
+            .addGroupBy('cl.phone_number')
+            .addGroupBy('cl.address')
+            .addGroupBy('ve.service')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.date')
+            .addGroupBy('staff.name')
+            .addGroupBy('ve.attended_date')
+            .addGroupBy('ve.description')
+            .addGroupBy('ve.product_name')
+            .addGroupBy('ve.work_status')
+            .addGroupBy('ve.quantity')
+            .addGroupBy('ve.id');
+
+        const result = await query.getRawMany();
+        return result;
+    }
 
 }

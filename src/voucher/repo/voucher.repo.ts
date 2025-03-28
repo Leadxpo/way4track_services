@@ -2650,6 +2650,147 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result?.total ?? 0;
     }
 
+    async getCashFlow(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string
+    }) {
+        const query = this.createQueryBuilder('sr')
+            .select([
+                'sr.voucher_type AS voucherType',
+                'SUM(sr.amount) AS totalAmount',
+                'sr.generation_date AS generationDate',
+                'ledger.group AS groupName',
+                'ledger.name AS ledgerName',
+                'br.name AS branchName',
+                'sr.payment_type AS paymentType',
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'sr.branch_id = br.id')
+            .where('sr.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sr.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(sr.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(sr.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        // Grouping by relevant fields
+        query.groupBy('sr.voucher_type')
+            .addGroupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .addGroupBy('br.name')
+            .addGroupBy('sr.payment_type');
+
+        // Execute query
+        const results = await query.getRawMany();
+
+        // Initialize cash flow variables
+        let cashInflow = 0;
+        let cashOutflow = 0;
+
+        // Iterate through results and calculate cash flow  VoucherTypeEnum.SALES, VoucherTypeEnum.PURCHASE,
+        results.forEach((txn) => {
+            const amount = parseFloat(txn.totalAmount) || 0;
+            if ([VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CREDITNOTE].includes(txn.voucherType)) {
+                cashInflow += amount;
+            } else if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.DEBITNOTE].includes(txn.voucherType)) {
+                cashOutflow += amount;
+            }
+        });
+
+        // Calculate net cash flow
+        const netCashFlow = cashInflow - cashOutflow;
+
+        return { cashInflow, cashOutflow, netCashFlow, transactions: results };
+    }
+
+    async getBankReconciliationReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        bankAccount?: string;
+    }) {
+        const query = this.createQueryBuilder('txn')
+            .select([
+                'txn.voucher_type AS voucherType',
+                'txn.amount AS amount',
+                'txn.payment_type AS paymentType',
+                'txn.generation_date AS transactionDate',
+                'ledger.name AS ledgerName',
+                'bank.account_name AS bankAccountName',
+                'bank.account_number AS bankAccountNumber',
+                'bank.ifsc_code AS ifscCode',
+                'txn.payment_status AS transactionStatus'
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 'txn.ledger_id = ledger.id')
+            .leftJoin(AccountEntity, 'bank', 'txn.from_account_id = bank.id')
+            .where('txn.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('txn.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('txn.payment_type = :paymentType', { paymentType: PaymentType.BANK });
+
+        if (req.fromDate) {
+            query.andWhere('DATE(txn.generation_date) >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('DATE(txn.generation_date) <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.bankAccount) {
+            query.andWhere('bank.account_number = :bankAccount', { bankAccount: req.bankAccount });
+        }
+
+        const transactions = await query.getRawMany();
+
+        // Calculate bank reconciliation data
+        let bankBalance = 0;
+        let totalReceipts = 0;
+        let totalPayments = 0;
+        let depositsInTransit = 0;
+        let outstandingChecks = 0;
+        let bankCharges = 0;
+
+        transactions.forEach((txn) => {
+            if ([VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CREDITNOTE].includes(txn.voucherType)) {
+                totalReceipts += txn.amount;
+                if (txn.transactionStatus === 'PENDING') {
+                    depositsInTransit += txn.amount;
+                }
+            } else if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.DEBITNOTE].includes(txn.voucherType)) {
+                totalPayments += txn.amount;
+                if (txn.transactionStatus === 'PENDING') {
+                    outstandingChecks += txn.amount;
+                }
+            } else if (txn.voucherType === VoucherTypeEnum.CONTRA && txn.paymentType === PaymentType.BANK) {
+                bankCharges += txn.amount;
+            }
+        });
+
+        // Calculate adjusted bank balance
+        bankBalance = totalReceipts - totalPayments - bankCharges;
+
+        return {
+            bankBalance,
+            totalReceipts,
+            totalPayments,
+            depositsInTransit,
+            outstandingChecks,
+            bankCharges,
+            transactions
+        };
+    }
+
 
 }
 

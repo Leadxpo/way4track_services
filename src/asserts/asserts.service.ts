@@ -69,21 +69,9 @@ export class AssertsService {
         try {
             console.log(createAssertsDto, "+========");
 
-            // Ensure voucherId is an integer
-            // const voucherId = Number(createAssertsDto.voucherId);
-            // if (isNaN(voucherId)) {
-            //     throw new Error('Invalid voucher ID');
-            // }
-
-            // const voucher = await this.voucherRepo.findOne({ where: { id: voucherId } });
-
-            // if (!voucher) {
-            //     throw new Error('Voucher not found');
-            // }
-
             let entity: AssertsEntity | null = null;
 
-            if (createAssertsDto.id || createAssertsDto.id !== null) {
+            if (createAssertsDto.id) {
                 // Fetch existing entity if updating
                 entity = await this.assertsRepository.findOneBy({ id: createAssertsDto.id });
                 if (!entity) {
@@ -91,7 +79,7 @@ export class AssertsService {
                 }
 
                 // Merge new data into the existing entity, EXCLUDING branchId
-                const { branchId, voucherId, ...rest } = createAssertsDto;
+                const { branchId,...rest } = createAssertsDto;
 
                 entity = this.assertsRepository.merge(entity, rest);
 
@@ -103,15 +91,6 @@ export class AssertsService {
                     }
                     entity.branchId = branchEntity; // Assign full entity instead of number
                 }
-
-                // Fetch and assign VoucherEntity properly
-                // const voucherEntity = await this.voucherRepo.findOne({ where: { id: createAssertsDto.voucherId } });
-                // if (!voucherEntity) {
-                //     throw new Error(`Voucher with ID ${voucherId} not found`);
-                // }
-                // entity.voucherId = voucherEntity; // Assign full entity instead of string
-
-                // If a new photo is uploaded, delete the existing file from GCS
                 if (photo && entity.assetPhoto) {
                     const existingFilePath = entity.assetPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
                     const file = this.storage.bucket(this.bucketName).file(existingFilePath);
