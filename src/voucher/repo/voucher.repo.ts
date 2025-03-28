@@ -2601,20 +2601,22 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }
 
 
-    async generateIncomeStatement(year: number) {
+    async generateIncomeStatement(req: {
+        year?: number
+    }) {
         // Revenue: Only consider SALES (not RECEIPT to avoid double counting)
-        const netSales = await this.getTotalByVoucherType(VoucherTypeEnum.SALES, year);
+        const netSales = await this.getTotalByVoucherType(VoucherTypeEnum.SALES, req.year);
 
         // Other income (Journals)
-        const otherIncome = await this.getTotalByVoucherType(VoucherTypeEnum.JOURNAL, year);
+        const otherIncome = await this.getTotalByVoucherType(VoucherTypeEnum.JOURNAL, req.year);
 
         // Expenses: Only consider PURCHASE (not PAYMENT to avoid double counting)
-        const costOfSales = await this.getTotalByVoucherType(VoucherTypeEnum.PURCHASE, year);
+        const costOfSales = await this.getTotalByVoucherType(VoucherTypeEnum.PURCHASE, req.year);
 
         // Adjustments
-        const debitNotes = await this.getTotalByVoucherType(VoucherTypeEnum.DEBITNOTE, year);
-        const creditNotes = await this.getTotalByVoucherType(VoucherTypeEnum.CREDITNOTE, year);
-        const interestExpense = await this.getTotalByVoucherType(VoucherTypeEnum.CONTRA, year);
+        const debitNotes = await this.getTotalByVoucherType(VoucherTypeEnum.DEBITNOTE, req.year);
+        const creditNotes = await this.getTotalByVoucherType(VoucherTypeEnum.CREDITNOTE, req.year);
+        const interestExpense = await this.getTotalByVoucherType(VoucherTypeEnum.CONTRA, req.year);
 
         // Calculations
         const grossProfit = netSales - costOfSales;
@@ -2625,7 +2627,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         // Return the generated income statement
         return {
-            year,
+
             netSales,
             costOfSales,
             grossProfit,
@@ -3050,6 +3052,53 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return loansandinterstAmounts;
     }
+
+    async getProfitAndLoss(req: { companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                'ledger.group AS "groupName"',
+                'ledger.name AS "ledgerName"',
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...purchaseVouchers) THEN ve.amount ELSE 0 END), 0) AS "purchaseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...salesVouchers) THEN ve.amount ELSE 0 END), 0) AS "salesAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...directExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "directExpenseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...indirectExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectExpenseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...indirectIncomeVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectIncomeAmount"`
+            ])
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.generation_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        const profitAndLoss = await query
+            .groupBy('ledger.group')
+            .addGroupBy('ledger.name')
+            .setParameters({
+                purchaseVouchers: [VoucherTypeEnum.PAYMENT],
+                salesVouchers: [VoucherTypeEnum.RECEIPT],
+                indirectExpenseVouchers: [VoucherTypeEnum.JOURNAL],
+                indirectIncomeVouchers: [VoucherTypeEnum.CREDITNOTE]
+            })
+            .getRawMany();
+
+        return {
+            directExpenses: profitAndLoss.filter(p => p.directExpenseAmount > 0),
+            purchases: profitAndLoss.filter(p => p.purchaseAmount > 0),
+            sales: profitAndLoss.filter(p => p.salesAmount > 0),
+            indirectExpenses: profitAndLoss.filter(p => p.indirectExpenseAmount > 0),
+            indirectIncomes: profitAndLoss.filter(p => p.indirectIncomeAmount > 0)
+        };
+    }
+
 }
 
 

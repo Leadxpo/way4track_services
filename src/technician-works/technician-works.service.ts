@@ -99,7 +99,7 @@ export class TechnicianService {
 
 
             await this.repo.insert(newTechnician);
-            return new CommonResponse(true, 65152, 'Technician Details Created Successfully');
+            return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
             console.error(`Error creating Technician details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
@@ -188,7 +188,7 @@ export class TechnicianService {
 
             console.log("Data saved successfully");
 
-            return new CommonResponse(true, 65152, 'Work Details Updated Successfully');
+            return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
         } catch (error) {
             console.error(`Error updating work details: ${error.message}`, error.stack);
             throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);

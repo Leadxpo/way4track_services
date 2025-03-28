@@ -847,6 +847,135 @@ export class DashboardController {
         }
     }
 
+    @Post('getCashFlow')
+    async getCashFlow(@Body() req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getCashFlow(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getBankReconciliationReport')
+    async getBankReconciliationReport(@Body() req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        bankAccount?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getBankReconciliationReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getBankStmtForReport')
+    async getBankStmtForReport(@Body() req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        bankAccountNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getBankStmtForReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getCashStmtForReport')
+    async getCashStmtForReport(@Body() req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getCashStmtForReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getLoansAndInterestsForReport')
+    async getLoansAndInterestsForReport(@Body() req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getLoansAndInterestsForReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getFixedAssertsForReport')
+    async getFixedAssertsForReport(@Body() req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getFixedAssertsForReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getProfitAndLoss')
+    async getProfitAndLoss(@Body() req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getProfitAndLoss(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('generateIncomeStatement')
+    async generateIncomeStatement(@Body() req: {
+        year?: number
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.generateIncomeStatement(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
 
     // @Post('calculateRcs')
     // async calculateRcs(@Body() req: {

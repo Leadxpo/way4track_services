@@ -229,6 +229,123 @@ export class VoucherDashboardService {
 
     }
 
+    async getProfitAndLoss(req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getProfitAndLoss(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getFixedAssertsForReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getFixedAssertsForReport(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getLoansAndInterestsForReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        branchName?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getLoansAndInterestsForReport(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getCashStmtForReport(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getCashStmtForReport(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getBankStmtForReport(req: {
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        bankAccountNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getBankStmtForReport(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getBankReconciliationReport(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate: string;
+        toDate: string;
+        bankAccount?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getBankReconciliationReport(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getCashFlow(req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.getCashFlow(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async generateIncomeStatement(req: {
+        year?: number
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.voucherRepository.generateIncomeStatement(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     // async calculateRcs(req: {
     //     companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
     // }): Promise<CommonResponse> {
