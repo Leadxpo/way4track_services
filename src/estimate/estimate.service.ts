@@ -79,8 +79,8 @@ export class EstimateService {
                         productId: product.id,
                         productName: product.productName,
                         quantity: productDetail.quantity,
-                        costPerUnit: product.price,
-                        totalCost: product.price * productDetail.quantity,
+                        costPerUnit: product.cost,
+                        totalCost: product.cost * productDetail.quantity,
                         hsnCode: product.hsnCode,
                     };
                 });
@@ -198,7 +198,7 @@ export class EstimateService {
                         throw new Error(`Quantity for product ${product.productName} must be greater than 0`);
                     }
 
-                    const costPerUnit = parseFloat(product.price.toString()) || 0;
+                    const costPerUnit = parseFloat(product.cost.toString()) || 0;
                     if (costPerUnit <= 0) {
                         throw new Error(`Cost per unit for product ${product.productName} must be greater than 0`);
                     }

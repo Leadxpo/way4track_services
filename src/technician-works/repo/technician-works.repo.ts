@@ -30,32 +30,37 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         const query = this.createQueryBuilder('wa')
             .select([
                 'DATE_FORMAT(wa.date, "%Y-%m") AS date',
-                'wa.staff_id AS staffId', // Corrected to select wa.staff_id
+                'wa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'COUNT(wa.id) AS totalAppointments',
                 'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingAppointments',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+            .where('wa.staff_id = :staffId', { staffId: req.staffId });
+
+        if (req.companyCode) {
+            query.andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode });
+        }
+
+        if (req.unitCode) {
+            query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+        }
+
         if (req.date) {
-            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+            query.andWhere('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date });
+        }
 
-        } // Only logged-in staff can view their data
-        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by the formatted date
+        query
+            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")')
             .addGroupBy('wa.staff_id')
-            .addGroupBy('staff.name'); // Add staff.name to the GROUP BY clause
-
-        // Set the status parameters correctly
-        const result = await query
+            .addGroupBy('staff.name')
             .setParameter('completed', WorkStatusEnum.COMPLETED)
-            .setParameter('pending', WorkStatusEnum.PENDING) // Assuming you need this for pending appointments
-            .getRawMany();
+            .setParameter('pending', WorkStatusEnum.PENDING);
 
-        return result;
+        return await query.getRawMany();
     }
+
 
 
     async getPaymentWorkAllocation(req: {

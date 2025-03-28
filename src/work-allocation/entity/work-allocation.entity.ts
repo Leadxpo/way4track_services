@@ -86,7 +86,7 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
 
-    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: false })
+    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: true })
     visitingNumber: string;
 
     @ManyToOne(() => SalesWorksEntity, (designation) => designation.sales, { nullable: true })

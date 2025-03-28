@@ -88,7 +88,7 @@ export class WorkAllocationAdapter {
                 entity.unitCode,
                 product?.id || 0,
                 entity?.productName || '',
-                product?.dateOfPurchase || null,
+                product?.inDate || null,
                 product?.vendorId?.id || null, // Accessing vendorId from product
                 product?.categoryName || '',
                 // product?.price || 0,
