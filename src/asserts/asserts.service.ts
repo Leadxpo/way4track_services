@@ -33,7 +33,7 @@ export class AssertsService {
     async getAssertDetails(req: AssertsIdDto): Promise<CommonResponse> {
         try {
             const assert = await this.assertsRepository.findOne({
-                relations: ['branchId', 'voucherId'],
+                relations: ['branchId'],
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
             });
 
@@ -51,7 +51,7 @@ export class AssertsService {
     async getAllAssertDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const assert = await this.assertsRepository.find({
-                relations: ['branchId', 'voucherId'],
+                relations: ['branchId'],
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
             });
 

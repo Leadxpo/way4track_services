@@ -28,7 +28,7 @@ export class AssertDashboardService {
         fromDate?: Date; toDate?: Date; companyCode?: string,
         unitCode?: string
     }): Promise<CommonResponse> {
-        const cardData = await this.assertRepo.getAssertDataByDate(req)
+        const cardData = await this.assertRepo.getAssetDataByDate(req)
         if (!cardData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

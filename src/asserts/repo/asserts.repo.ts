@@ -88,36 +88,43 @@ export class AssertsRepository extends Repository<AssertsEntity> {
         }
     }
 
-    async getAssertDataByDate(req: {
-        fromDate?: Date; toDate?: Date; companyCode?: string,
-        unitCode?: string
+    async getAssetDataByDate(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        companyCode?: string;
+        unitCode?: string;
+        branch?: string;
     }) {
-        const query = this.createQueryBuilder('as')
+        const query = this.createQueryBuilder('asset')
             .select([
-                'as.description AS description',
-                'as.asset_type AS assetType',
-                'as.payment_type AS paymentType',
-                've.name AS name',
-                'as.purchase_date AS purchaseDate',
-                've.payment_status AS paymentStatus',
-                've.amount AS amount',
-                've.voucher_id as voucherId',
+                'asset.description AS description',
+                'asset.asset_type AS assetType',
+                'asset.payment_type AS paymentType',
+                'asset.purchase_date AS purchaseDate',
+                'asset.asserts_name AS assetName',
+                'asset.asserts_amount AS assetAmount',
+                'asset.quantity AS quantity'
             ])
-            .leftJoin(VoucherEntity, 've', 'as.voucher_id=ve.id')
-            .where(`as.company_code = "${req.companyCode}"`)
-            .andWhere(`as.unit_code = "${req.unitCode}"`)
+            .leftJoin(BranchEntity, 'branch', 'branch.id = asset.branch_id')
+            .where('asset.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('asset.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.fromDate) {
-            query.andWhere('as.purchase_date >= :fromDate', { fromDate: req.fromDate });
+            query.andWhere('asset.purchase_date >= :fromDate', { fromDate: req.fromDate });
         }
 
         if (req.toDate) {
-            query.andWhere('as.purchase_date <= :toDate', { toDate: req.toDate });
+            query.andWhere('asset.purchase_date <= :toDate', { toDate: req.toDate });
+        }
+
+        if (req.branch) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branch });
         }
 
         const result = await query.getRawMany();
         return result;
     }
+
 
 
 
