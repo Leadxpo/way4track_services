@@ -24,6 +24,10 @@ export class WorkAllocationAdapter {
         staff.id = dto.staffId;
         entity.staffId = staff;
 
+        const staffId = new StaffEntity();
+        staffId.id = dto.sales_id;
+        entity.salesStaffRelation = staff;
+
         // entity.serviceOrProduct = dto.serviceOrProduct;
         entity.otherInformation = dto.otherInformation;
         entity.date = dto.date;

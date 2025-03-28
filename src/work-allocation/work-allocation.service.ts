@@ -84,20 +84,7 @@ export class WorkAllocationService {
             newWorkAllocation.workAllocationNumber = `#VOU-${(await this.workAllocationRepository.count() + 1)
                 .toString()
                 .padStart(5, '0')}`;
-            let salesEntity = null;
-            if (dto.sales_id) {
-                salesEntity = await this.salesworkRepository.findOne({
-                    where: { id: dto.sales_id }
-                });
-
-                if (!salesEntity) {
-                    throw new Error(`sales with ID '${dto.sales_id}' not found.`);
-                }
-                console.log(salesEntity, 'salesEntity');
-
-                newWorkAllocation.visitingNumber = salesEntity.visitingNumber; // Store name
-                newWorkAllocation.salesRelation = salesEntity; // Store relation
-            }
+           
             await this.workAllocationRepository.insert(newWorkAllocation);
             const technicianDto: TechnicianWorksDto = {
                 service: "",

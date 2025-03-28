@@ -284,6 +284,9 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => WorkAllocationEntity, (workAllocationEntity) => workAllocationEntity.staffId)
   workAllocation: WorkAllocationEntity[];
 
+  @OneToMany(() => WorkAllocationEntity, (workAllocationEntity) => workAllocationEntity.salesStaffRelation)
+  sales: WorkAllocationEntity[];
+
   @OneToMany(() => ProductAssignEntity, (productAssignEntity) => productAssignEntity.staffId)
   productAssign: ProductAssignEntity[];
 

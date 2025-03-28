@@ -89,7 +89,7 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column('varchar', { name: 'visitingNumber', length: 20, nullable: true })
     visitingNumber: string;
 
-    @ManyToOne(() => SalesWorksEntity, (designation) => designation.sales, { nullable: true })
-    @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of SalesWorksEntity
-    salesRelation: SalesWorksEntity;
+    @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
+    @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of StaffEntity
+    salesStaffRelation: StaffEntity;
 }

@@ -70,7 +70,7 @@ export class SalesWorksEntity extends BaseEntity {
     @Column({ name: 'visiting_number', type: 'varchar', unique: true })
     visitingNumber: string;
 
-    
-    @OneToMany(() => WorkAllocationEntity, (WorkAllocationEntity) => WorkAllocationEntity.salesRelation)
-    sales: WorkAllocationEntity[];
+
+    // @OneToMany(() => WorkAllocationEntity, (WorkAllocationEntity) => WorkAllocationEntity.salesRelation)
+    // sales: WorkAllocationEntity[];
 }
