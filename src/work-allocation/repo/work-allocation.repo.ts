@@ -7,6 +7,7 @@ import { ClientEntity } from "src/client/entity/client.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
+import { TechnicianWorksEntity } from "src/technician-works/entity/technician-works.entity";
 
 
 @Injectable()
@@ -31,7 +32,9 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
                 'staff.name AS staffName',
                 'client.name AS clientName',
                 'wa.work_status as workStatus',
-                'wa.product_name as productName'
+                'wa.product_name as productName',
+                'wa.service as service',
+
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id=wa.staff_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id=client.id')

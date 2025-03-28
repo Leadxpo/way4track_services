@@ -25,7 +25,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date: string; // Logged-in staff ID
+        date?: string; // Logged-in staff ID
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -37,11 +37,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessAppointments'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId }) // Only logged-in staff can view their data
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by the formatted date
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+        if (req.date) {
+            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+
+        } // Only logged-in staff can view their data
+        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by the formatted date
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name'); // Add staff.name to the GROUP BY clause
 
@@ -59,7 +62,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date: string; // Logged-in staff ID
+        date?: string; // Logged-in staff ID
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -70,11 +73,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(CASE WHEN wa.payment_status = :COMPLETED THEN 1 ELSE 0 END) AS totalSuccessPayment'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by formatted date
+        if (req.date) {
+            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+
+        }
+        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by formatted date
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name'); // Add staff.name to GROUP BY
 
@@ -408,7 +414,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 've.description AS description',
                 've.product_name AS productName',
                 've.work_status AS workStatus',
-                've.quantity AS quantity',
                 'SUM(ve.amount) AS totalAmount',
                 've.id AS id'
             ])
@@ -435,7 +440,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .addGroupBy('ve.description')
             .addGroupBy('ve.product_name')
             .addGroupBy('ve.work_status')
-            .addGroupBy('ve.quantity')
             .addGroupBy('ve.id');
 
         const result = await query.getRawMany();

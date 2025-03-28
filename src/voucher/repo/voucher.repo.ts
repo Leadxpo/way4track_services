@@ -2762,12 +2762,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         let bankCharges = 0;
 
         transactions.forEach((txn) => {
-            if ([VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CREDITNOTE].includes(txn.voucherType)) {
+            if ([VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CREDITNOTE, VoucherTypeEnum.SALES].includes(txn.voucherType)) {
                 totalReceipts += txn.amount;
                 if (txn.transactionStatus === 'PENDING') {
                     depositsInTransit += txn.amount;
                 }
-            } else if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.DEBITNOTE].includes(txn.voucherType)) {
+            } else if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE, VoucherTypeEnum.DEBITNOTE].includes(txn.voucherType)) {
                 totalPayments += txn.amount;
                 if (txn.transactionStatus === 'PENDING') {
                     outstandingChecks += txn.amount;

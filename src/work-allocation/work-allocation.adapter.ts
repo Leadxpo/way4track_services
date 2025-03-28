@@ -48,6 +48,7 @@ export class WorkAllocationAdapter {
         voucher.id = dto.voucherId
         entity.voucherId = voucher;
         entity.amount = dto.amount
+        entity.service = dto.service
         entity.productName = dto.productName
         entity.visitingNumber = dto.visitingNumber
         // if (!dto.productDetails || dto.productDetails.length === 0) {

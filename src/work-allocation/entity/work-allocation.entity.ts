@@ -26,6 +26,9 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
 
+    @Column({ name: 'service', type: 'text', nullable: true })
+    service: string;
+
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
 
