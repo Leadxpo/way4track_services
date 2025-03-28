@@ -42,12 +42,16 @@ export class ProductAssignService {
         staffId?: number,
         numberOfProducts?: number
     ): Promise<void> {
-        const imeiFrom = parseInt(imeiNumberFrom, 10);
-        const imeiTo = parseInt(imeiNumberTo, 10);
+        const imeiFrom = parseInt(imeiNumberFrom, 10) || 0;
+        const imeiTo = parseInt(imeiNumberTo, 10) || 0;
+        if (imeiNumberFrom && imeiNumberTo) {
 
-        if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
-            throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+
+            if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
+                throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+            }
         }
+
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.startTransaction();
@@ -227,7 +231,7 @@ export class ProductAssignService {
             }
             // Handle photo upload
             // const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
-            if (dto.id || dto.id !== null) {
+            if (dto.id) {
                 console.log(dto, "<<<<")
                 return await this.updateProductAssign(dto, photoPath);
             } else {

@@ -27,10 +27,10 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'product_id' })
   productId: ProductEntity;
 
-  @Column({ name: 'imei_number_from', type: 'varchar', length: 20 })
+  @Column({ name: 'imei_number_from', type: 'varchar', length: 20, nullable: true })
   imeiNumberFrom: string;
 
-  @Column({ name: 'imei_number_to', type: 'varchar', length: 20 })
+  @Column({ name: 'imei_number_to', type: 'varchar', length: 20, nullable: true })
   imeiNumberTo: string;
 
   @Column({ name: 'number_of_products', type: 'int', nullable: true })
@@ -43,16 +43,16 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'product_assign_photo', type: 'text', nullable: true })
   productAssignPhoto: string;
 
-  @Column({ name: 'branch_person', type: 'varchar', length: 20 })
+  @Column({ name: 'branch_person', type: 'varchar', length: 20,nullable:true })
   branchOrPerson: string;
 
   // @Column({ name: 'assigned_qty', type: 'int', nullable: true, default: null })
   // assignedQty: number;
 
-  @Column({ name: 'is_assign', type: 'varchar', default: false })
+  @Column({ name: 'is_assign', type: 'varchar', default: false,nullable:true })
   isAssign: string;
 
-  @Column({ name: 'assign_time', type: 'timestamp', nullable: true })
+  @Column({ name: 'assign_time', type: 'timestamp', nullable: true, })
   assignTime: Date;
 
   @Column({ name: 'assign_to', type: 'varchar', length: 50, nullable: true })
@@ -62,7 +62,7 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'product_type_id' })
   productTypeId: ProductTypeEntity;
 
-  @Column({ name: 'in_hands', type: 'varchar', default: false })
+  @Column({ name: 'in_hands', type: 'varchar', default: false ,nullable:true})
   inHands: string;
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
