@@ -20,13 +20,13 @@ export class AttendanceEntity {
     @Column({ name: 'day', type: 'date', nullable: false })
     day: Date;
 
-    @Column({ name: 'in_time', type: 'varchar', length: 10, nullable: true })
+    @Column({ name: 'in_time', type: 'varchar', length: 100, nullable: true })
     inTime: string;
 
     @Column({ name: 'in_time_remark', type: 'varchar', length: 255, nullable: true })
     inTimeRemark: string;
 
-    @Column({ name: 'out_time', type: 'varchar', length: 10, nullable: true })
+    @Column({ name: 'out_time', type: 'varchar', length: 100, nullable: true })
     outTime: string;
 
     @Column({ name: 'out_time_remark', type: 'varchar', length: 255, nullable: true })

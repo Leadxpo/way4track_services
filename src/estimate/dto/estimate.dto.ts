@@ -1,12 +1,12 @@
 
 export class EstimateDto {
-    id: number;
+    id?: number;
     clientId: string;
-    vendorId: number;
+    vendorId?: number;
     buildingAddress: string;
     estimateDate: Date;
     expireDate: string;
-    productOrService: string;
+    productOrService?: string;
     description: string;
     totalAmount: number;
     companyCode: string;
@@ -29,7 +29,7 @@ export class EstimateDto {
 
 
 export class ProductDetailDto {
-    productId: number;
+    productId?: number;
     productName: string;
     quantity: number;
     costPerUnit: number;
