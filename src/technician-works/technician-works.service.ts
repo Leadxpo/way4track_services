@@ -39,7 +39,6 @@ export class TechnicianService {
 
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
-
     async handleTechnicianDetails(
         req: TechnicianWorksDto,
         photos: {
@@ -47,7 +46,7 @@ export class TechnicianService {
             photo2?: Express.Multer.File[];
             photo3?: Express.Multer.File[];
             photo4?: Express.Multer.File[];
-        }
+        } = {} // ✅ Default to an empty object
     ): Promise<CommonResponse> {
         let filePaths: Record<keyof typeof photos, string | undefined> = {
             photo1: undefined,
@@ -70,6 +69,10 @@ export class TechnicianService {
                 console.log(`File uploaded to GCS: ${uniqueFileName}`);
                 filePaths[key] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
+        }
+        if (!photos || typeof photos !== 'object') {
+            console.error('Photos parameter is null or undefined');
+            photos = {}; // Ensure it's an empty object
         }
 
         return req.id
@@ -106,9 +109,14 @@ export class TechnicianService {
         }
     }
 
-
-    async updateTechnicianDetails(req: TechnicianWorksDto, filePaths: Record<string, string | null>): Promise<CommonResponse> {
+    async updateTechnicianDetails(
+        req: TechnicianWorksDto,
+        filePaths: Record<string, string | null> = {} // Ensure it's always an object
+    ): Promise<CommonResponse> {
         try {
+            // Ensure filePaths is always an object
+            filePaths = filePaths ?? {};
+
             let existingTechnician: TechnicianWorksEntity | null = null;
 
             if (req.id) {
@@ -120,45 +128,28 @@ export class TechnicianService {
             if (!existingTechnician) {
                 return new CommonResponse(false, 4002, 'Work not found for the provided ID.');
             }
-
+            
             if (req.workStatus === WorkStatusEnum.COMPLETED) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
                     { location: 'install' }
                 );
             }
-
-            // Photo field mapping
             const photoMapping: Record<string, string> = {
                 photo1: 'vehiclePhoto1',
                 photo2: 'vehiclePhoto2',
                 photo3: 'vehiclePhoto3',
                 photo4: 'vehiclePhoto4',
             };
+            
+            // ✅ Ensure filePaths is always a valid object
+            filePaths = filePaths ?? {};           
+         
 
-            Object.keys(photoMapping).forEach(field => {
-                const entityField = photoMapping[field];
+            // ✅ Safeguard against undefined filePaths
+            for (const [field, entityField] of Object.entries(photoMapping)) {
                 if (filePaths[field]) {
                     (existingTechnician as any)[entityField] = filePaths[field];
-                }
-            });
-
-            // Delete old images from storage if new ones are provided
-            for (const field in photoMapping) {
-                const entityField = photoMapping[field];
-                const newFilePath = filePaths[field];
-                const existingFilePath = existingTechnician[entityField as keyof TechnicianWorksEntity];
-
-                if (typeof existingFilePath === 'string' && newFilePath) {
-                    const existingFileName = existingFilePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-                    const file = this.storage.bucket(this.bucketName).file(existingFileName);
-
-                    try {
-                        await file.delete();
-                        console.log(`Deleted old file from GCS: ${existingFileName}`);
-                    } catch (error) {
-                        console.error(`Error deleting old file from GCS: ${error.message}`);
-                    }
                 }
             }
 
@@ -166,15 +157,8 @@ export class TechnicianService {
             const technicianEntity = this.adapter.convertDtoToEntity(req);
             technicianEntity.id = existingTechnician.id;
 
-            // Retain the photo fields in the updated entity
+            // Retain photo fields
             Object.assign(existingTechnician, technicianEntity);
-
-            Object.keys(photoMapping).forEach(field => {
-                const entityField = photoMapping[field];
-                if (filePaths[field]) {
-                    (existingTechnician as any)[entityField] = filePaths[field];
-                }
-            });
 
             console.log("Final data before saving:", existingTechnician);
 
@@ -194,6 +178,8 @@ export class TechnicianService {
             throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
         }
     }
+
+
 
 
 
