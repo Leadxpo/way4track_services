@@ -60,7 +60,7 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'json', name: 'product_details', nullable: true })
     productDetails: {
         type?: string
-        productId: number;
+        productId?: number;
         productName: string;
         quantity: number;
         costPerUnit: number;
