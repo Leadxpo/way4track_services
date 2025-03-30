@@ -62,29 +62,29 @@ export class EstimateService {
 
             let updatedProductDetails = existingEstimate.productDetails || [];
 
-            if (productDetails.length > 0) {
-                const productIds = productDetails
-                    .map(p => p.productId && !isNaN(Number(p.productId)) ? Number(p.productId) : null)
-                    .filter(id => id !== null);
+            // if (productDetails.length > 0) {
+            //     const productIds = productDetails
+            //         .map(p => p.productId && !isNaN(Number(p.productId)) ? Number(p.productId) : null)
+            //         .filter(id => id !== null);
 
-                const products = await this.productRepository.find({ where: { id: In(productIds) } });
+            //     const products = await this.productRepository.find({ where: { id: In(productIds) } });
 
-                if (products.length !== productIds.length) {
-                    throw new Error('Some products in the provided details do not exist');
-                }
+            //     if (products.length !== productIds.length) {
+            //         throw new Error('Some products in the provided details do not exist');
+            //     }
 
-                updatedProductDetails = productDetails.map(productDetail => {
-                    const product = products.find(p => p.id === Number(productDetail.productId));
-                    return {
-                        productId: product.id,
-                        productName: product.productName,
-                        quantity: productDetail.quantity,
-                        costPerUnit: product.cost,
-                        totalCost: product.cost * productDetail.quantity,
-                        hsnCode: product.hsnCode,
-                    };
-                });
-            }
+            //     updatedProductDetails = productDetails.map(productDetail => {
+            //         const product = products.find(p => p.id === Number(productDetail.productId));
+            //         return {
+            //             productId: product.id,
+            //             productName: product.productName,
+            //             quantity: productDetail.quantity,
+            //             costPerUnit: product.cost,
+            //             totalCost: product.cost * productDetail.quantity,
+            //             hsnCode: product.hsnCode,
+            //         };
+            //     });
+            // }
 
             const totalAmount = updatedProductDetails.reduce((sum, product) => sum + product.totalCost, 0);
 
@@ -173,8 +173,6 @@ export class EstimateService {
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
-
-            // Ensure productDetails is always an array
             const productDetailsArray: ProductDetailDto[] =
                 typeof dto.productDetails === "string"
                     ? JSON.parse(dto.productDetails)
@@ -183,44 +181,13 @@ export class EstimateService {
             if (!Array.isArray(productDetailsArray)) {
                 throw new Error("Invalid productDetails format. Expected an array.");
             }
-            console.log(productDetailsArray, "productDetailsArray")
-            const productDetails = await Promise.all(
-                productDetailsArray.map(async (productDetail) => {
-                    const product = await this.productRepository.findOne({
-                        where: { id: productDetail.productId },
-                    });
-                    if (!product) {
-                        throw new Error(`Product with ID ${productDetail.productId} not found`);
-                    }
+            dto.productDetails = productDetailsArray;
 
-                    const quantity = productDetail.quantity ? parseInt(productDetail.quantity.toString(), 10) : 0;
-                    if (quantity <= 0) {
-                        throw new Error(`Quantity for product ${product.productName} must be greater than 0`);
-                    }
-
-                    const costPerUnit = parseFloat(product.cost.toString()) || 0;
-                    if (costPerUnit <= 0) {
-                        throw new Error(`Cost per unit for product ${product.productName} must be greater than 0`);
-                    }
-
-                    const totalCost = costPerUnit * quantity;
-
-                    return {
-                        productId: product.id,
-                        productName: product.productName,
-                        quantity: quantity,
-                        costPerUnit: costPerUnit,
-                        totalCost: totalCost || 0,
-                        hsnCode: product.hsnCode,
-                    };
-                })
-            );
-
-            const totalAmount = productDetails.reduce((sum, product) => sum + (product.totalCost || 0), 0);
+            const totalAmount = productDetailsArray.reduce((sum, product) => sum + (product.totalCost || 0), 0);
 
             const newEstimate = this.estimateAdapter.convertDtoToEntity(dto);
             newEstimate.clientId = client;
-            newEstimate.productDetails = productDetails;
+            newEstimate.productDetails = productDetailsArray;
             newEstimate.amount = totalAmount || 0;
             newEstimate.estimateId = `EST-${(await this.estimateRepository.count() + 1).toString().padStart(4, '0')}`;
             if (dto.convertToInvoice) {

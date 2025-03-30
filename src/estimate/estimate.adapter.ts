@@ -41,18 +41,19 @@ export class EstimateAdapter {
         if (!dto.productDetails || dto.productDetails.length === 0) {
             entity.productDetails = [];
         } else {
-            entity.productDetails = dto.productDetails.map((productDetail) => {
-                const totalCost = productDetail.quantity * (productDetail.costPerUnit || 0);
-                return {
+            entity.productDetails = Array.isArray(dto.productDetails)
+                ? dto.productDetails.map((productDetail) => ({
+                    type: productDetail.type,
                     productId: productDetail.productId,
                     productName: productDetail.productName,
                     quantity: productDetail.quantity,
                     costPerUnit: productDetail.costPerUnit,
-                    totalCost: totalCost || 0,
+                    totalCost: productDetail.totalCost,
                     hsnCode: productDetail.hsnCode
-                };
-            });
+                }))
+                : [];
         }
+
 
 
         return entity;

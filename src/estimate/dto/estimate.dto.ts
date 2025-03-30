@@ -29,7 +29,8 @@ export class EstimateDto {
 
 
 export class ProductDetailDto {
-    productId?: number;
+    type?:string
+    productId: number;
     productName: string;
     quantity: number;
     costPerUnit: number;

@@ -118,11 +118,6 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
     }
 
     async getTotalPendingAndCompletedPercentage(req: BranchChartDto) {
-        const year = Number(req.date);
-        if (!year || isNaN(year)) {
-            throw new Error('Invalid year provided');
-        }
-
         const query = this.createQueryBuilder('ve')
             .select([
                 `YEAR(ve.date) AS year`,
@@ -136,8 +131,16 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            .andWhere(`YEAR(ve.date) = :year`, { year });
+            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode });
+
+        // Apply year filter only if date is provided
+        if (req.date) {
+            const year = Number(req.date);
+            if (isNaN(year)) {
+                throw new Error('Invalid year provided');
+            }
+            query.andWhere(`YEAR(ve.date) = :year`, { year });
+        }
 
         if (req.branchName) {
             query.andWhere(`LOWER(branch.name) = LOWER(:branchName)`, { branchName: req.branchName });
@@ -150,5 +153,6 @@ export class WorkAllocationRepository extends Repository<WorkAllocationEntity> {
 
         return query.getRawMany();
     }
+
 
 }
