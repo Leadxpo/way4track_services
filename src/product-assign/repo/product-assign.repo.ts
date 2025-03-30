@@ -282,12 +282,12 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
     async getProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string }) {
         try {
-            // Base query for grouping products by branch
+            // Query for grouped product details
             const groupedProductQuery = this.createQueryBuilder('productAssign')
                 .select([
                     'pa.id AS productId',
                     'pa.product_name AS productName',
-                    'pt.name AS productType',  // Correct reference
+                    'pt.name AS productType',
                     'br.name AS branchName',
                     'SUM(productAssign.number_of_products) AS totalProducts',
                     'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty',
@@ -304,11 +304,31 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
 
-            // Corrected GROUP BY statement
             groupedProductQuery.groupBy('pa.id, pa.product_name, br.name, pt.name, productAssign.status');
 
-            // Execute query
+            // Execute query for grouped product details
             const productDetails = await groupedProductQuery.getRawMany();
+
+            // Query to fetch product photos separately
+            const photoQuery = this.createQueryBuilder('productAssign')
+                .select([
+                    'productAssign.product_id AS productId',
+                    'productAssign.product_assign_photo AS productAssignPhoto'
+                ])
+                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+
+            if (req.branch) {
+                photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branch WHERE name = :branchName)', { branchName: req.branch });
+            }
+
+            const productPhotos = await photoQuery.getRawMany();
+
+            // Map photos to products
+            const productPhotoMap = new Map<string, string>();
+            productPhotos.forEach(photo => {
+                productPhotoMap.set(photo.productId, photo.productAssignPhoto);
+            });
 
             // Transform data into the required format
             const branchesMap = new Map<string, any>();
@@ -328,7 +348,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     name: productName || 'N/A',
                     type: productType || 'N/A',
                     totalProducts: Number(totalProducts) || 0,
-                    totalInHandsQty: Number(totalInHandsQty) || 0
+                    totalInHandsQty: Number(totalInHandsQty) || 0,
+                    photo: productPhotoMap.get(productId) || null // Assign photo from the mapped result
                 });
             });
 
@@ -338,6 +359,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             throw new Error('Failed to fetch product details by branch');
         }
     }
+
 
 
     async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }) {
@@ -671,7 +693,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             const branchesMap = new Map<string, any>();
 
             productDetails.forEach((product) => {
-                const { productType, branchName, inAssignStock, inHandStock, presentStock } = product;
+                const { productType, branchName, inAssignStock, inHandStock, presentStock, productStatus } = product;
 
                 const branchKey = branchName || 'WareHouse';
 
@@ -690,7 +712,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     type: productType || 'N/A',
                     inAssignStock: Number(inAssignStock) || 0,
                     inHandStock: Number(inHandStock) || 0,
-                    presentStock: Number(presentStock) || 0
+                    presentStock: Number(presentStock) || 0,
+                    productStatus: Number(productStatus) || 0
                 });
             });
 
