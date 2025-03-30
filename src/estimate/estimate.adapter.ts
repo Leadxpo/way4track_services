@@ -78,9 +78,10 @@ export class EstimateAdapter {
             entity.companyCode,
             entity.unitCode,
             entity.productDetails?.map(product => ({
+                type: product.type,
+                productId: product.productId,
                 name: product.productName,
                 quantity: product.quantity,
-                amount: product.quantity > 0 ? product.totalCost / product.quantity : 0,
                 costPerUnit: product.costPerUnit,
                 totalCost: product.totalCost,
                 hsnCode: product.hsnCode
