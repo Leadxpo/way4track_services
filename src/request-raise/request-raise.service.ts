@@ -156,42 +156,44 @@ export class RequestRaiseService {
 
 
     async getRequests(filter: {
-        // fromDate?: Date; toDate?: Date; 
-        branchName?: string, staffId?: string, companyCode?: string,
-        unitCode?: string
+        fromDate?: Date; toDate?: Date;
+        branchName?: string; staffId?: string; companyCode?: string;
+        unitCode?: string;
     }) {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
                 'req.request_id AS requestNumber',
-                'req.id as requestId',
-                // 'client.name AS client',
+                'req.id AS requestId',
                 'branch.name AS branchName',
                 'req.created_date AS paymentDate',
                 'req.request_type AS requestType',
                 'req.status AS status',
-                'sf.name as RequestTo'
+                'sf.name AS RequestTo'
             ])
-            // .leftJoin(ClientEntity, 'client', 'req.client_id=client.id',)
-            .leftJoin(BranchEntity, 'branch', 'req.branch_id=branch.id',)
-            .leftJoin(StaffEntity, 'sf', 'req.request_to=sf.id',)
-            .where(`req.company_code = "${filter.companyCode}"`)
-            .andWhere(`req.unit_code = "${filter.unitCode}"`)
-            .groupBy('req.id, req.created_date')
+            .leftJoin(BranchEntity, 'branch', 'req.branch_id = branch.id')
+            .leftJoin(StaffEntity, 'sf', 'req.request_to = sf.id')
+            .where('req.company_code = :companyCode', { companyCode: filter.companyCode })
+            .andWhere('req.unit_code = :unitCode', { unitCode: filter.unitCode })
             .orderBy('req.created_date', 'DESC');
 
-        // if (filter.fromDate) {
-        //     query.andWhere('req.created_date >= :fromDate', { fromDate: filter.fromDate });
-        // }
-
         if (filter.staffId) {
-            query.andWhere('sf.staff_id= :staffId', { staffId: filter.staffId });
+            query.andWhere('sf.staff_id = :staffId', { staffId: filter.staffId });
         }
 
         if (filter.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: filter.branchName });
         }
 
+        if (filter.fromDate) {
+            query.andWhere('DATE(req.created_date) >= :fromDate', { fromDate: filter.fromDate });
+        }
+
+        if (filter.toDate) {
+            query.andWhere('DATE(req.created_date) <= :toDate', { toDate: filter.toDate });
+        }
+
         const result = await query.getRawMany();
         return result;
     }
+
 }

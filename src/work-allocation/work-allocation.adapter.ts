@@ -19,6 +19,7 @@ export class WorkAllocationAdapter {
         const client = new ClientEntity();
         client.id = dto.clientId;
         entity.clientId = client;
+        entity.description = dto.description
 
         const staff = new StaffEntity();
         staff.id = dto.staffId;
@@ -28,7 +29,7 @@ export class WorkAllocationAdapter {
         staffId.id = dto.sales_id;
         entity.salesStaffRelation = staff;
 
-        // entity.serviceOrProduct = dto.serviceOrProduct;
+        entity.serviceOrProduct = dto.serviceOrProduct;
         entity.otherInformation = dto.otherInformation;
         entity.date = dto.date;
         entity.companyCode = dto.companyCode;
@@ -55,6 +56,7 @@ export class WorkAllocationAdapter {
         entity.service = dto.service
         entity.productName = dto.productName
         entity.visitingNumber = dto.visitingNumber
+        entity.workStatus = dto.workStatus
         // if (!dto.productDetails || dto.productDetails.length === 0) {
         //     entity.productDetails = [];
         // } else {

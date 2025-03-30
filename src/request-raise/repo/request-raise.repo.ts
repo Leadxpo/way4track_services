@@ -16,8 +16,8 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
     constructor(private dataSource: DataSource) {
         super(RequestRaiseEntity, dataSource.createEntityManager());
     }
-//New APi ware house manager 
-    async getRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string }) {
+    //New APi ware house manager 
+    async getRequestBranchWise(req: { companyCode: string, unitCode: string, branch?: string, fromDate?: string, toDate?: string }) {
         const query = this.createQueryBuilder('re')
             .select([
                 'br.name AS branch',  // Branch name
@@ -33,7 +33,9 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
             query.andWhere('br.name = :branch', { branch: req.branch });
         }
 
-        query.groupBy('br.name, re.products'); // Grouping by branch and products
+      
+
+        query.groupBy('br.name, re.products'); 
 
         const result = await query.getRawMany();
 
@@ -44,7 +46,9 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
             const existingBranch = transformedResult.find(branch => branch.location === item.branch);
 
             // Parse JSON column 'products'
-            const productList: RequestTypeProducts[] = JSON.parse(item.products || '[]');
+            const productList: RequestTypeProducts[] = typeof item.products === 'string'
+                ? JSON.parse(item.products)
+                : item.products || [];
 
             if (existingBranch) {
                 // Add products to existing branch

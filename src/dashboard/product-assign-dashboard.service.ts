@@ -100,6 +100,21 @@ export class ProductAssignDashboardService {
         }
     }
 
+    async getProductDetailsBy(req: {
+        unitCode: string;
+        companyCode: string;
+        branch?: string;
+        fromDate?: string;
+        toDate?: string;
+    }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getProductDetailsBy(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
     async getBranchManagerDetailProduct(req: {
         companyCode: string, unitCode: string, branchName?: string
     }): Promise<CommonResponse> {

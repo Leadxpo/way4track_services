@@ -125,12 +125,99 @@ export class AttendanceService {
         private readonly staffRepo: StaffRepository,
     ) { }
 
+    // async processAttendanceExcel(file: Express.Multer.File) {
+    //     const workbook = XLSX.read(file.buffer, { type: 'buffer' });
+    //     const sheetName = workbook.SheetNames[0];
+    //     const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    //     const attendanceRecords: AttendanceEntity[] = [];
+
+    //     for (const row of data) {
+    //         const staffId = row['Staff ID'];
+    //         const staffName = row['Name'];
+    //         const branchName = row['Branch Name'];
+    //         const monthYear = row['Month-Year']; // Format: "YYYY-MM"
+
+    //         if (!monthYear) continue;
+
+    //         const [year, month] = monthYear.split('-').map(Number);
+    //         const daysInMonth = new Date(year, month, 0).getDate();
+    //         console.log(daysInMonth, "?????????????")
+
+    //         // **Check if staff exists**
+    //         const staff = await this.staffRepo.findOne({ where: { staffId } });
+    //         if (!staff) {
+    //             throw new NotFoundException(`Staff with ID ${staffId} not found`);
+    //         }
+    //         console.log(staffId, ">>>>>>>>>>>>>>>>>")
+    //         for (let day = 1; day <= daysInMonth; day++) {
+    //             const inTimeField = `Day ${day} IN TIME`;
+    //             const inTimeRemarkField = `Day ${day} IN TIME Remarks`;
+    //             const outTimeField = `Day ${day} OUT TIME`;
+    //             const outTimeRemarkField = `Day ${day} OUT TIME Remarks`;
+    //             const statusField = `Day ${day} Status`;
+    //             const remarksField = `Day ${day} Remarks`;
+    //             if (row[inTimeField] || row[outTimeField]) {
+    //                 const date = new Date(year, month - 1, day); // Correct date
+
+    //                 // **Extract the provided values from Excel**
+    //                 const actualInTime = row[inTimeField] || null;
+    //                 const actualOutTime = row[outTimeField] || null;
+    //                 const inTimeRemark = row[inTimeRemarkField] || null;
+    //                 const outTimeRemark = row[outTimeRemarkField] || null;
+    //                 const status = row[statusField] as AttendanceStatus;
+    //                 const remarks = row[remarksField] || "";
+
+
+    //                 // **Check if attendance already exists**
+    //                 const existingRecord = await this.attendanceRepo.findOne({
+    //                     where: { staff: { id: staff.id }, day: date },
+    //                 });
+
+    //                 if (existingRecord) {
+    //                     // **Update existing record**
+    //                     existingRecord.inTime = actualInTime || existingRecord.inTime;
+    //                     existingRecord.inTimeRemark = inTimeRemark || existingRecord.inTimeRemark;
+    //                     existingRecord.outTime = actualOutTime || existingRecord.outTime;
+    //                     existingRecord.outTimeRemark = outTimeRemark || existingRecord.outTimeRemark;
+    //                     existingRecord.status = status || existingRecord.status;
+    //                     existingRecord.remark = remarks || existingRecord.remark;
+
+
+    //                     await this.attendanceRepo.save(existingRecord);
+    //                 } else {
+    //                     // **Insert new record**
+    //                     const attendance = new AttendanceEntity();
+    //                     attendance.staff = staff;
+    //                     attendance.staffName = staffName;
+    //                     attendance.branchName = branchName;
+    //                     attendance.day = date;
+    //                     attendance.inTime = actualInTime;
+    //                     attendance.inTimeRemark = inTimeRemark;
+    //                     attendance.outTime = actualOutTime;
+    //                     attendance.outTimeRemark = outTimeRemark;
+    //                     attendance.status = status;
+    //                     attendance.remark = remarks
+    //                     attendanceRecords.push(attendance);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     if (attendanceRecords.length > 0) {
+    //         await this.attendanceRepo.save(attendanceRecords);
+    //     }
+    //     console.log(attendanceRecords, "_________________")
+    //     return { message: 'Attendance data uploaded successfully', inserted: attendanceRecords.length };
+    // }
+
     async processAttendanceExcel(file: Express.Multer.File) {
         const workbook = XLSX.read(file.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
         const attendanceRecords: AttendanceEntity[] = [];
+        const missingStaffIds: number[] = [];
 
         for (const row of data) {
             const staffId = row['Staff ID'];
@@ -142,14 +229,14 @@ export class AttendanceService {
 
             const [year, month] = monthYear.split('-').map(Number);
             const daysInMonth = new Date(year, month, 0).getDate();
-            console.log(daysInMonth, "?????????????")
 
             // **Check if staff exists**
             const staff = await this.staffRepo.findOne({ where: { staffId } });
             if (!staff) {
-                throw new NotFoundException(`Staff with ID ${staffId} not found`);
+                missingStaffIds.push(staffId);
+                continue; // Skip this staff ID and proceed with the next row
             }
-            console.log(staffId, ">>>>>>>>>>>>>>>>>")
+
             for (let day = 1; day <= daysInMonth; day++) {
                 const inTimeField = `Day ${day} IN TIME`;
                 const inTimeRemarkField = `Day ${day} IN TIME Remarks`;
@@ -157,6 +244,7 @@ export class AttendanceService {
                 const outTimeRemarkField = `Day ${day} OUT TIME Remarks`;
                 const statusField = `Day ${day} Status`;
                 const remarksField = `Day ${day} Remarks`;
+
                 if (row[inTimeField] || row[outTimeField]) {
                     const date = new Date(year, month - 1, day); // Correct date
 
@@ -167,7 +255,6 @@ export class AttendanceService {
                     const outTimeRemark = row[outTimeRemarkField] || null;
                     const status = row[statusField] as AttendanceStatus;
                     const remarks = row[remarksField] || "";
-
 
                     // **Check if attendance already exists**
                     const existingRecord = await this.attendanceRepo.findOne({
@@ -183,7 +270,6 @@ export class AttendanceService {
                         existingRecord.status = status || existingRecord.status;
                         existingRecord.remark = remarks || existingRecord.remark;
 
-
                         await this.attendanceRepo.save(existingRecord);
                     } else {
                         // **Insert new record**
@@ -197,7 +283,7 @@ export class AttendanceService {
                         attendance.outTime = actualOutTime;
                         attendance.outTimeRemark = outTimeRemark;
                         attendance.status = status;
-                        attendance.remark = remarks
+                        attendance.remark = remarks;
                         attendanceRecords.push(attendance);
                     }
                 }
@@ -207,9 +293,14 @@ export class AttendanceService {
         if (attendanceRecords.length > 0) {
             await this.attendanceRepo.save(attendanceRecords);
         }
-        console.log(attendanceRecords, "_________________")
-        return { message: 'Attendance data uploaded successfully', inserted: attendanceRecords.length };
+
+        return {
+            message: 'Attendance data uploaded successfully',
+            inserted: attendanceRecords.length,
+            missingStaffIds: missingStaffIds.length > 0 ? missingStaffIds : 'None'
+        };
     }
+
 
     async updateAttendanceDetails(dto: CreateAttendanceDto): Promise<CommonResponse> {
         try {

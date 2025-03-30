@@ -287,7 +287,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 .select([
                     'pa.id AS productId',
                     'pa.product_name AS productName',
-                    'pt.name AS productType',
+                    'pt.name AS productType',  // Correct reference
                     'br.name AS branchName',
                     'SUM(productAssign.number_of_products) AS totalProducts',
                     'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.number_of_products ELSE 0 END) AS totalInHandsQty',
@@ -304,10 +304,10 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
 
-            // Group by all selected non-aggregated fields
-            groupedProductQuery.groupBy('pa.id, pa.product_name, productAssign.product_type, br.name, productAssign.status');
+            // Corrected GROUP BY statement
+            groupedProductQuery.groupBy('pa.id, pa.product_name, br.name, pt.name, productAssign.status');
 
-            // Execute query to fetch products grouped by branch
+            // Execute query
             const productDetails = await groupedProductQuery.getRawMany();
 
             // Transform data into the required format
@@ -316,7 +316,6 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             productDetails.forEach((product) => {
                 const { productId, productName, productType, branchName, totalProducts, totalInHandsQty } = product;
 
-                // If the branch is not yet added in the map, initialize it
                 if (!branchesMap.has(branchName)) {
                     branchesMap.set(branchName, {
                         branchName: branchName || 'N/A',
@@ -324,25 +323,22 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     });
                 }
 
-                // Push the product details into the respective branch
                 branchesMap.get(branchName)?.products.push({
                     id: Number(productId) || 0,
                     name: productName || 'N/A',
                     type: productType || 'N/A',
                     totalProducts: Number(totalProducts) || 0,
-                    totalInHandsQty: Number(totalInHandsQty) || 0 // Add in-hands quantity
+                    totalInHandsQty: Number(totalInHandsQty) || 0
                 });
             });
 
-            // Convert the map to an array of branch objects
-            const results = Array.from(branchesMap.values());
-
-            return results
+            return Array.from(branchesMap.values());
         } catch (error) {
             console.error('Error fetching product details by branch:', error);
             throw new Error('Failed to fetch product details by branch');
         }
     }
+
 
     async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }) {
         try {
@@ -362,7 +358,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
             // Group by product name, product type, and status
-            groupedProductQuery.groupBy('pa.id, pa.product_name, productAssign.product_type, productAssign.status');
+            groupedProductQuery.groupBy('pa.id, pa.product_name, productAssign.status');
 
             // Execute query to fetch products with the total and in-hands quantity
             const productDetails = await groupedProductQuery.getRawMany();
@@ -630,7 +626,81 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
     }
 
 
+    async getProductDetailsBy(req: {
+        unitCode: string;
+        companyCode: string;
+        branch?: string;
+        fromDate?: string;
+        toDate?: string;
+    }) {
+        try {
+            // Base query
+            const groupedProductQuery = this.createQueryBuilder('productAssign')
+                .select([
+                    'pt.name AS productType',
+                    'br.name AS branchName',
+                    'SUM(CASE WHEN pa.status = \'isAssign\' THEN pa.quantity ELSE 0 END) AS inAssignStock',
+                    'SUM(CASE WHEN pa.status = \'inHand\' THEN pa.quantity ELSE 0 END) AS inHandStock',
+                    'SUM(CASE WHEN pa.status = \'not_assigned\' THEN pa.quantity ELSE 0 END) AS presentStock',
+                    'ANY_VALUE(pa.product_status) as productStatus'
+                ])
+                .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+                .leftJoin(ProductEntity, 'pa', 'pa.id = productAssign.product_id')
+                .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pa.product_type_id')
+                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
+            // Apply filters dynamically
+            if (req.branch) {
+                groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
+            if (req.fromDate) {
+                groupedProductQuery.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+            }
+            if (req.toDate) {
+                groupedProductQuery.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
+            }
+
+            // Grouping fields
+            groupedProductQuery.groupBy('pt.name, br.name');
+
+            // Execute query
+            const productDetails = await groupedProductQuery.getRawMany();
+
+            // Transform data into required format
+            const branchesMap = new Map<string, any>();
+
+            productDetails.forEach((product) => {
+                const { productType, branchName, inAssignStock, inHandStock, presentStock } = product;
+
+                const branchKey = branchName || 'WareHouse';
+
+                // Initialize branch in map
+                if (!branchesMap.has(branchKey)) {
+                    branchesMap.set(branchKey, {
+                        branchName: branchKey,
+                        products: []
+                    });
+                }
+
+                // Push product details into respective branch
+                branchesMap.get(branchKey)?.products.push({
+                    // id: Number(productId) || 0,
+                    // name: productName || 'N/A',
+                    type: productType || 'N/A',
+                    inAssignStock: Number(inAssignStock) || 0,
+                    inHandStock: Number(inHandStock) || 0,
+                    presentStock: Number(presentStock) || 0
+                });
+            });
+
+            // Convert map to array
+            return Array.from(branchesMap.values());
+        } catch (error) {
+            console.error('Error fetching product details by branch:', error);
+            throw new Error('Failed to fetch product details by branch');
+        }
+    }
 
 
 

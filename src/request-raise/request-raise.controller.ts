@@ -66,8 +66,9 @@ export class RequestRaiseController {
 
     @Post('getRequestsBySearch')
     async getRequests(@Body() req: {
-        branchName?: string, companyCode?: string,
-        unitCode?: string, staffId?: string,
+        fromDate?: Date; toDate?: Date;
+        branchName?: string; staffId?: string; companyCode?: string;
+        unitCode?: string;
     }) {
         try {
             return this.requestService.getRequests(req);
