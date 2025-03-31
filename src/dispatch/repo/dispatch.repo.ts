@@ -24,7 +24,7 @@ export class DispatchRepository extends Repository<DispatchEntity> {
     }) {
         const query = this.createQueryBuilder('de')
             .select([
-                'de.id',
+                'de.id as id',
                 'sf.name AS staffName',
                 'sb.name AS subDealerName',
                 'cl.name AS clientName',
@@ -35,7 +35,10 @@ export class DispatchRepository extends Repository<DispatchEntity> {
                 'de.status as status',
                 'de.transport_id as transportId',
                 'de.package_id as packageId',
+                'de.receiver_name as receiverName',
+                'de.dispatcher_name as dispatcherName',
                 'de.tracking_url as trackingURL',
+
                 'de.dispatch_company_name as dispatchCompanyName',
 
             ])
