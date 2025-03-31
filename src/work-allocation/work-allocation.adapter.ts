@@ -8,6 +8,7 @@ import { ProductEntity } from 'src/product/entity/product.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 
 @Injectable()
 export class WorkAllocationAdapter {
@@ -45,6 +46,14 @@ export class WorkAllocationAdapter {
         vendor.id = dto.vendorId;
         entity.vendorId = vendor;
 
+        const estimate = new EstimateEntity();
+        estimate.estimateId = dto.estimateId;
+        entity.estimateId = estimate;
+
+        const invoice = new EstimateEntity();
+        invoice.invoiceId = dto.invoiceId;
+        entity.invoiceId = invoice;
+
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branchId = branch;
@@ -77,6 +86,10 @@ export class WorkAllocationAdapter {
             const product = entity.productId;
             const vendor = entity.vendorId;
             const voucher = entity.voucherId;
+            const invoice = entity.invoiceId
+            const estimate = entity.estimateId;
+            ;
+
 
             return new WorkAllocationResDto(
                 entity.id,
@@ -109,7 +122,10 @@ export class WorkAllocationAdapter {
                 entity.description,
                 entity.amount,
                 entity.branchId.id,
-                entity.branchId.branchName
+                entity.branchId.branchName,
+                entity.service,
+                entity.invoiceId.invoiceId,
+                entity.estimateId.estimateId
                 // Mapping productDetails array
                 // entity.productDetails?.map(productDetail => ({
                 //     productName: productDetail.productName,

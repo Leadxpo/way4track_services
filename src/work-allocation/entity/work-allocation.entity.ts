@@ -8,6 +8,7 @@ import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGe
 import { WorkStatusEnum } from '../enum/work-status-enum';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 
 @Entity('work_allocations')
 export class WorkAllocationEntity extends BaseEntity {
@@ -92,4 +93,12 @@ export class WorkAllocationEntity extends BaseEntity {
     @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
     @JoinColumn({ name: 'sales_id', referencedColumnName: 'id' }) // Use the primary key of StaffEntity
     salesStaffRelation: StaffEntity;
+
+    @ManyToOne(() => EstimateEntity, (Estimate) => Estimate.work, { nullable: true })
+    @JoinColumn({ name: 'estimate_id', referencedColumnName: 'id' })
+    estimateId: EstimateEntity;
+
+    @ManyToOne(() => EstimateEntity, (Estimate) => Estimate.workId, { nullable: true })
+    @JoinColumn({ name: 'invoice_id', referencedColumnName: 'id' })
+    invoiceId: EstimateEntity;
 }

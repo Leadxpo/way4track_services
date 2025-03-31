@@ -3,6 +3,7 @@ import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
 import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
+import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 export enum GSTORTDSEnum {
     GST = "GST",
@@ -56,6 +57,12 @@ export class EstimateEntity extends BaseEntity {
 
     @OneToMany(() => VoucherEntity, (product) => product.estimate)
     invoice: VoucherEntity[];
+
+    @OneToMany(() => WorkAllocationEntity, (product) => product.estimateId)
+    work: WorkAllocationEntity[];
+
+    @OneToMany(() => WorkAllocationEntity, (product) => product.invoiceId)
+    workId: WorkAllocationEntity[];
 
     @Column({ type: 'json', name: 'product_details', nullable: true })
     productDetails: {

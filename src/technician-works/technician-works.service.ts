@@ -100,6 +100,11 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto4 = filePaths.photo4;
             }
 
+            if (req.imeiNumber) {
+                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
+                req.productId = product.id
+            }
+
 
             await this.repo.insert(newTechnician);
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
@@ -128,7 +133,7 @@ export class TechnicianService {
             if (!existingTechnician) {
                 return new CommonResponse(false, 4002, 'Work not found for the provided ID.');
             }
-            
+
             if (req.workStatus === WorkStatusEnum.COMPLETED) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
@@ -141,10 +146,10 @@ export class TechnicianService {
                 photo3: 'vehiclePhoto3',
                 photo4: 'vehiclePhoto4',
             };
-            
+
             // ✅ Ensure filePaths is always a valid object
-            filePaths = filePaths ?? {};           
-         
+            filePaths = filePaths ?? {};
+
 
             // ✅ Safeguard against undefined filePaths
             for (const [field, entityField] of Object.entries(photoMapping)) {
@@ -152,6 +157,12 @@ export class TechnicianService {
                     (existingTechnician as any)[entityField] = filePaths[field];
                 }
             }
+
+            if (req.imeiNumber) {
+                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
+                req.productId = product.id
+            }
+
 
             // Convert DTO to entity and retain existing ID
             const technicianEntity = this.adapter.convertDtoToEntity(req);

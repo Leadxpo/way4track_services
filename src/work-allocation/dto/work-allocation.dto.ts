@@ -22,6 +22,8 @@ export class WorkAllocationDto {
     visitingNumber: string;
     branchId: number
     service?: string;
+    estimateId?: string
+    invoiceId?: string;
 
 }
 export class ProductDetail {
