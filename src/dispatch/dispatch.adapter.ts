@@ -69,10 +69,12 @@ export class DispatchAdapter {
         const sub = new SubDealerEntity()
         sub.subDealerId = dto.subDealerId
         entity.subDealerId = sub
+        if (dto.assignedProductsId) {
+            const product = new ProductAssignEntity()
+            product.id = dto.assignedProductsId
+            entity.assignedProductsId = product
+        }
 
-        const product = new ProductAssignEntity()
-        product.id = dto.assignedProductsId
-        entity.assignedProductsId = product
         return entity;
     }
 }

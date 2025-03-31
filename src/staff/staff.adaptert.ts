@@ -80,10 +80,11 @@ export class StaffAdapter {
             const branchEntity = new BranchEntity();
             branchEntity.id = dto.branch;
             entity.branch = branchEntity;
-            entity.branchName = branchEntity.branchName;
 
         }
         entity.experienceDetails = dto.experienceDetails
+        entity.branchName = dto.branchName;
+
         return entity;
     }
 
