@@ -620,6 +620,21 @@ export class DashboardController {
         }
     }
 
+    @Post('getVoucherAmountDetails')
+    async getVoucherAmountDetails(@Body() req: {
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getVoucherAmountDetails(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Post('getBranchWiseSolidLiquidCash')
     async getBranchWiseSolidLiquidCash(@Body() req: CommonReq): Promise<CommonResponse> {
         try {
@@ -771,6 +786,20 @@ export class DashboardController {
             //         return new CommonResponse(false, 500, 'Error details');
         }
     }
+
+    @Post('getTCSReport')
+    async getTCSReport(@Body() req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string; branchName?: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.getTCSReport(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
 
     @Post('getDEBITNOTEReport')
     async getDEBITNOTEReport(@Body() req: {

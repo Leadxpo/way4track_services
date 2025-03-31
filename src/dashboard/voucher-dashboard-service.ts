@@ -480,6 +480,20 @@ export class VoucherDashboardService {
         }
     }
 
+    async getVoucherAmountDetails(req: {
+
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            const voucherData = await this.voucherRepository.getVoucherAmountDetails(req);
+            return new CommonResponse(true, 200, 'Data retrieved successfully', voucherData);
+        } catch (err) {
+            console.error('Error in getSalesForTable:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
+        }
+    }
 
 
     async getPurchaseData(req: CommonReq): Promise<CommonResponse> {
