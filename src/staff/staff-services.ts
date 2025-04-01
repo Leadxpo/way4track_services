@@ -439,8 +439,6 @@ export class StaffService {
             data = await this.staffRepository.findOne({ where: { staffId: req.staffId } });
         } else if (req.aadharNumber) {
             data = await this.staffRepository.findOne({ where: { aadharNumber: req.aadharNumber } });
-        } else if (req.alternateNumber) {
-            data = await this.staffRepository.findOne({ where: { alternateNumber: req.alternateNumber } });
         } else if (req.email) {
             data = await this.staffRepository.findOne({ where: { email: req.email } });
         }
