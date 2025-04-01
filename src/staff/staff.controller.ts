@@ -72,6 +72,16 @@ export class StaffController {
         }
     }
 
+    @Post('getStaffVerification')
+    async getStaffVerification(@Body() dto: StaffDto): Promise<CommonResponse> {
+        try {
+            return this.staffService.getStaffVerification(dto);
+        } catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+
     @Post('getStaffDetailsById')
     async getStaffDetailsById(@Body() req: StaffIdDto): Promise<CommonResponse> {
         try {

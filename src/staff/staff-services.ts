@@ -58,7 +58,7 @@ export class StaffService {
             throw new ErrorResponse(5416, `Failed to handle staff details: ${error.message}`);
         }
     }
-    
+
 
     async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
         try {
@@ -429,4 +429,27 @@ export class StaffService {
             return new CommonResponse(false, 4579, "There Is No staff names")
         }
     }
+
+    async getStaffVerification(req: StaffDto): Promise<CommonResponse> {
+        let data = null;
+
+        if (req.phoneNumber) {
+            data = await this.staffRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+        } else if (req.staffId) {
+            data = await this.staffRepository.findOne({ where: { staffId: req.staffId } });
+        } else if (req.aadharNumber) {
+            data = await this.staffRepository.findOne({ where: { aadharNumber: req.aadharNumber } });
+        } else if (req.alternateNumber) {
+            data = await this.staffRepository.findOne({ where: { alternateNumber: req.alternateNumber } });
+        } else if (req.email) {
+            data = await this.staffRepository.findOne({ where: { email: req.email } });
+        }
+
+        if (data) {
+            return new CommonResponse(true, 75483, "Data already exists", data);
+        } else {
+            return new CommonResponse(false, 4579, "No matching data found");
+        }
+    }
+
 }
