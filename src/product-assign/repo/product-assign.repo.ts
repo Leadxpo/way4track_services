@@ -612,16 +612,20 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 'pr.location AS location',
                 'pt.name AS productType',
                 'pr.status AS productStatus',
-                'SUM(CASE WHEN pr.status = \'isAssign\' THEN productAssign.quantity ELSE 0 END) AS inAssignStock',
-                'SUM(CASE WHEN pr.status = \'install\' THEN productAssign.quantity ELSE 0 END) AS installStock',
-                'SUM(CASE WHEN pr.status = \'inHand\' THEN productAssign.quantity ELSE 0 END) AS inHandStock',
-                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN productAssign.quantity ELSE 0 END) AS presentStock'
+                'SUM(CASE WHEN pr.status = \'isAssign\' THEN productAssign.number_of_products ELSE 0 END) AS inAssignStock',
+                'SUM(CASE WHEN pr.status = \'install\' THEN productAssign.number_of_products ELSE 0 END) AS installStock',
+                'SUM(CASE WHEN pr.status = \'inHand\' THEN productAssign.number_of_products ELSE 0 END) AS inHandStock',
+                'SUM(CASE WHEN pr.status = \'not_assigned\' THEN pr.quantity ELSE 0 END) AS presentStock',
+                'br.name as branchName'
             ])
+            .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = productAssign.product_id')
             .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
             .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
-
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
         // Apply filters conditionally
         if (req.fromDate) {
             query.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
@@ -637,7 +641,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
         }
 
         // Grouping by all selected fields
-        query.groupBy(' pr.product_name, pr.product_description, pr.imei_number, pr.location, pt.name, pr.status');
+        query.groupBy(' pr.product_name, pr.product_description, pr.imei_number, pr.location, pt.name, pr.status,br.name');
 
         // Execute and return results
         const result = await query.getRawMany();

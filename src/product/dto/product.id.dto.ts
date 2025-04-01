@@ -5,7 +5,7 @@ export class ProductIdDto {
     productName?: string
     productType?: string
     status: string;
-
+    branchName?: string
     location: string;
     staffId?: string
     fromDate?: string;
