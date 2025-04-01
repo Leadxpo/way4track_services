@@ -446,7 +446,7 @@ export class StaffService {
         }
 
         if (data) {
-            return new CommonResponse(true, 75483, "Data already exists", data);
+            return new CommonResponse(true, 75483, "Data already exists");
         } else {
             return new CommonResponse(false, 4579, "No matching data found");
         }
