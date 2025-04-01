@@ -312,9 +312,10 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             // Query to fetch product photos separately
             const photoQuery = this.createQueryBuilder('productAssign')
                 .select([
-                    'productAssign.product_id AS productId',
-                    'productAssign.product_assign_photo AS productAssignPhoto'
+                    'pt.id AS productTypeId',
+                    'pt.product_photo AS productAssignPhoto'
                 ])
+                .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -327,14 +328,14 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             // Map photos to products
             const productPhotoMap = new Map<string, string>();
             productPhotos.forEach(photo => {
-                productPhotoMap.set(photo.productId, photo.productAssignPhoto);
+                productPhotoMap.set(photo.productTypeId, photo.productAssignPhoto);
             });
 
             // Transform data into the required format
             const branchesMap = new Map<string, any>();
 
             productDetails.forEach((product) => {
-                const { productId, productName, productType, branchName, totalProducts, totalInHandsQty } = product;
+                const { productId, productName, productType, branchName, totalProducts, totalInHandsQty, productTypeId } = product;
 
                 if (!branchesMap.has(branchName)) {
                     branchesMap.set(branchName, {
@@ -349,7 +350,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                     type: productType || 'N/A',
                     totalProducts: Number(totalProducts) || 0,
                     totalInHandsQty: Number(totalInHandsQty) || 0,
-                    photo: productPhotoMap.get(productId) || null // Assign photo from the mapped result
+                    photo: productPhotoMap.get(productTypeId) || null // Assign photo from the mapped result
                 });
             });
 
