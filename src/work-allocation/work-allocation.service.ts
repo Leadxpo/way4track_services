@@ -86,36 +86,36 @@ export class WorkAllocationService {
                 .padStart(5, '0')}`;
            
             await this.workAllocationRepository.insert(newWorkAllocation);
-            const technicianDto: TechnicianWorksDto = {
-                service: "",
-                workStatus: WorkStatusEnum.PENDING,
-                paymentStatus: PaymentStatus.PENDING,
-                imeiNumber: "",
-                vehicleType: "",
-                vehicleNumber: "",
-                chassisNumber: "",
-                engineNumber: "",
-                description: "",
-                date: dto.date,
-                staffId: dto.staffId ?? null,
-                branchId: dto.branchId ?? null,
-                productId: dto.productId ?? null,
-                vendorId: dto.vendorId ?? null,
-                clientId: dto.clientId ?? null,
-                voucherId: dto.voucherId ?? null,
-                workId: newWorkAllocation.id,
-                companyCode: dto.companyCode ?? "",
-                unitCode: dto.unitCode ?? "",
-                productName: dto.productName ?? "",
-                name: "",
-                phoneNumber: "",
-                simNumber: "",
-                address: "",
-                amount: dto.amount || 0
-                // requirementDetails: []
-            };
+            // const technicianDto: TechnicianWorksDto = {
+            //     service: "",
+            //     workStatus: WorkStatusEnum.PENDING,
+            //     paymentStatus: PaymentStatus.PENDING,
+            //     imeiNumber: "",
+            //     vehicleType: "",
+            //     vehicleNumber: "",
+            //     chassisNumber: "",
+            //     engineNumber: "",
+            //     description: "",
+            //     date: dto.date,
+            //     staffId: dto.staffId ?? null,
+            //     branchId: dto.branchId ?? null,
+            //     productId: dto.productId ?? null,
+            //     vendorId: dto.vendorId ?? null,
+            //     clientId: dto.clientId ?? null,
+            //     voucherId: dto.voucherId ?? null,
+            //     workId: newWorkAllocation.id,
+            //     companyCode: dto.companyCode ?? "",
+            //     unitCode: dto.unitCode ?? "",
+            //     productName: dto.productName ?? "",
+            //     name: "",
+            //     phoneNumber: "",
+            //     simNumber: "",
+            //     address: "",
+            //     amount: dto.amount || 0
+            //     // requirementDetails: []
+            // };
 
-            await this.service.createTechnicianDetails(technicianDto);
+            // await this.service.createTechnicianDetails(technicianDto);
 
             return new CommonResponse(true, 200, 'Work allocation and technician details created successfully');
         } catch (error) {

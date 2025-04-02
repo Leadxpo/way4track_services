@@ -35,6 +35,10 @@ export class TechnicianWorksAdapter {
         staff.id = dto.staffId;
         entity.staffId = staff;
 
+        const support = new StaffEntity();
+        support.id = dto.backEndStaffRelation;
+        entity.backEndStaffRelation = support;
+
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branchId = branch;
@@ -64,6 +68,8 @@ export class TechnicianWorksAdapter {
         entity.unitCode = dto.unitCode;
         entity.productName = dto.productName;
         entity.screenShot = dto.screenShot
+        entity.technicianNumber = dto.technicianNumber
+        entity.serviceOrProduct = dto.serviceOrProduct
         // entity.requirementDetails = dto.requirementDetails
 
         return entity;
@@ -101,7 +107,11 @@ export class TechnicianWorksAdapter {
             entity.vehiclePhoto3 ? entity.vehiclePhoto3 : null,
             entity.vehiclePhoto4 ? entity.vehiclePhoto4 : null,
             entity.attendedDate ? entity.attendedDate : null,
-            entity.screenShot ? entity.screenShot : null
+            entity.screenShot ? entity.screenShot : null,
+            entity.backEndStaffRelation ? entity.backEndStaffRelation.id : null,
+            entity.backEndStaffRelation ? entity.backEndStaffRelation.name : null,
+            entity.serviceOrProduct ? entity.serviceOrProduct : "",
+            entity.technicianNumber ? entity.technicianNumber : ""
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );

@@ -129,5 +129,11 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
     @JoinColumn({ name: 'back_supporter_id', referencedColumnName: 'id' })
-    salesStaffRelation: StaffEntity;
+    backEndStaffRelation: StaffEntity;
+
+    @Column({ name: 'technician_number', type: 'varchar', unique: true, nullable: true })
+    technicianNumber: string;
+
+    @Column({ name: 'service_or_product', type: 'varchar', length: 100, nullable: true })
+    serviceOrProduct: string;
 }

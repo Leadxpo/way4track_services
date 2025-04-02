@@ -36,6 +36,10 @@ export class TechnicianWorksResponseDto {
     // requirementDetails?: Requirements[];
     attendedDate?: Date;
     screenShot?: string
+    supportId?: number
+    supportName?: string
+    serviceOrProduct?: string;
+    technicianNumber?: string
     constructor(
         id: number,
         service: string,
@@ -68,7 +72,13 @@ export class TechnicianWorksResponseDto {
         vehiclePhoto4?: string,
         // requirementDetails?: Requirements[],
         attendedDate?: Date,
-        screenShot?: string
+        screenShot?: string,
+        supportId?: number,
+        supportName?: string,
+        serviceOrProduct?: string,
+        technicianNumber?: string
+
+
     ) {
         this.id = id;
         this.service = service;
@@ -102,5 +112,9 @@ export class TechnicianWorksResponseDto {
         // this.requirementDetails = requirementDetails;
         this.attendedDate = attendedDate;
         this.screenShot = screenShot
+        this.supportId = supportId
+        this.supportName = supportName
+        this.serviceOrProduct = serviceOrProduct
+        this.technicianNumber = technicianNumber
     }
 }

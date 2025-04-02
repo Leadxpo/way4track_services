@@ -13,5 +13,5 @@ export class CreateDesignationDto {
       add: boolean;
       edit: boolean;
       view: boolean;
-    //   delete: boolean;
+      delete: boolean;
   }

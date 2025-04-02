@@ -81,6 +81,39 @@ export class TechnicianService {
     }
 
 
+    // async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
+    //     try {
+    //         if (req.imeiNumber && req.workStatus === WorkStatusEnum.INSTALL) {
+    //             await this.productRepo.update(
+    //                 { imeiNumber: req.imeiNumber },
+    //                 { location: 'install' }
+    //             );
+    //         }
+
+    //         const newTechnician = this.adapter.convertDtoToEntity(req);
+
+    //         // Assign file URLs if available
+    //         if (filePaths) {
+    //             newTechnician.vehiclePhoto1 = filePaths.photo1;
+    //             newTechnician.vehiclePhoto2 = filePaths.photo2;
+    //             newTechnician.vehiclePhoto3 = filePaths.photo3;
+    //             newTechnician.vehiclePhoto4 = filePaths.photo4;
+    //         }
+
+    //         if (req.imeiNumber) {
+    //             const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
+    //             req.productId = product.id
+    //         }
+
+
+    //         await this.repo.insert(newTechnician);
+    //         return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
+    //     } catch (error) {
+    //         console.error(`Error creating Technician details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
+    //     }
+    // }
+
     async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
         try {
             if (req.imeiNumber && req.workStatus === WorkStatusEnum.INSTALL) {
@@ -101,10 +134,12 @@ export class TechnicianService {
             }
 
             if (req.imeiNumber) {
-                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
-                req.productId = product.id
+                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } });
+                req.productId = product?.id;
             }
 
+            // Generate Technician ID
+            // newTechnician.technicianNumber = await this.generateTechNumber();
 
             await this.repo.insert(newTechnician);
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
@@ -113,6 +148,7 @@ export class TechnicianService {
             throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
         }
     }
+
 
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
@@ -190,6 +226,32 @@ export class TechnicianService {
         }
     }
 
+    // private async generateTechNumber(): Promise<string> {
+    //     // Get the current year
+    //     const currentYear = new Date().getFullYear();
+    //     const nextYear = (currentYear + 1) % 100; // Last two digits of next year
+    //     const formattedYear = `${currentYear % 100}${nextYear}`; // e.g., "2526" for 2025
+
+    //     // Fetch the last inserted technician record based on ID
+    //     const lastTechnician = await this.repo
+    //         .createQueryBuilder('te')
+    //         .orderBy('te.id', 'DESC')
+    //         .getOne();
+
+    //     // Determine sequential number
+    //     let sequentialNumber = 1;
+
+    //     if (lastTechnician) {
+    //         sequentialNumber = lastTechnician.id + 1; // Increment from last ID
+    //     }
+
+    //     // Format sequential number as 9 digits (padded with leading zeros)
+    //     const paddedSequentialNumber = sequentialNumber.toString().padStart(9, '0');
+
+    //     // Generate final TechNumber
+    //     return `${formattedYear}-${paddedSequentialNumber}`;
+    // }
+
 
 
 
@@ -256,6 +318,23 @@ export class TechnicianService {
         date: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getTotalWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getBackendSupportWorkAllocation(req: {
+        staffId: string;
+        companyCode?: string;
+        unitCode?: string;
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getBackendSupportWorkAllocation(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
@@ -354,6 +433,18 @@ export class TechnicianService {
         staffId: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getUpCommingWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getWorkStatusCards(req: {
+        companyCode: string; unitCode: string; date?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getWorkStatusCards(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

@@ -454,8 +454,13 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
 
     async getBackendSupportWorkAllocation(req: {
-        staffId: string; companyCode?: string;
-        unitCode?: string; fromDate?: string; toDate?: string; branchName?: string
+        staffId?: string;
+        supporterId?: string;
+        companyCode?: string;
+        unitCode?: string;
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -474,29 +479,66 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.product_name as productName',
                 'wa.imei_number as imeiNumber',
                 'wa.vehicle_type as vehicleType',
-                'wa.vehicle_number as vehicleNumber',
-                'wa.chassis_number as chassisNumber',
-                'wa.engine_number as engineNumber',
-                'wa.vehicle_photo_1 as vehiclePhoto1',
-                'wa.vehicle_photo_2 as vehiclePhoto2',
-                'wa.vehicle_photo_3 as vehiclePhoto3',
-                'wa.vehicle_photo_4 as vehiclePhoto4',
                 'wa.description as description',
                 'wa.name as WaclientName',
                 'wa.phone_number as WaphoneNumber',
                 'wa.sim_number as simNumber',
                 'wa.attended_date AS attendedDate',
+                'wa.service_or_product AS serviceOrProduct',
+                'br.name AS branchName',
+
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
-            .leftJoin(BranchEntity, 'br', 'staff.id = wa.staff_id')
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
-            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
+        // Apply filters only if values are provided
+        if (req.staffId) {
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+        if (req.supporterId) {
+            query.andWhere('st.staff_id = :supporterId', { supporterId: req.supporterId });
+        }
+
+        if (req.fromDate && req.toDate) {
+            query.andWhere('wa.date BETWEEN :fromDate AND :toDate', {
+                fromDate: req.fromDate,
+                toDate: req.toDate,
+            });
+        }
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+
+        return await query.getRawMany();
+    }
+
+    async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
+                'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+                // 'COUNT(*) AS totalPayments'
+            ])
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        const result = await query.getRawMany();
+        // Add date condition for current date filtering
+        if (req.date) {
+            query.andWhere('wa.date = :date', { date: req.date });
+        }
+
+        const result = await query
+            .setParameter('install', WorkStatusEnum.INSTALL)
+            .setParameter('accept', WorkStatusEnum.ACCEPT)
+            .setParameter('activate', WorkStatusEnum.ACTIVATE)
+            .getRawOne(); // Expecting a single aggregated result
+
         return result;
     }
+
 
 }

@@ -123,7 +123,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'esic_number', type: 'varchar', length: 20, nullable: true })
   esicNumber: string;
 
-  @Column({ name: 'blood_group', type: 'varchar', length: 5, nullable: true })
+  @Column({ name: 'blood_group', type: 'varchar', length: 50, nullable: true })
   bloodGroup: string;
 
   @Column({ name: 'joining_date', type: 'date', nullable: true })

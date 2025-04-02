@@ -32,6 +32,10 @@ export class TechnicianWorksDto {
     address: string;
     attendedDate?: Date;
     amount: number;
+    backEndStaffRelation?: number
+    technicianNumber: string;
+    serviceOrProduct: string;
+
 } export class Requirements {
     productName: string;
     quantity: number;
