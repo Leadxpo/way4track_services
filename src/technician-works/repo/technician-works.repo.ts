@@ -489,7 +489,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
-
             .leftJoin(BranchEntity, 'br', 'staff.id = wa.staff_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
