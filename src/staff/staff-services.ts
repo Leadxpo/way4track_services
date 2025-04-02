@@ -224,7 +224,20 @@ export class StaffService {
             console.log(existingStaff, "??????????????")
 
             // Check if designation has changed
-            const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;
+            if(req.designation_id){
+                const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;
+                if (designationChanged) {
+                    const permissionsDto: PermissionsDto = {
+                        staffId: existingStaff.staffId,
+                        companyCode: req.companyCode,
+                        unitCode: req.unitCode
+                    };
+    
+                    await this.service.updatePermissionDetails(permissionsDto);
+                }
+                console.log(designationChanged, "designationChanged")
+            }
+           
 
             // Update staff details
             const updatedStaff: Partial<StaffEntity> = {
@@ -233,16 +246,7 @@ export class StaffService {
             };
             console.log(updatedStaff, "?>>>>>>>>>>>>>>")
             // Handle designation change
-            if (designationChanged) {
-                const permissionsDto: PermissionsDto = {
-                    staffId: existingStaff.staffId,
-                    companyCode: req.companyCode,
-                    unitCode: req.unitCode
-                };
-
-                await this.service.updatePermissionDetails(permissionsDto);
-            }
-            console.log(designationChanged, "designationChanged")
+            
 
             if (files?.photo?.[0]) {
                 if (existingStaff.staffPhoto) {
