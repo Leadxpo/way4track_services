@@ -3,5 +3,9 @@ export enum WorkStatusEnum {
     ALLOCATED = 'allocated',
     COMPLETED = 'completed',
     INCOMPLETE = 'incomplete',
+    INSTALL = 'install',
+    ACCEPT = 'accept',  // Corrected spelling
+    ACTIVATE = 'activate'  // Ensured consistency
 }
+
 

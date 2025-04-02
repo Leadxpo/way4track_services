@@ -83,7 +83,7 @@ export class TechnicianService {
 
     async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
         try {
-            if (req.imeiNumber && req.workStatus === WorkStatusEnum.COMPLETED) {
+            if (req.imeiNumber && req.workStatus === WorkStatusEnum.INSTALL) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
                     { location: 'install' }
@@ -134,7 +134,7 @@ export class TechnicianService {
                 return new CommonResponse(false, 4002, 'Work not found for the provided ID.');
             }
 
-            if (req.workStatus === WorkStatusEnum.COMPLETED) {
+            if (req.workStatus === WorkStatusEnum.INSTALL) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
                     { location: 'install' }

@@ -126,4 +126,8 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
+
+    @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
+    @JoinColumn({ name: 'back_supporter_id', referencedColumnName: 'id' })
+    salesStaffRelation: StaffEntity;
 }

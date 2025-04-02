@@ -248,5 +248,20 @@ export class ClientService {
         return new CommonResponse(true, 65152, "Status updated successfully");
     }
 
+    async getClientVerification(req: ClientDto): Promise<CommonResponse> {
+        let data = null;
+
+        if (req.phoneNumber) {
+            data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+        } else if (req.email) {
+            data = await this.clientRepository.findOne({ where: { email: req.email } });
+        }
+
+        if (data) {
+            return new CommonResponse(true, 75483, "Data already exists");
+        } else {
+            return new CommonResponse(false, 4579, "No matching data found");
+        }
+    }
 
 }

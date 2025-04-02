@@ -451,4 +451,53 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return result;
     }
 
+
+
+    async getBackendSupportWorkAllocation(req: {
+        staffId: string; companyCode?: string;
+        unitCode?: string; fromDate?: string; toDate?: string; branchName?: string
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .select([
+                'wa.id as id',
+                'wa.service AS service',
+                'wa.payment_status AS paymentStatus',
+                'wa.date AS date',
+                'staff.name AS staffName',
+                'st.name AS backSupportterName',
+                'client.client_id as clientId',
+                'client.name AS clientName',
+                'client.phone_number as phoneNumber',
+                'client.email as email',
+                'client.address as address',
+                'wa.work_status as workStatus',
+                'wa.product_name as productName',
+                'wa.imei_number as imeiNumber',
+                'wa.vehicle_type as vehicleType',
+                'wa.vehicle_number as vehicleNumber',
+                'wa.chassis_number as chassisNumber',
+                'wa.engine_number as engineNumber',
+                'wa.vehicle_photo_1 as vehiclePhoto1',
+                'wa.vehicle_photo_2 as vehiclePhoto2',
+                'wa.vehicle_photo_3 as vehiclePhoto3',
+                'wa.vehicle_photo_4 as vehiclePhoto4',
+                'wa.description as description',
+                'wa.name as WaclientName',
+                'wa.phone_number as WaphoneNumber',
+                'wa.sim_number as simNumber',
+                'wa.attended_date AS attendedDate',
+            ])
+            .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+
+            .leftJoin(BranchEntity, 'br', 'staff.id = wa.staff_id')
+            .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
+            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+            .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const result = await query.getRawMany();
+        return result;
+    }
+
 }

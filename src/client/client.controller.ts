@@ -79,4 +79,14 @@ export class ClientController {
 
     }
 
+    @Post('getClientVerification')
+    async getClientVerification(@Body() req: ClientDto): Promise<CommonResponse> {
+        try {
+            return this.clientService.getClientVerification(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+
 }
