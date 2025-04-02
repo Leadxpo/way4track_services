@@ -33,7 +33,7 @@ export class DesignationEntity {
     // @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.designations)
     // permissions: PermissionEntity[];
 
-    @Column('varchar', { name: 'designation', length: 20, nullable: false, unique: true })
+    @Column('varchar', { name: 'designation', length: 50, nullable: false, unique: true })
     designation: string; // Unique constraint added
 
     @OneToMany(() => StaffEntity, (staff) => staff.designationRelation)

@@ -258,9 +258,9 @@ export class ClientService {
         }
 
         if (data) {
-            return new CommonResponse(true, 75483, "Data already exists");
+            return new CommonResponse(false, 75483, "Data already exists",'false');
         } else {
-            return new CommonResponse(false, 4579, "No matching data found");
+            return new CommonResponse(true, 4579, "No matching data found",'true');
         }
     }
 

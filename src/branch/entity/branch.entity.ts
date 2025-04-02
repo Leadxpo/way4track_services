@@ -63,7 +63,8 @@ export class BranchEntity extends BaseEntity {
   notifications: NotificationEntity[];
 
   @OneToMany(() => WorkAllocationEntity, (asserts) => asserts.branchId)
-  workAllocation: WorkAllocationEntity[];
+  workAllocation: 
+  [];
 
   @OneToMany(() => ClientEntity, (asserts) => asserts.branch)
   client: ClientEntity[];
