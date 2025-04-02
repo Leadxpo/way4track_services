@@ -27,13 +27,13 @@ export class DesignationEntity {
         add: boolean;
         edit: boolean;
         view: boolean;
-        // delete: boolean;
+        delete: boolean;
     }[];
 
     // @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.designations)
     // permissions: PermissionEntity[];
 
-    @Column('varchar', { name: 'designation', length: 50, nullable: false, unique: true })
+    @Column('varchar', { name: 'designation', length: 20, nullable: false, unique: true })
     designation: string; // Unique constraint added
 
     @OneToMany(() => StaffEntity, (staff) => staff.designationRelation)
