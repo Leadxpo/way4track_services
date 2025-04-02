@@ -2700,7 +2700,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .addGroupBy('ledger.group')
             .addGroupBy('ledger.name')
             .addGroupBy('br.name')
-            .addGroupBy('sr.payment_type');
+            .addGroupBy('sr.payment_type')
+            .addGroupBy('sr.generation_date');
 
         // Execute query
         const results = await query.getRawMany();
