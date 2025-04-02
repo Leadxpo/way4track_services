@@ -145,7 +145,7 @@ export class ProductService {
                         planName: getCellValueByHeader('planName'),
                         remarks1: getCellValueByHeader('remarks1'),
                         remarks2: getCellValueByHeader('remarks2'),
-                        quantity: parseInt(getCellValueByHeader('quantity') || '0', 10),
+                        quantity: parseInt(getCellValueByHeader('quantity') || '1'),
                         ICCIDNo,
                         hsnCode: getCellValueByHeader('hsnCode'),
                         remarks3: getCellValueByHeader('remarks3'),
@@ -181,7 +181,7 @@ export class ProductService {
 
         Object.assign(productEntity, {
             SNO: productDto.SNO ?? productEntity.SNO,
-            productName: productDto.productName ?? productEntity.productName,
+            productName: productDto.productName ?? productDto.productType,
             inDate: productDto.inDate ?? productEntity.inDate,
             categoryName: productDto.categoryName ?? productEntity.categoryName,
             cost: productDto.cost ?? productEntity.cost,

@@ -41,7 +41,7 @@ export class DesignationService {
 
   async getDesignation(dto: CreateDesignationDto): Promise<CommonResponse> {
     try {
-      console.log(dto,dto.designation, "UUUUUUUUUUUUUUUUUU")
+      console.log(dto, dto.designation, "UUUUUUUUUUUUUUUUUU")
       const des = await this.designationRepository.findOne({
         where: { designation: dto.designation, companyCode: dto.companyCode, unitCode: dto.unitCode }
       });
@@ -65,6 +65,29 @@ export class DesignationService {
       }
 
       return new CommonResponse(true, 200, 'Designation details fetched successfully', des);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
+
+  async deleteDesignation(dto: CreateDesignationDto): Promise<CommonResponse> {
+    try {
+      // Find the designation by designation_id, companyCode, and unitCode
+      const designation = await this.designationRepository.findOne({
+        where: {
+          id: dto.id // Ensure designationId is treated as a string
+
+        }
+      });
+
+      if (!designation) {
+        return new CommonResponse(false, 404, 'designation not found');
+      }
+
+      // Now delete using designationId (not id)
+      await this.designationRepository.delete({ id: dto.id }); // Correct column is designationId
+
+      return new CommonResponse(true, 200, 'designation details deleted successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }

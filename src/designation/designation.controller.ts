@@ -33,4 +33,14 @@ export class DesignationController {
       return new CommonResponse(false, 500, 'Error fetching vendor details');
     }
   }
+
+  @Post('deleteDesignation')
+  async deleteDesignation(@Body() req: CreateDesignationDto): Promise<CommonResponse> {
+    try {
+      return this.designationService.deleteDesignation(req);
+    } catch (error) {
+      console.log("Error in create designation in services..", error);
+      return new CommonResponse(false, 500, 'Error fetching designation type details');
+    }
+  }
 }

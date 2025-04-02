@@ -18,7 +18,7 @@ export class NotificationService {
     ) { }
 
     async createNotification(
-        entity: RequestRaiseEntity | TicketsEntity | WorkAllocationEntity,
+        entity: RequestRaiseEntity | TicketsEntity,
         type: NotificationEnum
     ): Promise<void> {
         let message: string;
@@ -42,19 +42,21 @@ export class NotificationService {
             branch = entity.branch; // Assuming branch is an object
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
-        } else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
-            const designation = entity.staffId?.designation.toLowerCase();
-            if (designation === 'Technician') {
-                message = `Technician allocated for ${entity.otherInformation}`;
-                createdAt = entity.date;
-                user = entity.staffId; // Assuming staffId is a number
-                branch = entity.branchId; // Assuming branchId is a number
-                companyCode = entity.companyCode;
-                unitCode = entity.unitCode;
-            } else {
-                return;
-            }
-        } else {
+        }
+        //  else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
+        //     const designation = entity.staffId?.designation.toLowerCase();
+        //     if (designation === 'Technician') {
+        //         message = `Technician allocated for ${entity.otherInformation}`;
+        //         createdAt = entity.date;
+        //         user = entity.staffId; // Assuming staffId is a number
+        //         branch = entity.branchId; // Assuming branchId is a number
+        //         companyCode = entity.companyCode;
+        //         unitCode = entity.unitCode;
+        //     } else {
+        //         return;
+        //     }
+        // }
+        else {
             throw new Error('Invalid entity type or notification type.');
         }
         //&& entity.install
