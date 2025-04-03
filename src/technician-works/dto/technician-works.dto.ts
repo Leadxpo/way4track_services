@@ -36,7 +36,8 @@ export class TechnicianWorksDto {
     technicianNumber: string;
     serviceOrProduct: string;
 
-} export class Requirements {
+}
+ export class Requirements {
     productName: string;
     quantity: number;
     price: number;

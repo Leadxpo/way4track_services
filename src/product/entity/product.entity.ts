@@ -138,7 +138,7 @@ export class ProductEntity extends BaseEntity {
   mobileNumber: string;
 
   @Column({ name: 'sim_no', type: 'varchar', length: 50, nullable: true })
-  simNo: string;
+  simNumber: string;
 
   @Column({ name: 'sim_imsi', type: 'varchar', length: 50, nullable: true })
   simImsi: string;

@@ -34,7 +34,7 @@ export class ProductDto {
   remarks3: string;
   BASKET_NAME: string;
   SIM_IMSI: string;
-  SIM_NO: string;
+  SIM_Number: string;
   MOBILE_NUMBER: string;
   productTypeId?: number
   productStatus?: ProductStatusEnum

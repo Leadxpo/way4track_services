@@ -91,7 +91,7 @@ export class ProductService {
                 "remarks3": "remarks3",
                 "BASKET_NAME": "BASKET_NAME",
                 "SIM_IMSI": "SIM_IMSI",
-                "SIM_NO": "SIM_NO",
+                "SIMNUMBER": "SIMNUMBER",
                 "MOBILE_NUMBER": "MOBILE_NUMBER",
             };
 
@@ -151,7 +151,7 @@ export class ProductService {
                         remarks3: getCellValueByHeader('remarks3'),
                         BASKET_NAME: getCellValueByHeader('BASKET_NAME'),
                         SIM_IMSI: getCellValueByHeader('SIM_IMSI'),
-                        SIM_NO: getCellValueByHeader('SIM_NO'),
+                        SIMNUMBER: getCellValueByHeader('SIMNUMBER'),
                         MOBILE_NUMBER: getCellValueByHeader('MOBILE_NUMBER'),
                     });
                 }
@@ -210,7 +210,7 @@ export class ProductService {
             remarks3: productDto.remarks3 ?? productEntity.remarks3,
             BASKET_NAME: productDto.BASKET_NAME ?? productEntity.basketName,
             SIM_IMSI: productDto.SIM_IMSI ?? productEntity.simImsi,
-            SIM_NO: productDto.SIM_NO ?? productEntity.simNo,
+            SIMNUMBER: productDto.SIM_Number ?? productEntity.simNumber,
             MOBILE_NUMBER: productDto.MOBILE_NUMBER ?? productEntity.mobileNumber,
             productTypeId: productDto.productTypeId ?? productEntity.productTypeId
         });
@@ -356,7 +356,7 @@ export class ProductService {
         //     remarks3: productDto.remarks3,
         //     BASKET_NAME: productDto.BASKET_NAME,
         //     SIM_IMSI: productDto.SIM_IMSI,
-        //     SIM_NO: productDto.SIM_NO,
+        //     SIMNUMBER: productDto.SIMNUMBER,
         //     MOBILE_NUMBER: productDto.MOBILE_NUMBER,
         //     voucherId: productDto.voucherId,
         //     vendorId: productDto.vendorId

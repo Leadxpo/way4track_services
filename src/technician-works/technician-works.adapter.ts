@@ -17,7 +17,6 @@ export class TechnicianWorksAdapter {
         entity.service = dto.service;
         entity.workStatus = dto.workStatus;
         entity.paymentStatus = dto.paymentStatus;
-        entity.imeiNumber = dto.imeiNumber;
         entity.vehicleType = dto.vehicleType;
         entity.vehicleNumber = dto.vehicleNumber;
         entity.chassisNumber = dto.chassisNumber;
@@ -42,10 +41,11 @@ export class TechnicianWorksAdapter {
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branchId = branch;
+        entity.imeiNumber = dto.imeiNumber;
 
-        const product = new ProductEntity();
-        product.id = dto.productId;
-        entity.productId = product;
+        // const product = new ProductEntity();
+        // product.imeiNumber = dto.imeiNumber;
+        // entity.productId.id = product.id;
 
         const vendor = new VendorEntity();
         vendor.id = dto.vendorId;
@@ -70,6 +70,11 @@ export class TechnicianWorksAdapter {
         entity.screenShot = dto.screenShot
         entity.technicianNumber = dto.technicianNumber
         entity.serviceOrProduct = dto.serviceOrProduct
+        entity.name = dto.name
+        entity.phoneNumber = dto.phoneNumber
+        entity.simNumber = dto.simNumber
+        entity.amount = dto.amount
+        entity.address = dto.address
         // entity.requirementDetails = dto.requirementDetails
 
         return entity;

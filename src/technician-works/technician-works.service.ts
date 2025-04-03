@@ -54,7 +54,7 @@ export class TechnicianService {
             photo3: undefined,
             photo4: undefined
         };
-
+        console.log(filePaths, "fileoath")
         for (const [key, fileArray] of Object.entries(photos)) {
             if (fileArray && fileArray.length > 0) {
                 const file = fileArray[0]; // Get the first file
@@ -80,50 +80,40 @@ export class TechnicianService {
             : await this.createTechnicianDetails(req, filePaths);
     }
 
-
-    // async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
-    //     try {
-    //         if (req.imeiNumber && req.workStatus === WorkStatusEnum.INSTALL) {
-    //             await this.productRepo.update(
-    //                 { imeiNumber: req.imeiNumber },
-    //                 { location: 'install' }
-    //             );
-    //         }
-
-    //         const newTechnician = this.adapter.convertDtoToEntity(req);
-
-    //         // Assign file URLs if available
-    //         if (filePaths) {
-    //             newTechnician.vehiclePhoto1 = filePaths.photo1;
-    //             newTechnician.vehiclePhoto2 = filePaths.photo2;
-    //             newTechnician.vehiclePhoto3 = filePaths.photo3;
-    //             newTechnician.vehiclePhoto4 = filePaths.photo4;
-    //         }
-
-    //         if (req.imeiNumber) {
-    //             const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
-    //             req.productId = product.id
-    //         }
-
-
-    //         await this.repo.insert(newTechnician);
-    //         return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
-    //     } catch (error) {
-    //         console.error(`Error creating Technician details: ${error.message}`, error.stack);
-    //         throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
-    //     }
-    // }
-
     async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
         try {
+            console.log(req, "req");
+
             if (req.imeiNumber && req.workStatus === WorkStatusEnum.INSTALL) {
                 await this.productRepo.update(
                     { imeiNumber: req.imeiNumber },
-                    { location: 'install' }
+                    { status: 'install' }
+                );
+            } else if (req.simNumber && req.workStatus === WorkStatusEnum.INSTALL) {
+                await this.productRepo.update(
+                    { simNumber: req.simNumber },
+                    { status: 'install' }
                 );
             }
 
+            let ProductEntity;
+            if (req.imeiNumber) {
+                ProductEntity = await this.productRepo.findOne({
+                    where: { imeiNumber: req.imeiNumber }
+                });
+            } else if (req.simNumber) {
+                ProductEntity = await this.productRepo.findOne({
+                    where: { simNumber: req.simNumber }
+                });
+            }
+
+            req.productId = ProductEntity?.id;
+
+            // Convert DTO to Entity
             const newTechnician = this.adapter.convertDtoToEntity(req);
+            newTechnician.productId = ProductEntity?.id;
+
+            console.log(newTechnician, "newTechnician");
 
             // Assign file URLs if available
             if (filePaths) {
@@ -131,11 +121,6 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto2 = filePaths.photo2;
                 newTechnician.vehiclePhoto3 = filePaths.photo3;
                 newTechnician.vehiclePhoto4 = filePaths.photo4;
-            }
-
-            if (req.imeiNumber) {
-                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } });
-                req.productId = product?.id;
             }
 
             // Generate Technician ID
@@ -148,6 +133,7 @@ export class TechnicianService {
             throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
         }
     }
+
 
 
     async updateTechnicianDetails(
@@ -170,12 +156,21 @@ export class TechnicianService {
                 return new CommonResponse(false, 4002, 'Work not found for the provided ID.');
             }
 
-            if (req.workStatus === WorkStatusEnum.INSTALL) {
+            if ((req.imeiNumber || req.simNumber) && req.workStatus === WorkStatusEnum.INSTALL) {
                 await this.productRepo.update(
-                    { imeiNumber: req.imeiNumber },
-                    { location: 'install' }
+                    { imeiNumber: req.imeiNumber, simNumber: req.simNumber },
+                    { status: 'install' }
                 );
             }
+
+            // Find product based on IMEI or SIM
+            const product = await this.productRepo.findOne({
+                where: [
+                    { imeiNumber: req.imeiNumber },
+                    { simNumber: req.simNumber }
+                ]
+            });
+            req.productId = product?.id;
             const photoMapping: Record<string, string> = {
                 photo1: 'vehiclePhoto1',
                 photo2: 'vehiclePhoto2',
@@ -194,10 +189,7 @@ export class TechnicianService {
                 }
             }
 
-            if (req.imeiNumber) {
-                const product = await this.productRepo.findOne({ where: { imeiNumber: req.imeiNumber } })
-                req.productId = product.id
-            }
+
 
 
             // Convert DTO to entity and retain existing ID
