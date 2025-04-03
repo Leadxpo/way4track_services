@@ -480,6 +480,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.attended_date AS attendedDate',
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
+                'staff.id as staffId',
+                'st.id as backSupporterId'
 
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
