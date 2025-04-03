@@ -159,6 +159,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.payment_status AS paymentStatus',
                 'wa.date AS date',
                 'staff.name AS staffName',
+                'staff.id as staffId',
+                'st.id as backSupporterId',
                 'wa.client_id as WaclientId',
                 'wa.email as email',
                 'wa.address as address',
@@ -178,8 +180,10 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.phone_number as phoneNumber',
                 'wa.sim_number as simNumber',
                 'w.work_allocation_number as workAllocationNumber',
+                'st.name AS backSupportterName',
 
             ])
+            .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(WorkAllocationEntity, 'w', 'w.id = wa.work_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')

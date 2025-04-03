@@ -2825,18 +2825,20 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(ve.amount) AS "totalAmount"`,
                 `fromBank.account_name AS "fromBankAccountName"`,
                 `fromBank.account_number AS "fromBankAccountNumber"`,
-                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`,
-                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`, `fromBank.address AS "fromBankaddress"`,
+                `fromBank.total_amount AS "fromBankTotalAmount"`,
+                `fromBank.account_type AS "fromBankAccountType"`,
+                `fromBank.ifsc_code AS "fromBankifscCode"`,
+                `fromBank.total_amount AS "fromBankTotalAmount"`,
+                `fromBank.account_type AS "fromBankAccountType"`,
+                `fromBank.ifsc_code AS "fromBankifscCode"`, `fromBank.address AS "fromBankaddress"`,
                 `fromBank.phone_number AS "fromBankphoneNumber"`,
-                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`, `toBank.address AS "toBankaddress"`,
+                `toBank.phone_number AS "toBankphoneNumber"`,
+                `toBank.total_amount AS "toBankTotalAmount"`,
+                `toBank.account_type AS "toBankAccountType"`,
+                `toBank.ifsc_code AS "toBankifscCode"`, `toBank.address AS "toBankaddress"`,
                 `toBank.account_name AS "toBankAccountName"`,
                 `toBank.account_number AS "toBankAccountNumber"`,
-                // `COUNT(ve.voucher_id) AS "pendingInvoices"`,
-                // `MAX(ve.due_date) AS "lastDueDate"`,
-                // `CASE  
-                //     WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
-                //     ELSE NULL  
-                //  END AS "overdueDays"`
+
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .leftJoin(AccountEntity, 'fromBank', 've.from_account_id = fromBank.id') // Join for from_account
