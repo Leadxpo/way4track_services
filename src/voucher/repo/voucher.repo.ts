@@ -2828,16 +2828,19 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `fromBank.total_amount AS "fromBankTotalAmount"`,
                 `fromBank.account_type AS "fromBankAccountType"`,
                 `fromBank.ifsc_code AS "fromBankifscCode"`,
-                `fromBank.total_amount AS "fromBankTotalAmount"`,
                 `fromBank.account_type AS "fromBankAccountType"`,
-                `fromBank.ifsc_code AS "fromBankifscCode"`, `fromBank.address AS "fromBankaddress"`,
+                `fromBank.ifsc_code AS "fromBankifscCode"`,
+                `fromBank.address AS "fromBankaddress"`,
                 `fromBank.phone_number AS "fromBankphoneNumber"`,
                 `toBank.phone_number AS "toBankphoneNumber"`,
                 `toBank.total_amount AS "toBankTotalAmount"`,
                 `toBank.account_type AS "toBankAccountType"`,
-                `toBank.ifsc_code AS "toBankifscCode"`, `toBank.address AS "toBankaddress"`,
+                `toBank.ifsc_code AS "toBankifscCode"`,
+                `toBank.address AS "toBankaddress"`,
                 `toBank.account_name AS "toBankAccountName"`,
                 `toBank.account_number AS "toBankAccountNumber"`,
+                'SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount',
+                'SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount'
 
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
@@ -2875,6 +2878,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .addGroupBy('toBank.account_name')
             .addGroupBy('toBank.account_number')
             .addGroupBy('ve.due_date')
+            .setParameters({
+                debitVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
+            })
             .orderBy('ve.generation_date', 'ASC')
             .addOrderBy('branch.name', 'ASC');
 
@@ -2898,12 +2905,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `branch.name AS "branchName"`,
                 `ledger.name AS "ledgerName"`,
                 `SUM(ve.amount) AS "totalAmount"`,
-                `COUNT(ve.voucher_id) AS "pendingInvoices"`,
-                `MAX(ve.due_date) AS "lastDueDate"`,
-                `CASE  
-                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
-                    ELSE NULL  
-                 END AS "overdueDays"`
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .leftJoin(LedgerEntity, 'ledger', 'ledger.id = ve.ledger_id') // Ledger to track payables
@@ -2928,7 +2929,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .addGroupBy('ve.voucher_type')
             .addGroupBy('branch.name')
             .addGroupBy('ledger.name')
-            .addGroupBy('ve.due_date')
             .orderBy('ve.generation_date', 'ASC')
             .addOrderBy('branch.name', 'ASC');
 

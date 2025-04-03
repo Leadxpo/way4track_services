@@ -14,8 +14,8 @@ import { TechinicianWoksRepository } from './repo/technician-works.repo';
 import { ProductRepository } from 'src/product/repo/product.repo';
 import { TechnicianWorksEntity } from './entity/technician-works.entity';
 import { TechIdDto } from './dto/technician-id.dto';
-import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -113,7 +113,7 @@ export class TechnicianService {
             // Convert DTO to Entity
             const newTechnician = this.adapter.convertDtoToEntity(req);
             newTechnician.productId = ProductEntity?.id;
-            newTechnician.amount = ProductEntity?.cost
+            newTechnician.amount=ProductEntity?.cost
 
             console.log(newTechnician, "newTechnician");
 

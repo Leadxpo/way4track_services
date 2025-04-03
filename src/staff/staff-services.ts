@@ -19,6 +19,7 @@ import { LettersRepository } from 'src/letters/repo/letters.repo';
 import { LettersEntity } from 'src/letters/entity/letters.entity';
 import { DesignationRepository } from 'src/designation/repo/designation.repo';
 import { Letters } from './enum/qualifications.enum';
+import { StaffStatus } from './enum/staff-status';
 
 
 @Injectable()
@@ -224,7 +225,7 @@ export class StaffService {
             console.log(existingStaff, "??????????????")
 
             // Check if designation has changed
-            if(req.designation_id){
+            if (req.designation_id) {
                 const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;
                 if (designationChanged) {
                     const permissionsDto: PermissionsDto = {
@@ -232,12 +233,12 @@ export class StaffService {
                         companyCode: req.companyCode,
                         unitCode: req.unitCode
                     };
-    
+
                     await this.service.updatePermissionDetails(permissionsDto);
                 }
                 console.log(designationChanged, "designationChanged")
             }
-           
+
 
             // Update staff details
             const updatedStaff: Partial<StaffEntity> = {
@@ -246,7 +247,7 @@ export class StaffService {
             };
             console.log(updatedStaff, "?>>>>>>>>>>>>>>")
             // Handle designation change
-            
+
 
             if (files?.photo?.[0]) {
                 if (existingStaff.staffPhoto) {
@@ -400,10 +401,9 @@ export class StaffService {
         }
     }
 
-
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
-            const staff = await this.staffRepository.find({
+            const staff = await this.staffRepository.findOne({
                 relations: ['branch', 'voucherId', 'notifications', 'permissions', 'designationRelation'],
                 where: {
                     staffId: req.staffId,
@@ -413,11 +413,16 @@ export class StaffService {
                     designation: req.designation  // Fix: Compare by designation name
                 },
             });
-            if (!staff || staff.length === 0) {
-                return new CommonResponse(false, 404, 'Staff not found');
+
+            if (!staff) {
+                return new CommonResponse(false, 404, 'Invalid credentials');
             }
-            // const data = this.adapter.convertEntityToDto(staff);
-            return new CommonResponse(true, 200, 'Staff details fetched successfully', staff)
+
+            if (staff.status !== StaffStatus.ACTIVE) {
+                return new CommonResponse(false, 403, 'Staff is not active');
+            }
+
+            return new CommonResponse(true, 200, 'Staff details fetched successfully', staff);
         } catch (error) {
             console.error("Error in getStaffProfileDetails service:", error);
             return new CommonResponse(false, 500, 'Error fetching staff details');
