@@ -2831,7 +2831,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`, `toBank.address AS "toBankaddress"`,
                 `toBank.account_name AS "toBankAccountName"`,
                 `toBank.account_number AS "toBankAccountNumber"`,
-                `COUNT(ve.voucher_id) AS "pendingInvoices"`,
+                // `COUNT(ve.voucher_id) AS "pendingInvoices"`,
                 // `MAX(ve.due_date) AS "lastDueDate"`,
                 // `CASE  
                 //     WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
