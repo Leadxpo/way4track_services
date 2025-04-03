@@ -22,13 +22,17 @@ export class TechnicianWorksAdapter {
         entity.chassisNumber = dto.chassisNumber;
         entity.engineNumber = dto.engineNumber;
         entity.vehiclePhoto1 = dto.vehiclePhoto1;
+        entity.vehiclePhoto5 = dto.vehiclePhoto5;
+        entity.vehiclePhoto6 = dto.vehiclePhoto6;
+        entity.vehiclePhoto7 = dto.vehiclePhoto7;
+        entity.vehiclePhoto8 = dto.vehiclePhoto8;
+        entity.vehiclePhoto9 = dto.vehiclePhoto9;
+        entity.vehiclePhoto10 = dto.vehiclePhoto10;
         entity.vehiclePhoto2 = dto.vehiclePhoto2;
         entity.vehiclePhoto3 = dto.vehiclePhoto3;
         entity.vehiclePhoto4 = dto.vehiclePhoto4;
-        entity.attendedDate = dto.attendedDate
-
-        entity.date = dto.date;
-
+        entity.startDate = dto.startDate
+        entity.endDate = dto.endDate;
         // Assign related entities by their IDs
         const staff = new StaffEntity();
         staff.id = dto.staffId;
@@ -76,6 +80,7 @@ export class TechnicianWorksAdapter {
         entity.amount = dto.amount
         entity.address = dto.address
         entity.email = dto.email
+        entity.remark = dto.remark
         // entity.requirementDetails = dto.requirementDetails
 
         return entity;
@@ -93,7 +98,6 @@ export class TechnicianWorksAdapter {
             entity.chassisNumber,
             entity.engineNumber,
             entity.description,
-            entity.date,
             entity.staffId ? entity.staffId.id : null,
             entity.branchId ? entity.branchId.id : null,
             entity.productId ? entity.productId.id : null,
@@ -112,12 +116,20 @@ export class TechnicianWorksAdapter {
             entity.vehiclePhoto2 ? entity.vehiclePhoto2 : null,
             entity.vehiclePhoto3 ? entity.vehiclePhoto3 : null,
             entity.vehiclePhoto4 ? entity.vehiclePhoto4 : null,
-            entity.attendedDate ? entity.attendedDate : null,
+            entity.vehiclePhoto5 ? entity.vehiclePhoto5 : null,
+            entity.vehiclePhoto6 ? entity.vehiclePhoto6 : null,
+            entity.vehiclePhoto7 ? entity.vehiclePhoto7 : null,
+            entity.vehiclePhoto8 ? entity.vehiclePhoto8 : null,
+            entity.vehiclePhoto9 ? entity.vehiclePhoto9 : null,
+            entity.vehiclePhoto10 ? entity.vehiclePhoto10 : null,
             entity.screenShot ? entity.screenShot : null,
+            entity.startDate ? entity.startDate : null,
+            entity.endDate ? entity.endDate : null,
             entity.backEndStaffRelation ? entity.backEndStaffRelation.id : null,
             entity.backEndStaffRelation ? entity.backEndStaffRelation.name : null,
             entity.serviceOrProduct ? entity.serviceOrProduct : "",
-            entity.technicianNumber ? entity.technicianNumber : ""
+            entity.technicianNumber ? entity.technicianNumber : "",
+            entity.remark ? entity.remark : ""
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );

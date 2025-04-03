@@ -53,11 +53,29 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'vehicle_photo_4', type: 'varchar', length: 255, nullable: true })
     vehiclePhoto4: string;
 
-    @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
-    date: Date;
+    @Column({ name: 'vehicle_photo_5', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto5: string;
 
-    @Column({ name: 'attended_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
-    attendedDate: Date;
+    @Column({ name: 'vehicle_photo_6', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto6: string;
+
+    @Column({ name: 'vehicle_photo_7', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto7: string;
+
+    @Column({ name: 'vehicle_photo_8', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto8: string;
+
+    @Column({ name: 'vehicle_photo_9', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto9: string;
+
+    @Column({ name: 'vehicle_photo_10', type: 'varchar', length: 255, nullable: true })
+    vehiclePhoto10: string;
+
+    @Column({ name: 'start_date', type: 'timestamp', nullable: true })
+    startDate: Date;
+
+    @Column({ name: 'end_date', type: 'timestamp', nullable: true })
+    endDate: Date;
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.technician, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
@@ -139,4 +157,7 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column({ name: 'service_or_product', type: 'varchar', length: 100, nullable: true })
     serviceOrProduct: string;
+
+    @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true })
+    remark: string;
 }

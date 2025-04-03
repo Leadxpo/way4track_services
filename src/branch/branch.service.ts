@@ -27,74 +27,98 @@ export class BranchService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async saveBranchDetails(dto: BranchDto, photo: Express.Multer.File): Promise<CommonResponse> {
+    async saveBranchDetails(
+        dto: BranchDto,
+        photos?: { photo?: Express.Multer.File[]; image?: Express.Multer.File[] }
+    ): Promise<CommonResponse> {
         try {
-            let fileUrl: string | null = null;
-            console.log(dto, "{{{{{{}}}}}}}}}}}}")
-            // Check if this is an update and the entity already has a file
+            photos = photos ?? { photo: [], image: [] };
+            let filePaths: Record<keyof typeof photos, string | undefined> = { photo: undefined, image: undefined };
+
+            console.log(dto, "Received DTO");
+
+            // Upload new files to Google Cloud Storage (GCS)
+            for (const [key, fileArray] of Object.entries(photos)) {
+                if (fileArray?.length > 0) {
+                    const file = fileArray[0]; // First file
+                    const uniqueFileName = `branch_photos/${Date.now()}-${file.originalname}`;
+                    const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+                    await storageFile.save(file.buffer, {
+                        contentType: file.mimetype,
+                        resumable: false,
+                    });
+
+                    console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                    filePaths[key as keyof typeof photos] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                }
+            }
+
             let entity: BranchEntity | null = null;
+
             if (dto.id) {
+                // Fetch existing entity for updates
                 entity = await this.branchRepo.findOneBy({ id: dto.id });
+
                 if (!entity) {
                     throw new ErrorResponse(404, 'Branch not found');
                 }
 
-                // If there's an existing file, delete it from GCS
-                if (entity.branchPhoto) {
-                    const existingFilePath = entity.branchPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
-                    try {
-                        await file.delete();
-                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
-                    } catch (error) {
-                        console.error(`Error deleting file from GCS: ${error.message}`);
-                        // Proceed even if the file doesn't exist or can't be deleted
+                const photoMapping: Record<'photo' | 'image', keyof BranchEntity> = {
+                    photo: 'branchPhoto',
+                    image: 'qrPhoto'
+                };
+
+                // Delete old files if new ones are uploaded
+                for (const key in photoMapping) {
+                    const entityField = photoMapping[key as keyof typeof photoMapping];
+
+                    if (filePaths[key as keyof typeof filePaths]) {
+                        const existingFilePath = entity[entityField];
+
+                        // Ensure existingFilePath is a string before using replace()
+                        if (typeof existingFilePath === 'string') {
+                            const existingFileName = existingFilePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                            const file = this.storage.bucket(this.bucketName).file(existingFileName);
+
+                            try {
+                                await file.delete();
+                                console.log(`Deleted old file from GCS: ${existingFileName}`);
+                            } catch (error) {
+                                console.error(`Error deleting old file from GCS: ${error.message}`);
+                            }
+                        }
+
+                        // ✅ Fix: Explicit type assertion to prevent 'never' type error
+                        (entity as any)[entityField] = filePaths[key as keyof typeof filePaths];
+
                     }
                 }
 
-                // Merge updated details
+                // Merge new DTO data into the existing entity
                 entity = this.branchRepo.merge(entity, dto);
             } else {
-                // For new branches, convert DTO to Entity
+                // Create new branch entity
                 entity = this.adapter.convertBranchDtoToEntity(dto);
+                entity.branchPhoto = filePaths.photo;
+                entity.qrPhoto = filePaths.image;
             }
 
-            // Handle new photo upload
-            if (photo) {
-                const bucket = this.storage.bucket(this.bucketName);
+            console.log("Final data before saving:", entity);
 
-                // Generate a unique file name
-                const uniqueFileName = `Branch_photos/${Date.now()}-${photo.originalname}`;
-
-                // Upload the file to Google Cloud Storage
-                const file = bucket.file(uniqueFileName);
-
-                await file.save(photo.buffer, {
-                    contentType: photo.mimetype,
-                    resumable: false,
-                });
-
-                console.log(`File uploaded to GCS: ${uniqueFileName}`);
-
-                // Get the public URL of the uploaded file
-                fileUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-                entity.branchPhoto = fileUrl; // Set the file URL in the entity
-            }
-
-            console.log('Entity to be saved:', entity);
-
-            // Save the branch details to the database
+            // Save entity
             await this.branchRepo.save(entity);
 
-            // Create success message
+            // Success message
             const message = dto.id ? 'Branch Details Updated Successfully' : 'Branch Details Created Successfully';
 
-            return new CommonResponse(true, 65152, message, { branchPhoto: fileUrl });
+            return new CommonResponse(true, 200, message);
         } catch (error) {
             console.error('Error saving branch details:', error);
-            throw new ErrorResponse(5416, error.message); // Handle error and return response
+            throw new ErrorResponse(500, error.message);
         }
     }
+
 
     async deleteBranchDetails(dto: BranchIdDto): Promise<CommonResponse> {
         try {

@@ -1,9 +1,9 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { BranchService } from './branch.service';
 import { BranchDto } from './dto/branch.dto';
 import { BranchIdDto } from './dto/branch-id.dto';
 import { CommonResponse } from 'src/models/common-response';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
 import * as multer from 'multer'; // Import multer for memory storage configuration
 
@@ -17,17 +17,25 @@ const multerOptions = {
 export class BranchController {
     constructor(private readonly branchService: BranchService) { }
 
-
-    @UseInterceptors(FileInterceptor("photo", multerOptions))
     @Post("saveBranchDetails")
+    @UseInterceptors(FileFieldsInterceptor(
+        [
+            { name: 'photo', maxCount: 1 },
+            { name: 'image', maxCount: 1 },
+        ],
+        multerOptions
+    ))
     async saveBranchDetails(
         @Body() dto: BranchDto,
-        @UploadedFile() photo: Express.Multer.File
+        @UploadedFiles() photos: {
+            photo?: Express.Multer.File[],
+            image?: Express.Multer.File[],
+        }
     ): Promise<CommonResponse> {
         if (dto.id) {
             dto.id = Number(dto.id);
         }
-        return this.branchService.saveBranchDetails(dto, photo);
+        return this.branchService.saveBranchDetails(dto, photos);
     }
 
     @Post('deleteBranchDetails')

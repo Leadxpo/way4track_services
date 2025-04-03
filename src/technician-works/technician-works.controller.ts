@@ -27,6 +27,12 @@ export class TechnicianController {
                 { name: 'photo2', maxCount: 1 },
                 { name: 'photo3', maxCount: 1 },
                 { name: 'photo4', maxCount: 1 },
+                { name: 'photo5', maxCount: 1 },
+                { name: 'photo6', maxCount: 1 },
+                { name: 'photo7', maxCount: 1 },
+                { name: 'photo8', maxCount: 1 },
+                { name: 'photo9', maxCount: 1 },
+                { name: 'photo10', maxCount: 1 },
                 { name: 'screenShot', maxCount: 1 },
 
             ],
@@ -41,6 +47,12 @@ export class TechnicianController {
             photo2?: Express.Multer.File[],
             photo3?: Express.Multer.File[],
             photo4?: Express.Multer.File[],
+            photo5?: Express.Multer.File[],
+            photo6?: Express.Multer.File[],
+            photo7?: Express.Multer.File[],
+            photo8?: Express.Multer.File[],
+            photo9?: Express.Multer.File[],
+            photo10?: Express.Multer.File[],
             screenShot?: Express.Multer.File[]
         }
     ): Promise<CommonResponse> {

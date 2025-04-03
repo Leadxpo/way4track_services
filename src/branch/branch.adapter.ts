@@ -16,6 +16,7 @@ export class BranchAdapter {
         entity.branchOpening = dto.branchOpening;
         entity.email = dto.email;
         entity.branchPhoto = dto.branchPhoto;
+        entity.qrPhoto = dto.qrPhoto
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode;
         entity.latitude = dto.latitude;

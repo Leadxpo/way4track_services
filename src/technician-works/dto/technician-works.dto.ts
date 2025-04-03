@@ -16,8 +16,14 @@ export class TechnicianWorksDto {
     vehiclePhoto3?: string;
     vehiclePhoto4?: string;
     screenShot?: string;
-
-    date: Date;
+    vehiclePhoto5?: string;
+    vehiclePhoto6?: string;
+    vehiclePhoto7?: string;
+    vehiclePhoto8?: string;
+    vehiclePhoto9?: string;
+    vehiclePhoto10?: string;
+    startDate: Date;
+    endDate: Date;
     description: string;
     staffId: number; branchId: number; productId: number;
     vendorId: number; clientId: number; voucherId: number;
@@ -36,6 +42,7 @@ export class TechnicianWorksDto {
     technicianNumber: string;
     serviceOrProduct: string;
     email: string;
+    remark: string;
 
 
 }

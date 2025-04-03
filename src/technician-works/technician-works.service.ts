@@ -46,13 +46,26 @@ export class TechnicianService {
             photo2?: Express.Multer.File[];
             photo3?: Express.Multer.File[];
             photo4?: Express.Multer.File[];
+            photo5?: Express.Multer.File[];
+            photo6?: Express.Multer.File[];
+            photo7?: Express.Multer.File[];
+            photo8?: Express.Multer.File[];
+            photo9?: Express.Multer.File[];
+            photo10?: Express.Multer.File[];
         } = {} // ✅ Default to an empty object
     ): Promise<CommonResponse> {
         let filePaths: Record<keyof typeof photos, string | undefined> = {
             photo1: undefined,
             photo2: undefined,
             photo3: undefined,
-            photo4: undefined
+            photo4: undefined,
+            photo5: undefined,
+            photo6: undefined,
+            photo7: undefined,
+            photo8: undefined,
+            photo9: undefined,
+            photo10: undefined,
+
         };
         console.log(filePaths, "fileoath")
         for (const [key, fileArray] of Object.entries(photos)) {
@@ -113,7 +126,7 @@ export class TechnicianService {
             // Convert DTO to Entity
             const newTechnician = this.adapter.convertDtoToEntity(req);
             newTechnician.productId = ProductEntity?.id;
-            newTechnician.amount=ProductEntity?.cost
+            newTechnician.amount = ProductEntity?.cost
 
             console.log(newTechnician, "newTechnician");
 
@@ -281,6 +294,7 @@ export class TechnicianService {
             const Technician = await this.repo.createQueryBuilder('Technician')
                 .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
                 .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
+                .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
                 .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
                 .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
                 .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')

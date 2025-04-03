@@ -56,6 +56,9 @@ export class BranchEntity extends BaseEntity {
   @Column({ name: 'branch_photo', type: 'text', nullable: true })
   branchPhoto: string;
 
+  @Column({ name: 'qr_photo', type: 'text', nullable: true })
+  qrPhoto: string;
+
   @OneToMany(() => AssertsEntity, (asserts) => asserts.branchId)
   asserts: AssertsEntity[];
 
@@ -63,8 +66,8 @@ export class BranchEntity extends BaseEntity {
   notifications: NotificationEntity[];
 
   @OneToMany(() => WorkAllocationEntity, (asserts) => asserts.branchId)
-  workAllocation: 
-  [];
+  workAllocation:
+    [];
 
   @OneToMany(() => ClientEntity, (asserts) => asserts.branch)
   client: ClientEntity[];

@@ -17,5 +17,6 @@ export class BranchDto {
     longitude: string;
     CIN: string;
     GST: string;
+    qrPhoto?: string;
 
 }

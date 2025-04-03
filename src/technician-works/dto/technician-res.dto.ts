@@ -19,7 +19,13 @@ export class TechnicianWorksResponseDto {
     vehiclePhoto2?: string;
     vehiclePhoto3?: string;
     vehiclePhoto4?: string;
-    date: Date;
+    vehiclePhoto5?: string;
+    vehiclePhoto6?: string;
+    vehiclePhoto7?: string;
+    vehiclePhoto8?: string;
+    vehiclePhoto9?: string;
+    vehiclePhoto10?: string;
+
     staffId: number;
     branchId: number;
     productId: number;
@@ -34,14 +40,16 @@ export class TechnicianWorksResponseDto {
     phoneNumber: string;
     simNumber: string;
     address: string;
-    // requirementDetails?: Requirements[];
-    attendedDate?: Date;
+
     screenShot?: string
     supportId?: number
     supportName?: string
     serviceOrProduct?: string;
     technicianNumber?: string
     email?: string;
+    startDate?: Date;
+    endDate?: Date;
+    remark?: string
 
     constructor(
         id: number,
@@ -54,7 +62,6 @@ export class TechnicianWorksResponseDto {
         chassisNumber: string,
         engineNumber: string,
         description: string,
-        date?: Date,
         staffId?: number,
         branchId?: number,
         productId?: number,
@@ -73,14 +80,21 @@ export class TechnicianWorksResponseDto {
         vehiclePhoto2?: string,
         vehiclePhoto3?: string,
         vehiclePhoto4?: string,
-        // requirementDetails?: Requirements[],
-        attendedDate?: Date,
+        vehiclePhoto5?: string,
+        vehiclePhoto6?: string,
+        vehiclePhoto7?: string,
+        vehiclePhoto8?: string,
+        vehiclePhoto9?: string,
+        vehiclePhoto10?: string,
         screenShot?: string,
+        startDate?: Date,
+        endDate?: Date,
         supportId?: number,
         supportName?: string,
         serviceOrProduct?: string,
         technicianNumber?: string,
-        email?: string
+        email?: string,
+        remark?: string
 
 
     ) {
@@ -94,7 +108,6 @@ export class TechnicianWorksResponseDto {
         this.chassisNumber = chassisNumber;
         this.engineNumber = engineNumber;
         this.description = description
-        this.date = date ?? new Date();
         this.staffId = staffId ?? null;
         this.branchId = branchId ?? null;
         this.productId = productId ?? null;
@@ -113,13 +126,20 @@ export class TechnicianWorksResponseDto {
         this.vehiclePhoto2 = vehiclePhoto2 ?? "";
         this.vehiclePhoto3 = vehiclePhoto3 ?? "";
         this.vehiclePhoto4 = vehiclePhoto4 ?? "";
-        // this.requirementDetails = requirementDetails;
-        this.attendedDate = attendedDate;
+        this.vehiclePhoto5 = vehiclePhoto5 ?? "";
+        this.vehiclePhoto6 = vehiclePhoto6 ?? "";
+        this.vehiclePhoto7 = vehiclePhoto7 ?? "";
+        this.vehiclePhoto8 = vehiclePhoto8 ?? "";
+        this.vehiclePhoto9 = vehiclePhoto9 ?? "";
+        this.vehiclePhoto10 = vehiclePhoto10 ?? "";
         this.screenShot = screenShot
         this.supportId = supportId
         this.supportName = supportName
         this.serviceOrProduct = serviceOrProduct
         this.technicianNumber = technicianNumber
         this.email = email
+        this.startDate = startDate
+        this.endDate = endDate
+        this.remark = remark
     }
 }
