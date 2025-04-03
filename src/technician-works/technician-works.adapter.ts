@@ -8,6 +8,8 @@ import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation
 import { TechnicianWorksDto } from 'src/technician-works/dto/technician-works.dto';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TechnicianWorksResponseDto } from './dto/technician-res.dto';
+import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
+import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
 
 export class TechnicianWorksAdapter {
     // Convert DTO to Entity
@@ -54,6 +56,14 @@ export class TechnicianWorksAdapter {
         const vendor = new VendorEntity();
         vendor.id = dto.vendorId;
         entity.vendorId = vendor;
+
+        const vehicle = new VehicleTypeEntity();
+        vehicle.id = dto.vehicleId;
+        entity.vehicleId = vehicle;
+
+        const service = new ServiceTypeEntity();
+        service.id = dto.serviceId;
+        entity.serviceId = service;
 
         const client = new ClientEntity();
         client.id = dto.clientId;

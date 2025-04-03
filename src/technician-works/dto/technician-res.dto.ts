@@ -50,7 +50,8 @@ export class TechnicianWorksResponseDto {
     startDate?: Date;
     endDate?: Date;
     remark?: string
-
+    vehicleId?: number
+    serviceId?: number
     constructor(
         id: number,
         service: string,
@@ -94,7 +95,9 @@ export class TechnicianWorksResponseDto {
         serviceOrProduct?: string,
         technicianNumber?: string,
         email?: string,
-        remark?: string
+        remark?: string,
+        vehicleId?: number,
+        serviceId?: number
 
 
     ) {
@@ -141,5 +144,7 @@ export class TechnicianWorksResponseDto {
         this.startDate = startDate
         this.endDate = endDate
         this.remark = remark
+        this.vehicleId = vehicleId
+        this.serviceId = serviceId
     }
 }

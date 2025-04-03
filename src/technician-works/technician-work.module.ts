@@ -11,6 +11,9 @@ import { TechnicianWorksAdapter } from './technician-works.adapter';
 import { TechnicianController } from './technician-works.controller';
 import { TechnicianService } from './technician-works.service';
 import { WorkAllocationModule } from 'src/work-allocation/work-allocation.module';
+import { ServiceTypeModule } from 'src/service-type/service.module';
+import { ProductTypeModule } from 'src/product-type/product-type.module';
+import { VehicleTypeModule } from 'src/vehicle-type/vehicle-type.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([TechnicianWorksEntity]),
@@ -19,6 +22,9 @@ import { WorkAllocationModule } from 'src/work-allocation/work-allocation.module
     forwardRef(() => ClientModule),
     forwardRef(() => WorkAllocationModule),
     forwardRef(() => StaffModule),
+    forwardRef(() => ServiceTypeModule),
+    forwardRef(() => VehicleTypeModule),
+    forwardRef(() => ProductTypeModule),
     forwardRef(() => ProductModule)],
     controllers: [TechnicianController],
     providers: [TechnicianService, TechnicianWorksAdapter, TechinicianWoksRepository],

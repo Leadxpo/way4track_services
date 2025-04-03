@@ -2,7 +2,9 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { PaymentStatus } from 'src/product/dto/payment-status.enum';
 import { ProductEntity } from 'src/product/entity/product.entity';
+import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
@@ -151,6 +153,14 @@ export class TechnicianWorksEntity extends BaseEntity {
     @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })
     @JoinColumn({ name: 'back_supporter_id', referencedColumnName: 'id' })
     backEndStaffRelation: StaffEntity;
+
+    @ManyToOne(() => VehicleTypeEntity, (designation) => designation.tech, { nullable: true })
+    @JoinColumn({ name: 'vehicle_id', referencedColumnName: 'id' })
+    vehicleId: VehicleTypeEntity;
+
+    @ManyToOne(() => ServiceTypeEntity, (designation) => designation.technician, { nullable: true })
+    @JoinColumn({ name: 'service_id', referencedColumnName: 'id' })
+    serviceId: ServiceTypeEntity;
 
     @Column({ name: 'technician_number', type: 'varchar', unique: true, nullable: true })
     technicianNumber: string;

@@ -63,6 +63,10 @@ import { LedgerModule } from './ledger/ledger.module';
 import { LedgerEntity } from './ledger/entity/ledger.entity';
 import { GroupsModule } from './groups/groups.module';
 import { GroupsEntity } from './groups/entity/groups.entity';
+import { VehicleTypeEntity } from './vehicle-type/entity/vehicle-type.entity';
+import { VehicleTypeModule } from './vehicle-type/vehicle-type.module';
+import { ServiceTypeEntity } from './service-type/entity/service.entity';
+import { ServiceTypeModule } from './service-type/service.module';
 
 @Module({
   imports: [
@@ -73,11 +77,11 @@ import { GroupsEntity } from './groups/entity/groups.entity';
       username: 'root',
       password: 'root',
       database: 'localdb',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -110,7 +114,9 @@ import { GroupsEntity } from './groups/entity/groups.entity';
     SalesworkModule,
     PayRollModule,
     LedgerModule,
-    GroupsModule
+    GroupsModule,
+    VehicleTypeModule,
+    ServiceTypeModule
   ],
   controllers: [],
   providers: [],

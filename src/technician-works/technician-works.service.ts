@@ -20,6 +20,8 @@ import { ProductEntity } from 'src/product/entity/product.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
+import { VehicleTypeRepository } from 'src/vehicle-type/repo/vehicle-type.repo';
+import { ServiceTypeRepository } from 'src/service-type/repo/service.repo';
 
 
 @Injectable()
@@ -29,7 +31,10 @@ export class TechnicianService {
     constructor(
         private adapter: TechnicianWorksAdapter,
         private repo: TechinicianWoksRepository,
-        private productRepo: ProductRepository
+        private productRepo: ProductRepository,
+        private vehicleRepo: VehicleTypeRepository,
+        private serviceRepo: ServiceTypeRepository,
+
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -119,9 +124,22 @@ export class TechnicianService {
                     where: { simNumber: req.simNumber }
                 });
             }
-
             req.productId = ProductEntity?.id;
             req.amount = ProductEntity?.cost
+            let vehicle;
+            if (req.vehicleId) {
+                vehicle = await this.vehicleRepo.findOne({ where: { id: req.vehicleId } })
+            }
+            req.vehicleId = vehicle?.id
+            req.vehicleType = vehicle?.name
+
+            let service;
+            if (req.serviceId) {
+                service = await this.serviceRepo.findOne({ where: { id: req.serviceId } })
+            }
+            req.serviceId = service?.id
+            req.service = service?.name
+
 
             // Convert DTO to Entity
             const newTechnician = this.adapter.convertDtoToEntity(req);
@@ -139,7 +157,7 @@ export class TechnicianService {
             }
 
             // Generate Technician ID
-            // newTechnician.technicianNumber = await this.generateTechNumber();
+            newTechnician.technicianNumber = await this.generateTechNumber();
 
             await this.repo.insert(newTechnician);
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
@@ -233,31 +251,31 @@ export class TechnicianService {
         }
     }
 
-    // private async generateTechNumber(): Promise<string> {
-    //     // Get the current year
-    //     const currentYear = new Date().getFullYear();
-    //     const nextYear = (currentYear + 1) % 100; // Last two digits of next year
-    //     const formattedYear = `${currentYear % 100}${nextYear}`; // e.g., "2526" for 2025
+    private async generateTechNumber(): Promise<string> {
+        // Get the current year
+        const currentYear = new Date().getFullYear();
+        const nextYear = (currentYear + 1) % 100; // Last two digits of next year
+        const formattedYear = `${currentYear % 100}${nextYear}`; // e.g., "2526" for 2025
 
-    //     // Fetch the last inserted technician record based on ID
-    //     const lastTechnician = await this.repo
-    //         .createQueryBuilder('te')
-    //         .orderBy('te.id', 'DESC')
-    //         .getOne();
+        // Fetch the last inserted technician record based on ID
+        const lastTechnician = await this.repo
+            .createQueryBuilder('te')
+            .orderBy('te.id', 'DESC')
+            .getOne();
 
-    //     // Determine sequential number
-    //     let sequentialNumber = 1;
+        // Determine sequential number
+        let sequentialNumber = 1;
 
-    //     if (lastTechnician) {
-    //         sequentialNumber = lastTechnician.id + 1; // Increment from last ID
-    //     }
+        if (lastTechnician) {
+            sequentialNumber = lastTechnician.id + 1; // Increment from last ID
+        }
 
-    //     // Format sequential number as 9 digits (padded with leading zeros)
-    //     const paddedSequentialNumber = sequentialNumber.toString().padStart(9, '0');
+        // Format sequential number as 9 digits (padded with leading zeros)
+        const paddedSequentialNumber = sequentialNumber.toString().padStart(9, '0');
 
-    //     // Generate final TechNumber
-    //     return `${formattedYear}-${paddedSequentialNumber}`;
-    // }
+        // Generate final TechNumber
+        return `${formattedYear}-${paddedSequentialNumber}`;
+    }
 
 
 

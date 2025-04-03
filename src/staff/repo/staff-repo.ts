@@ -327,6 +327,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
             .where('sf.staff_id = :staffId', { staffId })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('sf.company_code = :companyCode', { companyCode })
             .andWhere('sf.unit_code = :unitCode', { unitCode })
             .andWhere('a.day BETWEEN :startDate AND :endDate', {
@@ -427,6 +428,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.phone_number AS phoneNumber',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -472,6 +474,7 @@ export class StaffRepository extends Repository<StaffEntity> {
     async getStaff(req: { companyCode: string, unitCode: string, staffId?: string }) {
         const query = this.createQueryBuilder('staff')
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.designation IN (:...designations)', {
                 designations: ['Accountant', 'Warehouse Manager', 'HR'],
@@ -495,6 +498,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'salesman') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         return await query.getRawOne();
@@ -735,6 +739,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'salesman') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.branchName) {
@@ -760,6 +765,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'branchManager.phone_number AS branchManagerPhoneNumber',
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.branchName) {
@@ -920,6 +926,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .leftJoinAndSelect(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(staff.designation) = :managerDesignation', { managerDesignation: 'branch manager' })
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branchName) {
@@ -940,6 +947,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 // .leftJoin(DesignationEntity, 'designation', 'designation.id = staff.designation')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) = :designation', { designation: 'technician' })
                 .getMany();
@@ -950,6 +958,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 // .leftJoin(DesignationEntity, 'designation', 'designation.id = staff.designation')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) = :designation', { designation: 'salesman' })
                 .getMany();
@@ -959,6 +968,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .select(['staff', 'branch.name'])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) NOT IN (:...designations)', { designations: ['technician', 'salesman'] })
                 .getMany();
@@ -1118,6 +1128,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                     { managerDesignation: 'branch manager' } // Directly compare the designation value
                 )
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branchName) {
@@ -1130,6 +1141,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             const staffResults = await this.createQueryBuilder('staff')
                 .leftJoinAndSelect('staff.branch', 'branch')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branchName) {

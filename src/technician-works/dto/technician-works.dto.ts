@@ -43,6 +43,8 @@ export class TechnicianWorksDto {
     serviceOrProduct: string;
     email: string;
     remark: string;
+    vehicleId?:number
+    serviceId?:number
 
 
 }
