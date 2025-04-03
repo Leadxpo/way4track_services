@@ -1436,7 +1436,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 END AS "overdueDays"`,
                 `ledger.name AS "ledgerName"`,
             ])
-            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id')
+            .leftJoin(LedgerEntity, 'ledger', 'ledger.id = ve.ledger_id')
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
@@ -2825,19 +2825,23 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(ve.amount) AS "totalAmount"`,
                 `fromBank.account_name AS "fromBankAccountName"`,
                 `fromBank.account_number AS "fromBankAccountNumber"`,
+                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`,
+                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`, `fromBank.address AS "fromBankaddress"`,
+                `fromBank.phone_number AS "fromBankphoneNumber"`,
+                `fromBank.total_amount AS "fromBankTotalAmount"`, `fromBank.account_type AS "fromBankAccountType"`, `fromBank.ifsc_code AS "fromBankifscCode"`, `toBank.address AS "toBankaddress"`,
                 `toBank.account_name AS "toBankAccountName"`,
                 `toBank.account_number AS "toBankAccountNumber"`,
                 `COUNT(ve.voucher_id) AS "pendingInvoices"`,
-                `MAX(ve.due_date) AS "lastDueDate"`,
-                `CASE  
-                    WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
-                    ELSE NULL  
-                 END AS "overdueDays"`
+                // `MAX(ve.due_date) AS "lastDueDate"`,
+                // `CASE  
+                //     WHEN ve.due_date < CURRENT_DATE THEN DATEDIFF(CURRENT_DATE, ve.due_date)  
+                //     ELSE NULL  
+                //  END AS "overdueDays"`
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .leftJoin(AccountEntity, 'fromBank', 've.from_account_id = fromBank.id') // Join for from_account
             .leftJoin(AccountEntity, 'toBank', 've.to_account_id = toBank.id') // Join for to_account
-            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id')
+            .leftJoin(LedgerEntity, 'ledger', 'ledger.id = ve.ledger_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('ve.payment_type != :paymentType', { paymentType: PaymentType.CASH });
@@ -2900,7 +2904,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                  END AS "overdueDays"`
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
-            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id') // Ledger to track payables
+            .leftJoin(LedgerEntity, 'ledger', 'ledger.id = ve.ledger_id') // Ledger to track payables
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('ve.payment_type = :paymentType', { paymentType: PaymentType.CASH });

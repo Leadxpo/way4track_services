@@ -35,9 +35,11 @@ export class TechnicianWorksDto {
     backEndStaffRelation?: number
     technicianNumber: string;
     serviceOrProduct: string;
+    email: string;
+
 
 }
- export class Requirements {
+export class Requirements {
     productName: string;
     quantity: number;
     price: number;

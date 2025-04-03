@@ -75,6 +75,7 @@ export class TechnicianWorksAdapter {
         entity.simNumber = dto.simNumber
         entity.amount = dto.amount
         entity.address = dto.address
+        entity.email = dto.email
         // entity.requirementDetails = dto.requirementDetails
 
         return entity;

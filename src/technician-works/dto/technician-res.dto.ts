@@ -1,6 +1,7 @@
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { Requirements } from "./technician-works.dto";
+import { emit } from "process";
 
 export class TechnicianWorksResponseDto {
     id: number;
@@ -40,6 +41,8 @@ export class TechnicianWorksResponseDto {
     supportName?: string
     serviceOrProduct?: string;
     technicianNumber?: string
+    email?: string;
+
     constructor(
         id: number,
         service: string,
@@ -76,7 +79,8 @@ export class TechnicianWorksResponseDto {
         supportId?: number,
         supportName?: string,
         serviceOrProduct?: string,
-        technicianNumber?: string
+        technicianNumber?: string,
+        email?: string
 
 
     ) {
@@ -116,5 +120,6 @@ export class TechnicianWorksResponseDto {
         this.supportName = supportName
         this.serviceOrProduct = serviceOrProduct
         this.technicianNumber = technicianNumber
+        this.email = email
     }
 }

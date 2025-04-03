@@ -108,10 +108,12 @@ export class TechnicianService {
             }
 
             req.productId = ProductEntity?.id;
+            req.amount = ProductEntity?.cost
 
             // Convert DTO to Entity
             const newTechnician = this.adapter.convertDtoToEntity(req);
             newTechnician.productId = ProductEntity?.id;
+            newTechnician.amount = ProductEntity?.cost
 
             console.log(newTechnician, "newTechnician");
 
