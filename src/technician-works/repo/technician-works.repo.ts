@@ -181,6 +181,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.sim_number as simNumber',
                 'w.work_allocation_number as workAllocationNumber',
                 'st.name AS backSupportterName',
+                'wa.amount as amount'
+
 
             ])
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -485,7 +487,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
                 'staff.id as staffId',
-                'st.id as backSupporterId'
+                'st.id as backSupporterId',
+                'wa.amount as amount'
 
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
