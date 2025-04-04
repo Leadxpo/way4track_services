@@ -175,19 +175,23 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.vehicle_photo_2 as vehiclePhoto2',
                 'wa.vehicle_photo_3 as vehiclePhoto3',
                 'wa.vehicle_photo_4 as vehiclePhoto4',
+                'wa.vehicle_photo_5 as vehiclePhoto5',
+                'wa.vehicle_photo_6 as vehiclePhoto6',
+                'wa.vehicle_photo_7 as vehiclePhoto7',
+                'wa.vehicle_photo_8 as vehiclePhoto8',
+                'wa.vehicle_photo_9 as vehiclePhoto9',
+                'wa.vehicle_photo_10 as vehiclePhoto10',
                 'wa.description as description',
                 'wa.name as clientName',
                 'wa.phone_number as phoneNumber',
                 'wa.sim_number as simNumber',
-                'w.work_allocation_number as workAllocationNumber',
                 'st.name AS backSupportterName',
                 'wa.amount as amount',
                 'wa.end_date AS endDate',
             ])
-            .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
-            .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
-            .leftJoin(WorkAllocationEntity, 'w', 'w.id = wa.work_id')
-            .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
+            .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+            .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
@@ -195,6 +199,29 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         const result = await query.getRawMany();
         return result;
     }
+
+    // async getStaffWorkAllocation(req: {
+    //     staffId: string;
+    //     companyCode?: string;
+    //     unitCode?: string;
+    // }) {
+    //     const query = this.createQueryBuilder('wa')
+    //         .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+    //         .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+    //         .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
+    //         .where('staff.staff_id = :staffId', { staffId: req.staffId });
+
+    //     if (req.companyCode) {
+    //         query.andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode });
+    //     }
+    //     if (req.unitCode) {
+    //         query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+    //     }
+
+    //     const result = await query.getMany(); // Fetch all columns
+    //     return result;
+    // }
+
 
     async getDailyWorkCountForWeek(req: {
         companyCode?: string;
@@ -487,7 +514,17 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'br.name AS branchName',
                 'staff.id as staffId',
                 'st.id as backSupporterId',
-                'wa.amount as amount'
+                'wa.amount as amount',
+                'wa.vehicle_photo_1 as vehiclePhoto1',
+                'wa.vehicle_photo_2 as vehiclePhoto2',
+                'wa.vehicle_photo_3 as vehiclePhoto3',
+                'wa.vehicle_photo_4 as vehiclePhoto4',
+                'wa.vehicle_photo_5 as vehiclePhoto5',
+                'wa.vehicle_photo_6 as vehiclePhoto6',
+                'wa.vehicle_photo_7 as vehiclePhoto7',
+                'wa.vehicle_photo_8 as vehiclePhoto8',
+                'wa.vehicle_photo_9 as vehiclePhoto9',
+                'wa.vehicle_photo_10 as vehiclePhoto10',
 
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')

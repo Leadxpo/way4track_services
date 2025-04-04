@@ -154,6 +154,12 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto2 = filePaths.photo2;
                 newTechnician.vehiclePhoto3 = filePaths.photo3;
                 newTechnician.vehiclePhoto4 = filePaths.photo4;
+                newTechnician.vehiclePhoto5 = filePaths.photo5;
+                newTechnician.vehiclePhoto6 = filePaths.photo6;
+                newTechnician.vehiclePhoto7 = filePaths.photo7;
+                newTechnician.vehiclePhoto8 = filePaths.photo8;
+                newTechnician.vehiclePhoto9 = filePaths.photo9;
+                newTechnician.vehiclePhoto10 = filePaths.photo10;
             }
 
             // Generate Technician ID
@@ -209,6 +215,12 @@ export class TechnicianService {
                 photo2: 'vehiclePhoto2',
                 photo3: 'vehiclePhoto3',
                 photo4: 'vehiclePhoto4',
+                photo5: 'vehiclePhoto4',
+                photo6: 'vehiclePhoto4',
+                photo7: 'vehiclePhoto4',
+                photo8: 'vehiclePhoto4',
+                photo9: 'vehiclePhoto4',
+                photo10: 'vehiclePhoto4',
             };
 
             // ✅ Ensure filePaths is always a valid object
@@ -240,6 +252,12 @@ export class TechnicianService {
                 vehiclePhoto2: existingTechnician.vehiclePhoto2,
                 vehiclePhoto3: existingTechnician.vehiclePhoto3,
                 vehiclePhoto4: existingTechnician.vehiclePhoto4,
+                vehiclePhoto5: existingTechnician.vehiclePhoto5,
+                vehiclePhoto6: existingTechnician.vehiclePhoto6,
+                vehiclePhoto7: existingTechnician.vehiclePhoto7,
+                vehiclePhoto8: existingTechnician.vehiclePhoto8,
+                vehiclePhoto9: existingTechnician.vehiclePhoto9,
+                vehiclePhoto10: existingTechnician.vehiclePhoto10,
             });
 
             console.log("Data saved successfully");

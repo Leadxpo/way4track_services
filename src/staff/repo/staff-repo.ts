@@ -48,12 +48,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
                 'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
                 'sf.monthly_salary AS actualSalary',
-                // 'sf.salary_status AS salaryStatus',
                 'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
-                // Total OT minutes
-                'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOTMinutes',
+                 'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOTMinutes',
 
-                // Total Late Deduction minutes
                 'SUM(CASE WHEN a.out_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalLateDeductionMinutes',
 
                 // Total Late minutes
@@ -69,17 +66,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                         ELSE 0 
                     END
                 ) AS extraHalfSalary`,
-                // Total extra half salary for such days
-                // 'SUM(CASE WHEN a.out_time_remark = "L" AND TIMESTAMPDIFF(HOUR, a.in_time, a.out_time) >= 6 THEN sf.monthly_salary / (2 * DAY(LAST_DAY(a.day))) ELSE 0 END) AS extraHalfSalary',
-
-                // OT hours excluding "L" hours for such days
-                // `SUM(
-                //     CASE 
-                //         WHEN a.in_time_remark = "E" AND a.out_time_remark = "L" AND TIMESTAMPDIFF(HOUR, a.in_time, a.out_time) < 6 THEN TIMESTAMPDIFF(HOUR, a.in_time, a.out_time)
-                //         WHEN a.in_time_remark = "E" AND a.out_time_remark = "L" AND TIMESTAMPDIFF(HOUR, a.in_time, a.out_time) >= 6 THEN 0
-                //         ELSE 0
-                //     END
-                // ) AS totalOTHours`,
+               
                 `  SUM(
                     CASE 
                         WHEN a.out_time_remark = "L" 
