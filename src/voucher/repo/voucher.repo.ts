@@ -1612,7 +1612,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const query = this.createQueryBuilder('ve')
             .select([
                 `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END) AS ReceivableAmount`,
-                `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END) AS PayableAmount`
+                `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END) AS PayableAmount`,
+                `SUM(CASE WHEN ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END) AS SalesAmount`,
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })

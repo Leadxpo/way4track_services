@@ -181,6 +181,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.vehicle_photo_8 as vehiclePhoto8',
                 'wa.vehicle_photo_9 as vehiclePhoto9',
                 'wa.vehicle_photo_10 as vehiclePhoto10',
+                'wa.screen_shot as screenShot',
                 'wa.description as description',
                 'wa.name as clientName',
                 'wa.phone_number as phoneNumber',
@@ -190,6 +191,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.end_date AS endDate',
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+            .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
