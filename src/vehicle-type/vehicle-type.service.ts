@@ -84,7 +84,7 @@ export class VehicleTypeService {
                 return new CommonResponse(false, 404, 'VehicleType not found');
             }
 
-            await this.vehicleTypeRepository.delete({ id: dto.id });
+            await this.vehicleTypeRepository.delete({ id: VehicleType.id });
 
             return new CommonResponse(true, 200, 'VehicleType details deleted successfully');
         } catch (error) {

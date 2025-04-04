@@ -19,136 +19,24 @@ export class StaffRepository extends Repository<StaffEntity> {
         super(StaffEntity, dataSource.createEntityManager());
     }
 
-    // async payRoll(req: { branch?: string; companyCode: string; unitCode: string }) {
-    //     const query = this.createQueryBuilder('sf')
-    //         .select([
-    //             'sf.staff_id AS staffId',
-    //             'sf.name AS staffName',
-    //             'br.name AS branch',
-    //             'sf.designation AS designation',
-    //             'sf.staff_photo AS staffPhoto',
-    //             'MONTH(a.day) AS month',
-    //             'YEAR(a.day) AS year',
-    //             'sf.carry_forward_leaves as carryForwardLeaves',
-    //             'DAY(LAST_DAY(a.day)) AS monthDays',
-    //             'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
-    //             'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
-    //             // 'sf.professional_tax as professionalTax',
-    //             'sf.monthly_salary AS actualSalary',
-    //             'sf.salary_status AS salaryStatus',
-    //             'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOTMinutes',
-    //             'SUM(CASE WHEN a.out_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalLateDeductionMinutes',
-    //             'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalLateMinutes',
-    //             'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalOTHours',
-    //             'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
-    //             'SUM(CASE WHEN COALESCE(TIME_TO_SEC(a.out_time_remark), 0) / 3600 >= 6 AND (a.out_time_remark IS NULL OR a.out_time_remark NOT LIKE "%OT%") THEN 1 ELSE 0 END) AS daysWith6HoursOutLate'
-    //         ])
-    //         .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
-    //         .leftJoin('sf.attendance', 'a')
-    //         .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode });
 
-
-    //     if (req.branch) {
-    //         query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
-    //     }
-
-    //     query.groupBy('sf.staff_id, br.name, sf.designation, sf.staff_photo, month, year, monthDays');
-
-    //     const result = await query.getRawMany();
-
-    //     // Process the data
-    //     const groupedData = result.map((record) => {
-    //         const monthDays = Math.max(1, Number(record.monthDays) || 0); // Avoid division by zero
-    //         const actualSalary = Number(record.actualSalary) || 0;
-    //         const perDaySalary = actualSalary / monthDays;
-    //         const perHourSalary = perDaySalary / 9 || 0;
-    //         let carryForwardLeaves = 12
-    //         if (Number(record.leaveDays) > 1) {
-    //             carryForwardLeaves -= 1
-
-    //         }
-    //         const presentDays = Number(record.presentDays) || 0
-    //         let actualEarnedSalary = 0
-    //         if (Number(record.leaveDays) === 0 || Number(record.leaveDays) === 1) {
-    //             actualEarnedSalary = perDaySalary * monthDays
-    //         } else {
-    //             actualEarnedSalary = perDaySalary * presentDays
-
-    //         }
-    //         let totalOTMinutes = Number(record.totalOTMinutes) || 0;
-    //         let totalOutLateOTMinutes = Number(record.totalOTHours) || 0;
-    //         const daysWith6HoursOutLate = Number(record.daysWith6HoursOutLate) || 0;
-
-    //         totalOutLateOTMinutes -= daysWith6HoursOutLate * 6 * 60;
-    //         let totalOTPayableMinutes = totalOTMinutes + totalOutLateOTMinutes;
-    //         let totalOTHoursWorked = totalOTPayableMinutes / 60;
-
-    //         if (totalOTHoursWorked >= 8 && Number(record.lateDays) < 2) {
-    //             totalOTHoursWorked *= 1.5;
-    //         } else if (totalOTHoursWorked >= 8 && Number(record.lateDays) > 2) {
-    //             totalOTHoursWorked *= 1;
-    //         }
-
-    //         let finalOTAmount = totalOTHoursWorked * perHourSalary;
-    //         const totalOutTimeEarly = Number(record.totalLateDeductionMinutes) / 60 || 0;
-    //         const totalLateHours = Number(record.totalLateMinutes) / 60 || 0;
-
-    //         let lateDeductions = (totalLateHours + totalOutTimeEarly) * perHourSalary || 0;
-
-    //         const grossSalary = Math.round(actualEarnedSalary + (isNaN(finalOTAmount) ? 0 : finalOTAmount));
-
-    //         const ESIC_Employee = Math.round(grossSalary * 0.0075) || 0;
-    //         const ESIC_Employer = Math.round(grossSalary * 0.0325) || 0;
-    //         const PFDayWage = Math.round(actualSalary * 0.4) || 0;
-    //         const PF_Employee = Math.round(PFDayWage * 0.12) || 0;
-    //         const PF_Employer1 = Math.round(PFDayWage * 0.0833) || 0;
-    //         const PF_Employer2 = Math.round(PFDayWage * 0.0367) || 0;
-    //         const extraHalfSalary = daysWith6HoursOutLate * (perDaySalary / 2) || 0;
-    //         const updatedNetSalary = grossSalary - (record.designation !== 'ceo' ? ESIC_Employer : ESIC_Employee) - lateDeductions - PF_Employee + extraHalfSalary;
-
-    //         return {
-    //             staffId: record.staffId,
-    //             staffName: record.staffName,
-    //             branch: record.branch,
-    //             designation: record.designation,
-    //             staffPhoto: record.staffPhoto,
-    //             salaryDetails: [
-    //                 {
-    //                     year: record.year || 0,
-    //                     month: record.month || 0,
-    //                     monthDays,
-    //                     presentDays: Number(record.presentDays) || 0,
-    //                     leaveDays: Number(record.leaveDays) || 0,
-    //                     actualSalary: Number(record.actualSalary),
-    //                     totalEarlyMinutes: Number(record.totalLateDeductionMinutes) || 0,
-    //                     totalLateMinutes: Number(record.totalLateMinutes) || 0,
-    //                     lateDays: Number(record.lateDays) || 0,
-    //                     perDaySalary,
-    //                     perHourSalary,
-    //                     totalOTHours: totalOTHoursWorked,
-    //                     OTAmount: isNaN(finalOTAmount) ? 0 : finalOTAmount,
-    //                     lateDeductions: isNaN(lateDeductions) ? 0 : lateDeductions,
-    //                     grossSalary: isNaN(grossSalary) ? 0 : grossSalary,
-    //                     ESIC_Employee,
-    //                     ESIC_Employer,
-    //                     PF_Employee,
-    //                     PF_Employer1,
-    //                     PF_Employer2,
-    //                     extraHalfSalary,
-    //                     daysOutLate6HoursOrMore: daysWith6HoursOutLate,
-    //                     netSalary: isNaN(updatedNetSalary) ? 0 : updatedNetSalary,
-    //                     salaryStatus: record.salaryStatus,
-    //                     carryForwardLeaves
-    //                 }
-    //             ]
-    //         };
-    //     });
-
-    //     return groupedData;
-    // }
 
     async payRoll(req: { branch?: string; companyCode: string; unitCode: string, date: string }) {
+        // const payrollStartDate = new Date(req.date);
+        // payrollStartDate.setDate(26);
+        // payrollStartDate.setMonth(payrollStartDate.getMonth() - 1); // Previous month
+        // Move to previous month
+
+        const payrollEndDate = new Date(req.date);
+        payrollEndDate.setDate(25);
+
+        const payrollStartDate = new Date(payrollEndDate);
+        payrollStartDate.setDate(26);
+        payrollStartDate.setMonth(payrollStartDate.getMonth() - 1);
+
+        // Extract payroll month and year from start date
+        const payrollMonth = payrollStartDate.getMonth() + 1; // Month as number (1-12)
+        const payrollYear = payrollStartDate.getFullYear();
         const query = this.createQueryBuilder('sf')
             .select([
                 'sf.staff_id AS staffId',
@@ -156,10 +44,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'br.name AS branch',
                 'sf.designation AS designation',
                 'sf.staff_photo AS staffPhoto',
-                'MONTH(a.day) AS month',
-                'YEAR(a.day) AS year',
                 'sf.carry_forward_leaves as carryForwardLeaves',
-                'DAY(LAST_DAY(a.day)) AS monthDays',
                 'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
                 'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
                 'sf.monthly_salary AS actualSalary',
@@ -187,26 +72,33 @@ export class StaffRepository extends Repository<StaffEntity> {
                         WHEN a.in_time_remark = "E" AND a.out_time_remark = "L" AND TIMESTAMPDIFF(HOUR, a.in_time, a.out_time) >= 6 THEN 0
                         ELSE 0
                     END
-                ) AS totalOTHours`
+                ) AS totalOTHours`,
+                `${payrollMonth} AS payrollMonth`,
+                `${payrollYear} AS payrollYear`
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .leftJoin('sf.attendance', 'a')
             .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('MONTH(a.day) = MONTH(:date)', { date: req.date })
-            .andWhere('YEAR(a.day) = YEAR(:date)', { date: req.date });
+            // .andWhere('MONTH(a.day) = MONTH(:date)', { date: req.date })
+            // .andWhere('YEAR(a.day) = YEAR(:date)', { date: req.date });
+            .where('a.day BETWEEN :startDate AND :endDate', {
+                startDate: payrollStartDate.toISOString().split('T')[0],
+                endDate: payrollEndDate.toISOString().split('T')[0],
+            })
 
         if (req.branch) {
             query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
         }
 
-        query.groupBy('sf.staff_id, br.name, sf.designation, sf.staff_photo, month, year, monthDays');
+        query.groupBy('sf.staff_id, br.name, sf.designation, sf.staff_photo, payrollMonth, payrollYear');
 
         const result = await query.getRawMany();
 
         // Process the data
         const groupedData = result.map((record) => {
-            const monthDays = Math.max(1, Number(record.monthDays) || 0); // Avoid division by zero
+            const totalPayrollDays = Math.ceil((payrollEndDate.getTime() - payrollStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+            const monthDays = totalPayrollDays // Avoid division by zero
             const actualSalary = Number(record.actualSalary) || 0;
             const perDaySalary = actualSalary / monthDays;
             const perHourSalary = perDaySalary / 9 || 0;
@@ -259,9 +151,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 branch: record.branch,
                 designation: record.designation,
                 staffPhoto: record.staffPhoto,
-
-                year: record.year || 0,
-                month: record.month || 0,
+                year: payrollYear || 0,
+                month: payrollMonth || 0,
                 monthDays,
                 presentDays: Number(record.presentDays) || 0,
                 leaveDays: Number(record.leaveDays) || 0,

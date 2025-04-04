@@ -1353,8 +1353,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 ) AS productSalesAmount`,
                 `SUM(
                     JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ServiceSales')
+                ) AS serviceSalesAmount`,
+                `SUM(
+                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
                     * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'others')
-                ) AS productSalesAmount`
+                ) AS otherSalesAmount`
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .where(`YEAR(ve.generation_date) = :year`, { year: req.date }) // Filtering by selected year

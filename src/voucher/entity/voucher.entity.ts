@@ -28,6 +28,7 @@ export enum TypeEnum {
     Renewables = "Renewables",
     Replacements = "Replacements",
     Product_Sales = "ProductSales",
+    Service_Sales = "ServiceSales",
     Others = "Others"
 }
 @Entity('voucher')

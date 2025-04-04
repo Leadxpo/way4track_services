@@ -301,12 +301,15 @@ export class StaffService {
             }
 
             await this.staffRepository.update(existingStaff.id, updatedStaff);
-
-            if (existingLetters.id) {
-                await this.letterRepo.update(existingLetters.id, letterUpdates);
-            } else {
-                await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+            if (letterUpdates) {
+                if (existingLetters.id) {
+                    await this.letterRepo.update(existingLetters.id, letterUpdates);
+                } else {
+                    await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+                }
             }
+
+
 
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {

@@ -84,7 +84,7 @@ export class ServiceTypeService {
                 return new CommonResponse(false, 404, 'ServiceType not found');
             }
 
-            await this.serviceTypeRepository.delete({ id: dto.id });
+            await this.serviceTypeRepository.delete({ id: ServiceType.id });
 
             return new CommonResponse(true, 200, 'ServiceType details deleted successfully');
         } catch (error) {

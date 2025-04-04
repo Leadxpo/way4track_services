@@ -29,7 +29,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
-                'DATE_FORMAT(wa.date, "%Y-%m") AS date',
+                'DATE_FORMAT(wa.start_date, "%Y-%m") AS date',
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'COUNT(wa.id) AS totalAppointments',
@@ -48,11 +48,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         }
 
         if (req.date) {
-            query.andWhere('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date });
+            query.andWhere('DATE_FORMAT(wa.start_date, "%Y-%m") = :date', { date: req.date });
         }
 
         query
-            .groupBy('DATE_FORMAT(wa.date, "%Y-%m")')
+            .groupBy('DATE_FORMAT(wa.start_date, "%Y-%m")')
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name')
             .setParameter('completed', WorkStatusEnum.COMPLETED)
@@ -71,7 +71,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
-                'DATE_FORMAT(wa.date, "%Y-%m") AS date',
+                'DATE_FORMAT(wa.start_date, "%Y-%m") AS date',
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'SUM(CASE WHEN wa.payment_status = :PENDING THEN 1 ELSE 0 END) AS totalPendingPayment',
@@ -82,10 +82,10 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
         if (req.date) {
-            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+            query.where('DATE_FORMAT(wa.start_date, "%Y-%m") = :date', { date: req.date })
 
         }
-        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Group by formatted date
+        query.groupBy('DATE_FORMAT(wa.start_date, "%Y-%m")') // Group by formatted date
             .addGroupBy('wa.staff_id')
             .addGroupBy('staff.name'); // Add staff.name to GROUP BY
 
@@ -128,20 +128,20 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .select([
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
-                'YEAR(wa.date) AS year',
-                `(DATEDIFF(wa.date, :today) DIV 7) + 1 AS weekNumber`, // Adjusted week calculation
+                'YEAR(wa.start_date) AS year',
+                `(DATEDIFF(wa.start_date, :today) DIV 7) + 1 AS weekNumber`, // Adjusted week calculation
                 'COUNT(wa.id) AS totalTickets',
                 `SUM(CASE WHEN wa.work_status = 'pending' THEN 1 ELSE 0 END) AS totalPendingTickets`, // Fixed issue
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', { today })
+            .where('wa.start_date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', { today })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .groupBy('wa.staff_id')
             .addGroupBy('staff.name')
-            .addGroupBy('YEAR(wa.date)')
-            .addGroupBy(`(DATEDIFF(wa.date, :today) DIV 7) + 1`); // Ensure correct week grouping
+            .addGroupBy('YEAR(wa.start_date)')
+            .addGroupBy(`(DATEDIFF(wa.start_date, :today) DIV 7) + 1`); // Ensure correct week grouping
 
         const result = await query.getRawMany();
         console.log(result, "{{{{{{{{{");
@@ -157,7 +157,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.id as id',
                 'wa.service AS service',
                 'wa.payment_status AS paymentStatus',
-                'wa.date AS date',
+                'wa.start_date AS startDate',
                 'staff.name AS staffName',
                 'staff.id as staffId',
                 'st.id as backSupporterId',
@@ -181,9 +181,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.sim_number as simNumber',
                 'w.work_allocation_number as workAllocationNumber',
                 'st.name AS backSupportterName',
-                'wa.amount as amount'
-
-
+                'wa.amount as amount',
+                'wa.end_date AS endDate',
             ])
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
@@ -206,11 +205,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .select([
                 'wa.staff_id AS staffId',
                 'staff.name AS staffName',
-                'DATE(wa.date) AS workDate', // Grouping by day
+                'DATE(wa.start_date) AS workDate', // Grouping by day
                 'COUNT(wa.id) AS totalTickets'
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 6 DAY)', {
+            .where('wa.start_date BETWEEN :today AND DATE_ADD(:today, INTERVAL 6 DAY)', {
                 today: new Date().toISOString().split('T')[0]
             }) // Fetch work counts for the next 7 days (one week)
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode })
@@ -218,7 +217,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .groupBy('wa.staff_id')
             .addGroupBy('staff.name')
-            .addGroupBy('DATE(wa.date)'); // Grouping by date ensures daily breakdown
+            .addGroupBy('DATE(wa.start_date)'); // Grouping by date ensures daily breakdown
 
         const result = await query.getRawMany();
         return result;
@@ -242,8 +241,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 const year = dateObj.getFullYear();
                 const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
 
-                query.andWhere('YEAR(wa.date) = :year', { year });
-                query.andWhere('MONTH(wa.date) = :month', { month });
+                query.andWhere('YEAR(wa.start_date) = :year', { year });
+                query.andWhere('MONTH(wa.start_date) = :month', { month });
             }
         }
         if (req.branchName) {
@@ -265,8 +264,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'br.name AS branchName',
                 'wa.work_status AS WorkStatus',
                 'wa.payment_status AS paymentStatus',
-                'YEAR(wa.date) AS year',
-                'MONTH(wa.date) AS month'
+                'YEAR(wa.start_date) AS year',
+                'MONTH(wa.start_date) AS month'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
@@ -280,8 +279,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             const year = dateObj.getFullYear();
             const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
 
-            query.andWhere('YEAR(wa.date) = :year', { year });
-            query.andWhere('MONTH(wa.date) = :month', { month });
+            query.andWhere('YEAR(wa.start_date) = :year', { year });
+            query.andWhere('MONTH(wa.start_date) = :month', { month });
         }
 
         if (req.branchName) {
@@ -300,8 +299,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'br.name AS branchName',
                 'wa.work_status AS WorkStatus',
                 'wa.payment_status AS paymentStatus',
-                'YEAR(wa.date) AS year',
-                'MONTH(wa.date) AS month'
+                'YEAR(wa.start_date) AS year',
+                'MONTH(wa.start_date) AS month'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
@@ -315,8 +314,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             const year = dateObj.getFullYear();
             const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
 
-            query.andWhere('YEAR(wa.date) = :year', { year });
-            query.andWhere('MONTH(wa.date) = :month', { month });
+            query.andWhere('YEAR(wa.start_date) = :year', { year });
+            query.andWhere('MONTH(wa.start_date) = :month', { month });
         }
 
         if (req.branchName) {
@@ -335,8 +334,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'br.name AS branchName',
                 'wa.work_status AS WorkStatus',
                 'wa.payment_status AS paymentStatus',
-                'YEAR(wa.date) AS year',
-                'MONTH(wa.date) AS month'
+                'YEAR(wa.start_date) AS year',
+                'MONTH(wa.start_date) AS month'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
@@ -350,8 +349,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 const year = dateObj.getFullYear();
                 const month = dateObj.getMonth() + 1; // getMonth() is 0-based, so add 1
 
-                query.andWhere('YEAR(wa.date) = :year', { year });
-                query.andWhere('MONTH(wa.date) = :month', { month });
+                query.andWhere('YEAR(wa.start_date) = :year', { year });
+                query.andWhere('MONTH(wa.start_date) = :month', { month });
             }
         }
 
@@ -380,11 +379,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.address AS clientAddress',
                 'wa.description AS description',
                 'wa.product_name AS productName',
-                'YEAR(wa.date) AS year',
-                `FLOOR((DATEDIFF(wa.date, :today) / 7) + 1) AS weekNumber` // Adjusted week calculation
+                'YEAR(wa.start_date) AS year',
+                `FLOOR((DATEDIFF(wa.start_date, :today) / 7) + 1) AS weekNumber` // Adjusted week calculation
             ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
-            .where('wa.date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', { today })
+            .where('wa.start_date BETWEEN :today AND DATE_ADD(:today, INTERVAL 4 WEEK)', { today })
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
 
         if (req.companyCode) {
@@ -395,7 +394,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
         }
 
-        query.groupBy('wa.staff_id, staff.name, wa.name, wa.phone_number, wa.address, wa.description, wa.product_name, YEAR(wa.date), weekNumber');
+        query.groupBy('wa.staff_id, staff.name, wa.name, wa.phone_number, wa.address, wa.description, wa.product_name, YEAR(wa.start_date), weekNumber');
 
         const result = await query.getRawMany();
         console.log(result, "{{{{{{{{{");
@@ -416,9 +415,9 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'cl.address AS address',
                 've.service AS service',
                 've.payment_status AS paymentStatus',
-                've.date AS date',
+                've.start_date AS date',
                 'staff.name AS staffName',
-                've.attended_date AS attendedDate',
+                've.end_date AS attendedDate',
                 've.description AS description',
                 've.product_name AS productName',
                 've.work_status AS workStatus',
@@ -442,9 +441,9 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .addGroupBy('cl.address')
             .addGroupBy('ve.service')
             .addGroupBy('ve.payment_status')
-            .addGroupBy('ve.date')
+            .addGroupBy('ve.start_date')
             .addGroupBy('staff.name')
-            .addGroupBy('ve.attended_date')
+            .addGroupBy('ve.end_date')
             .addGroupBy('ve.description')
             .addGroupBy('ve.product_name')
             .addGroupBy('ve.work_status')
@@ -470,7 +469,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.id as id',
                 'wa.service AS service',
                 'wa.payment_status AS paymentStatus',
-                'wa.date AS date',
+                'wa.start_date AS startDate',
                 'staff.name AS staffName',
                 'st.name AS backSupportterName',
                 'wa.email as email',
@@ -483,7 +482,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.name as clientName',
                 'wa.phone_number as phoneNumber',
                 'wa.sim_number as simNumber',
-                'wa.attended_date AS attendedDate',
+                'wa.end_date AS endDate',
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
                 'staff.id as staffId',
@@ -506,7 +505,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         }
 
         if (req.fromDate && req.toDate) {
-            query.andWhere('wa.date BETWEEN :fromDate AND :toDate', {
+            query.andWhere('wa.start_date BETWEEN :fromDate AND :toDate', {
                 fromDate: req.fromDate,
                 toDate: req.toDate,
             });
@@ -531,7 +530,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
         // Add date condition for current date filtering
         if (req.date) {
-            query.andWhere('wa.date = :date', { date: req.date });
+            query.andWhere('wa.start_date = :date', { date: req.date });
         }
 
         const result = await query
