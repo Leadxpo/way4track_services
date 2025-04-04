@@ -10,7 +10,9 @@ import { RequestTypeProducts } from '../dto/request-raise.dto';
 export enum RequestType {
     assets = "assets",
     money = "money",
-    products = "products"
+    products = "products",
+    personal = "personal",
+    leave_request = "leaveRequest"
 }
 @Entity('requests')
 export class RequestRaiseEntity extends BaseEntity {
@@ -45,7 +47,7 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'description', type: 'text' })
     description: string;
 
-    @Column({ name: 'request_for', type: 'text' ,nullable:true})
+    @Column({ name: 'request_for', type: 'text', nullable: true })
     requestFor: string;
 
     @Column({ name: 'created_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -75,4 +77,10 @@ export class RequestRaiseEntity extends BaseEntity {
 
     @Column({ type: 'json', name: 'products', nullable: true })
     products: RequestTypeProducts[];
+
+    @Column({ name: 'from_date', type: 'timestamp', nullable: true })
+    fromDate: Date;
+
+    @Column({ name: 'to_date', type: 'timestamp', nullable: true })
+    toDate: Date;
 }

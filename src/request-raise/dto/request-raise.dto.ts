@@ -17,6 +17,8 @@ export class RequestRaiseDto {
     unitCode: string;
     requestId?: string
     products?: RequestTypeProducts[];
+    fromDate?: Date;
+    toDate?: Date;
 }
 export class RequestTypeProducts {
     productType: string;

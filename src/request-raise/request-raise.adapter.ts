@@ -37,6 +37,8 @@ export class RequestRaiseAdapter {
         entity.createdDate = dto.createdDate;
         entity.products = dto.products
         entity.requestFor = dto.requestFor
+        entity.fromDate = dto.fromDate
+        entity.toDate = dto.toDate
         if (dto.id) {
             entity.id = dto.id;
         }
@@ -58,7 +60,11 @@ export class RequestRaiseAdapter {
             entity.companyCode,
             entity.unitCode,
             entity.subDealerId.id,
-            entity.subDealerId.name
+            entity.subDealerId.name,
+            entity.products,
+            entity.requestFor,
+            entity.fromDate,
+            entity.toDate
         );
     }
 }
