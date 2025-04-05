@@ -61,8 +61,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return await query.getRawMany();
     }
 
-
-
+    
     async getPaymentWorkAllocation(req: {
         companyCode?: string;
         unitCode?: string;
@@ -115,7 +114,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
         return result;
     }
-
 
     async getUpCommingWorkAllocation(req: {
         companyCode?: string;
@@ -192,8 +190,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.installation_address as installationAddress'
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
-            .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
