@@ -33,12 +33,13 @@ export class StaffRepository extends Repository<StaffEntity> {
 
                 'sf.carry_forward_leaves as carryForwardLeaves',
 
-                'count(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
-                'count(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
+                'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
+                'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
+
 
                 'sf.monthly_salary AS actualSalary',
 
-                'count(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
+                'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
 
                 'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalInTimeEarlyMinutes',
 
@@ -113,6 +114,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             let totalOutTimeLateMinutes = Number(record.totalOutTimeLateMinutes) || 0;
 
             let totalEarlyMinutes = totalInTimeEarlyMinutes + totalOutTimeLateMinutes
+            let totalEarlyHours = (totalEarlyMinutes / 60) || 0
 
             let totalOutTimeEarlyMinutes = Number(record.totalOutTimeEarlyMinutes) || 0;
             let totalInTimeLateMinutes = Number(record.totalInTimeLateMinutes) || 0;
@@ -132,11 +134,11 @@ export class StaffRepository extends Repository<StaffEntity> {
             }
             let finalOTAmount = totalOTHoursWorked * perHourSalary;
             const totalOutTimeEarly = Number(totalOutTimeEarlyMinutes) / 60 || 0;
-            const totalLateHours = Number(totalInTimeLateMinutes) / 60 || 0;
+            const totalInTimeLateHours = Number(totalInTimeLateMinutes) / 60 || 0;
 
-            let totalLateMinutes = totalOutTimeEarly + totalLateHours
+            let totalLateHours = totalOutTimeEarly + totalInTimeLateHours
 
-            let lateDeductions = (totalLateHours + totalOutTimeEarly) * perHourSalary || 0;
+            let lateDeductions = totalLateHours * perHourSalary || 0;
 
             const grossSalary = Math.round(actualEarnedSalary + (isNaN(finalOTAmount) ? 0 : finalOTAmount));
             const ESIC_Employee = Math.round(grossSalary * 0.0075) || 0;
@@ -158,8 +160,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 presentDays: Number(record.presentDays) || 0,
                 leaveDays: Number(record.leaveDays) || 0,
                 actualSalary: Number(record.actualSalary),
-                totalEarlyMinutes: Number(totalEarlyMinutes) || 0,
-                totalLateMinutes: Number(totalLateMinutes) || 0,
+                totalEarlyHours: Number(totalEarlyHours) || 0,
+                totalLateHours: Number(totalLateHours) || 0,
                 lateDays: Number(record.lateDays) || 0,
                 perDaySalary,
                 perHourSalary,

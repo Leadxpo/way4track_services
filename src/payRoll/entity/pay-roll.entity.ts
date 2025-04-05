@@ -42,11 +42,11 @@ export class PayrollEntity {
     @Column({ name: 'actual_salary', type: 'decimal', precision: 10, scale: 2 })
     actualSalary: number;
 
-    @Column({ name: 'total_early_minutes', type: 'int', default: 0 })
-    totalEarlyMinutes: number;
+    @Column({ name: 'total_early_hours', type: 'int', default: 0 })
+    totalEarlyHours: number;
 
-    @Column({ name: 'total_late_minutes', type: 'int', default: 0 })
-    totalLateMinutes: number;
+    @Column({ name: 'total_late_hours', type: 'int', default: 0 })
+    totalLateHours: number;
 
     @Column({ name: 'late_days', type: 'int', default: 0 })
     lateDays: number;

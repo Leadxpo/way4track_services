@@ -10,9 +10,9 @@ export class PayrollAdapter {
             return entity;
         });
     }
-    
 
-     toDto(entity: PayrollEntity): PayrollDto {
+
+    toDto(entity: PayrollEntity): PayrollDto {
         return {
             staffId: entity.staffId,
             staffName: entity.staffName,
@@ -25,8 +25,8 @@ export class PayrollAdapter {
             presentDays: entity.presentDays,
             leaveDays: entity.leaveDays,
             actualSalary: entity.actualSalary,
-            totalEarlyMinutes: entity.totalEarlyMinutes,
-            totalLateMinutes: entity.totalLateMinutes,
+            totalEarlyHours: entity.totalEarlyHours,
+            totalLateHours: entity.totalLateHours,
             lateDays: entity.lateDays,
             perDaySalary: entity.perDaySalary,
             perHourSalary: entity.perHourSalary,
@@ -50,8 +50,8 @@ export class PayrollAdapter {
             leaveEncashment: entity.leaveEncashment,
             plBikeNeedToPay: entity.plBikeNeedToPay,
             plBikeAmount: entity.plBikeAmount,
-            payableAmount:entity.payableAmount,
-            adavnceAmount:entity.adavnceAmount,
+            payableAmount: entity.payableAmount,
+            adavnceAmount: entity.adavnceAmount,
 
         };
     }

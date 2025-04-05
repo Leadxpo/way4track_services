@@ -13,8 +13,8 @@ export class PayrollDto {
     presentDays: number;
     leaveDays: number;
     actualSalary: number;
-    totalEarlyMinutes: number;
-    totalLateMinutes: number;
+    totalEarlyHours: number;
+    totalLateHours: number;
     lateDays: number;
     perDaySalary?: number;
     perHourSalary?: number;
