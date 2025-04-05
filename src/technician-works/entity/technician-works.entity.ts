@@ -138,7 +138,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     simNumber: string;
 
     @Column({ name: 'address', type: 'text', nullable: true })
-    address: string;// Removed price field as per the previous request
+    address: string;
+
+    @Column({ name: 'installation_address', type: 'text', nullable: true })
+    installationAddress: string;// Removed price field as per the previous request
 
     // @Column({ type: 'json', name: 'requirement_details', nullable: true })
     // requirementDetails: {

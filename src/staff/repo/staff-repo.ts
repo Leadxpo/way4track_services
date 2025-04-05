@@ -22,6 +22,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         payrollStartDate.setMonth(payrollStartDate.getMonth() - 1);
         const payrollMonth = payrollStartDate.getMonth() + 1;
         const payrollYear = payrollStartDate.getFullYear();
+
         const query = this.createQueryBuilder('sf')
             .select([
                 'sf.staff_id AS staffId',
@@ -45,24 +46,7 @@ export class StaffRepository extends Repository<StaffEntity> {
 
                 'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalInTimeLateMinutes',
 
-                'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalOutTimeLateMinutes',
-
-                ` SUM(
-                    CASE 
-                        WHEN CAST(SUBSTRING_INDEX(a.out_time_remark, ':', 1) AS UNSIGNED) >= 6  
-                        THEN sf.monthly_salary / (2 * DAY(LAST_DAY(a.day))) 
-                        ELSE 0 
-                    END
-                ) AS extraHalfSalary`,
-                ` SUM(
-                    CASE 
-                        WHEN CAST(SUBSTRING_INDEX(a.out_time_remark, ':', 1) AS UNSIGNED) >= 6  
-                        THEN 0  -- Exclude from OT hours
-                        WHEN a.in_time_remark = "E" 
-                        THEN TIME_TO_SEC(TIMEDIFF(a.out_time, a.in_time)) / 3600
-                        ELSE 0
-                    END
-                ) AS totalOTHours`,
+                'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalOutTimeLateMinutes',
                 ` SUM(
                     CASE 
                         WHEN CAST(SUBSTRING_INDEX(a.out_time_remark, ':', 1) AS UNSIGNED) >= 6  
@@ -70,6 +54,24 @@ export class StaffRepository extends Repository<StaffEntity> {
                         ELSE 0 
                     END
                 ) AS daysWith6HoursOutLate`,
+                `SUM(
+  CASE 
+    WHEN a.in_time_remark LIKE '%E%' THEN
+      TIME_TO_SEC(REPLACE(a.in_time_remark, 'E', '')) / 60
+    ELSE 0
+  END
+) AS earlyOTMinutes`,
+                `SUM(
+  CASE 
+    WHEN a.out_time_remark LIKE '%L%' THEN
+      CASE 
+        WHEN TIME_TO_SEC(REPLACE(a.out_time_remark, 'L', '')) / 3600 >= 6 THEN 0
+        ELSE TIME_TO_SEC(REPLACE(a.out_time_remark, 'L', '')) / 60
+      END
+    ELSE 0
+  END
+) AS lateOTMinutes`,
+
                 `${payrollMonth} AS payrollMonth`,
                 `${payrollYear} AS payrollYear`
             ])
@@ -77,19 +79,15 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin('sf.attendance', 'a')
             .where('sf.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('sf.unit_code = :unitCode', { unitCode: req.unitCode })
-            .where('a.day BETWEEN :startDate AND :endDate', {
+            .andWhere('a.day BETWEEN :startDate AND :endDate', {
                 startDate: payrollStartDate.toISOString().split('T')[0],
                 endDate: payrollEndDate.toISOString().split('T')[0],
             })
-
         if (req.branch) {
             query.andWhere('br.name LIKE :branchName', { branchName: `%${req.branch}%` });
         }
-
-        query.groupBy('sf.staff_id, br.name, sf.designation, sf.staff_photo, payrollMonth, payrollYear');
-
+        query.groupBy('sf.staff_id, br.name,payrollMonth,payrollYear');
         const result = await query.getRawMany();
-
         // Process the data
         const groupedData = result.map((record) => {
             const totalPayrollDays = Math.ceil((payrollEndDate.getTime() - payrollStartDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -97,51 +95,57 @@ export class StaffRepository extends Repository<StaffEntity> {
             const actualSalary = Number(record.actualSalary) || 0;
             const perDaySalary = actualSalary / monthDays;
             const perHourSalary = perDaySalary / 9 || 0;
-
+            const halfDaySalary = perDaySalary / 2
             let carryForwardLeaves = 12;
             if (Number(record.leaveDays) >= 1) {
                 carryForwardLeaves -= 1;
             }
 
             const presentDays = Number(record.presentDays) || 0;
-            let actualEarnedSalary = (Number(record.leaveDays) <= 1) ? perDaySalary * monthDays : perDaySalary * presentDays;
 
-            let totalOTMinutes = Number(record.totalOTMinutes) || 0;
-            let totalOutLateOTMinutes = Number(record.totalOTHours) || 0;
+            const actualEarnedSalary = Number(record.leaveDays) > 1
+                ? perDaySalary * presentDays
+                : perDaySalary * monthDays;
+
+
+            let totalInTimeEarlyMinutes = Number(record.totalInTimeEarlyMinutes) || 0;
+
+            let totalOutTimeLateMinutes = Number(record.totalOutTimeLateMinutes) || 0;
+
+            let totalEarlyMinutes = totalInTimeEarlyMinutes + totalOutTimeLateMinutes
+
+            let totalOutTimeEarlyMinutes = Number(record.totalOutTimeEarlyMinutes) || 0;
+            let totalInTimeLateMinutes = Number(record.totalInTimeLateMinutes) || 0;
+
+            let totalOTMinutes = Number(record.earlyOTMinutes) + Number(record.lateOTMinutes) || 0;
 
             const daysWith6HoursOutLate = Number(record.daysWith6HoursOutLate) || 0;
+            const extraHalfSalary = Number(record.daysWith6HoursOutLate) * halfDaySalary || 0;
 
-            totalOutLateOTMinutes = Math.max(0, totalOutLateOTMinutes - daysWith6HoursOutLate * 6 * 60);
-
-            totalOutLateOTMinutes -= daysWith6HoursOutLate * 6 * 60;
-            let totalOTPayableMinutes = totalOTMinutes + totalOutLateOTMinutes;
+            let totalOTPayableMinutes = totalOTMinutes
             let totalOTHoursWorked = totalOTPayableMinutes / 60;
-            if (totalOutLateOTMinutes < 6 * 60) {
-                totalOTHoursWorked += totalOutLateOTMinutes / 60;
-            }
+
             if (totalOTHoursWorked >= 8 && Number(record.lateDays) < 2) {
                 totalOTHoursWorked *= 1.5;
             } else if (totalOTHoursWorked >= 8 && Number(record.lateDays) > 2) {
                 totalOTHoursWorked *= 1;
             }
-
             let finalOTAmount = totalOTHoursWorked * perHourSalary;
-            const totalOutTimeEarly = Number(record.totalLateDeductionMinutes) / 60 || 0;
-            const totalLateHours = Number(record.totalLateMinutes) / 60 || 0;
+            const totalOutTimeEarly = Number(totalOutTimeEarlyMinutes) / 60 || 0;
+            const totalLateHours = Number(totalInTimeLateMinutes) / 60 || 0;
+
+            let totalLateMinutes = totalOutTimeEarly + totalLateHours
 
             let lateDeductions = (totalLateHours + totalOutTimeEarly) * perHourSalary || 0;
 
             const grossSalary = Math.round(actualEarnedSalary + (isNaN(finalOTAmount) ? 0 : finalOTAmount));
-
             const ESIC_Employee = Math.round(grossSalary * 0.0075) || 0;
             const ESIC_Employer = Math.round(grossSalary * 0.0325) || 0;
             const PFDayWage = Math.round(actualSalary * 0.4) || 0;
             const PF_Employee = Math.round(PFDayWage * 0.12) || 0;
             const PF_Employer1 = Math.round(PFDayWage * 0.0833) || 0;
             const PF_Employer2 = Math.round(PFDayWage * 0.0367) || 0;
-            const extraHalfSalary = Number(record.extraHalfSalary) || 0;
             const updatedNetSalary = grossSalary - lateDeductions - PF_Employee + extraHalfSalary;
-
             return {
                 staffId: record.staffId,
                 staffName: record.staffName,
@@ -154,8 +158,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 presentDays: Number(record.presentDays) || 0,
                 leaveDays: Number(record.leaveDays) || 0,
                 actualSalary: Number(record.actualSalary),
-                totalEarlyMinutes: Number(record.totalLateDeductionMinutes) || 0,
-                totalLateMinutes: Number(record.totalLateMinutes) || 0,
+                totalEarlyMinutes: Number(totalEarlyMinutes) || 0,
+                totalLateMinutes: Number(totalLateMinutes) || 0,
                 lateDays: Number(record.lateDays) || 0,
                 perDaySalary,
                 perHourSalary,
@@ -184,7 +188,6 @@ export class StaffRepository extends Repository<StaffEntity> {
 
             };
         });
-
         return groupedData;
     }
 
@@ -215,7 +218,7 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = sf.branch_id')
             .leftJoin(AttendanceEntity, 'a', 'a.staff_id = sf.id')
             .where('sf.staff_id = :staffId', { staffId })
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
+            .andWhere('sf.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('sf.company_code = :companyCode', { companyCode })
             .andWhere('sf.unit_code = :unitCode', { unitCode })
             .andWhere('a.day BETWEEN :startDate AND :endDate', {

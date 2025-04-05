@@ -29,18 +29,6 @@ export enum YesNo {
   NO = 'No',
 }
 
-// export enum DesignationEnum {
-//   CEO = 'CEO',
-//   HR = 'HR',
-//   Accountant = 'Accountant',
-//   WarehouseManager = 'Warehouse Manager',
-//   BranchManager = 'Branch Manager',
-//   SubDealer = 'Sub Dealer',
-//   Technician = 'Technician',
-//   SalesMan = 'Sales Man', // make sure this matches with the dropdown
-//   CallCenter = 'Call Center',
-// }
-
 export enum Qualification {
   TENTH = '10th Class',
   INTERMEDIATE = 'Intermediate',
@@ -69,14 +57,6 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ name: 'alternate_number', type: 'varchar', length: 15, nullable: true })
   alternateNumber: string;
-
-  // @Column({
-  //   name: 'designation',
-  //   type: 'enum',
-  //   enum: DesignationEnum,
-  //   default: DesignationEnum.CEO
-  // })
-  // designation: DesignationEnum;
 
   @Column({ name: 'staff_id', type: 'varchar', unique: true })
   staffId: string;
@@ -131,18 +111,6 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ name: 'before_experience', type: 'int', comment: 'Experience in years', nullable: true })
   beforeExperience: number;
-
-  // @Column({ name: 'previous_company', type: 'varchar', length: 255, nullable: true })
-  // previousCompany: string;
-
-  // @Column({ name: 'previous_designation', type: 'varchar', length: 100, nullable: true })
-  // previousDesignation: string;
-
-  // @Column({ name: 'total_experience', type: 'int', nullable: true })
-  // totalExperience: number;
-
-  // @Column({ name: 'previous_salary', type: 'decimal', precision: 10, scale: 2, nullable: true })
-  // previousSalary: number;
 
   @Column({ name: 'bank_name', type: 'varchar', length: 255, nullable: true })
   bankName: string;
@@ -318,7 +286,7 @@ export class StaffEntity extends BaseEntity {
   @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
   designationRelation: DesignationEntity;
 
-  @Column({ type: 'int', default: 0, name: "carry_forward_leaves", nullable: true })
+  @Column({ type: 'int', default: 12, name: "carry_forward_leaves", nullable: true })
   carryForwardLeaves: number;
 
   @Column({ type: 'json', name: 'experience_details', nullable: true })

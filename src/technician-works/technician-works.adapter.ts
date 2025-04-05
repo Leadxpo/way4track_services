@@ -91,7 +91,7 @@ export class TechnicianWorksAdapter {
         entity.address = dto.address
         entity.email = dto.email
         entity.remark = dto.remark
-        // entity.requirementDetails = dto.requirementDetails
+        entity.installationAddress = dto.installationAddress
 
         return entity;
     }
@@ -139,7 +139,8 @@ export class TechnicianWorksAdapter {
             entity.backEndStaffRelation ? entity.backEndStaffRelation.name : null,
             entity.serviceOrProduct ? entity.serviceOrProduct : "",
             entity.technicianNumber ? entity.technicianNumber : "",
-            entity.remark ? entity.remark : ""
+            entity.remark ? entity.remark : "",
+            entity.installationAddress ? entity.installationAddress : ""
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );

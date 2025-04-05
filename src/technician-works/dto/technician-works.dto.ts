@@ -45,7 +45,7 @@ export class TechnicianWorksDto {
     remark: string;
     vehicleId?:number
     serviceId?:number
-
+    installationAddress?: string;
 
 }
 export class Requirements {

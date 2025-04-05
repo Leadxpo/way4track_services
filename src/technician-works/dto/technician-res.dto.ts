@@ -52,6 +52,8 @@ export class TechnicianWorksResponseDto {
     remark?: string
     vehicleId?: number
     serviceId?: number
+    installationAddress?: string
+
     constructor(
         id: number,
         service: string,
@@ -97,7 +99,8 @@ export class TechnicianWorksResponseDto {
         email?: string,
         remark?: string,
         vehicleId?: number,
-        serviceId?: number
+        serviceId?: number,
+        installationAddress?: string
 
 
     ) {
@@ -146,5 +149,6 @@ export class TechnicianWorksResponseDto {
         this.remark = remark
         this.vehicleId = vehicleId
         this.serviceId = serviceId
+        this.installationAddress=installationAddress
     }
 }
