@@ -185,10 +185,12 @@ export class StaffDashboardService {
                     record.totalEarlyHours !== existing.totalEarlyHours ||
                     record.lateDeductions !== existing.lateDeductions ||
                     record.grossSalary !== existing.grossSalary ||
-                    record.netSalary !== existing.netSalary || record.extraHalfSalary !== existing.extraHalfSalary || record.daysOutLate6HoursOrMore !== existing.daysOutLate6HoursOrMore
+                    record.netSalary !== existing.netSalary ||
+                    record.extraHalfSalary !== existing.extraHalfSalary ||
+                    record.daysOutLate6HoursOrMore !== existing.daysOutLate6HoursOrMore;
 
                 if (hasChanges) {
-                    updatedPayrollEntries.push(basePayroll);
+                    updatedPayrollEntries.push({ ...existing, ...basePayroll });
                 }
             }
         }
@@ -199,18 +201,11 @@ export class StaffDashboardService {
             await this.service.createOrUpdatePayroll(allToSave);
         }
 
-        // Merge updated data (existing or new)
-        const mergedPayroll = uniqueStaffData.map(calculated => {
-            const saved = existingPayrollMap.get(calculated.staffId);
-            return {
-                ...saved,
-                ...calculated,
-            };
+        const refreshedPayroll = await this.payrollRepo.find({
+            where: { year, month },
         });
 
-        const allMerged = [...mergedPayroll, ...newPayrollEntries];
-
-        return new CommonResponse(true, 200, "Payroll processed successfully", allMerged);
+        return new CommonResponse(true, 200, "Payroll processed successfully", refreshedPayroll);
     }
 
 
