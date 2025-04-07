@@ -16,29 +16,6 @@ const multerOptions = {
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
-  // @Post('bulk-upload')
-  // @UseInterceptors(FileInterceptor('file'))
-  // async bulkUpload(@UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
-  //   return this.productService.bulkUploadProducts(file);
-  // }
-
-  // @Post('createOrUpdateProduct')
-  // @UseInterceptors(FileInterceptor('file', multerOptions))
-  // async createOrUpdateProduct(
-  //   @Body() productDto: ProductDto,
-  //   @UploadedFile() file: Express.Multer.File
-  // ): Promise<CommonResponse> {
-  //   try {
-  //     if (productDto.id) {
-  //       productDto.id = Number(productDto.id);
-  //     }
-  //     return await this.productService.createOrUpdateProduct(productDto, file);
-  //   } catch (error) {
-  //     console.error('Error in save details with resume in service:', error);
-  //     return new CommonResponse(false, 500, 'Error saving details with resume');
-  //   }
-  // }
-
   @Post('bulk-upload')
   @UseInterceptors(FileInterceptor('file', multerOptions))
   async bulkUpload(

@@ -6,6 +6,7 @@ import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entit
 import { ProductStatusEnum } from 'src/product/enum/product-status.enum';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Entity('product_assignments')
 export class ProductAssignEntity extends BaseEntity {
@@ -36,20 +37,30 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'number_of_products', type: 'int', nullable: true })
   numberOfProducts: number;
 
+  @Column({ name: 'sim_number_from', type: 'varchar', length: 20, nullable: true })
+  simNumberFrom: string;
+
+  @Column({ name: 'sim_number_to', type: 'varchar', length: 20, nullable: true })
+  simNumberTo: string;
+
   @ManyToOne(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign, { nullable: true })
   @JoinColumn({ name: 'request_id' })
   requestId: RequestRaiseEntity;
 
+  @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign, { nullable: true })
+  @JoinColumn({ name: 'sub_dealer_id' })
+  subDealerId: SubDealerEntity;
+
   @Column({ name: 'product_assign_photo', type: 'text', nullable: true })
   productAssignPhoto: string;
 
-  @Column({ name: 'branch_person', type: 'varchar', length: 20,nullable:true })
+  @Column({ name: 'branch_person', type: 'varchar', length: 20, nullable: true })
   branchOrPerson: string;
 
   // @Column({ name: 'assigned_qty', type: 'int', nullable: true, default: null })
   // assignedQty: number;
 
-  @Column({ name: 'is_assign', type: 'varchar', default: false,nullable:true })
+  @Column({ name: 'is_assign', type: 'varchar', default: false, nullable: true })
   isAssign: string;
 
   @Column({ name: 'assign_time', type: 'timestamp', nullable: true, })
@@ -62,7 +73,7 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'product_type_id' })
   productTypeId: ProductTypeEntity;
 
-  @Column({ name: 'in_hands', type: 'varchar', default: false ,nullable:true})
+  @Column({ name: 'in_hands', type: 'varchar', default: false, nullable: true })
   inHands: string;
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })

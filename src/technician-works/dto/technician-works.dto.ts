@@ -50,6 +50,7 @@ export class TechnicianWorksDto {
     activateDate: Date;
     pendingDate: Date;
     completedDate: Date;
+    subDealerId?: number
 }
 export class Requirements {
     productName: string;

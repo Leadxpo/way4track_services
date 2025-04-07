@@ -11,6 +11,7 @@ import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Remarks } from '../dto/technician-works.dto';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Entity('technician_works')
 export class TechnicianWorksEntity extends BaseEntity {
@@ -189,4 +190,8 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column({ name: 'remark', type: 'json', nullable: true })
     remark: Remarks[]
+
+    @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.techWork, { nullable: true })
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealerId: SubDealerEntity;
 }

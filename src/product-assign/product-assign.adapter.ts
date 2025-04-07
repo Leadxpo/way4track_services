@@ -6,6 +6,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Injectable()
 export class ProductAssignAdapter {
@@ -36,6 +37,11 @@ export class ProductAssignAdapter {
       entity.requestId = request;
     }
 
+    if (dto.subDealerId) {
+      const sub = new SubDealerEntity();
+      sub.id = dto.subDealerId;
+      entity.subDealerId = sub;
+    }
 
     if (dto.productTypeId) {
       const product = new ProductTypeEntity();
@@ -51,6 +57,8 @@ export class ProductAssignAdapter {
 
     entity.imeiNumberFrom = dto.imeiNumberFrom || null;
     entity.imeiNumberTo = dto.imeiNumberTo || null;
+    entity.simNumberFrom = dto.simNumberFrom || null;
+    entity.simNumberTo = dto.simNumberTo || null;
     entity.branchOrPerson = dto.branchOrPerson || null;
     entity.productAssignPhoto = dto.productAssignPhoto || null;
     entity.isAssign = dto.isAssign

@@ -14,6 +14,8 @@ import { ProductAssignAdapter } from './product-assign.adapter';
 import { ProductAssignRepository } from './repo/product-assign.repo';
 import { CommonReq } from 'src/models/common-req';
 import { Storage } from '@google-cloud/storage';
+import { SubDealerRepository } from 'src/sub-dealer/repo/sub-dealer.repo';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 @Injectable()
 export class ProductAssignService {
@@ -23,7 +25,8 @@ export class ProductAssignService {
         private readonly productAssignRepository: ProductAssignRepository,
         private readonly productAssignAdapter: ProductAssignAdapter,
         private readonly branchRepo: BranchRepository,
-        private dataSource: DataSource
+        private dataSource: DataSource,
+        private subRepo: SubDealerRepository
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -40,30 +43,16 @@ export class ProductAssignService {
         imeiNumberTo: string,
         branchId?: number,
         staffId?: number,
-        numberOfProducts?: number
+        numberOfProducts?: number,
+        simNumberFrom?: string,
+        simNumberTo?: string,
+        subDealerId?: number
     ): Promise<void> {
-        const imeiFrom = parseInt(imeiNumberFrom, 10) || 0;
-        const imeiTo = parseInt(imeiNumberTo, 10) || 0;
-        if (imeiNumberFrom && imeiNumberTo) {
-
-
-            if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
-                throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
-            }
-        }
-
-
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.startTransaction();
 
         try {
-            const products = await queryRunner.manager
-                .getRepository(ProductEntity)
-                .createQueryBuilder("product")
-                .where("CAST(product.imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
-                .getMany();
-
-
+            // Determine status and location
             let status = "not_assigned";
             let location = "warehouse";
 
@@ -78,28 +67,65 @@ export class ProductAssignService {
                 if (staff) {
                     location = staff.name;
                     status = "inHand";
+                } else if (subDealerId) {
+                    const sub = await queryRunner.manager.findOne(SubDealerEntity, { where: { id: subDealerId } })
+                    if (sub) {
+                        location = sub.subDealerId;
+                        status = 'isAssign'
+                    }
                 }
             }
 
-            // Bulk update products
-            await queryRunner.manager
-                .createQueryBuilder()
-                .update(ProductEntity)
-                .set({ status, location })
-                .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
-                .execute();
+            let imeiUpdateResult, simUpdateResult;
+
+            // IMEI logic
+            if (imeiNumberFrom) {
+                const imeiFrom = parseInt(imeiNumberFrom, 10);
+                const imeiTo = imeiNumberTo ? parseInt(imeiNumberTo, 10) : imeiFrom;
+
+                if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
+                    throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+                }
+
+                imeiUpdateResult = await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(ProductEntity)
+                    .set({ status, location })
+                    .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                    .execute();
+            }
+
+            // SIM logic
+            if (simNumberFrom) {
+                const simFrom = parseInt(simNumberFrom, 10);
+                const simTo = simNumberTo ? parseInt(simNumberTo, 10) : simFrom;
+
+                if (isNaN(simFrom) || isNaN(simTo) || simFrom > simTo) {
+                    throw new Error(`Invalid SIM range: ${simNumberFrom} - ${simNumberTo}`);
+                }
+
+                simUpdateResult = await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(ProductEntity)
+                    .set({ status, location })
+                    .where("CAST(sim_no AS UNSIGNED) BETWEEN :simFrom AND :simTo", { simFrom, simTo })
+                    .execute();
+            }
 
             await queryRunner.commitTransaction();
 
-            console.log(`Updated ${products.length} products successfully.`);
+            const updatedCount = (imeiUpdateResult?.affected || 0) + (simUpdateResult?.affected || 0);
+            console.log(`✅ Assigned ${updatedCount} product(s) successfully.`);
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            console.error("Error assigning products:", error);
+            console.error("❌ Error assigning products:", error);
             throw new Error(`Failed to assign products: ${error.message}`);
         } finally {
             await queryRunner.release();
         }
     }
+
+
 
     async saveProductAssign(dto: ProductAssignDto, photoPath: string | null): Promise<CommonResponse> {
         try {
@@ -116,7 +142,9 @@ export class ProductAssignService {
                 dto.imeiNumberTo,
                 dto.branchId,
                 dto.staffId,
-                dto.numberOfProducts
+                dto.numberOfProducts,
+                dto.simNumberFrom,
+                dto.simNumberTo
             );
 
             return new CommonResponse(true, 201, 'Product details created successfully');
@@ -132,6 +160,8 @@ export class ProductAssignService {
             if (!existingProduct) {
                 throw new Error('Product not found');
             }
+
+            // Handle GCS photo deletion
             if (photoPath && existingProduct.productAssignPhoto) {
                 const existingFilePath = existingProduct.productAssignPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
                 const file = this.storage.bucket(this.bucketName).file(existingFilePath);
@@ -143,74 +173,85 @@ export class ProductAssignService {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-            // Convert DTO to entity
-            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
 
-            // Update the existing product details with new values, including the photo if provided
+            // Convert DTO to entity and update with photo if any
+            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
             const updatedProduct = {
                 ...existingProduct,
                 ...entity,
                 productAssignPhoto: photoPath || existingProduct.productAssignPhoto,
             };
 
-            // Check for changes in IMEI range and update status/location accordingly
             const imeiFrom = parseInt(dto.imeiNumberFrom, 10);
-            const imeiTo = parseInt(dto.imeiNumberTo, 10);
-
-            if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
-                throw new Error(`Invalid IMEI range: ${dto.imeiNumberFrom} - ${dto.imeiNumberTo}`);
-            }
+            const imeiTo = parseInt(dto.imeiNumberTo, 10) || imeiFrom;
 
             const queryRunner = this.dataSource.createQueryRunner();
             await queryRunner.startTransaction();
 
             try {
-                // Fetch the current products that are assigned in the given range
-                const currentProducts = await queryRunner.manager
-                    .getRepository(ProductEntity)
-                    .createQueryBuilder("product")
-                    .where("CAST(product.imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
-                    .getMany();
+                // Determine status and location from dto
+                let status = "not_assigned";
+                let location = "warehouse";
 
-                // Handle product status updates for removal or reassignment
-                if (currentProducts.length) {
-                    const productIds = currentProducts.map(p => p.id);
-
-                    // Mark products as removed (or any other status) if not part of the new IMEI range
-                    await queryRunner.manager
-                        .createQueryBuilder()
-                        .update(ProductEntity)
-                        .set({ status: "not_assigned", location: "warehouse" })
-                        .where("product.id IN (:...productIds)", { productIds })
-                        .execute();
+                if (dto.branchId) {
+                    const branch = await queryRunner.manager.findOne(BranchEntity, { where: { id: dto.branchId } });
+                    if (branch) {
+                        location = branch.branchName;
+                        status = "isAssign";
+                    }
+                } else if (dto.staffId) {
+                    const staff = await queryRunner.manager.findOne(StaffEntity, { where: { id: dto.staffId } });
+                    if (staff) {
+                        location = staff.name;
+                        status = "inHand";
+                    }
+                } else if (dto.subDealerId) {
+                    const sub = await queryRunner.manager.findOne(SubDealerEntity, { where: { id: dto.subDealerId } });
+                    if (sub) {
+                        location = sub.subDealerId;
+                        status = "isAssign";
+                    }
                 }
 
-                // Handle new products being added to the IMEI range
+                // Update IMEI range
                 await queryRunner.manager
                     .createQueryBuilder()
                     .update(ProductEntity)
-                    .set({ status: "isAssign", location: "warehouse" }) // Change this depending on the status and location
+                    .set({ status, location })
                     .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
                     .execute();
 
+                // Update SIM range if provided
+                if (dto.simNumberFrom) {
+                    const simFrom = parseInt(dto.simNumberFrom, 10);
+                    const simTo = dto.simNumberTo ? parseInt(dto.simNumberTo, 10) : simFrom;
+
+                    await queryRunner.manager
+                        .createQueryBuilder()
+                        .update(ProductEntity)
+                        .set({ status, location })
+                        .where("CAST(sim_no AS UNSIGNED) BETWEEN :simFrom AND :simTo", { simFrom, simTo })
+                        .execute();
+                }
+
+                await this.productAssignRepository.save(updatedProduct);
                 await queryRunner.commitTransaction();
 
-                console.log(`Updated product assignments successfully.`);
+                console.log(`✅ Product assignment updated successfully.`);
+                return new CommonResponse(true, 200, 'Product details updated successfully');
             } catch (error) {
                 await queryRunner.rollbackTransaction();
-                console.error("Error handling product assignment:", error);
-                throw new Error(`Failed to handle product assignment: ${error.message}`);
+                console.error("❌ Error updating product assignment:", error);
+                throw new Error(`Failed to update Product assignment: ${error.message}`);
             } finally {
                 await queryRunner.release();
             }
-
-            await this.productAssignRepository.save(updatedProduct);
-            return new CommonResponse(true, 200, 'Product details updated successfully');
         } catch (error) {
-            console.error(`Error updating Product details: ${error.message}`, error.stack);
+            console.error(`❌ Error updating Product details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update Product details: ${error.message}`);
         }
     }
+
 
 
     async handleProductDetails(dto: ProductAssignDto, photo?: Express.Multer.File): Promise<CommonResponse> {
@@ -254,28 +295,6 @@ export class ProductAssignService {
             if (!productAssign) {
                 throw new Error('Product assignment not found');
             }
-
-            // Make sure that request is assigned from the RequestRaiseEntity
-            // const request = productAssign.requestId ? productAssign.requestId.description : '';
-
-            // const responseDto = new ProductAssignResDto(
-            //     productAssign.id,
-            //     productAssign.staffId.id.toString(),
-            //     productAssign.staffId.name,
-            //     productAssign.branchId.id,
-            //     productAssign.branchId.branchName,
-            //     productAssign.productId.productName,
-            //     productAssign.productId.categoryName,
-            //     productAssign.imeiNumberFrom,
-            //     productAssign.imeiNumberTo,
-            //     productAssign.numberOfProducts,
-            //     productAssign.productAssignPhoto,
-            //     productAssign.companyCode,
-            //     productAssign.unitCode,
-            //     productAssign.requestId?.id,  // Ensure requestId is included if available
-            //     request  // Assign the request name
-            // );
-
             return new CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
         } catch (error) {
             throw new ErrorResponse(500, error.message);

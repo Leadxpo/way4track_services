@@ -2,7 +2,9 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
+import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
@@ -74,4 +76,10 @@ export class SubDealerEntity {
 
   @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.subDealerId)
   dispatch: DispatchEntity[];
+
+  @OneToMany(() => ProductAssignEntity, (ProductAssignEntity) => ProductAssignEntity.subDealerId)
+  productAssign: ProductAssignEntity[];
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.subDealerId)
+  techWork: TechnicianWorksEntity[];
 }

@@ -38,7 +38,137 @@ export class ProductService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
+    // async bulkUploadProducts(file: Express.Multer.File): Promise<any[]> {
+    //     const getCellValue = (cell: ExcelJS.Cell) => {
+    //         if (cell.value === null || cell.value === undefined) {
+    //             return null;
+    //         }
+    //         if (typeof cell.value === 'object') {
+    //             return (cell.value as any).text || cell.value.toString();
+    //         }
+    //         return cell.value.toString();
+    //     };
+
+    //     const parseDate = (dateString: string) => {
+    //         const parsedDate = new Date(dateString);
+    //         return isNaN(parsedDate.getTime()) ? null : parsedDate;
+    //     };
+
+    //     try {
+    //         const workbook = new ExcelJS.Workbook();
+    //         await workbook.xlsx.load(file.buffer);
+    //         const worksheet = workbook.worksheets[0];
+
+    //         // Define header normalization mapping
+    //         const headerMapping: { [key: string]: string } = {
+    //             "product name": "productName",
+    //             "date of purchase": "inDate",
+    //             "vendor name": "vendorName",
+    //             "vendor email id": "vendorEmailId",
+    //             "vendor address": "vendorAddress",
+    //             "imei number": "imeiNumber",
+    //             "supplier name": "supplierName",
+    //             "serial number": "serialNumber",
+    //             "primary no": "primaryNo",
+    //             "secondary no": "secondaryNo",
+    //             "primary network": "primaryNetwork",
+    //             "secondary network": "secondaryNetwork",
+    //             "category name": "categoryName",
+    //             "voucher id": "voucherId",
+    //             "cost": "cost",
+    //             "product description": "productDescription",
+    //             "company code": "companyCode",
+    //             "vendor phone number": "vendorPhoneNumber",
+    //             "device model": "deviceModel",
+    //             "unit code": "unitCode",
+    //             "sim status": "simStatus",
+    //             "plan name": "planName",
+    //             "remarks 1": "remarks1",
+    //             "remarks 2": "remarks2",
+    //             "quantity": "quantity",
+    //             "iccid no": "ICCIDNo",
+    //             "hsn code": "hsnCode",
+    //             "remarks3": "remarks3",
+    //             "BASKET_NAME": "BASKET_NAME",
+    //             "SIM_IMSI": "SIM_IMSI",
+    //             "SIMNUMBER": "SIMNUMBER",
+    //             "MOBILE_NUMBER": "MOBILE_NUMBER",
+    //         };
+
+    //         // Map headers dynamically, case-insensitively
+    //         const headers: { [key: string]: number } = {};
+    //         worksheet.getRow(1).eachCell((cell, colNumber) => {
+    //             const headerName = getCellValue(cell)?.toLowerCase();
+    //             if (headerName && headerMapping[headerName]) {
+    //                 headers[headerMapping[headerName]] = colNumber;
+    //             }
+    //         });
+
+    //         const data = [];
+    //         worksheet.eachRow((row, rowIndex) => {
+    //             if (rowIndex > 1) {
+    //                 const getCellValueByHeader = (header: string) => {
+    //                     const colNumber = headers[header];
+    //                     return colNumber ? getCellValue(row.getCell(colNumber)) : null;
+    //                 };
+
+    //                 const imeiNumber = getCellValueByHeader('imeiNumber');
+    //                 const ICCIDNo = getCellValueByHeader('ICCIDNo');
+
+    //                 // Skip row if both imeiNumber and ICCIDNo are missing
+    //                 if (!imeiNumber && !ICCIDNo) {
+    //                     return;
+    //                 }
+
+    //                 data.push({
+    //                     productName: getCellValueByHeader('productName'),
+    //                     inDate: parseDate(getCellValueByHeader('inDate')),
+    //                     vendorName: getCellValueByHeader('vendorName'),
+    //                     vendorEmailId: getCellValueByHeader('vendorEmailId'),
+    //                     vendorAddress: getCellValueByHeader('vendorAddress'),
+    //                     imeiNumber,
+    //                     supplierName: getCellValueByHeader('supplierName'),
+    //                     serialNumber: getCellValueByHeader('serialNumber'),
+    //                     primaryNo: getCellValueByHeader('primaryNo'),
+    //                     secondaryNo: getCellValueByHeader('secondaryNo'),
+    //                     primaryNetwork: getCellValueByHeader('primaryNetwork'),
+    //                     secondaryNetwork: getCellValueByHeader('secondaryNetwork'),
+    //                     categoryName: getCellValueByHeader('categoryName'),
+    //                     voucherId: getCellValueByHeader('voucherId'),
+    //                     cost: parseFloat(getCellValueByHeader('cost') || '0'),
+    //                     productDescription: getCellValueByHeader('productDescription'),
+    //                     companyCode: getCellValueByHeader('companyCode'),
+    //                     vendorPhoneNumber: getCellValueByHeader('vendorPhoneNumber'),
+    //                     deviceModel: getCellValueByHeader('deviceModel'),
+    //                     unitCode: getCellValueByHeader('unitCode'),
+    //                     simStatus: getCellValueByHeader('simStatus'),
+    //                     planName: getCellValueByHeader('planName'),
+    //                     remarks1: getCellValueByHeader('remarks1'),
+    //                     remarks2: getCellValueByHeader('remarks2'),
+    //                     quantity: parseInt(getCellValueByHeader('quantity') || '1'),
+    //                     ICCIDNo,
+    //                     hsnCode: getCellValueByHeader('hsnCode'),
+    //                     remarks3: getCellValueByHeader('remarks3'),
+    //                     BASKET_NAME: getCellValueByHeader('BASKET_NAME'),
+    //                     SIM_IMSI: getCellValueByHeader('SIM_IMSI'),
+    //                     SIMNUMBER: getCellValueByHeader('SIMNUMBER'),
+    //                     MOBILE_NUMBER: getCellValueByHeader('MOBILE_NUMBER'),
+    //                 });
+    //             }
+    //         });
+
+    //         // const productEntities = await Promise.all(
+    //         //     data.map(async (productDto) => this.handleProductData(productDto))
+    //         // );
+
+    //         return data;
+    //     } catch (error) {
+    //         throw new ErrorResponse(500, 'Error parsing Excel file');
+    //     }
+    // }
+
     async bulkUploadProducts(file: Express.Multer.File): Promise<any[]> {
+        console.log(file, "+++++++")
         const getCellValue = (cell: ExcelJS.Cell) => {
             if (cell.value === null || cell.value === undefined) {
                 return null;
@@ -59,7 +189,6 @@ export class ProductService {
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.worksheets[0];
 
-            // Define header normalization mapping
             const headerMapping: { [key: string]: string } = {
                 "product name": "productName",
                 "date of purchase": "inDate",
@@ -74,7 +203,7 @@ export class ProductService {
                 "primary network": "primaryNetwork",
                 "secondary network": "secondaryNetwork",
                 "category name": "categoryName",
-                "voucher id": "voucherId",
+                // "voucher id": "voucherId",
                 "cost": "cost",
                 "product description": "productDescription",
                 "company code": "companyCode",
@@ -88,14 +217,13 @@ export class ProductService {
                 "quantity": "quantity",
                 "iccid no": "ICCIDNo",
                 "hsn code": "hsnCode",
-                "remarks3": "remarks3",
-                "BASKET_NAME": "BASKET_NAME",
-                "SIM_IMSI": "SIM_IMSI",
-                "SIMNUMBER": "SIMNUMBER",
-                "MOBILE_NUMBER": "MOBILE_NUMBER",
+                "remarks 3": "remarks3",
+                "basket name": "BASKET_NAME",
+                "sim imsi": "SIM_IMSI",
+                "sim number": "SIM_Number",
+                "mobile number": "MOBILE_NUMBER",
             };
 
-            // Map headers dynamically, case-insensitively
             const headers: { [key: string]: number } = {};
             worksheet.getRow(1).eachCell((cell, colNumber) => {
                 const headerName = getCellValue(cell)?.toLowerCase();
@@ -103,69 +231,120 @@ export class ProductService {
                     headers[headerMapping[headerName]] = colNumber;
                 }
             });
+            console.log(headers)
+            const finalData = [];
+            const results = [];
 
-            const data = [];
-            worksheet.eachRow((row, rowIndex) => {
-                if (rowIndex > 1) {
-                    const getCellValueByHeader = (header: string) => {
-                        const colNumber = headers[header];
-                        return colNumber ? getCellValue(row.getCell(colNumber)) : null;
-                    };
 
-                    const imeiNumber = getCellValueByHeader('imeiNumber');
-                    const ICCIDNo = getCellValueByHeader('ICCIDNo');
+            for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
+                const row = worksheet.getRow(rowIndex);
 
-                    // Skip row if both imeiNumber and ICCIDNo are missing
-                    if (!imeiNumber && !ICCIDNo) {
-                        return;
-                    }
+                const getCellValueByHeader = (header: string) => {
+                    const colNumber = headers[header];
+                    return colNumber ? getCellValue(row.getCell(colNumber)) : null;
+                };
 
-                    data.push({
-                        productName: getCellValueByHeader('productName'),
-                        inDate: parseDate(getCellValueByHeader('inDate')),
-                        vendorName: getCellValueByHeader('vendorName'),
-                        vendorEmailId: getCellValueByHeader('vendorEmailId'),
-                        vendorAddress: getCellValueByHeader('vendorAddress'),
-                        imeiNumber,
-                        supplierName: getCellValueByHeader('supplierName'),
-                        serialNumber: getCellValueByHeader('serialNumber'),
-                        primaryNo: getCellValueByHeader('primaryNo'),
-                        secondaryNo: getCellValueByHeader('secondaryNo'),
-                        primaryNetwork: getCellValueByHeader('primaryNetwork'),
-                        secondaryNetwork: getCellValueByHeader('secondaryNetwork'),
-                        categoryName: getCellValueByHeader('categoryName'),
-                        voucherId: getCellValueByHeader('voucherId'),
-                        cost: parseFloat(getCellValueByHeader('cost') || '0'),
-                        productDescription: getCellValueByHeader('productDescription'),
-                        companyCode: getCellValueByHeader('companyCode'),
-                        vendorPhoneNumber: getCellValueByHeader('vendorPhoneNumber'),
-                        deviceModel: getCellValueByHeader('deviceModel'),
-                        unitCode: getCellValueByHeader('unitCode'),
-                        simStatus: getCellValueByHeader('simStatus'),
-                        planName: getCellValueByHeader('planName'),
-                        remarks1: getCellValueByHeader('remarks1'),
-                        remarks2: getCellValueByHeader('remarks2'),
-                        quantity: parseInt(getCellValueByHeader('quantity') || '1'),
-                        ICCIDNo,
-                        hsnCode: getCellValueByHeader('hsnCode'),
-                        remarks3: getCellValueByHeader('remarks3'),
-                        BASKET_NAME: getCellValueByHeader('BASKET_NAME'),
-                        SIM_IMSI: getCellValueByHeader('SIM_IMSI'),
-                        SIMNUMBER: getCellValueByHeader('SIMNUMBER'),
-                        MOBILE_NUMBER: getCellValueByHeader('MOBILE_NUMBER'),
+                const imeiNumber = getCellValueByHeader('imeiNumber');
+                const simNumber = getCellValueByHeader('SIM_Number');
+                console.log(simNumber, "==")
+                if (!imeiNumber && !simNumber) continue;
+
+                const currentRow = {
+                    productName: getCellValueByHeader('productName'),
+                    inDate: parseDate(getCellValueByHeader('inDate')),
+                    vendorName: getCellValueByHeader('vendorName'),
+                    vendorEmailId: getCellValueByHeader('vendorEmailId'),
+                    vendorAddress: getCellValueByHeader('vendorAddress'),
+                    imeiNumber,
+                    supplierName: getCellValueByHeader('supplierName'),
+                    serialNumber: getCellValueByHeader('serialNumber'),
+                    primaryNo: getCellValueByHeader('primaryNo'),
+                    secondaryNo: getCellValueByHeader('secondaryNo'),
+                    primaryNetwork: getCellValueByHeader('primaryNetwork'),
+                    secondaryNetwork: getCellValueByHeader('secondaryNetwork'),
+                    categoryName: getCellValueByHeader('categoryName'),
+                    // voucherId: getCellValueByHeader('voucherId'),
+                    cost: parseFloat(getCellValueByHeader('cost') || '0'),
+                    productDescription: getCellValueByHeader('productDescription'),
+                    companyCode: getCellValueByHeader('companyCode'),
+                    vendorPhoneNumber: getCellValueByHeader('vendorPhoneNumber'),
+                    deviceModel: getCellValueByHeader('deviceModel'),
+                    unitCode: getCellValueByHeader('unitCode'),
+                    simStatus: getCellValueByHeader('simStatus'),
+                    planName: getCellValueByHeader('planName'),
+                    remarks1: getCellValueByHeader('remarks1'),
+                    remarks2: getCellValueByHeader('remarks2'),
+                    quantity: parseInt(getCellValueByHeader('quantity') || '1'),
+                    ICCIDNo: getCellValueByHeader('ICCIDNo'),
+                    hsnCode: getCellValueByHeader('hsnCode'),
+                    remarks3: getCellValueByHeader('remarks3'),
+                    simImsi: getCellValueByHeader('SIM_IMSI'),
+                    basketName: getCellValueByHeader('BASKET_NAME'),
+                    mobileNumber: getCellValueByHeader('MOBILE_NUMBER'),
+                    simNumber,
+                };
+                console.log(currentRow, "::::::::")
+
+                let existing = null;
+
+                if (imeiNumber && simNumber) {
+                    existing = await this.productRepository.findOne({
+                        where: [
+                            { imeiNumber },
+                            { simNumber: simNumber }
+                        ],
+                    });
+                } else if (imeiNumber) {
+                    existing = await this.productRepository.findOne({
+                        where: { imeiNumber },
+                    });
+                } else if (simNumber) {
+                    existing = await this.productRepository.findOne({
+                        where: { simNumber: simNumber },
                     });
                 }
-            });
+                console.log(existing, "??????????")
+                if (existing) {
+                    const hasChanged = Object.keys(currentRow).some(key => {
+                        return currentRow[key] !== existing[key];
+                    });
 
-            // const productEntities = await Promise.all(
-            //     data.map(async (productDto) => this.handleProductData(productDto))
-            // );
+                    if (hasChanged) {
+                        await this.productRepository.update(existing.id, currentRow);
+                        results.push({
+                            row: rowIndex,
+                            status: 'updated',
+                            message: 'Product updated successfully.',
+                            identifier: imeiNumber || simNumber
+                        });
+                    } else {
+                        results.push({
+                            row: rowIndex,
+                            status: 'exists',
+                            message: 'Product already exists with no changes.',
+                            identifier: imeiNumber || simNumber
+                        });
+                    }
+                } else {
+                    finalData.push(currentRow);
+                    results.push({
+                        row: rowIndex,
+                        status: 'inserted',
+                        message: 'New product added.',
+                        identifier: imeiNumber || simNumber
+                    });
+                }
 
-            return data;
+            }
+            console.log(finalData, ">>>>>>>>>")
+            return finalData;
         } catch (error) {
+            console.error("Error processing Excel:", error); // <-- log actual error
             throw new ErrorResponse(500, 'Error parsing Excel file');
         }
+
     }
+
 
     async handleProductData(productDto: ProductDto): Promise<ProductEntity> {
         let productEntity: ProductEntity;
@@ -235,15 +414,15 @@ export class ProductService {
             productEntity.vendorId = vendor;
         }
 
-        if (productDto.voucherId) {
-            const voucher = await this.voucherRepository.findOne({
-                where: { id: productDto.voucherId },
-            });
-            if (!voucher) {
-                throw new ErrorResponse(400, `Voucher with ID ${productDto.voucherId} not found`);
-            }
-            productEntity.voucherId = [voucher];
-        }
+        // if (productDto.voucherId) {
+        //     const voucher = await this.voucherRepository.findOne({
+        //         where: { id: productDto.voucherId },
+        //     });
+        //     if (!voucher) {
+        //         throw new ErrorResponse(400, `Voucher with ID ${productDto.voucherId} not found`);
+        //     }
+        //     productEntity.voucherId = [voucher];
+        // }
 
         return productEntity;
     }
@@ -260,19 +439,15 @@ export class ProductService {
         if (!file) {
             return new CommonResponse(false, 400, 'File is required');
         }
-
+        console.log(file, "file")
         // Convert Excel file to JSON
         const jsonData = await this.bulkUploadProducts(file);
+        console.log(jsonData, "jsonData")
+
         if (!jsonData || jsonData.length === 0) {
             return new CommonResponse(false, 400, 'Invalid or empty Excel file');
         }
         console.log(jsonData, "...........")
-        // Validate Product Type
-        // const productType = await this.productTypeRepo.findOne({ where: { id: productDto.productTypeId } });
-        // if (!productType) {
-        //     return new CommonResponse(false, 404, 'Product type not found');
-        // }
-
         let designationEntity = null;
         if (productDto.productTypeId) {
             designationEntity = await this.productTypeRepo.findOne({
@@ -280,7 +455,7 @@ export class ProductService {
             });
 
             if (!designationEntity) {
-                throw new Error(`Designation with ID '${productDto.productTypeId}' not found.`);
+                throw new Error(`productType with ID '${productDto.productTypeId}' not found.`);
             }
             console.log(designationEntity, 'designationEntity');
 
@@ -305,76 +480,31 @@ export class ProductService {
                 });
 
                 vendor.vendorId = this.generateVendorId((await this.vendorRepository.count()) + 1);
-                vendor = await this.vendorRepository.save(vendor); // Save and update the reference
+                vendor = await this.vendorRepository.save(vendor);
             }
 
-            productDto.vendorId = vendor.id; // Ensure the product gets the vendorId
+            productDto.vendorId = vendor.id;
         }
 
 
-        if (productDto.voucherId) {
-            const voucher = await this.voucherRepository.findOne({
-                where: { id: productDto.voucherId },
-            });
+        // if (productDto.voucherId) {
+        //     const voucher = await this.voucherRepository.findOne({
+        //         where: { id: productDto.voucherId },
+        //     });
 
-            if (!voucher) {
-                return new CommonResponse(false, 400, `Voucher with ID ${productDto.voucherId} not found`);
-            }
-        }
-
-        // Merge additional inputs with Excel data
-        // const finalProductData = jsonData.map((excelRow) => ({
-        //     ...excelRow,
-        //     ...productDto, // Merge all productDto fields directly
-        //     productTypeId: productDto.productTypeId,
-        //     productName: productDto.productName,
-        //     inDate: productDto.inDate,
-        //     categoryName: productDto.categoryName,
-        //     cost: productDto.cost,
-        //     productDescription: productDto.productDescription,
-        //     companyCode: productDto.companyCode,
-        //     unitCode: productDto.unitCode,
-        //     primaryNo: productDto.primaryNo,
-        //     supplierName: productDto.supplierName,
-        //     serialNumber: productDto.serialNumber,
-        //     secondaryNo: productDto.secondaryNo,
-        //     primaryNetwork: productDto.primaryNetwork,
-        //     secondaryNetwork: productDto.secondaryNetwork,
-        //     simStatus: productDto.simStatus,
-        //     planName: productDto.planName,
-        //     remarks1: productDto.remarks1,
-        //     remarks2: productDto.remarks2,
-        //     deviceModel: productDto.deviceModel,
-        //     imeiNumber: productDto.imeiNumber,
-        //     quantity: productDto.quantity,
-        //     vendorName: productDto.vendorName,
-        //     vendorPhoneNumber: productDto.vendorPhoneNumber,
-        //     vendorAddress: productDto.vendorAddress,
-        //     vendorEmailId: productDto.vendorEmailId,
-        //     ICCIDNo: productDto.ICCIDNo,
-        //     hsnCode: productDto.hsnCode,
-        //     remarks3: productDto.remarks3,
-        //     BASKET_NAME: productDto.BASKET_NAME,
-        //     SIM_IMSI: productDto.SIM_IMSI,
-        //     SIMNUMBER: productDto.SIMNUMBER,
-        //     MOBILE_NUMBER: productDto.MOBILE_NUMBER,
-        //     voucherId: productDto.voucherId,
-        //     vendorId: productDto.vendorId
-
-        // }));
+        //     if (!voucher) {
+        //         return new CommonResponse(false, 400, `Voucher with ID ${productDto.voucherId} not found`);
+        //     }
+        // }
 
         const finalProductData = jsonData.map((excelRow) => ({
             ...excelRow,
             ...productDto,
             productTypeId: productDto.productTypeId,
-            productType: productDto.productType // Merging the DTO directly
+            productType: productDto.productType
         }));
 
         console.log(finalProductData, "/////")
-        // Convert JSON to entities
-        // const productEntities = this.productRepository.create(finalProductData);
-        // console.log(productEntities, ">>>>>")
-        // Save all data to the database
         await this.productRepository.save(finalProductData);
 
         return new CommonResponse(true, 201, 'Products saved successfully');

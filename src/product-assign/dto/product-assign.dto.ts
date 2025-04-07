@@ -20,5 +20,7 @@ export class ProductAssignDto {
     productTypeId: number;
     inHands: string;
     status?: ProductStatusEnum
-
+    simNumberFrom?: string;
+    simNumberTo?: string;
+    subDealerId?: number
 }

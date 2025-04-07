@@ -10,6 +10,7 @@ import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation
 import { CommonReq } from "src/models/common-req";
 import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
+import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 
 
 
@@ -192,11 +193,15 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.accept_start_date as acceptStartDate',
                 'wa.activate_date as activateDate',
                 'wa.pending_date as pendingDate',
-                'wa.completed_date as completedDate'
+                'wa.completed_date as completedDate',
+                'sb .name as subDealerName',
+                'sb.sub_dealer_id as subDealerId',
+                'sb.sub_dealer_phone_number as subDealerPhoneNumber'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
@@ -517,6 +522,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
     async getBackendSupportWorkAllocation(req: {
         staffId?: string;
+        subDealerId?: string
         supporterId?: string;
         companyCode?: string;
         unitCode?: string;
@@ -564,10 +570,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.accept_start_date as acceptStartDate',
                 'wa.activate_date as activateDate',
                 'wa.pending_date as pendingDate',
-                'wa.completed_date as completedDate'
+                'wa.completed_date as completedDate',
+                'sb .name as subDealerName',
+                'sb.sub_dealer_id as subDealerId',
+                'sb.sub_dealer_phone_number as subDealerPhoneNumber'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
@@ -594,12 +604,71 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             query.andWhere(`wa.work_status=:status`, { status: req.status })
         }
 
+        if (req.subDealerId) {
+            query.andWhere(`sb.sub_dealer_id=:subDealerId`, { subDealerId: req.subDealerId })
+        }
+
         return await query.getRawMany();
     }
+
+    // async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
+    //     const baseQuery = this.createQueryBuilder('wa')
+    //         .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+    //         .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+    //         .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+
+    //     if (req.date) {
+    //         baseQuery.andWhere('wa.start_date = :date', { date: req.date });
+    //     }
+
+    //     const overallQuery = baseQuery.clone()
+    //         .select([
+    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
+    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
+    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
+    //         ]);
+
+    //     const branchWiseQuery = baseQuery.clone()
+    //         .select([
+    //             'br.name AS branchName',
+    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
+    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
+    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
+    //         ])
+    //         .groupBy('br.name');
+
+    //     const params = {
+    //         install: WorkStatusEnum.INSTALL,
+    //         accept: WorkStatusEnum.ACCEPT,
+    //         activate: WorkStatusEnum.ACTIVATE,
+    //         pending: WorkStatusEnum.PENDING,
+    //         completed: WorkStatusEnum.COMPLETED,
+    //     };
+
+    //     const [overall, branchWise] = await Promise.all([
+    //         overallQuery.setParameters(params).getRawOne(),
+    //         branchWiseQuery.setParameters(params).getRawMany(),
+    //     ]);
+
+    //     return {
+    //         overall,
+    //         branchWise,
+    //     };
+    // }
 
     async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
         const baseQuery = this.createQueryBuilder('wa')
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const baseQuery1 = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -627,6 +696,17 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             ])
             .groupBy('br.name');
 
+        const branchWiseQuery1 = baseQuery1.clone()
+            .select([
+                'sb.sub_dealer_id AS subDealerId',
+                'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
+                'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
+            ])
+            .groupBy('sb.sub_dealer_id');
+
         const params = {
             install: WorkStatusEnum.INSTALL,
             accept: WorkStatusEnum.ACCEPT,
@@ -635,17 +715,26 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             completed: WorkStatusEnum.COMPLETED,
         };
 
-        const [overall, branchWise] = await Promise.all([
+        const [overall, branchWise, subDealer] = await Promise.all([
             overallQuery.setParameters(params).getRawOne(),
             branchWiseQuery.setParameters(params).getRawMany(),
+            branchWiseQuery1.setParameters(params).getRawMany()
         ]);
 
+
         return {
-            overall,
-            branchWise,
+            overall: {
+                totalInstallWork: overall?.totalInstallWork || 0,
+                totalAcceptWork: overall?.totalAcceptWork || 0,
+                totalActivateWork: overall?.totalActivateWork || 0,
+                totalPendingWork: overall?.totalPendingWork || 0,
+                totalCompletedWork: overall?.totalCompletedWork || 0,
+            },
+            branchWise: branchWise || [],
+            subDealer: subDealer || []
         };
-    }
 
 
+    } 
 
 }
