@@ -178,22 +178,22 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'imei_number', type: 'varchar', length: 50, nullable: true })
   imeiNumber: string;
 
-  @Column({ name: 'termination_date', type: 'date', nullable: true })
+  @Column({ name: 'termination_date', type: 'date', nullable: true, default: null })
   terminationDate: Date;
 
-  @Column({ name: 'resignation_date', type: 'date', nullable: true })
+  @Column({ name: 'resignation_date', type: 'date', nullable: true, default: null })
   resignationDate: Date;
 
-  @Column({ name: 'final_settlement_date', type: 'date', nullable: true })
+  @Column({ name: 'final_settlement_date', type: 'date', nullable: true, default: null })
   finalSettlementDate: Date;
 
   @Column({ name: 'insurance_number', type: 'varchar', length: 50, nullable: true })
   insuranceNumber: string;
 
-  @Column({ name: 'insurance_eligibility_date', type: 'date', nullable: true })
+  @Column({ name: 'insurance_eligibility_date', type: 'date', nullable: true, default: null })
   insuranceEligibilityDate: Date;
 
-  @Column({ name: 'insurance_expiry_date', type: 'date', nullable: true })
+  @Column({ name: 'insurance_expiry_date', type: 'date', nullable: true, default: null })
   insuranceExpiryDate: Date;
 
   @Column({ name: 'description', type: 'text', nullable: true })
