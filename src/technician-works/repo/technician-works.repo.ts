@@ -148,7 +148,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
     async getStaffWorkAllocation(req: {
         staffId: string; companyCode?: string;
-        unitCode?: string;
+        unitCode?: string; status?: string
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -188,7 +188,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.amount as amount',
                 'wa.end_date AS endDate',
                 'wa.installation_address as installationAddress',
-                'wa.technician_number as technicianNumber'
+                'wa.technician_number as technicianNumber',
+                'wa.accept_start_date as acceptStartDate',
+                'wa.activate_date as activateDate',
+                'wa.pending_date as pendingDate',
+                'wa.completed_date as completedDate'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -198,33 +202,13 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
             .andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode }) // Changed to .andWhere()
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+        if (req.status) {
+            query.andWhere(`wa.work_status=:status`, { status: req.status })
+        }
 
         const result = await query.getRawMany();
         return result;
     }
-
-    // async getStaffWorkAllocation(req: {
-    //     staffId: string;
-    //     companyCode?: string;
-    //     unitCode?: string;
-    // }) {
-    //     const query = this.createQueryBuilder('wa')
-    //         .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
-    //         .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
-    //         .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
-    //         .where('staff.staff_id = :staffId', { staffId: req.staffId });
-
-    //     if (req.companyCode) {
-    //         query.andWhere('wa.company_code = :companyCode', { companyCode: req.companyCode });
-    //     }
-    //     if (req.unitCode) {
-    //         query.andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
-    //     }
-
-    //     const result = await query.getMany(); // Fetch all columns
-    //     return result;
-    // }
-
 
     async getDailyWorkCountForWeek(req: {
         companyCode?: string;
@@ -483,7 +467,53 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return result;
     }
 
+    async getClientDataForTablePhoneNumber(req: {
+        phoneNumber?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }) {
+        const query = this.createQueryBuilder('ve')
+            .select([
+                've.name AS clientName',
+                've.phone_number AS phoneNumber',
+                've.address AS address',
+                've.service AS service',
+                've.payment_status AS paymentStatus',
+                've.start_date AS date',
+                'staff.name AS staffName',
+                've.end_date AS attendedDate',
+                've.description AS description',
+                've.product_name AS productName',
+                've.work_status AS workStatus',
+                'SUM(ve.amount) AS totalAmount',
+                've.id AS id',
+                've.technician_number as technicianNumber',
+            ])
+            .leftJoin(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
+        if (req.phoneNumber) {
+            query.andWhere('ve.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
+        }
+
+        query.groupBy('ve.name')
+            .addGroupBy('ve.phone_number')
+            .addGroupBy('ve.address')
+            .addGroupBy('ve.service')
+            .addGroupBy('ve.payment_status')
+            .addGroupBy('ve.start_date')
+            .addGroupBy('staff.name')
+            .addGroupBy('ve.end_date')
+            .addGroupBy('ve.description')
+            .addGroupBy('ve.product_name')
+            .addGroupBy('ve.work_status')
+            .addGroupBy('ve.id')
+            .addGroupBy('ve.technician_number');
+
+        const result = await query.getRawMany();
+        return result;
+    }
 
     async getBackendSupportWorkAllocation(req: {
         staffId?: string;
@@ -493,6 +523,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         fromDate?: string;
         toDate?: string;
         branchName?: string;
+        status?: string
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -529,8 +560,11 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.vehicle_photo_9 as vehiclePhoto9',
                 'wa.vehicle_photo_10 as vehiclePhoto10',
                 'wa.installation_address as installationAddress',
-                'wa.technician_number as technicianNumber'
-
+                'wa.technician_number as technicianNumber',
+                'wa.accept_start_date as acceptStartDate',
+                'wa.activate_date as activateDate',
+                'wa.pending_date as pendingDate',
+                'wa.completed_date as completedDate'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -556,33 +590,62 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
 
+        if (req.status) {
+            query.andWhere(`wa.work_status=:status`, { status: req.status })
+        }
+
         return await query.getRawMany();
     }
 
     async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
-        const query = this.createQueryBuilder('wa')
+        const baseQuery = this.createQueryBuilder('wa')
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.date) {
+            baseQuery.andWhere('wa.start_date = :date', { date: req.date });
+        }
+
+        const overallQuery = baseQuery.clone()
             .select([
                 'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
                 'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
                 'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-                // 'COUNT(*) AS totalPayments'
+                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
+            ]);
+
+        const branchWiseQuery = baseQuery.clone()
+            .select([
+                'br.name AS branchName',
+                'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
+                'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
             ])
-            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+            .groupBy('br.name');
 
-        // Add date condition for current date filtering
-        if (req.date) {
-            query.andWhere('wa.start_date = :date', { date: req.date });
-        }
+        const params = {
+            install: WorkStatusEnum.INSTALL,
+            accept: WorkStatusEnum.ACCEPT,
+            activate: WorkStatusEnum.ACTIVATE,
+            pending: WorkStatusEnum.PENDING,
+            completed: WorkStatusEnum.COMPLETED,
+        };
 
-        const result = await query
-            .setParameter('install', WorkStatusEnum.INSTALL)
-            .setParameter('accept', WorkStatusEnum.ACCEPT)
-            .setParameter('activate', WorkStatusEnum.ACTIVATE)
-            .getRawOne(); // Expecting a single aggregated result
+        const [overall, branchWise] = await Promise.all([
+            overallQuery.setParameters(params).getRawOne(),
+            branchWiseQuery.setParameters(params).getRawMany(),
+        ]);
 
-        return result;
+        return {
+            overall,
+            branchWise,
+        };
     }
+
 
 
 }

@@ -2660,7 +2660,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .createQueryBuilder('voucher')
             .select('SUM(voucher.amount)', 'total')
             .where('voucher.voucherType = :voucherType', { voucherType })
-            .andWhere('YEAR(voucher.date) = :year', { year })
+            .andWhere('YEAR(voucher.generation_date) = :year', { year })
             .getRawOne();
 
         return result?.total ?? 0;
@@ -3079,12 +3079,13 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 'ledger.group AS "groupName"',
                 'ledger.name AS "ledgerName"',
-                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...purchaseVouchers) THEN ve.amount ELSE 0 END), 0) AS "purchaseAmount"`,
-                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...salesVouchers) THEN ve.amount ELSE 0 END), 0) AS "salesAmount"`,
-                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...directExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "directExpenseAmount"`,
-                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...indirectExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectExpenseAmount"`,
-                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:...indirectIncomeVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectIncomeAmount"`
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:purchaseVouchers) THEN ve.amount ELSE 0 END), 0) AS "purchaseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:salesVouchers) THEN ve.amount ELSE 0 END), 0) AS "salesAmount"`,
+                // `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:directExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "directExpenseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:indirectExpenseVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectExpenseAmount"`,
+                `COALESCE(SUM(CASE WHEN ve.voucher_type IN (:indirectIncomeVouchers) THEN ve.amount ELSE 0 END), 0) AS "indirectIncomeAmount"`
             ])
+
             .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
             .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
@@ -3112,7 +3113,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .getRawMany();
 
         return {
-            directExpenses: profitAndLoss.filter(p => p.directExpenseAmount > 0),
+            // directExpenses: profitAndLoss.filter(p => p.directExpenseAmount > 0),
             purchases: profitAndLoss.filter(p => p.purchaseAmount > 0),
             sales: profitAndLoss.filter(p => p.salesAmount > 0),
             indirectExpenses: profitAndLoss.filter(p => p.indirectExpenseAmount > 0),

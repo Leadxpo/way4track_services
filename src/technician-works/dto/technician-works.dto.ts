@@ -42,14 +42,22 @@ export class TechnicianWorksDto {
     technicianNumber: string;
     serviceOrProduct: string;
     email: string;
-    remark: string;
-    vehicleId?:number
-    serviceId?:number
+    vehicleId?: number
+    serviceId?: number
     installationAddress?: string;
-
+    remark: Remarks[];
+    acceptStartDate: Date;
+    activateDate: Date;
+    pendingDate: Date;
+    completedDate: Date;
 }
 export class Requirements {
     productName: string;
     quantity: number;
     price: number;
+}
+export class Remarks {
+    name: string;
+    date: Date;
+    desc: string;
 }

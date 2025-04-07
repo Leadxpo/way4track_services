@@ -82,7 +82,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
   email: string;
 
-  @Column({ name: 'office_email', type: 'varchar', length: 150, unique: true, nullable: true })
+  @Column({ name: 'office_email', type: 'varchar', length: 150, nullable: true })
   officeEmail: string;
 
   @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })

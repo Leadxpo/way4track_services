@@ -524,4 +524,18 @@ export class TechnicianService {
         }
 
     }
+
+    async getClientDataForTablePhoneNumber(req: {
+        companyCode?: string;
+        unitCode?: string
+        phoneNumber: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getClientDataForTablePhoneNumber(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
 }

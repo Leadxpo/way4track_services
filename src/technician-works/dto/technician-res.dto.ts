@@ -1,6 +1,6 @@
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
-import { Requirements } from "./technician-works.dto";
+import { Remarks, Requirements } from "./technician-works.dto";
 import { emit } from "process";
 
 export class TechnicianWorksResponseDto {
@@ -49,11 +49,14 @@ export class TechnicianWorksResponseDto {
     email?: string;
     startDate?: Date;
     endDate?: Date;
-    remark?: string
     vehicleId?: number
     serviceId?: number
     installationAddress?: string
-
+    remark?: Remarks[];
+    acceptStartDate?: Date;
+    activateDate?: Date;
+    pendingDate?: Date;
+    completedDate?: Date;
     constructor(
         id: number,
         service: string,
@@ -97,10 +100,14 @@ export class TechnicianWorksResponseDto {
         serviceOrProduct?: string,
         technicianNumber?: string,
         email?: string,
-        remark?: string,
         vehicleId?: number,
         serviceId?: number,
-        installationAddress?: string
+        installationAddress?: string,
+        remark?: Remarks[],
+        acceptStartDate?: Date,
+        activateDate?: Date,
+        pendingDate?: Date,
+        completedDate?: Date
 
 
     ) {
@@ -149,6 +156,12 @@ export class TechnicianWorksResponseDto {
         this.remark = remark
         this.vehicleId = vehicleId
         this.serviceId = serviceId
-        this.installationAddress=installationAddress
+        this.installationAddress = installationAddress
+        this.acceptStartDate = acceptStartDate
+        this.activateDate = activateDate
+        this.pendingDate = pendingDate
+        this.completedDate = completedDate
+
+
     }
 }

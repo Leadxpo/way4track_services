@@ -10,6 +10,7 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Remarks } from '../dto/technician-works.dto';
 
 @Entity('technician_works')
 export class TechnicianWorksEntity extends BaseEntity {
@@ -78,6 +79,18 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column({ name: 'end_date', type: 'timestamp', nullable: true })
     endDate: Date;
+
+    @Column({ name: 'accept_start_date', type: 'timestamp', nullable: true })
+    acceptStartDate: Date;
+
+    @Column({ name: 'activate_date', type: 'timestamp', nullable: true })
+    activateDate: Date;
+
+    @Column({ name: 'pending_date', type: 'timestamp', nullable: true })
+    pendingDate: Date;
+
+    @Column({ name: 'completed_date', type: 'timestamp', nullable: true })
+    completedDate: Date;
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.technician, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
@@ -171,6 +184,9 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'service_or_product', type: 'varchar', length: 100, nullable: true })
     serviceOrProduct: string;
 
-    @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true })
-    remark: string;
+    // @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true })
+    // remark: string;
+
+    @Column({ name: 'remark', type: 'json', nullable: true })
+    remark: Remarks[]
 }

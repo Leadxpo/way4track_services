@@ -92,6 +92,11 @@ export class TechnicianWorksAdapter {
         entity.email = dto.email
         entity.remark = dto.remark
         entity.installationAddress = dto.installationAddress
+        entity.acceptStartDate = dto.acceptStartDate
+        entity.activateDate = dto.activateDate
+        entity.pendingDate = dto.pendingDate
+        entity.completedDate = dto.completedDate
+
 
         return entity;
     }
@@ -139,8 +144,15 @@ export class TechnicianWorksAdapter {
             entity.backEndStaffRelation ? entity.backEndStaffRelation.name : null,
             entity.serviceOrProduct ? entity.serviceOrProduct : "",
             entity.technicianNumber ? entity.technicianNumber : "",
-            entity.remark ? entity.remark : "",
-            entity.installationAddress ? entity.installationAddress : ""
+            entity.email ? entity.email : "",
+            entity.vehicleId ? entity.vehicleId.id : null,
+            entity.serviceId ? entity.serviceId.id : null,
+            entity.installationAddress ? entity.installationAddress : "",
+            entity.remark ? entity.remark : [],
+            entity.acceptStartDate ? entity.acceptStartDate : null,
+            entity.activateDate ? entity.activateDate : null,
+            entity.pendingDate ? entity.pendingDate : null,
+            entity.completedDate ? entity.completedDate : null
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );
