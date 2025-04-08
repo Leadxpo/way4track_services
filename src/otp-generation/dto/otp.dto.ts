@@ -7,6 +7,7 @@ export class OTPDto {
   phoneNumber: string;
   companyCode: string
   unitCode: string
+  isResend?: boolean
 
 }
 

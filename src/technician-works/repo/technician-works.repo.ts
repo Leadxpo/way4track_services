@@ -198,7 +198,9 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
                 'wa.remark as remark',
-                'br.id as branchId'
+                'br.id as branchId',
+                'br.id AS branchId',
+
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -555,7 +557,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
                 'br.id AS branchId',
-
                 'staff.id as staffId',
                 'st.id as backSupporterId',
                 'wa.amount as amount',
@@ -615,56 +616,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
         return await query.getRawMany();
     }
-
-    // async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
-    //     const baseQuery = this.createQueryBuilder('wa')
-    //         .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
-    //         .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
-
-
-    //     if (req.date) {
-    //         baseQuery.andWhere('wa.start_date = :date', { date: req.date });
-    //     }
-
-    //     const overallQuery = baseQuery.clone()
-    //         .select([
-    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
-    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
-    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
-    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
-    //         ]);
-
-    //     const branchWiseQuery = baseQuery.clone()
-    //         .select([
-    //             'br.name AS branchName',
-    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
-    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
-    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
-    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
-    //         ])
-    //         .groupBy('br.name');
-
-    //     const params = {
-    //         install: WorkStatusEnum.INSTALL,
-    //         accept: WorkStatusEnum.ACCEPT,
-    //         activate: WorkStatusEnum.ACTIVATE,
-    //         pending: WorkStatusEnum.PENDING,
-    //         completed: WorkStatusEnum.COMPLETED,
-    //     };
-
-    //     const [overall, branchWise] = await Promise.all([
-    //         overallQuery.setParameters(params).getRawOne(),
-    //         branchWiseQuery.setParameters(params).getRawMany(),
-    //     ]);
-
-    //     return {
-    //         overall,
-    //         branchWise,
-    //     };
-    // }
 
     async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
         const baseQuery = this.createQueryBuilder('wa')
