@@ -4,6 +4,7 @@ import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
@@ -82,4 +83,7 @@ export class SubDealerEntity {
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.subDealerId)
   techWork: TechnicianWorksEntity[];
+
+  @OneToMany(() => SubDelaerStaffEntity, (SubDelaerStaffEntity) => SubDelaerStaffEntity.subDealerId)
+  subDealerStaff: SubDelaerStaffEntity[];
 }

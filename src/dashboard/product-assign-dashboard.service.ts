@@ -23,6 +23,19 @@ export class ProductAssignDashboardService {
         }
     }
 
+    async productSubDealerAssignDetails(req: {
+        subDealerId?: string;
+        companyCode: string;
+        unitCode: string;
+    }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.productSubDealerAssignDetails(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
     async getSearchDetailProduct(req:
         ProductIdDto
     ): Promise<CommonResponse> {

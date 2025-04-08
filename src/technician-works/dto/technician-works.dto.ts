@@ -58,6 +58,7 @@ export class Requirements {
     price: number;
 }
 export class Remarks {
+    staffId: string
     name: string;
     date: Date;
     desc: string;
