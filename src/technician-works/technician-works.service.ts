@@ -22,6 +22,11 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 import { VehicleTypeRepository } from 'src/vehicle-type/repo/vehicle-type.repo';
 import { ServiceTypeRepository } from 'src/service-type/repo/service.repo';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
+import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 
 @Injectable()
@@ -173,8 +178,6 @@ export class TechnicianService {
         }
     }
 
-
-
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
         filePaths: Record<string, string | null> = {} // Ensure it's always an object
@@ -215,12 +218,12 @@ export class TechnicianService {
                 photo2: 'vehiclePhoto2',
                 photo3: 'vehiclePhoto3',
                 photo4: 'vehiclePhoto4',
-                photo5: 'vehiclePhoto4',
-                photo6: 'vehiclePhoto4',
-                photo7: 'vehiclePhoto4',
-                photo8: 'vehiclePhoto4',
-                photo9: 'vehiclePhoto4',
-                photo10: 'vehiclePhoto4',
+                photo5: 'vehiclePhoto5',
+                photo6: 'vehiclePhoto6',
+                photo7: 'vehiclePhoto7',
+                photo8: 'vehiclePhoto8',
+                photo9: 'vehiclePhoto9',
+                photo10: 'vehiclePhoto10',
             };
 
             // ✅ Ensure filePaths is always a valid object
@@ -236,31 +239,20 @@ export class TechnicianService {
 
 
 
-
-            // Convert DTO to entity and retain existing ID
-            const technicianEntity = this.adapter.convertDtoToEntity(req);
-            technicianEntity.id = existingTechnician.id;
-
             // Retain photo fields
-            Object.assign(existingTechnician, technicianEntity);
+            // Object.assign(existingTechnician, technicianEntity);
 
             console.log("Final data before saving:", existingTechnician);
 
-            await this.repo.update({ id: existingTechnician.id }, {
+            const updatedStaff: Partial<TechnicianWorksEntity> = {
                 ...existingTechnician,
-                vehiclePhoto1: existingTechnician.vehiclePhoto1,
-                vehiclePhoto2: existingTechnician.vehiclePhoto2,
-                vehiclePhoto3: existingTechnician.vehiclePhoto3,
-                vehiclePhoto4: existingTechnician.vehiclePhoto4,
-                vehiclePhoto5: existingTechnician.vehiclePhoto5,
-                vehiclePhoto6: existingTechnician.vehiclePhoto6,
-                vehiclePhoto7: existingTechnician.vehiclePhoto7,
-                vehiclePhoto8: existingTechnician.vehiclePhoto8,
-                vehiclePhoto9: existingTechnician.vehiclePhoto9,
-                vehiclePhoto10: existingTechnician.vehiclePhoto10,
-            });
+                ...this.adapter.convertDtoToEntity(req)
+            };
+            await this.repo.update(existingTechnician.id,
+                updatedStaff
+            );
 
-            console.log("Data saved successfully");
+            console.log("Data saved successfully", updatedStaff);
 
             return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
         } catch (error) {
@@ -294,12 +286,6 @@ export class TechnicianService {
         // Generate final TechNumber
         return `${formattedYear}-${paddedSequentialNumber}`;
     }
-
-
-
-
-
-
 
     async deleteTechnicianDetails(dto: TechIdDto): Promise<CommonResponse> {
         try {

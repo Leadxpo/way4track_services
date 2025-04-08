@@ -310,7 +310,6 @@ export class VoucherService {
         if (!ledger) {
             throw new NotFoundException('Ledger not found.');
         }
-
         const pendingVouchers = await this.voucherRepository.find({
             where: {
                 ledgerId: ledger, // Use the full entity instead of ledger.id
@@ -318,7 +317,6 @@ export class VoucherService {
             },
             select: ['invoiceId', 'amount', 'paidAmount', 'reminigAmount'], // Return only invoiceId and amount
         });
-
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
 

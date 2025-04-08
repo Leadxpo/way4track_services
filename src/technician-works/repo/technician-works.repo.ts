@@ -197,7 +197,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
-                'wa.remark as remark'
+                'wa.remark as remark',
+                'br.id as branchId'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')

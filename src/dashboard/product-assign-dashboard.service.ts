@@ -27,8 +27,40 @@ export class ProductAssignDashboardService {
         subDealerId?: string;
         companyCode: string;
         unitCode: string;
+        subDealerName?: string;
+
     }): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.productSubDealerAssignDetails(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
+    async getProductAssignmentSummaryBySubDealer(req: {
+        subDealerId?: string;
+        companyCode: string;
+        unitCode: string;
+
+    }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getProductAssignmentSummaryBySubDealer(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
+    async getProductDetailsBySubDealer(req: {
+        unitCode: string;
+        companyCode: string;
+        subDealerId?: string;
+        fromDate?: string;
+        toDate?: string;
+
+    }): Promise<CommonResponse> {
+        const productData = await this.productAssignRepo.getProductDetailsBySubDealer(req)
         if (!productData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
