@@ -554,6 +554,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.end_date AS endDate',
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
+                'br.id AS branchId',
+
                 'staff.id as staffId',
                 'st.id as backSupporterId',
                 'wa.amount as amount',
