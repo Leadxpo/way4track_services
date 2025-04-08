@@ -196,7 +196,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.completed_date as completedDate',
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
-                'sb.sub_dealer_phone_number as subDealerPhoneNumber'
+                'sb.sub_dealer_phone_number as subDealerPhoneNumber',
+                'wa.remark as remark'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -573,7 +574,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.completed_date as completedDate',
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
-                'sb.sub_dealer_phone_number as subDealerPhoneNumber'
+                'sb.sub_dealer_phone_number as subDealerPhoneNumber',
+                'wa.remark as remark'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -735,6 +737,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         };
 
 
-    } 
+    }
 
 }
