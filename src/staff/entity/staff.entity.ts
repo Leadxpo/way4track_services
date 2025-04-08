@@ -231,8 +231,8 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.staffId)
   appointment: AppointmentEntity[];
 
-  @OneToMany(() => OtpEntity, (OtpEntity) => OtpEntity.staff)
-  otpGeneration: OtpEntity[];
+  // @OneToMany(() => OtpEntity, (OtpEntity) => OtpEntity.staff)
+  // otpGeneration: OtpEntity[];
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.staffId)
   technician: TechnicianWorksEntity[];
