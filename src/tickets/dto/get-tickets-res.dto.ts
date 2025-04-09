@@ -15,6 +15,7 @@ export class GetTicketsResDto {
     unitCOde: string;
     workStatus?: WorkStatusEnum;
     description?: string;
+    subDealerId?: number
     constructor(
         staffId: number,
         staffName: string,
@@ -28,7 +29,9 @@ export class GetTicketsResDto {
         companyCode: string,
         unitCOde: string,
         workStatus?: WorkStatusEnum,
-        description?: string
+        description?: string,
+        subDealerId?: number
+
     ) {
         this.staffId = staffId;
         this.staffName = staffName;
@@ -43,5 +46,6 @@ export class GetTicketsResDto {
         this.unitCOde = unitCOde
         this.workStatus = workStatus
         this.description = description
+        this.subDealerId = subDealerId
     }
 }

@@ -472,7 +472,10 @@ export class TechnicianService {
     }
 
     async getWorkStatusCards(req: {
-        companyCode: string; unitCode: string; date?: string
+        companyCode: string;
+        unitCode: string;
+        fromDate?: string;
+        toDate?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getWorkStatusCards(req)
         if (!VoucherData) {
@@ -483,6 +486,17 @@ export class TechnicianService {
 
     }
 
+    async getSubDealerServiceTypesCards(req: {
+        companyCode: string; unitCode: string; date?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getSubDealerServiceTypesCards(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
     async getUpCommingWorkAllocationDetails(req: {
         companyCode?: string;
         unitCode?: string

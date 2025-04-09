@@ -5,7 +5,8 @@ export enum WorkStatusEnum {
     INCOMPLETE = 'incomplete',
     INSTALL = 'install',
     ACCEPT = 'accept',  // Corrected spelling
-    ACTIVATE = 'activate'  // Ensured consistency
+    ACTIVATE = 'activate',
+    Processing = 'Processing' // Ensured consistency
 }
 
 

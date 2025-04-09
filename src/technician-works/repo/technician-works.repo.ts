@@ -11,6 +11,7 @@ import { CommonReq } from "src/models/common-req";
 import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { ServiceTypeEntity } from "src/service-type/entity/service.entity";
 
 
 
@@ -214,6 +215,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.status) {
             query.andWhere(`wa.work_status=:status`, { status: req.status })
         }
+        query.orderBy('wa.start_date', 'ASC')
 
         const result = await query.getRawMany();
         return result;
@@ -613,7 +615,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.subDealerId) {
             query.andWhere(`sb.sub_dealer_id=:subDealerId`, { subDealerId: req.subDealerId })
         }
-
+        query.orderBy('wa.start_date', 'ASC')
         return await query.getRawMany();
     }
 
@@ -691,6 +693,62 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         };
 
 
+    }
+
+    async getSubDealerServiceTypesCards(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate?: string;
+        toDate?: string;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .leftJoin(ServiceTypeEntity, 'st', 'st.id = wa.service_id')
+            .select([
+                'sb.id AS subDealerId',
+                'sb.name AS subDealerName',
+                'st.name AS serviceName',
+                'COUNT(*) AS totalServices',
+                'SUM(CAST(wa.amount AS float)) AS totalAmount'
+            ])
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('wa.start_date >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('wa.end_date <= :toDate', { toDate: req.toDate });
+        }
+
+        query.groupBy('sb.id')
+            .addGroupBy('sb.name')
+            .addGroupBy('st.name');
+
+        const result = await query.getRawMany();
+
+        // Optional: group into nested structure in JS
+        const groupedResult = result.reduce((acc, row) => {
+            const subDealerId = row.subDealerId;
+            if (!acc[subDealerId]) {
+                acc[subDealerId] = {
+                    subDealerId,
+                    subDealerName: row.subDealerName,
+                    services: []
+                };
+            }
+
+            acc[subDealerId].services.push({
+                serviceName: row.serviceName,
+                totalServices: +row.totalServices,
+                totalAmount: +row.totalAmount
+            });
+
+            return acc;
+        }, {} as Record<string, any>);
+
+        return Object.values(groupedResult);
     }
 
 }

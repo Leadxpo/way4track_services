@@ -8,6 +8,7 @@ import { CommonReq } from "src/models/common-req";
 import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { StaffEntity } from "src/staff/entity/staff.entity";
+import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 
 
 
@@ -125,36 +126,53 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         companyCode?: string;
         unitCode?: string;
         staffId: string;
-        date?: string; // Logged-in staff ID
+        subDealerId?: string;
+        date?: string;
     }) {
         const query = this.createQueryBuilder('wa')
-            .select([
-                'DATE_FORMAT(wa.date, "%Y-%m") AS date',
-                'wa.staff_id AS staffId', // Ensuring the selection is from the 'wa' table
-                'staff.name AS staffName',
-                'COUNT(wa.id) AS totalTickets',
-                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingTickets',
-                'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessTickets'
-            ])
             .leftJoin(StaffEntity, 'staff', 'wa.staff_id = staff.id')
+            .leftJoin(SubDealerEntity, 'sb', 'wa.sub_dealer_id = sb.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })
-            .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.staffId) {
+            query.andWhere('wa.staff_id = :staffId', { staffId: req.staffId });
+        }
+
+        if (req.subDealerId) {
+            query.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId: req.subDealerId });
+        }
+
         if (req.date) {
-            query.where('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date })
+            // Only filter by date if provided
+            query.andWhere('DATE_FORMAT(wa.date, "%Y-%m") = :date', { date: req.date });
+        }
 
-        } // Only logged-in staff can view their data
-        query.groupBy('DATE_FORMAT(wa.date, "%Y-%m")') // Grouping by month
-            .addGroupBy('wa.staff_id')
-            .addGroupBy('staff.name');
+        query.select([
+            'wa.staff_id AS staffId',
+            'staff.name AS staffName',
+            'sb.sub_dealer_id AS subDealerId',
+            'COUNT(wa.id) AS totalTickets',
+            'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingTickets',
+            'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessTickets',
+            'SUM(CASE WHEN wa.work_status = :processing THEN 1 ELSE 0 END) AS totalProcessingTickets',
+        ]);
 
-        // Set the status parameters
+        // Group by staff and subdealer to separate rows per person/sub-dealer
+        query
+            .groupBy('wa.staff_id')
+            .addGroupBy('staff.name')
+            .addGroupBy('sb.sub_dealer_id');
+
         const result = await query
             .setParameter('completed', WorkStatusEnum.COMPLETED)
-            .setParameter('pending', WorkStatusEnum.PENDING) // Correctly setting pending and completed statuses
+            .setParameter('pending', WorkStatusEnum.PENDING)
+            .setParameter('processing', WorkStatusEnum.Processing)
             .getRawMany();
 
         return result;
     }
+
+
 
 }
