@@ -24,7 +24,7 @@ export class LoginService {
         if (!req.staffId || !req.password || !req.designation || !req.companyCode || !req.unitCode) {
             throw new Error('Missing required login details.');
         }
-        if (designation === 'subdealer') {
+        if (designation === 'Sub Dealer') {
             login = await this.subDealerService.getSubDealerProfileDetails(req);
         } else {
             login = await this.staffService.getStaffProfileDetails(req);

@@ -844,7 +844,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
             // Combine results
             const results = {
-                groupedBranches: groupedBranches.map(branch => ({
+                groupedSubDealers: groupedBranches.map(branch => ({
                     subDealerId: branch.subDealerId || 'N/A',
                 })),
                 totalAssignedQty: Number(totalAssignedQty?.totalAssignedQty || 0),

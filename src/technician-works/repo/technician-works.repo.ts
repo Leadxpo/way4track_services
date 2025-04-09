@@ -526,14 +526,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
     async getBackendSupportWorkAllocation(req: {
         staffId?: string;
-        subDealerId?: string
+        subDealerId?: string;
         supporterId?: string;
         companyCode?: string;
         unitCode?: string;
         fromDate?: string;
         toDate?: string;
         branchName?: string;
-        status?: string
+        status?: string;
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
