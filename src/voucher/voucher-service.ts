@@ -135,6 +135,8 @@ export class VoucherService {
                         ? JSON.parse(voucherDto.productDetails)
                         : voucherDto.productDetails;
 
+                console.log(productDetailsArray, "+++++++++++++++++")
+
                 if (!Array.isArray(productDetailsArray)) {
                     throw new Error("Invalid productDetails format. Expected an array.");
                 }
