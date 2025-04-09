@@ -9,6 +9,7 @@ import { NotificationAdapter } from './notification.adapter';
 import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { In } from 'typeorm';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 
 @Injectable()
 export class NotificationService {
@@ -18,7 +19,7 @@ export class NotificationService {
     ) { }
 
     async createNotification(
-        entity: RequestRaiseEntity | TicketsEntity,
+        entity: RequestRaiseEntity | TicketsEntity|TechnicianWorksEntity,
         type: NotificationEnum
     ): Promise<void> {
         let message: string;
@@ -43,7 +44,7 @@ export class NotificationService {
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         }
-        //  else if (type === NotificationEnum.Technician && entity instanceof WorkAllocationEntity) {
+        //  else if (type === NotificationEnum.TechnicianWorks && entity instanceof TechnicianWorksEntity) {
         //     const designation = entity.staffId?.designation.toLowerCase();
         //     if (designation === 'Technician') {
         //         message = `Technician allocated for ${entity.otherInformation}`;

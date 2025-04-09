@@ -108,6 +108,7 @@ export class TechnicianWorksAdapter {
         entity.unitCode = dto.unitCode;
         entity.productName = dto.productName;
         entity.screenShot = dto.screenShot
+        entity.description = dto.description
         entity.technicianNumber = dto.technicianNumber
         entity.serviceOrProduct = dto.serviceOrProduct
         entity.name = dto.name

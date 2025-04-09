@@ -12,7 +12,7 @@ import {
 export enum NotificationEnum {
     Request = "Request",
     Ticket = "Ticket",
-    Technician = "Technician",
+    TechnicianWorks = "TechnicianWorks",
 }
 
 @Entity('notifications')
