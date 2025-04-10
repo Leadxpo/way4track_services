@@ -72,7 +72,9 @@ export class TechnicianService {
             photo8?: Express.Multer.File[];
             photo9?: Express.Multer.File[];
             photo10?: Express.Multer.File[];
-        } = {} // ✅ Default to an empty object
+            image?: Express.Multer.File[];
+            videos?: Express.Multer.File[];
+        } = {}
     ): Promise<CommonResponse> {
         let filePaths: Record<keyof typeof photos, string | undefined> = {
             photo1: undefined,
@@ -85,13 +87,34 @@ export class TechnicianService {
             photo8: undefined,
             photo9: undefined,
             photo10: undefined,
-
+            image: undefined,
+            videos: undefined
         };
-        console.log(filePaths, "fileoath")
+
+        const uploadedImages: string[] = [];
+        const uploadedVideos: string[] = [];
+
         for (const [key, fileArray] of Object.entries(photos)) {
-            if (fileArray && fileArray.length > 0) {
-                const file = fileArray[0]; // Get the first file
-                const uniqueFileName = `vehicle_photos/${Date.now()}-${file.originalname}`;
+            if (!fileArray || fileArray.length === 0) continue;
+
+            if (key === 'image' || key === 'videos') continue;
+
+            const file = fileArray[0];
+            const uniqueFileName = `vehicle_photos/${Date.now()}-${file.originalname}`;
+            const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+            await storageFile.save(file.buffer, {
+                contentType: file.mimetype,
+                resumable: false,
+            });
+
+            filePaths[key as keyof typeof filePaths] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
+        // Upload multiple remark images
+        if (photos.image?.length) {
+            for (const file of photos.image) {
+                const uniqueFileName = `remark_images/${Date.now()}-${file.originalname}`;
                 const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
 
                 await storageFile.save(file.buffer, {
@@ -99,21 +122,38 @@ export class TechnicianService {
                     resumable: false,
                 });
 
-                console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                filePaths[key] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                uploadedImages.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
             }
         }
-        if (!photos || typeof photos !== 'object') {
-            console.error('Photos parameter is null or undefined');
-            photos = {}; // Ensure it's an empty object
+
+        // Upload multiple remark videos
+        if (photos.videos?.length) {
+            for (const file of photos.videos) {
+                const uniqueFileName = `remark_videos/${Date.now()}-${file.originalname}`;
+                const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+                await storageFile.save(file.buffer, {
+                    contentType: file.mimetype,
+                    resumable: false,
+                });
+
+                uploadedVideos.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
+            }
         }
 
         return req.id
             ? await this.updateTechnicianDetails(req, filePaths)
-            : await this.createTechnicianDetails(req, filePaths);
+            : await this.createTechnicianDetails(req, filePaths, uploadedImages, uploadedVideos);
     }
 
-    async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
+
+    async createTechnicianDetails(
+        req: TechnicianWorksDto,
+        filePaths?: Record<string, string | null>,
+        uploadedImages: string[] = [],
+        uploadedVideos: string[] = []
+    ): Promise<CommonResponse> {
+
         try {
             console.log(req, "req");
 
@@ -161,7 +201,6 @@ export class TechnicianService {
             newTechnician.productId = ProductEntity?.id;
             newTechnician.amount = ProductEntity?.cost
 
-            console.log(newTechnician, "newTechnician");
 
             // Assign file URLs if available
             if (filePaths) {
@@ -175,10 +214,26 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto8 = filePaths.photo8;
                 newTechnician.vehiclePhoto9 = filePaths.photo9;
                 newTechnician.vehiclePhoto10 = filePaths.photo10;
+
             }
+
+            if (typeof newTechnician.remark === 'string') {
+                newTechnician.remark = JSON.parse(newTechnician.remark);
+            }
+
+            // Attach image and videos to the first remark (if remarks exist)
+            if (newTechnician.remark?.length > 0) {
+                newTechnician.remark = newTechnician.remark.map((remark, index) => ({
+                    ...remark,
+                    image: uploadedImages[index] || null,
+                    videos: uploadedVideos[index] || null
+                }));
+            }
+
 
             // Generate Technician ID
             newTechnician.technicianNumber = await this.generateTechNumber();
+            console.log(newTechnician, "newTechnician");
 
             await this.repo.insert(newTechnician);
             const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } })
@@ -217,9 +272,13 @@ export class TechnicianService {
 
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
-        filePaths: Record<string, string | null> = {} // Ensure it's always an object
+        filePaths: Record<string, string | null> = {},
+
     ): Promise<CommonResponse> {
         try {
+
+            const uploadedImages: string[] = [];
+            const uploadedVideos: string[] = [];
             // Ensure filePaths is always an object
             filePaths = filePaths ?? {};
 
@@ -261,12 +320,15 @@ export class TechnicianService {
                 photo8: 'vehiclePhoto8',
                 photo9: 'vehiclePhoto9',
                 photo10: 'vehiclePhoto10',
+                image: 'image',
+                videos: 'videos'
             };
 
             // ✅ Ensure filePaths is always a valid object
             filePaths = filePaths ?? {};
 
-
+            if (filePaths.image) uploadedImages.push(filePaths.image);
+            if (filePaths.videos) uploadedVideos.push(filePaths.videos);
             // ✅ Safeguard against undefined filePaths
             for (const [field, entityField] of Object.entries(photoMapping)) {
                 if (filePaths[field]) {
@@ -285,10 +347,18 @@ export class TechnicianService {
                 ...this.adapter.convertDtoToEntity(req),
             } as TechnicianWorksEntity;
 
-            // const updatedStaff: Partial<TechnicianWorksEntity> = {
-            //     ...existingTechnician,
-            //     ...this.adapter.convertDtoToEntity(req)
-            // };
+            if (Array.isArray(req.remark)) {
+                const newRemarks = req.remark.map((remark, index) => ({
+                    ...remark,
+                    image: uploadedImages[index] || null,
+                    videos: uploadedVideos[index] || null,
+                }));
+                updatedStaff.remark = [
+                    ...(existingTechnician.remark || []),
+                    ...newRemarks
+                ];
+            }
+
             if (updatedStaff.workStatus === WorkStatusEnum.ACTIVATE && updatedStaff.paymentStatus === PaymentStatus.PENDING && updatedStaff.subDealerId) {
                 try {
                     await this.notificationService.createNotification(updatedStaff, NotificationEnum.TechnicianWorks);

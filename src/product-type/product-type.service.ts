@@ -157,7 +157,7 @@ export class ProductTypeService {
                 return new CommonResponse(false, 404, 'ProductType not found');
             }
 
-            await this.productTypeRepository.delete({ id: dto.id }); // Correct 
+            await this.productTypeRepository.delete({ id: ProductType.id }); // Correct 
 
             return new CommonResponse(true, 200, 'ProductType details deleted successfully');
         } catch (error) {

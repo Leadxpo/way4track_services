@@ -64,4 +64,6 @@ export class Remarks {
     name: string;
     date: Date;
     desc: string;
+    image?: string;
+    video?: string
 }
