@@ -51,6 +51,8 @@ export class TechnicianWorksDto {
     pendingDate: Date;
     completedDate: Date;
     subDealerId?: number
+    userName?: string;
+    applicationId?: number
 }
 export class Requirements {
     productName: string;

@@ -27,6 +27,13 @@ import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
 import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { NotificationService } from 'src/notifications/notification.service';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { PaymentStatus } from 'src/product/dto/payment-status.enum';
+import { ClientRepository } from 'src/client/repo/client.repo';
+import { ClientService } from 'src/client/client.service';
+import { ClientDto } from 'src/client/dto/client.dto';
+import { ClientStatus } from 'src/client/enum/client-status.enum';
 
 
 @Injectable()
@@ -39,6 +46,9 @@ export class TechnicianService {
         private productRepo: ProductRepository,
         private vehicleRepo: VehicleTypeRepository,
         private serviceRepo: ServiceTypeRepository,
+        private notificationService: NotificationService,
+        private clientService: ClientService,
+        private clientRepo: ClientRepository
 
     ) {
         this.storage = new Storage({
@@ -171,6 +181,33 @@ export class TechnicianService {
             newTechnician.technicianNumber = await this.generateTechNumber();
 
             await this.repo.insert(newTechnician);
+            const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } })
+            if (!client) {
+                const clientDto: ClientDto = {
+                    name: newTechnician.name || "",
+                    branch: req.branchId ?? null,
+                    phoneNumber: newTechnician.phoneNumber || "",
+                    dob: "",
+                    email: newTechnician.email || "",
+                    address: newTechnician.address || "",
+                    joiningDate: newTechnician.startDate || null,
+                    companyCode: req.companyCode ?? "",
+                    unitCode: req.unitCode ?? "",
+                    hsnCode: "",
+                    SACCode: "",
+                    tds: false,
+                    tcs: false,
+                    billWiseDate: false,
+                    status: ClientStatus.Active,
+
+                };
+
+                try {
+                    await this.clientService.createClientDetails(clientDto);
+                } catch (notificationError) {
+                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                }
+            }
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
             console.error(`Error creating Technician details: ${error.message}`, error.stack);
@@ -243,11 +280,23 @@ export class TechnicianService {
             // Object.assign(existingTechnician, technicianEntity);
 
             console.log("Final data before saving:", existingTechnician);
-
-            const updatedStaff: Partial<TechnicianWorksEntity> = {
+            const updatedStaff = {
                 ...existingTechnician,
-                ...this.adapter.convertDtoToEntity(req)
-            };
+                ...this.adapter.convertDtoToEntity(req),
+            } as TechnicianWorksEntity;
+
+            // const updatedStaff: Partial<TechnicianWorksEntity> = {
+            //     ...existingTechnician,
+            //     ...this.adapter.convertDtoToEntity(req)
+            // };
+            if (updatedStaff.workStatus === WorkStatusEnum.ACTIVATE && updatedStaff.paymentStatus === PaymentStatus.PENDING && updatedStaff.subDealerId) {
+                try {
+                    await this.notificationService.createNotification(updatedStaff, NotificationEnum.TechnicianWorks);
+                } catch (notificationError) {
+                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                }
+            }
+
             await this.repo.update(existingTechnician.id,
                 updatedStaff
             );
@@ -471,11 +520,24 @@ export class TechnicianService {
 
     }
 
+    async getJobCompleted(req: {
+        companyCode: string;
+        unitCode: string;
+        date?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getJobCompleted(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getWorkStatusCards(req: {
         companyCode: string;
         unitCode: string;
-        fromDate?: string;
-        toDate?: string;
+        date?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getWorkStatusCards(req)
         if (!VoucherData) {

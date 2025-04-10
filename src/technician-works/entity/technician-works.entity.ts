@@ -12,6 +12,7 @@ import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Remarks } from '../dto/technician-works.dto';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 
 @Entity('technician_works')
 export class TechnicianWorksEntity extends BaseEntity {
@@ -105,6 +106,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     @JoinColumn({ name: 'product_id' })
     productId: ProductEntity;
 
+    @ManyToOne(() => ProductTypeEntity, (ProductTypeEntity) => ProductTypeEntity.technician, { nullable: true })
+    @JoinColumn({ name: 'application_id' })
+    applicationId: ProductTypeEntity;
+
     @ManyToOne(() => VendorEntity, (vendorEntity) => vendorEntity.technician, { nullable: true })
     @JoinColumn({ name: 'vendor_id' })
     vendorId: VendorEntity;
@@ -185,8 +190,8 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'service_or_product', type: 'varchar', length: 100, nullable: true })
     serviceOrProduct: string;
 
-    // @Column({ name: 'remark', type: 'varchar', length: 255, nullable: true })
-    // remark: string;
+    @Column({ name: 'user_name', type: 'varchar', length: 100, nullable: true })
+    userName: string;
 
     @Column({ name: 'remark', type: 'json', nullable: true })
     remark: Remarks[]

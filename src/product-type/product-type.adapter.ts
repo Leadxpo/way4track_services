@@ -14,9 +14,9 @@ export class ProductTypeAdapter {
                         item.name,
                         item.companyCode,
                         item.unitCode,
-                        item.productPhoto,
-                        item.blogImage,
-                        item.description
+                        // item.productPhoto,
+                        // item.blogImage,
+                        // item.description
                     )
             );
         }
@@ -26,9 +26,9 @@ export class ProductTypeAdapter {
             entity.name,
             entity.companyCode,
             entity.unitCode,
-            entity.productPhoto,
-            entity.productPhoto,
-            entity.description
+            // entity.productPhoto,
+            // entity.productPhoto,
+            // entity.description
 
         );
     }
@@ -42,9 +42,9 @@ export class ProductTypeAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.name = dto.name;
-        entity.productPhoto = dto.productPhoto;
-        entity.blogImage = dto.blogImage
-        entity.description = dto.description
+        // entity.productPhoto = dto.productPhoto;
+        // entity.blogImage = dto.blogImage
+        // entity.description = dto.description
         return entity;
     }
 }

@@ -10,16 +10,19 @@ import { CommonResponse } from 'src/models/common-response';
 import { ErrorResponse } from 'src/models/error-response';
 import { In } from 'typeorm';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { TechinicianWoksRepository } from 'src/technician-works/repo/technician-works.repo';
+
 
 @Injectable()
 export class NotificationService {
     constructor(
         private readonly notificationRepository: NotificationRepository,
-        private readonly notificationAdapter: NotificationAdapter
+        private readonly notificationAdapter: NotificationAdapter,
+        private readonly technicianWorksRepository: TechinicianWoksRepository,
     ) { }
 
     async createNotification(
-        entity: RequestRaiseEntity | TicketsEntity|TechnicianWorksEntity,
+        entity: RequestRaiseEntity | TicketsEntity | TechnicianWorksEntity,
         type: NotificationEnum
     ): Promise<void> {
         let message: string;
@@ -28,6 +31,8 @@ export class NotificationService {
         let branch: any;
         let companyCode: string;
         let unitCode: string;
+        let subDealer: any;
+
 
         if (type === NotificationEnum.Request && entity instanceof RequestRaiseEntity) {
             message = entity.description;
@@ -44,19 +49,24 @@ export class NotificationService {
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         }
-        //  else if (type === NotificationEnum.TechnicianWorks && entity instanceof TechnicianWorksEntity) {
-        //     const designation = entity.staffId?.designation.toLowerCase();
-        //     if (designation === 'Technician') {
-        //         message = `Technician allocated for ${entity.otherInformation}`;
-        //         createdAt = entity.date;
-        //         user = entity.staffId; // Assuming staffId is a number
-        //         branch = entity.branchId; // Assuming branchId is a number
-        //         companyCode = entity.companyCode;
-        //         unitCode = entity.unitCode;
-        //     } else {
-        //         return;
-        //     }
-        // }
+        else if (type === NotificationEnum.TechnicianWorks && 'workStatus' in entity && 'subDealerId' in entity) {
+            const subDealerId = typeof entity.subDealerId === 'object' ? entity.subDealerId.id : entity.subDealerId;
+
+            if (!subDealerId) {
+                console.warn('SubDealerId is missing or invalid for notification type TechnicianWorks');
+                return;
+            }
+
+            const pendingWorks = await this.technicianWorksRepository.getSubDealerPendingPayments({ subDealerId });
+            const pending = pendingWorks?.subDealer || {};
+
+            message = `Pending payment for activated work: ${pending.totalActivateWork || 0}, pending: ${pending.totalPendingWork || 0}, total amount: ₹${pending.totalAmount || 0}`;
+            createdAt = new Date();
+            subDealer = subDealerId;
+            companyCode = entity.companyCode;
+            unitCode = entity.unitCode;
+        }
+
         else {
             throw new Error('Invalid entity type or notification type.');
         }
@@ -70,6 +80,7 @@ export class NotificationService {
             branchId: typeof branch === 'object' ? branch.id : branch, // Fallback for primitive
             companyCode,
             unitCode,
+            subDealerId: typeof subDealer === 'object' ? subDealer.id : subDealer
         });
 
         await this.notificationRepository.insert(notificationEntity);

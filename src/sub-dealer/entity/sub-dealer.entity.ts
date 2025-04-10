@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
@@ -90,4 +91,7 @@ export class SubDealerEntity {
 
   @OneToMany(() => SubDelaerStaffEntity, (SubDelaerStaffEntity) => SubDelaerStaffEntity.subDealerId)
   subDealerStaff: SubDelaerStaffEntity[];
+
+  @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.subDealerId)
+  note: NotificationEntity[];
 }

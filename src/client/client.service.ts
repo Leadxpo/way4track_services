@@ -65,7 +65,7 @@ export class ClientService {
         }
     }
 
-    async createClientDetails(dto: ClientDto, photoPath: string | null): Promise<CommonResponse> {
+    async createClientDetails(dto: ClientDto, photoPath?: string | null): Promise<CommonResponse> {
         try {
             console.log(dto, "KKKKKKKKKKKKKK")
             const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });

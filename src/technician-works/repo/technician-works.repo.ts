@@ -751,4 +751,95 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         return Object.values(groupedResult);
     }
 
+    async getSubDealerPendingPayments(req: {
+        subDealerId?: number;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .select([
+                'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalActivateWork',
+                'SUM(CASE WHEN wa.payment_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CAST(wa.amount AS float)) AS totalAmount'
+            ])
+            .andWhere('sb.id = :subDealerId', { subDealerId: req.subDealerId });
+
+        const params = {
+            accept: WorkStatusEnum.ACCEPT,
+            pending: PaymentStatus.PENDING,
+        };
+
+        const [subDealer] = await Promise.all([
+            query.setParameters(params).getRawOne()
+        ]);
+
+        return {
+            subDealer: subDealer || []
+        };
+    }
+
+
+    async getJobCompleted(req: { companyCode: string; unitCode: string; date?: string }) {
+        const baseQuery = this.createQueryBuilder('wa')
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const baseQuery1 = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.date) {
+            baseQuery.andWhere('wa.activate_date = :date', { date: req.date });
+            baseQuery1.andWhere('wa.activate_date = :date', { date: req.date });
+        }
+        const overallQuery = baseQuery.clone()
+            .select([
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ]);
+
+        const branchWiseQuery = baseQuery.clone()
+            .select([
+                'br.name AS branchName',
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ])
+            .groupBy('br.name');
+
+        const branchWiseQuery1 = baseQuery1.clone()
+            .select([
+                'sb.sub_dealer_id AS subDealerId',
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ])
+            .groupBy('sb.sub_dealer_id');
+
+        const params = {
+            activate: WorkStatusEnum.ACTIVATE,
+        };
+
+        const [overall, branchWise, subDealer] = await Promise.all([
+            overallQuery.setParameters(params).getRawOne(),
+            branchWiseQuery.setParameters(params).getRawMany(),
+            branchWiseQuery1.setParameters(params).getRawMany()
+        ]);
+
+
+        return {
+            overall: {
+
+                totalActivateWork: overall?.totalActivateWork || 0,
+
+            },
+            branchWise: branchWise || [],
+            subDealer: subDealer || []
+        };
+
+
+    }
+
 }

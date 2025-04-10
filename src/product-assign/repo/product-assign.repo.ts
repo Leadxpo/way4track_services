@@ -759,7 +759,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
             // Grouping fields
             groupedProductQuery.groupBy('pt.name, sb.name, sb.sub_dealer_id');
-            ;
+            
 
             // Execute query
             const productDetails = await groupedProductQuery.getRawMany();
@@ -844,12 +844,16 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
             // Combine results
             const results = {
-                groupedSubDealers: groupedBranches.map(branch => ({
-                    subDealerId: branch.subDealerId || 'N/A',
-                })),
-                totalAssignedQty: Number(totalAssignedQty?.totalAssignedQty || 0),
-                totalInHandsQty: Number(totalInHandsQty?.totalInHandsQty || 0),
+                groupedSubDealers: groupedBranches?.map((branch) => ({
+                    subDealerId: branch?.subDealerId || 'N/A',
+                })) || [],
+                totalAssignedQty: Number(totalAssignedQty?.totalAssignedQty ?? 0),
+                totalInHandsQty: Number(totalInHandsQty?.totalInHandsQty ?? 0),
+                totalQty:
+                    Number(totalAssignedQty?.totalAssignedQty ?? 0) -
+                    Number(totalInHandsQty?.totalInHandsQty ?? 0),
             };
+
 
             return results;
 

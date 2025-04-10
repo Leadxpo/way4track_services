@@ -15,6 +15,7 @@ import { ServiceTypeModule } from 'src/service-type/service.module';
 import { ProductTypeModule } from 'src/product-type/product-type.module';
 import { VehicleTypeModule } from 'src/vehicle-type/vehicle-type.module';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { NotificationModule } from 'src/notifications/notification.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([TechnicianWorksEntity]),
@@ -27,11 +28,14 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
     forwardRef(() => VehicleTypeModule),
     forwardRef(() => ProductTypeModule),
     forwardRef(() => SubDealerEntity),
+    forwardRef(() => NotificationModule),
     forwardRef(() => ProductModule)],
+
     controllers: [TechnicianController],
     providers: [TechnicianService, TechnicianWorksAdapter, TechinicianWoksRepository],
     exports: [TechinicianWoksRepository, TechnicianService]
 
 })
 export class TechnicianModule { }
+
 

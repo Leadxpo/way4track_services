@@ -166,6 +166,18 @@ export class TechnicianController {
         }
     }
 
+    @Post('getJobCompleted')
+    async getJobCompleted(@Body() req: {
+        companyCode: string; unitCode: string; date?: string
+    }) {
+        try {
+            return this.techService.getJobCompleted(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
     @Post('getSubDealerServiceTypesCards')
     async getSubDealerServiceTypesCards(@Body() req: {
         companyCode: string;

@@ -9,5 +9,6 @@ export enum ClientStatusEnum {
 
 export enum ClientStatus {
   Active = "Active",
-  InActive = "InActive"
+  InActive = "InActive",
+  Renewal="Renewal"
 }

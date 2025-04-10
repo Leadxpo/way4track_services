@@ -11,7 +11,7 @@ export class ClientResDto {
     // dob: string;
     email: string;
     address: string;
-    joiningDate: string;
+    joiningDate: Date;
     companyCode: string;
     unitCode: string
     status: ClientStatus
@@ -27,7 +27,7 @@ export class ClientResDto {
         // dob: string,
         email: string,
         address: string,
-        joiningDate: string,
+        joiningDate: Date,
         companyCode: string,
         unitCode: string,
         status: ClientStatus

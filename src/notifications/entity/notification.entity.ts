@@ -1,6 +1,7 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -53,4 +54,8 @@ export class NotificationEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
+
+    @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.note, { nullable: true })
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealerId: SubDealerEntity;
 }

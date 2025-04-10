@@ -4,6 +4,7 @@ import { NotificationEntity } from './entity/notification.entity';
 import { CreateNotificationDto, GetNotificationDto } from './dto/notification.dto';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 
 @Injectable()
@@ -17,6 +18,9 @@ export class NotificationAdapter {
         const staffEntity = new StaffEntity();
         staffEntity.id = dto.userId;
         entity.user = staffEntity;
+        const sub = new SubDealerEntity();
+        sub.id = dto.subDealerId;
+        entity.subDealerId = sub;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         return entity;
@@ -35,6 +39,7 @@ export class NotificationAdapter {
                 data.notificationType,
                 data.unitCode,
                 data.companyCode,
+                data.subDealerId.id
             );
         });
     }

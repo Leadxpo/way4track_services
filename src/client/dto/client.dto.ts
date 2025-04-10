@@ -8,7 +8,7 @@ export class ClientDto {
     dob: string;
     email: string;
     address: string;
-    joiningDate: string;
+    joiningDate: Date;
     clientPhoto?: string;
     clientId?: string;
     voucherId?: number
@@ -20,6 +20,6 @@ export class ClientDto {
     tcs: boolean;
     billWiseDate: boolean;
     status: ClientStatus
-    branchName: string;
+    branchName?: string;
 
 }

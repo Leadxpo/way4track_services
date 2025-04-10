@@ -25,7 +25,7 @@ export class ClientAdapter {
         //     entity.dob = new Date(entity.dob).toISOString().split('T')[0];
         // }
         if (entity.joiningDate) {
-            entity.joiningDate = new Date(entity.joiningDate).toISOString().split('T')[0];
+            entity.joiningDate = dto.joiningDate;
         }
 
         // entity.status = dto.status

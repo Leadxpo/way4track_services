@@ -11,6 +11,7 @@ import { TechnicianWorksResponseDto } from './dto/technician-res.dto';
 import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
 import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 
 export class TechnicianWorksAdapter {
     // Convert DTO to Entity
@@ -103,6 +104,12 @@ export class TechnicianWorksAdapter {
             entity.subDealerId = sub;
         }
 
+        if (dto.applicationId) {
+            const pt = new ProductTypeEntity();
+            pt.id = dto.applicationId;
+            entity.applicationId = pt;
+        }
+
         // Directly assigning other properties
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
@@ -123,7 +130,7 @@ export class TechnicianWorksAdapter {
         entity.activateDate = dto.activateDate
         entity.pendingDate = dto.pendingDate
         entity.completedDate = dto.completedDate
-
+        entity.userName = dto.userName
 
         return entity;
     }
@@ -180,7 +187,9 @@ export class TechnicianWorksAdapter {
             entity.activateDate ? entity.activateDate : null,
             entity.pendingDate ? entity.pendingDate : null,
             entity.completedDate ? entity.completedDate : null,
-            entity.subDealerId ? entity.subDealerId.id : null
+            entity.subDealerId ? entity.subDealerId.id : null,
+            entity.userName ? entity.userName : "",
+            entity.applicationId ? entity.applicationId.id : null
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );
