@@ -8,6 +8,9 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany, ManyToMany } from 'typeorm';
 import { ProductStatusEnum } from '../enum/product-status.enum';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 @Entity('products')
 export class ProductEntity extends BaseEntity {
@@ -152,5 +155,16 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'product_status', type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.available })
   productStatus: ProductStatusEnum
 
+  @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.product, { nullable: true })
+  @JoinColumn({ name: 'branch_id' })
+  branchId: BranchEntity;
+
+  @ManyToOne(() => SubDealerEntity, (sub) => sub.product, { nullable: true })
+  @JoinColumn({ name: 'sub_dealer_id' })
+  subDealerId: SubDealerEntity;
+
+  @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.product, { nullable: true })
+  @JoinColumn({ name: 'staff_id' })
+  staffId: StaffEntity;
 
 }

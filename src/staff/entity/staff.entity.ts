@@ -17,6 +17,7 @@ import { DesignationEntity } from 'src/designation/entity/designation.entity';
 import { StaffStatus } from '../enum/staff-status';
 import { Letters } from '../enum/qualifications.enum';
 import { Experience } from '../dto/staff.dto';
+import { ProductEntity } from 'src/product/entity/product.entity';
 
 
 export enum Gender {
@@ -291,5 +292,8 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ type: 'json', name: 'experience_details', nullable: true })
   experienceDetails: Experience[];
+
+  @OneToMany(() => ProductEntity, (asserts) => asserts.staffId)
+  product: ProductEntity[];
 
 }

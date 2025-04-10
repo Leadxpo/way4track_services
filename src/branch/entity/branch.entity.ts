@@ -5,6 +5,7 @@ import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
@@ -74,6 +75,9 @@ export class BranchEntity extends BaseEntity {
 
   @OneToMany(() => StaffEntity, (asserts) => asserts.branch)
   staff: StaffEntity[];
+
+  @OneToMany(() => ProductEntity, (asserts) => asserts.branchId)
+  product: ProductEntity[];
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.branchId)
   technician: TechnicianWorksEntity[];

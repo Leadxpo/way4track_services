@@ -4,6 +4,7 @@ import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
@@ -94,4 +95,7 @@ export class SubDealerEntity {
 
   @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.subDealerId)
   note: NotificationEntity[];
+
+  @OneToMany(() => ProductEntity, (asserts) => asserts.subDealerId)
+  product: ProductEntity[];
 }

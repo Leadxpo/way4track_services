@@ -62,7 +62,7 @@ export class VoucherDto {
     ledgerId?: number
     pendingInvoices?: PendingInvoice[]
     supplierLocation?: string;
-    voucherGST?: number;
+    voucherGST?: string;
     estimate?: number
     paidAmount?: number;
     TCS?: number;
