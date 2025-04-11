@@ -199,7 +199,7 @@ export class ProductTypeService {
     }
 
     async getProductTypeNamesDropDown(): Promise<CommonResponse> {
-        const data = await this.productTypeRepository.find({ select: ['name', 'id'] });
+        const data = await this.productTypeRepository.find({ select: ['name', 'id', 'type'] });
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {

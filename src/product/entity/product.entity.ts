@@ -167,4 +167,7 @@ export class ProductEntity extends BaseEntity {
   @JoinColumn({ name: 'staff_id' })
   staffId: StaffEntity;
 
+  @Column({ name: 'assign_time', type: 'timestamp', nullable: true, })
+  assignTime: Date;
+
 }

@@ -228,7 +228,8 @@ export class ProductService {
         file: Express.Multer.File,
         subDealerId?: number,
         staffId?: number,
-        branchId?: number
+        branchId?: number,
+        assignTime?: Date
     ): Promise<any[]> {
         console.log(file, "+++++++");
 
@@ -384,16 +385,21 @@ export class ProductService {
 
                     if (branchId && (!existing.branchId || existing.branchId.id !== branchId)) {
                         updateData.branchId = { id: branchId };
+                        updateData.status = 'assigned'
+                        updateData.assignTime = assignTime
                         hasChanged = true;
                     }
 
                     if (subDealerId && (!existing.subDealerId || existing.subDealerId.id !== subDealerId)) {
                         updateData.subDealerId = { id: subDealerId };
+                        updateData.status = 'assigned'
+                        updateData.assignTime = assignTime
                         hasChanged = true;
                     }
 
                     if (staffId && (!existing.staffId || existing.staffId.id !== staffId)) {
                         updateData.staffId = { id: staffId };
+                        updateData.status = 'inHand'
                         hasChanged = true;
                     }
 
@@ -578,7 +584,9 @@ export class ProductService {
             }
             console.log(designationEntity, 'subdealer');
         }
-        const jsonData = await this.bulkUploadProducts(file, productDto?.subDealerId, productDto?.staffId, productDto?.branchId,);
+
+
+        const jsonData = await this.bulkUploadProducts(file, productDto?.subDealerId, productDto?.staffId, productDto?.branchId, productDto.assignTime);
         console.log(jsonData, "jsonData")
         const finalProductData = jsonData.map((excelRow) => ({
             ...excelRow,
@@ -668,4 +676,23 @@ export class ProductService {
         }
     }
 
+
+    async productAssignDetails(req: {
+        branchName?: string;
+        subDealerId?: string
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse> {
+        try {
+            const product = await this.productRepository.productAssignDetails(req)
+            if (!product) {
+                return new CommonResponse(false, 404, 'product not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'product details fetched successfully', product);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
 }

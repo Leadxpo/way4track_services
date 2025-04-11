@@ -162,13 +162,6 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'installation_address', type: 'text', nullable: true })
     installationAddress: string;// Removed price field as per the previous request
 
-    // @Column({ type: 'json', name: 'requirement_details', nullable: true })
-    // requirementDetails: {
-    //     productName: string;
-    //     quantity: number;
-    //     price: number;
-    // }[];
-
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
 

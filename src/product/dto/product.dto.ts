@@ -42,6 +42,8 @@ export class ProductDto {
   branchId?: number
   subDealerId?: number
   staffId?: number
+  assignTime?: Date;
+
 }
 
 
