@@ -5,5 +5,6 @@ export enum PaymentStatus {
     PARTIALLY_PAID = "PARTIALLY_PAID",
     Expired = "Expired",
     COMPLETED = "COMPLETED",
-    PENDING="PENDING"
+    PENDING = "PENDING",
+    UNPAID = "UNPAID"
 }

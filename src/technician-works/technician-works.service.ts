@@ -72,6 +72,7 @@ export class TechnicianService {
             photo8?: Express.Multer.File[];
             photo9?: Express.Multer.File[];
             photo10?: Express.Multer.File[];
+            screenShot?: Express.Multer.File[];
             image?: Express.Multer.File[];
             videos?: Express.Multer.File[];
         } = {}
@@ -87,6 +88,7 @@ export class TechnicianService {
             photo8: undefined,
             photo9: undefined,
             photo10: undefined,
+            screenShot: undefined,
             image: undefined,
             videos: undefined
         };
@@ -214,6 +216,7 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto8 = filePaths.photo8;
                 newTechnician.vehiclePhoto9 = filePaths.photo9;
                 newTechnician.vehiclePhoto10 = filePaths.photo10;
+                newTechnician.screenShot = filePaths.screenShot;
 
             }
 
@@ -320,6 +323,7 @@ export class TechnicianService {
                 photo8: 'vehiclePhoto8',
                 photo9: 'vehiclePhoto9',
                 photo10: 'vehiclePhoto10',
+                screenShot: 'screenShot',
                 image: 'image',
                 videos: 'videos'
             };
