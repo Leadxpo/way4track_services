@@ -192,4 +192,7 @@ export class TechnicianWorksEntity extends BaseEntity {
     @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.techWork, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
+
+    @Column('decimal', { name: 'paid_amount', nullable: true })
+    paidAmount: number;
 }

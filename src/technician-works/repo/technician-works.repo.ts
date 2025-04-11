@@ -12,6 +12,7 @@ import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 import { ServiceTypeEntity } from "src/service-type/entity/service.entity";
+import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
 
 
 
@@ -201,12 +202,15 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.remark as remark',
                 'br.id as branchId',
                 'br.id AS branchId',
-
+                'pt.name as applicationName',
+                'wa.user_name as userName',
+                'wa.paid_amount as paidAmount'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = wa.application_id')
             .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
@@ -581,7 +585,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
-                'wa.remark as remark'
+                'wa.remark as remark',
+                'wa.paid_amount as paidAmount'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -776,7 +781,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             subDealer: subDealer || []
         };
     }
-
 
     async getJobCompleted(req: { companyCode: string; unitCode: string; date?: string }) {
         const baseQuery = this.createQueryBuilder('wa')
