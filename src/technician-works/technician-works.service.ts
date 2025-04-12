@@ -284,16 +284,66 @@ export class TechnicianService {
         }
     }
 
+
+    //         // Retain photo fields
+    //         // Object.assign(existingTechnician, technicianEntity);
+    //         const updatedStaff = {
+    //             ...existingTechnician,
+    //             ...this.adapter.convertDtoToEntity(req),
+    //         } as TechnicianWorksEntity;
+
+    //         console.log("Final data before saving:", existingTechnician);
+
+    //         Object.assign(existingTechnician, this.adapter.convertDtoToEntity(req));
+
+    //         let newRemarks: any[] = [];
+    //         if (req.remark && Array.isArray(req.remark)) {
+    //             newRemarks = req.remark.map((remark, index) => ({
+    //                 ...remark,
+    //                 image: filePaths.image || null,  // or dynamic if you're uploading many
+    //                 video: filePaths.videos || null,
+    //             }));
+    //         }
+
+    //         // Merge old + new
+    //         if (existingTechnician.remark) {
+    //             existingTechnician.remark = [...existingTechnician.remark, ...newRemarks];
+    //         } else {
+    //             existingTechnician.remark = newRemarks;
+    //         }
+
+    //         console.log("Saving technician with remarks:", existingTechnician.remark);
+
+    //         // ✅ Save directly
+
+
+    //         let convertedData = this.adapter.convertDtoToEntity(req);
+    //         delete convertedData.remark;
+
+    //         Object.assign(existingTechnician, convertedData);
+
+    //         // This log should now show BOTH new + old remarks
+    //         console.log("Final remarks to save:", existingTechnician.remark);
+
+    //         await this.repo.save(existingTechnician);
+    //         // await this.repo.save(updatedStaff);
+    //         return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
+    //     } catch (error) {
+    //         console.error(`Error updating work details: ${error.message}`, error.stack);
+    //         throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
+    //     }
+    // }
+
+
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
         filePaths: Record<string, string | null> = {},
-
     ): Promise<CommonResponse> {
         try {
-            console.log(req.remark, "remark")
+            console.log(req, "remark");
             const uploadedImages: string[] = [];
             const uploadedVideos: string[] = [];
-            // Ensure filePaths is always an object
+
             filePaths = filePaths ?? {};
 
             let existingTechnician: TechnicianWorksEntity | null = null;
@@ -314,6 +364,7 @@ export class TechnicianService {
                     { status: 'install' }
                 );
             }
+
 
             // Find product based on IMEI or SIM
             const product = await this.productRepo.findOne({
@@ -351,50 +402,64 @@ export class TechnicianService {
                 }
             }
 
-
-
-
-            // Retain photo fields
-            // Object.assign(existingTechnician, technicianEntity);
-
-            console.log("Final data before saving:", existingTechnician);
-            const updatedStaff = {
-                ...existingTechnician,
-                ...this.adapter.convertDtoToEntity(req),
-            } as TechnicianWorksEntity;
-
-            let newRemarks: any[] = [];
-            if (req.remark && Array.isArray(req.remark)) {
-                newRemarks = req.remark.map((remark, index) => ({
-                    ...remark,
-                    image: uploadedImages[index] || null,
-                    video: uploadedVideos[index] || null,
-                }));
-            }
-            console.log(newRemarks, "???????")
-            // Step 2: Check if existingTechnician already has remarks
-            if (Array.isArray(existingTechnician.remark)) {
-                // Append new remarks to existing ones
-                updatedStaff.remark = [...existingTechnician.remark, ...newRemarks];
-            } else {
-                // No existing remarks → use new ones directly
-                updatedStaff.remark = newRemarks;
-            }
-            console.log(updatedStaff.remark, "updates")
-            if (updatedStaff.workStatus === WorkStatusEnum.ACTIVATE && updatedStaff.paymentStatus === PaymentStatus.PENDING && updatedStaff.subDealerId) {
+            console.log("Saving technician with remarks: before", existingTechnician.remark);
+            let parsedRemark = req.remark;
+            if (typeof req.remark === 'string') {
                 try {
-                    await this.notificationService.createNotification(updatedStaff, NotificationEnum.TechnicianWorks);
+                    parsedRemark = JSON.parse(req.remark);
+                } catch (e) {
+                    console.error('Failed to parse remark string', req.remark);
+                    parsedRemark = [];  // Default to an empty array in case of parsing error
+                }
+            }
+
+            // Ensure it's an array before processing
+            if (!Array.isArray(parsedRemark)) {
+                parsedRemark = [];  // Default to an empty array if it's not a valid array
+            }
+
+            // 👇 Parse remark string if necessary
+            // let parsedRemark = req.remark;
+            // if (typeof req.remark === 'string') {
+            //     parsedRemark = JSON.parse(req.remark);
+            // }
+
+            // ✅ Create new remarks with media
+            let newRemarks: any[] = [];
+            if (parsedRemark && Array.isArray(parsedRemark)) {
+                newRemarks = parsedRemark.map((remark) => ({
+                    ...remark,
+                    image: remark?.image ?? filePaths?.image ?? null,
+                    videos: remark?.video ?? filePaths?.videos ?? null
+                }));
+
+            }
+
+
+            // ✅ Merge remarks
+            existingTechnician.remark = Array.isArray(existingTechnician.remark)
+                ? [...existingTechnician.remark, ...newRemarks]
+                : newRemarks;
+
+            console.log("Saving technician with remarks:", existingTechnician.remark);
+
+
+            if (existingTechnician.workStatus === WorkStatusEnum.ACTIVATE && existingTechnician.paymentStatus === PaymentStatus.PENDING && existingTechnician.subDealerId) {
+                try {
+                    await this.notificationService.createNotification(existingTechnician, NotificationEnum.TechnicianWorks);
                 } catch (notificationError) {
                     console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
                 }
             }
+            // ✅ Convert rest of DTO, remove remark
+            let convertedData = this.adapter.convertDtoToEntity(req);
+            delete convertedData.remark;
 
-            // await this.repo.update(existingTechnician.id,
-            //     updatedStaff
-            // );
-            await this.repo.save(updatedStaff);
+            Object.assign(existingTechnician, convertedData);
 
-            console.log("Data saved successfully", updatedStaff);
+            console.log("Final remarks to save:", existingTechnician.remark);
+
+            await this.repo.save(existingTechnician);
 
             return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
         } catch (error) {
@@ -455,33 +520,49 @@ export class TechnicianService {
 
     async getTechnicianDetailsById(req: TechIdDto): Promise<CommonResponse> {
         try {
-            const Technician = await this.repo.createQueryBuilder('Technician')
-                .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
-                .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
-                .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
-                .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
-                .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
-                .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')
+            console.log(req, "+++++++++++")
 
-                .where('Technician.id = :id', { id: req.id })
-                .andWhere('Technician.companyCode = :companyCode', { companyCode: req.companyCode })
-                .andWhere('Technician.unitCode = :unitCode', { unitCode: req.unitCode })
-                .getOne();
+            const Technician = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'backEndStaffRelation', 'applicationId', 'clientId', 'vehicleId', 'serviceId', 'subDealerId'] });
 
             if (!Technician) {
-                return new CommonResponse(false, 404, 'work not found');
+                return new CommonResponse(false, 404, 'Technician not found');
             }
-            console.log(Technician);  // Log the result before conversion to DTO
-
-            // const data = this.adapter.convertEntityToDto([Technician]);
-            // console.log(data);  // Log the result before conversion to DTO
-
-            return new CommonResponse(true, 200, 'work details fetched successfully', Technician);
+            else {
+                return new CommonResponse(true, 200, 'Technician details fetched successfully', Technician);
+            }
         } catch (error) {
-            console.error("Error in getTechnicianDetailsById service:", error);
-            return new CommonResponse(false, 500, 'Error fetching Technician details');
+            throw new ErrorResponse(500, error.message);
         }
     }
+    // async getTechnicianDetailsById(req: TechIdDto): Promise<CommonResponse> {
+    //     try {
+    //         const Technician = await this.repo.createQueryBuilder('Technician')
+    //             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
+    //             .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
+    //             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
+    //             .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
+    //             .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
+    //             .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')
+
+    //             .where('Technician.id = :id', { id: req.id })
+    //             .andWhere('Technician.company_code = :companyCode', { companyCode: req.companyCode })
+    //             .andWhere('Technician.unit_code = :unitCode', { unitCode: req.unitCode })
+    //             .getOne();
+
+    //         if (!Technician) {
+    //             return new CommonResponse(false, 404, 'work not found');
+    //         }
+    //         console.log(Technician);  // Log the result before conversion to DTO
+
+    //         // const data = this.adapter.convertEntityToDto([Technician]);
+    //         // console.log(data);  // Log the result before conversion to DTO
+
+    //         return new CommonResponse(true, 200, 'work details fetched successfully', Technician);
+    //     } catch (error) {
+    //         console.error("Error in getTechnicianDetailsById service:", error);
+    //         return new CommonResponse(false, 500, 'Error fetching Technician details');
+    //     }
+    // }
 
     async getTotalWorkAllocation(req: {
         companyCode?: string;
