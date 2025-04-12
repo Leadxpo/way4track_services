@@ -509,7 +509,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'pt.name as applicationName',
             ])
             .leftJoinAndSelect(StaffEntity, 'staff', 've.staff_id = staff.id')
-            .leftJoinAndSelect(ProductTypeEntity, 'pt', 'pt.id = wa.application_id')
+            .leftJoinAndSelect(ProductTypeEntity, 'pt', 'pt.id = ve.application_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 

@@ -224,15 +224,6 @@ export class TechnicianService {
             if (typeof newTechnician.remark === 'string') {
                 newTechnician.remark = JSON.parse(newTechnician.remark);
             }
-
-            // Attach image and videos to the first remark (if remarks exist)
-            // if (newTechnician.remark?.length > 0) {
-            //     newTechnician.remark = newTechnician.remark.map((remark, index) => ({
-            //         ...remark,
-            //         image: uploadedImages[index] || null,
-            //         videos: uploadedVideos[index] || null
-            //     }));
-            // }
             if (typeof newTechnician.remark === 'string') {
                 newTechnician.remark = JSON.parse(newTechnician.remark);
             }
@@ -344,12 +335,25 @@ export class TechnicianService {
             filePaths = filePaths ?? {};
             console.log(filePaths, "files")
 
-        
-            for (const [field, entityField] of Object.entries(photoMapping)) {
-                if (filePaths[field]) {
-                    (existingTechnician as any)[entityField] = filePaths[field];
-                }
+            if (filePaths) {
+                existingTechnician.vehiclePhoto1 = filePaths.photo1;
+                existingTechnician.vehiclePhoto2 = filePaths.photo2;
+                existingTechnician.vehiclePhoto3 = filePaths.photo3;
+                existingTechnician.vehiclePhoto4 = filePaths.photo4;
+                existingTechnician.vehiclePhoto5 = filePaths.photo5;
+                existingTechnician.vehiclePhoto6 = filePaths.photo6;
+                existingTechnician.vehiclePhoto7 = filePaths.photo7;
+                existingTechnician.vehiclePhoto8 = filePaths.photo8;
+                existingTechnician.vehiclePhoto9 = filePaths.photo9;
+                existingTechnician.vehiclePhoto10 = filePaths.photo10;
+                existingTechnician.screenShot = filePaths.screenShot;
+
             }
+            // for (const [field, entityField] of Object.entries(photoMapping)) {
+            //     if (filePaths[field]) {
+            //         (existingTechnician as any)[entityField] = filePaths[field];
+            //     }
+            // }
 
             console.log("Saving technician with remarks: before", existingTechnician.remark);
             let parsedRemark = req.remark;
