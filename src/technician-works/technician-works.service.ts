@@ -142,10 +142,11 @@ export class TechnicianService {
                 uploadedVideos.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
             }
         }
-
+        console.log(photos, "?")
         return req.id
-            ? await this.updateTechnicianDetails(req, filePaths)
+            ? await this.updateTechnicianDetails(req, filePaths, uploadedImages, uploadedVideos)
             : await this.createTechnicianDetails(req, filePaths, uploadedImages, uploadedVideos);
+
     }
 
 
@@ -284,68 +285,17 @@ export class TechnicianService {
         }
     }
 
-
-    //         // Retain photo fields
-    //         // Object.assign(existingTechnician, technicianEntity);
-    //         const updatedStaff = {
-    //             ...existingTechnician,
-    //             ...this.adapter.convertDtoToEntity(req),
-    //         } as TechnicianWorksEntity;
-
-    //         console.log("Final data before saving:", existingTechnician);
-
-    //         Object.assign(existingTechnician, this.adapter.convertDtoToEntity(req));
-
-    //         let newRemarks: any[] = [];
-    //         if (req.remark && Array.isArray(req.remark)) {
-    //             newRemarks = req.remark.map((remark, index) => ({
-    //                 ...remark,
-    //                 image: filePaths.image || null,  // or dynamic if you're uploading many
-    //                 video: filePaths.videos || null,
-    //             }));
-    //         }
-
-    //         // Merge old + new
-    //         if (existingTechnician.remark) {
-    //             existingTechnician.remark = [...existingTechnician.remark, ...newRemarks];
-    //         } else {
-    //             existingTechnician.remark = newRemarks;
-    //         }
-
-    //         console.log("Saving technician with remarks:", existingTechnician.remark);
-
-    //         // ✅ Save directly
-
-
-    //         let convertedData = this.adapter.convertDtoToEntity(req);
-    //         delete convertedData.remark;
-
-    //         Object.assign(existingTechnician, convertedData);
-
-    //         // This log should now show BOTH new + old remarks
-    //         console.log("Final remarks to save:", existingTechnician.remark);
-
-    //         await this.repo.save(existingTechnician);
-    //         // await this.repo.save(updatedStaff);
-    //         return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
-    //     } catch (error) {
-    //         console.error(`Error updating work details: ${error.message}`, error.stack);
-    //         throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
-    //     }
-    // }
-
-
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
         filePaths: Record<string, string | null> = {},
+        uploadedImages: string[] = [],
+        uploadedVideos: string[] = []
     ): Promise<CommonResponse> {
         try {
             console.log(req, "remark");
-            const uploadedImages: string[] = [];
-            const uploadedVideos: string[] = [];
 
-            filePaths = filePaths ?? {};
 
+            // filePaths = filePaths ?? {};
             let existingTechnician: TechnicianWorksEntity | null = null;
 
             if (req.id) {
@@ -392,10 +342,9 @@ export class TechnicianService {
 
             // ✅ Ensure filePaths is always a valid object
             filePaths = filePaths ?? {};
+            console.log(filePaths, "files")
 
-            if (filePaths.image) uploadedImages.push(filePaths.image);
-            if (filePaths.videos) uploadedVideos.push(filePaths.videos);
-            // ✅ Safeguard against undefined filePaths
+        
             for (const [field, entityField] of Object.entries(photoMapping)) {
                 if (filePaths[field]) {
                     (existingTechnician as any)[entityField] = filePaths[field];
@@ -417,20 +366,13 @@ export class TechnicianService {
             if (!Array.isArray(parsedRemark)) {
                 parsedRemark = [];  // Default to an empty array if it's not a valid array
             }
-
-            // 👇 Parse remark string if necessary
-            // let parsedRemark = req.remark;
-            // if (typeof req.remark === 'string') {
-            //     parsedRemark = JSON.parse(req.remark);
-            // }
-
             // ✅ Create new remarks with media
             let newRemarks: any[] = [];
             if (parsedRemark && Array.isArray(parsedRemark)) {
-                newRemarks = parsedRemark.map((remark) => ({
+                newRemarks = parsedRemark.map((remark, index) => ({
                     ...remark,
-                    image: remark?.image ?? filePaths?.image ?? null,
-                    videos: remark?.video ?? filePaths?.videos ?? null
+                    image: uploadedImages[index] || null,
+                    video: uploadedVideos[index] || null,
                 }));
 
             }
