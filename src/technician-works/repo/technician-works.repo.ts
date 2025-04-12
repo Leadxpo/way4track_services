@@ -503,8 +503,13 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(ve.amount) AS totalAmount',
                 've.id AS id',
                 've.technician_number as technicianNumber',
+                've.remark as remark',
+                've.paid_amount as paidAmount',
+                've.user_name as userName',
+                'pt.name as applicationName',
             ])
-            .leftJoin(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .leftJoinAndSelect(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .leftJoinAndSelect(ProductTypeEntity, 'pt', 'pt.id = wa.application_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
