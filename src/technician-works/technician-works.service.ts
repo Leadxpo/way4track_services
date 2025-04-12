@@ -225,11 +225,22 @@ export class TechnicianService {
             }
 
             // Attach image and videos to the first remark (if remarks exist)
-            if (newTechnician.remark?.length > 0) {
+            // if (newTechnician.remark?.length > 0) {
+            //     newTechnician.remark = newTechnician.remark.map((remark, index) => ({
+            //         ...remark,
+            //         image: uploadedImages[index] || null,
+            //         videos: uploadedVideos[index] || null
+            //     }));
+            // }
+            if (typeof newTechnician.remark === 'string') {
+                newTechnician.remark = JSON.parse(newTechnician.remark);
+            }
+
+            if (Array.isArray(newTechnician.remark)) {
                 newTechnician.remark = newTechnician.remark.map((remark, index) => ({
                     ...remark,
                     image: uploadedImages[index] || null,
-                    videos: uploadedVideos[index] || null
+                    video: uploadedVideos[index] || null,
                 }));
             }
 
@@ -279,7 +290,7 @@ export class TechnicianService {
 
     ): Promise<CommonResponse> {
         try {
-
+            console.log(req.remark, "remark")
             const uploadedImages: string[] = [];
             const uploadedVideos: string[] = [];
             // Ensure filePaths is always an object
@@ -342,6 +353,7 @@ export class TechnicianService {
 
 
 
+
             // Retain photo fields
             // Object.assign(existingTechnician, technicianEntity);
 
@@ -351,18 +363,24 @@ export class TechnicianService {
                 ...this.adapter.convertDtoToEntity(req),
             } as TechnicianWorksEntity;
 
-            if (Array.isArray(req.remark)) {
-                const newRemarks = req.remark.map((remark, index) => ({
+            let newRemarks: any[] = [];
+            if (req.remark && Array.isArray(req.remark)) {
+                newRemarks = req.remark.map((remark, index) => ({
                     ...remark,
                     image: uploadedImages[index] || null,
-                    videos: uploadedVideos[index] || null,
+                    video: uploadedVideos[index] || null,
                 }));
-                updatedStaff.remark = [
-                    ...(existingTechnician.remark || []),
-                    ...newRemarks
-                ];
             }
-
+            console.log(newRemarks, "???????")
+            // Step 2: Check if existingTechnician already has remarks
+            if (Array.isArray(existingTechnician.remark)) {
+                // Append new remarks to existing ones
+                updatedStaff.remark = [...existingTechnician.remark, ...newRemarks];
+            } else {
+                // No existing remarks → use new ones directly
+                updatedStaff.remark = newRemarks;
+            }
+            console.log(updatedStaff.remark, "updates")
             if (updatedStaff.workStatus === WorkStatusEnum.ACTIVATE && updatedStaff.paymentStatus === PaymentStatus.PENDING && updatedStaff.subDealerId) {
                 try {
                     await this.notificationService.createNotification(updatedStaff, NotificationEnum.TechnicianWorks);
@@ -371,9 +389,10 @@ export class TechnicianService {
                 }
             }
 
-            await this.repo.update(existingTechnician.id,
-                updatedStaff
-            );
+            // await this.repo.update(existingTechnician.id,
+            //     updatedStaff
+            // );
+            await this.repo.save(updatedStaff);
 
             console.log("Data saved successfully", updatedStaff);
 

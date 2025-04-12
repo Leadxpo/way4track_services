@@ -407,19 +407,18 @@ export class StaffService {
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
             let staff;
-            if (req.uniqueId) {
-                staff = await this.staffRepository.findOne({
-                    relations: ['branch', 'voucherId', 'notifications', 'permissions', 'designationRelation'],
-                    where: {
-                        staffId: req.staffId,
-                        password: req.password,
-                        companyCode: req.companyCode,
-                        unitCode: req.unitCode,
-                        designation: req.designation,
-                        uniqueId: req.uniqueId // Fix: Compare by designation name
-                    },
-                });
-            }
+            // if (req.uniqueId) {
+            staff = await this.staffRepository.findOne({
+                where: {
+                    staffId: req.staffId,
+                    password: req.password,
+                    companyCode: req.companyCode,
+                    unitCode: req.unitCode,
+                    designation: req.designation,
+                    // uniqueId: req.uniqueId // Fix: Compare by designation name
+                },
+            });
+            // }
 
 
             if (!staff) {
@@ -430,9 +429,9 @@ export class StaffService {
                 return new CommonResponse(false, 403, 'Staff is not active');
             }
 
-            if (staff.uniqueId) {
+            // if (staff.uniqueId) {
 
-            }
+            // }
 
             return new CommonResponse(true, 200, 'Staff details fetched successfully', staff);
         } catch (error) {
