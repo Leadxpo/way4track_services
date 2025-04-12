@@ -44,7 +44,7 @@ export class StaffService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    async handleStaffDetails(req: StaffDto, files?: any): Promise<CommonResponse> {
         try {
 
             if (req.id) {
@@ -61,7 +61,7 @@ export class StaffService {
     }
 
 
-    async createStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    async createStaffDetails(req: StaffDto, files?: any): Promise<CommonResponse> {
         try {
             const newStaff = this.adapter.convertDtoToEntity(req);
             console.log(req, "req");
@@ -212,7 +212,7 @@ export class StaffService {
 
 
 
-    async updateStaffDetails(req: StaffDto, files: any): Promise<CommonResponse> {
+    async updateStaffDetails(req: StaffDto, files?: any): Promise<CommonResponse> {
         try {
             let existingStaff: StaffEntity | null = await this.staffRepository.findOne({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
@@ -404,34 +404,92 @@ export class StaffService {
         }
     }
 
+    // async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
+    //     try {
+    //         let staff;
+    //         let device;
+    //         if (req.uniqueId) {
+    //             device = await this.staffRepository.findOne({
+    //                 where: {
+    //                     uniqueId: req.uniqueId
+    //                 },
+    //             });
+    //             if (device) {
+    //                 staff = await this.staffRepository.findOne({
+    //                     where: {
+    //                         staffId: req.staffId,
+    //                         password: req.password,
+    //                         companyCode: req.companyCode,
+    //                         unitCode: req.unitCode,
+    //                         designation: req.designation,
+    //                         uniqueId: device.uniqueId // Fix: Compare by designation name
+    //                     },
+    //                 });
+    //             } else {
+    //                 await this.staffRepository.save({ uniqueId: req.uniqueId })
+    //             }
+    //         } else {
+    //             return new CommonResponse(false, 404, 'device id not given');
+    //         }
+
+
+
+    //         if (!staff) {
+    //             return new CommonResponse(false, 404, 'Invalid credentials');
+    //         }
+
+    //         if (staff.status !== StaffStatus.ACTIVE) {
+    //             return new CommonResponse(false, 403, 'Staff is not active');
+    //         }
+
+
+    //         return new CommonResponse(true, 200, 'Staff details fetched successfully', staff);
+    //     } catch (error) {
+    //         console.error("Error in getStaffProfileDetails service:", error);
+    //         return new CommonResponse(false, 500, 'Error fetching staff details');
+    //     }
+    // }
+
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
-            let staff;
-            // if (req.uniqueId) {
-            staff = await this.staffRepository.findOne({
+            if (!req.uniqueId) {
+                return new CommonResponse(false, 404, 'Device ID not provided');
+            }
+
+            // Step 1: Check if any staff already has this device ID
+            const device = await this.staffRepository.findOne({
+                where: { uniqueId: req.uniqueId },
+            });
+
+            // Step 2: Try to find the staff with provided credentials (without checking uniqueId yet)
+            const staff = await this.staffRepository.findOne({
                 where: {
                     staffId: req.staffId,
                     password: req.password,
                     companyCode: req.companyCode,
                     unitCode: req.unitCode,
-                    designation: req.designation,
-                    // uniqueId: req.uniqueId // Fix: Compare by designation name
+                    designation: req.designation, // Optional: remove if not part of login
                 },
             });
-            // }
-
 
             if (!staff) {
                 return new CommonResponse(false, 404, 'Invalid credentials');
             }
 
+            // Step 3: If device not recognized, and staff has no uniqueId, assign this one
+            if (!device && !staff.uniqueId) {
+                staff.uniqueId = req.uniqueId;
+                await this.staffRepository.save(staff); // Save the updated staff
+            }
+
+            // Step 4: Check if the staff trying to log in matches the device
+            if (staff.uniqueId !== req.uniqueId) {
+                return new CommonResponse(false, 404, 'Device not recognized for this staff');
+            }
+
             if (staff.status !== StaffStatus.ACTIVE) {
                 return new CommonResponse(false, 403, 'Staff is not active');
             }
-
-            // if (staff.uniqueId) {
-
-            // }
 
             return new CommonResponse(true, 200, 'Staff details fetched successfully', staff);
         } catch (error) {

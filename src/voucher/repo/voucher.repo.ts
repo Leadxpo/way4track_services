@@ -2539,7 +2539,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'ledger.name AS ledgerName',
                 'br.name AS branchName',
                 'sr.payment_type AS paymentType',
-                'MAX(ve.due_date) AS lastDueDate'
+                'MAX(sr.due_date) AS lastDueDate'
 
             ])
             .leftJoin(LedgerEntity, 'ledger', 'sr.ledger_id = ledger.id')

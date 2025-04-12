@@ -335,20 +335,7 @@ export class TechnicianService {
             filePaths = filePaths ?? {};
             console.log(filePaths, "files")
 
-            if (filePaths) {
-                existingTechnician.vehiclePhoto1 = filePaths.photo1;
-                existingTechnician.vehiclePhoto2 = filePaths.photo2;
-                existingTechnician.vehiclePhoto3 = filePaths.photo3;
-                existingTechnician.vehiclePhoto4 = filePaths.photo4;
-                existingTechnician.vehiclePhoto5 = filePaths.photo5;
-                existingTechnician.vehiclePhoto6 = filePaths.photo6;
-                existingTechnician.vehiclePhoto7 = filePaths.photo7;
-                existingTechnician.vehiclePhoto8 = filePaths.photo8;
-                existingTechnician.vehiclePhoto9 = filePaths.photo9;
-                existingTechnician.vehiclePhoto10 = filePaths.photo10;
-                existingTechnician.screenShot = filePaths.screenShot;
 
-            }
             // for (const [field, entityField] of Object.entries(photoMapping)) {
             //     if (filePaths[field]) {
             //         (existingTechnician as any)[entityField] = filePaths[field];
@@ -387,7 +374,7 @@ export class TechnicianService {
                 ? [...existingTechnician.remark, ...newRemarks]
                 : newRemarks;
 
-            console.log("Saving technician with remarks:", existingTechnician.remark);
+            console.log("Saving technician with remarks:", existingTechnician.screenShot);
 
 
             if (existingTechnician.workStatus === WorkStatusEnum.ACTIVATE && existingTechnician.paymentStatus === PaymentStatus.PENDING && existingTechnician.subDealerId) {
@@ -402,8 +389,23 @@ export class TechnicianService {
             delete convertedData.remark;
 
             Object.assign(existingTechnician, convertedData);
+            if (filePaths) {
+                existingTechnician.vehiclePhoto1 = filePaths.photo1;
+                existingTechnician.vehiclePhoto2 = filePaths.photo2;
+                existingTechnician.vehiclePhoto3 = filePaths.photo3;
+                existingTechnician.vehiclePhoto4 = filePaths.photo4;
+                existingTechnician.vehiclePhoto5 = filePaths.photo5;
+                existingTechnician.vehiclePhoto6 = filePaths.photo6;
+                existingTechnician.vehiclePhoto7 = filePaths.photo7;
+                existingTechnician.vehiclePhoto8 = filePaths.photo8;
+                existingTechnician.vehiclePhoto9 = filePaths.photo9;
+                existingTechnician.vehiclePhoto10 = filePaths.photo10;
+                existingTechnician.screenShot = filePaths.screenShot;
 
-            console.log("Final remarks to save:", existingTechnician.remark);
+            }
+            console.log(existingTechnician.screenShot, ":::::::::::")
+
+            console.log("Final remarks to save:", existingTechnician.screenShot);
 
             await this.repo.save(existingTechnician);
 
