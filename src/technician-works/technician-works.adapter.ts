@@ -132,6 +132,8 @@ export class TechnicianWorksAdapter {
         entity.completedDate = dto.completedDate
         entity.userName = dto.userName
 
+        entity.paidAmount = dto.paidAmount
+
         return entity;
     }
 
@@ -189,7 +191,8 @@ export class TechnicianWorksAdapter {
             entity.completedDate ? entity.completedDate : null,
             entity.subDealerId ? entity.subDealerId.id : null,
             entity.userName ? entity.userName : "",
-            entity.applicationId ? entity.applicationId.id : null
+            entity.applicationId ? entity.applicationId.id : null,
+            entity.paidAmount ? entity.paidAmount : null
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );
