@@ -57,7 +57,7 @@ export class AttendenceRepository extends Repository<AttendanceEntity> {
         const query = this.createQueryBuilder('a')
             .select([
                 'a.id AS id',
-                'a.staff_id AS staffId',
+                'staff.staff_id AS staffId',
                 'a.day AS day',
                 'a.branch_name AS branchName',
                 'a.in_time AS inTime',

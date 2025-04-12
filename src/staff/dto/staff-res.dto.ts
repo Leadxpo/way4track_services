@@ -69,6 +69,7 @@ export class GetStaffResDto {
     carryForwardLeaves?: number;
     staffStatus?: StaffStatus;
     accountBranch?: string;
+    uniqueId?: string;
 
     constructor(
         id: number,
@@ -135,6 +136,7 @@ export class GetStaffResDto {
         carryForwardLeaves?: number,
         staffStatus?: StaffStatus,
         accountBranch?: string | undefined,
+        uniqueId?: string
 
 
 
@@ -205,6 +207,7 @@ export class GetStaffResDto {
         this.carryForwardLeaves = carryForwardLeaves
         this.staffStatus = staffStatus
         this.branchName = branchName
+        this.uniqueId = uniqueId
     }
 }
 

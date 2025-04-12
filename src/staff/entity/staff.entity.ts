@@ -203,6 +203,9 @@ export class StaffEntity extends BaseEntity {
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;
 
+  @Column('varchar', { name: 'unique_id', length: 20, nullable: true })
+  uniqueId: string;
+
   @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
   unitCode: string;
 

@@ -84,7 +84,7 @@ export class StaffAdapter {
         }
         entity.experienceDetails = dto.experienceDetails
         entity.branchName = dto.branchName;
-
+        entity.uniqueId = dto.uniqueId
         return entity;
     }
 
@@ -156,7 +156,9 @@ export class StaffAdapter {
                 staffMember.officeEmail,
                 staffMember.mailAllocation,
                 staffMember.carryForwardLeaves,
-                staffMember.status
+                staffMember.status,
+                staffMember.accountBranch ? staffMember.accountBranch : "",
+                staffMember.uniqueId
             );
         });
     }

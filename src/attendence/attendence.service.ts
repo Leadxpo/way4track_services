@@ -24,7 +24,7 @@ export class AttendanceService {
         const workbook = XLSX.read(file.buffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
+        console.log(data, "data")
         const attendanceRecords: AttendanceEntity[] = [];
         const missingStaffIds: number[] = [];
 
@@ -102,7 +102,7 @@ export class AttendanceService {
         if (attendanceRecords.length > 0) {
             await this.attendanceRepo.save(attendanceRecords);
         }
-
+        console.log(attendanceRecords, "attendanceRecords")
         return {
             message: 'Attendance data uploaded successfully',
             inserted: attendanceRecords.length,
