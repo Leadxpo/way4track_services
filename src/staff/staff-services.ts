@@ -452,14 +452,14 @@ export class StaffService {
 
     async getStaffProfileDetails(req: LoginDto): Promise<CommonResponse> {
         try {
-            if (!req.uniqueId) {
-                return new CommonResponse(false, 404, 'Device ID not provided');
-            }
+            // if (!req.uniqueId) {
+            //     return new CommonResponse(false, 404, 'Device ID not provided');
+            // }
 
             // Step 1: Check if any staff already has this device ID
-            const device = await this.staffRepository.findOne({
-                where: { uniqueId: req.uniqueId },
-            });
+            // const device = await this.staffRepository.findOne({
+            //     where: { uniqueId: req.uniqueId },
+            // });
 
             // Step 2: Try to find the staff with provided credentials (without checking uniqueId yet)
             const staff = await this.staffRepository.findOne({
@@ -477,15 +477,15 @@ export class StaffService {
             }
 
             // Step 3: If device not recognized, and staff has no uniqueId, assign this one
-            if (!device && !staff.uniqueId) {
-                staff.uniqueId = req.uniqueId;
-                await this.staffRepository.save(staff); // Save the updated staff
-            }
+            // if (!device && !staff.uniqueId) {
+            //     staff.uniqueId = req.uniqueId;
+            //     await this.staffRepository.save(staff); // Save the updated staff
+            // }
 
             // Step 4: Check if the staff trying to log in matches the device
-            if (staff.uniqueId !== req.uniqueId) {
-                return new CommonResponse(false, 404, 'Device not recognized for this staff');
-            }
+            // if (staff.uniqueId !== req.uniqueId) {
+            //     return new CommonResponse(false, 404, 'Device not recognized for this staff');
+            // }
 
             if (staff.status !== StaffStatus.ACTIVE) {
                 return new CommonResponse(false, 403, 'Staff is not active');
