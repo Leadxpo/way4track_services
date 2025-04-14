@@ -2594,7 +2594,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 END AS "overdueDays"` // Calculate overdue days only for past due dates
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
-            .leftJoin('ledger', 'ledger', 'ledger.id = ve.ledger_id') // Joining ledger to track payables
+            .leftJoin(LedgerEntity, 'ledger', 've.ledger_id = ledger.id')
+            // Joining ledger to track payables
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('ve.payment_status = :pendingStatus', { pendingStatus: PaymentStatus.PENDING })
