@@ -1,6 +1,6 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { OTPGenerationService } from './otp-generation.services';
-import { OTPDto } from './dto/otp.dto';
+import { ChangePasswordDto, OTPDto } from './dto/otp.dto';
 
 @Controller('otp')
 export class OTPGenerationController {
@@ -18,8 +18,15 @@ export class OTPGenerationController {
         return this.otpService.verifyOtp(req);
     }
 
-    // @Post('re-send-otp')
-    // resendOtp(@Body() req: OTPDto) {
-    //     return this.otpService.resendOtp(req);
-    // }
+    @Post('change-password')
+    changePassword(
+        @Body() req: ChangePasswordDto
+    ) {
+        return this.otpService.changePassword(req);
+    }
+
+    @Post('re-send-otp')
+    resendOtp(@Body() req: OTPDto) {
+        return this.otpService.reSendOtp(req);
+    }
 }

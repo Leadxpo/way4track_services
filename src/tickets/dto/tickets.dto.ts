@@ -12,4 +12,5 @@ export class TicketsDto {
     unitCode: string;
     workStatus: WorkStatusEnum;
     description: string;
+    subDealerId?:number
 }

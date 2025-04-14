@@ -227,14 +227,49 @@ export class DashboardController {
     }
 
 
-    @Post('productSubDealerAssignDetails')
-    async productSubDealerAssignDetails(@Body() req: {
+    @Post('getProductAssignmentSummaryBySubDealer')
+    async getProductAssignmentSummaryBySubDealer(@Body() req: {
         subDealerId?: string;
         companyCode: string;
         unitCode: string;
     }): Promise<CommonResponse> {
         try {
+            return await this.productAssignDashboardService.getProductAssignmentSummaryBySubDealer(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         // return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('productSubDealerAssignDetails')
+    async productSubDealerAssignDetails(@Body() req: {
+        subDealerId?: string;
+        companyCode: string;
+        unitCode: string;
+        subDealerName?: string;
+
+    }): Promise<CommonResponse> {
+        try {
             return await this.productAssignDashboardService.productSubDealerAssignDetails(req)
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+            //         // return new CommonResponse(false, 500, 'Error details');
+        }
+    }
+
+    @Post('getProductDetailsBySubDealer')
+    async getProductDetailsBySubDealer(@Body() req: {
+        unitCode: string;
+        companyCode: string;
+        subDealerId?: string;
+        fromDate?: string;
+        toDate?: string;
+
+    }): Promise<CommonResponse> {
+        try {
+            return await this.productAssignDashboardService.getProductDetailsBySubDealer(req)
         }
         catch (error) {
             console.log("Error in details in service..", error);

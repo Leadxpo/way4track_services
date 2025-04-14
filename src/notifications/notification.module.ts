@@ -10,12 +10,15 @@ import { TicketsModule } from 'src/tickets/tickets.module';
 import { NotificationRepository } from './repo/notification.repo';
 import { WorkAllocationModule } from 'src/work-allocation/work-allocation.module';
 import { NotificationAdapter } from './notification.adapter';
+import { TechnicianModule } from 'src/technician-works/technician-work.module';
 @Module({
     imports: [
         TypeOrmModule.forFeature([NotificationEntity, RequestRaiseEntity, TicketsEntity]),
         forwardRef(() => RequestRaiseModule),
         forwardRef(() => TicketsModule),
         forwardRef(() => WorkAllocationModule),
+        forwardRef(() => TechnicianModule),
+
     ],
     controllers: [NotificationController],
     providers: [NotificationService, NotificationRepository, NotificationAdapter],

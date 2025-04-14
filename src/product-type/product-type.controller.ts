@@ -17,26 +17,26 @@ export class ProductTypeController {
     constructor(private readonly service: ProductTypeService) { }
 
     @Post('handleProductTypeDetails')
-    @UseInterceptors(FileFieldsInterceptor(
-        [
-            { name: 'photo', maxCount: 1 },
-            { name: 'image', maxCount: 1 },
-        ],
-        multerOptions
-    ))
+    // @UseInterceptors(FileFieldsInterceptor(
+    //     [
+    //         { name: 'photo', maxCount: 1 },
+    //         { name: 'image', maxCount: 1 },
+    //     ],
+    //     multerOptions
+    // ))
     async handleProductTypeDetails(
         @Body() dto: ProductTypeDto,
-         @UploadedFiles() photos: {
-            photo?: Express.Multer.File[],
-            image?: Express.Multer.File[],
-                  
-                }
+        //  @UploadedFiles() photos: {
+        //     photo?: Express.Multer.File[],
+        //     image?: Express.Multer.File[],
+
+        //         }
     ): Promise<CommonResponse> {
         try {
             if (dto.id) {
                 dto.id = Number(dto.id);
             }
-            return await this.service.handleProductTypeDetails(dto, photos);
+            return await this.service.handleProductTypeDetails(dto);
         } catch (error) {
             console.error('Error in save hiring details with resume in service:', error);
             return new CommonResponse(false, 500, 'Error saving hiring details with resume');

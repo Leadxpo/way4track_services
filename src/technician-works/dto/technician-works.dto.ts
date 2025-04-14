@@ -51,6 +51,10 @@ export class TechnicianWorksDto {
     pendingDate: Date;
     completedDate: Date;
     subDealerId?: number
+    userName?: string;
+    applicationId?: number
+    paidAmount?: number;
+
 }
 export class Requirements {
     productName: string;
@@ -62,4 +66,6 @@ export class Remarks {
     name: string;
     date: Date;
     desc: string;
+    image?: string;
+    video?: string
 }

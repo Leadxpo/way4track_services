@@ -58,6 +58,9 @@ export class TechnicianWorksResponseDto {
     pendingDate?: Date;
     completedDate?: Date;
     subDealerId?: number
+    userName?: string;
+    applicationId?: number
+    paidAmount?: number
 
     constructor(
         id: number,
@@ -110,8 +113,10 @@ export class TechnicianWorksResponseDto {
         activateDate?: Date,
         pendingDate?: Date,
         completedDate?: Date,
-        subDealerId?: number
-
+        subDealerId?: number,
+        userName?: string,
+        applicationId?: number,
+        paidAmount?: number
 
     ) {
         this.id = id;
@@ -165,6 +170,8 @@ export class TechnicianWorksResponseDto {
         this.pendingDate = pendingDate
         this.completedDate = completedDate
         this.subDealerId = subDealerId
-
+        this.userName = userName
+        this.applicationId = applicationId
+        this.paidAmount = paidAmount
     }
 }

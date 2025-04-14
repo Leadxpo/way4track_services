@@ -9,9 +9,9 @@ export class OtpEntity {
   @Column({ name: 'staff_id', type: 'varchar', nullable: true })
   staffId: string;  // Store staffId directly
 
-  @ManyToOne(() => StaffEntity, (staff) => staff.otpGeneration, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'staff_id' })
-  staff: StaffEntity;
+  // @ManyToOne(() => StaffEntity, (staff) => staff.otpGeneration, { onDelete: 'CASCADE' })
+  // @JoinColumn({ name: 'staff_id' })
+  // staff: StaffEntity;
 
   @Column({ name: 'otp', type: 'varchar', length: 6 })
   otp: string;

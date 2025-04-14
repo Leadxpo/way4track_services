@@ -22,6 +22,18 @@ import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BranchChartDto } from 'src/voucher/dto/balance-chart.dto';
 import { VehicleTypeRepository } from 'src/vehicle-type/repo/vehicle-type.repo';
 import { ServiceTypeRepository } from 'src/service-type/repo/service.repo';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
+import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { NotificationService } from 'src/notifications/notification.service';
+import { NotificationEnum } from 'src/notifications/entity/notification.entity';
+import { PaymentStatus } from 'src/product/dto/payment-status.enum';
+import { ClientRepository } from 'src/client/repo/client.repo';
+import { ClientService } from 'src/client/client.service';
+import { ClientDto } from 'src/client/dto/client.dto';
+import { ClientStatus } from 'src/client/enum/client-status.enum';
 
 
 @Injectable()
@@ -34,6 +46,9 @@ export class TechnicianService {
         private productRepo: ProductRepository,
         private vehicleRepo: VehicleTypeRepository,
         private serviceRepo: ServiceTypeRepository,
+        private notificationService: NotificationService,
+        private clientService: ClientService,
+        private clientRepo: ClientRepository
 
     ) {
         this.storage = new Storage({
@@ -57,7 +72,10 @@ export class TechnicianService {
             photo8?: Express.Multer.File[];
             photo9?: Express.Multer.File[];
             photo10?: Express.Multer.File[];
-        } = {} // ✅ Default to an empty object
+            screenShot?: Express.Multer.File[];
+            image?: Express.Multer.File[];
+            videos?: Express.Multer.File[];
+        } = {}
     ): Promise<CommonResponse> {
         let filePaths: Record<keyof typeof photos, string | undefined> = {
             photo1: undefined,
@@ -70,13 +88,35 @@ export class TechnicianService {
             photo8: undefined,
             photo9: undefined,
             photo10: undefined,
-
+            screenShot: undefined,
+            image: undefined,
+            videos: undefined
         };
-        console.log(filePaths, "fileoath")
+
+        const uploadedImages: string[] = [];
+        const uploadedVideos: string[] = [];
+
         for (const [key, fileArray] of Object.entries(photos)) {
-            if (fileArray && fileArray.length > 0) {
-                const file = fileArray[0]; // Get the first file
-                const uniqueFileName = `vehicle_photos/${Date.now()}-${file.originalname}`;
+            if (!fileArray || fileArray.length === 0) continue;
+
+            if (key === 'image' || key === 'videos') continue;
+
+            const file = fileArray[0];
+            const uniqueFileName = `vehicle_photos/${Date.now()}-${file.originalname}`;
+            const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+            await storageFile.save(file.buffer, {
+                contentType: file.mimetype,
+                resumable: false,
+            });
+
+            filePaths[key as keyof typeof filePaths] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
+        // Upload multiple remark images
+        if (photos.image?.length) {
+            for (const file of photos.image) {
+                const uniqueFileName = `remark_images/${Date.now()}-${file.originalname}`;
                 const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
 
                 await storageFile.save(file.buffer, {
@@ -84,21 +124,39 @@ export class TechnicianService {
                     resumable: false,
                 });
 
-                console.log(`File uploaded to GCS: ${uniqueFileName}`);
-                filePaths[key] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                uploadedImages.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
             }
         }
-        if (!photos || typeof photos !== 'object') {
-            console.error('Photos parameter is null or undefined');
-            photos = {}; // Ensure it's an empty object
-        }
 
+        // Upload multiple remark videos
+        if (photos.videos?.length) {
+            for (const file of photos.videos) {
+                const uniqueFileName = `remark_videos/${Date.now()}-${file.originalname}`;
+                const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+                await storageFile.save(file.buffer, {
+                    contentType: file.mimetype,
+                    resumable: false,
+                });
+
+                uploadedVideos.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
+            }
+        }
+        console.log(photos, "?")
         return req.id
-            ? await this.updateTechnicianDetails(req, filePaths)
-            : await this.createTechnicianDetails(req, filePaths);
+            ? await this.updateTechnicianDetails(req, filePaths, uploadedImages, uploadedVideos)
+            : await this.createTechnicianDetails(req, filePaths, uploadedImages, uploadedVideos);
+
     }
 
-    async createTechnicianDetails(req: TechnicianWorksDto, filePaths?: Record<string, string | null>): Promise<CommonResponse> {
+
+    async createTechnicianDetails(
+        req: TechnicianWorksDto,
+        filePaths?: Record<string, string | null>,
+        uploadedImages: string[] = [],
+        uploadedVideos: string[] = []
+    ): Promise<CommonResponse> {
+
         try {
             console.log(req, "req");
 
@@ -146,7 +204,6 @@ export class TechnicianService {
             newTechnician.productId = ProductEntity?.id;
             newTechnician.amount = ProductEntity?.cost
 
-            console.log(newTechnician, "newTechnician");
 
             // Assign file URLs if available
             if (filePaths) {
@@ -160,12 +217,58 @@ export class TechnicianService {
                 newTechnician.vehiclePhoto8 = filePaths.photo8;
                 newTechnician.vehiclePhoto9 = filePaths.photo9;
                 newTechnician.vehiclePhoto10 = filePaths.photo10;
+                newTechnician.screenShot = filePaths.screenShot;
+
             }
+
+            if (typeof newTechnician.remark === 'string') {
+                newTechnician.remark = JSON.parse(newTechnician.remark);
+            }
+            if (typeof newTechnician.remark === 'string') {
+                newTechnician.remark = JSON.parse(newTechnician.remark);
+            }
+
+            if (Array.isArray(newTechnician.remark)) {
+                newTechnician.remark = newTechnician.remark.map((remark, index) => ({
+                    ...remark,
+                    image: uploadedImages[index] || null,
+                    video: uploadedVideos[index] || null,
+                }));
+            }
+
 
             // Generate Technician ID
             newTechnician.technicianNumber = await this.generateTechNumber();
+            console.log(newTechnician, "newTechnician");
 
             await this.repo.insert(newTechnician);
+            const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } })
+            if (!client) {
+                const clientDto: ClientDto = {
+                    name: newTechnician.name || "",
+                    branch: req.branchId ?? null,
+                    phoneNumber: newTechnician.phoneNumber || "",
+                    dob: "",
+                    email: newTechnician.email || "",
+                    address: newTechnician.address || "",
+                    joiningDate: newTechnician.startDate || null,
+                    companyCode: req.companyCode ?? "",
+                    unitCode: req.unitCode ?? "",
+                    hsnCode: "",
+                    SACCode: "",
+                    tds: false,
+                    tcs: false,
+                    billWiseDate: false,
+                    status: ClientStatus.Active,
+
+                };
+
+                try {
+                    await this.clientService.createClientDetails(clientDto);
+                } catch (notificationError) {
+                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                }
+            }
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
             console.error(`Error creating Technician details: ${error.message}`, error.stack);
@@ -173,16 +276,17 @@ export class TechnicianService {
         }
     }
 
-
-
     async updateTechnicianDetails(
         req: TechnicianWorksDto,
-        filePaths: Record<string, string | null> = {} // Ensure it's always an object
+        filePaths: Record<string, string | null> = {},
+        uploadedImages: string[] = [],
+        uploadedVideos: string[] = []
     ): Promise<CommonResponse> {
         try {
-            // Ensure filePaths is always an object
-            filePaths = filePaths ?? {};
+            console.log(req, "remark");
 
+
+            // filePaths = filePaths ?? {};
             let existingTechnician: TechnicianWorksEntity | null = null;
 
             if (req.id) {
@@ -202,6 +306,7 @@ export class TechnicianService {
                 );
             }
 
+
             // Find product based on IMEI or SIM
             const product = await this.productRepo.findOne({
                 where: [
@@ -215,52 +320,94 @@ export class TechnicianService {
                 photo2: 'vehiclePhoto2',
                 photo3: 'vehiclePhoto3',
                 photo4: 'vehiclePhoto4',
-                photo5: 'vehiclePhoto4',
-                photo6: 'vehiclePhoto4',
-                photo7: 'vehiclePhoto4',
-                photo8: 'vehiclePhoto4',
-                photo9: 'vehiclePhoto4',
-                photo10: 'vehiclePhoto4',
+                photo5: 'vehiclePhoto5',
+                photo6: 'vehiclePhoto6',
+                photo7: 'vehiclePhoto7',
+                photo8: 'vehiclePhoto8',
+                photo9: 'vehiclePhoto9',
+                photo10: 'vehiclePhoto10',
+                screenShot: 'screenShot',
+                image: 'image',
+                videos: 'videos'
             };
 
             // ✅ Ensure filePaths is always a valid object
             filePaths = filePaths ?? {};
+            console.log(filePaths, "files")
 
 
-            // ✅ Safeguard against undefined filePaths
-            for (const [field, entityField] of Object.entries(photoMapping)) {
-                if (filePaths[field]) {
-                    (existingTechnician as any)[entityField] = filePaths[field];
+            // for (const [field, entityField] of Object.entries(photoMapping)) {
+            //     if (filePaths[field]) {
+            //         (existingTechnician as any)[entityField] = filePaths[field];
+            //     }
+            // }
+
+            console.log("Saving technician with remarks: before", existingTechnician.remark);
+            let parsedRemark = req.remark;
+            if (typeof req.remark === 'string') {
+                try {
+                    parsedRemark = JSON.parse(req.remark);
+                } catch (e) {
+                    console.error('Failed to parse remark string', req.remark);
+                    parsedRemark = [];  // Default to an empty array in case of parsing error
                 }
             }
 
+            // Ensure it's an array before processing
+            if (!Array.isArray(parsedRemark)) {
+                parsedRemark = [];  // Default to an empty array if it's not a valid array
+            }
+            // ✅ Create new remarks with media
+            let newRemarks: any[] = [];
+            if (parsedRemark && Array.isArray(parsedRemark)) {
+                newRemarks = parsedRemark.map((remark, index) => ({
+                    ...remark,
+                    image: uploadedImages[index] || null,
+                    video: uploadedVideos[index] || null,
+                }));
+
+            }
 
 
+            // ✅ Merge remarks
+            existingTechnician.remark = Array.isArray(existingTechnician.remark)
+                ? [...existingTechnician.remark, ...newRemarks]
+                : newRemarks;
 
-            // Convert DTO to entity and retain existing ID
-            const technicianEntity = this.adapter.convertDtoToEntity(req);
-            technicianEntity.id = existingTechnician.id;
+            console.log("Saving technician with remarks:", existingTechnician.screenShot);
 
-            // Retain photo fields
-            Object.assign(existingTechnician, technicianEntity);
 
-            console.log("Final data before saving:", existingTechnician);
+            if (existingTechnician.workStatus === WorkStatusEnum.ACTIVATE && existingTechnician.paymentStatus === PaymentStatus.PENDING && existingTechnician.subDealerId) {
+                try {
+                    await this.notificationService.createNotification(existingTechnician, NotificationEnum.TechnicianWorks);
+                } catch (notificationError) {
+                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                }
+            }
+            // ✅ Convert rest of DTO, remove remark
+            let convertedData = this.adapter.convertDtoToEntity(req);
+            delete convertedData.remark;
 
-            await this.repo.update({ id: existingTechnician.id }, {
-                ...existingTechnician,
-                vehiclePhoto1: existingTechnician.vehiclePhoto1,
-                vehiclePhoto2: existingTechnician.vehiclePhoto2,
-                vehiclePhoto3: existingTechnician.vehiclePhoto3,
-                vehiclePhoto4: existingTechnician.vehiclePhoto4,
-                vehiclePhoto5: existingTechnician.vehiclePhoto5,
-                vehiclePhoto6: existingTechnician.vehiclePhoto6,
-                vehiclePhoto7: existingTechnician.vehiclePhoto7,
-                vehiclePhoto8: existingTechnician.vehiclePhoto8,
-                vehiclePhoto9: existingTechnician.vehiclePhoto9,
-                vehiclePhoto10: existingTechnician.vehiclePhoto10,
-            });
+            Object.assign(existingTechnician, convertedData);
+            if (filePaths) {
+                existingTechnician.vehiclePhoto1 = filePaths.photo1;
+                existingTechnician.vehiclePhoto2 = filePaths.photo2;
+                existingTechnician.vehiclePhoto3 = filePaths.photo3;
+                existingTechnician.vehiclePhoto4 = filePaths.photo4;
+                existingTechnician.vehiclePhoto5 = filePaths.photo5;
+                existingTechnician.vehiclePhoto6 = filePaths.photo6;
+                existingTechnician.vehiclePhoto7 = filePaths.photo7;
+                existingTechnician.vehiclePhoto8 = filePaths.photo8;
+                existingTechnician.vehiclePhoto9 = filePaths.photo9;
+                existingTechnician.vehiclePhoto10 = filePaths.photo10;
+                existingTechnician.screenShot = filePaths.screenShot;
 
-            console.log("Data saved successfully");
+            }
+            console.log(existingTechnician.screenShot, ":::::::::::")
+
+            console.log("Final remarks to save:", existingTechnician.screenShot);
+
+            await this.repo.save(existingTechnician);
 
             return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
         } catch (error) {
@@ -295,12 +442,6 @@ export class TechnicianService {
         return `${formattedYear}-${paddedSequentialNumber}`;
     }
 
-
-
-
-
-
-
     async deleteTechnicianDetails(dto: TechIdDto): Promise<CommonResponse> {
         try {
             const TechnicianExists = await this.repo.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
@@ -327,33 +468,49 @@ export class TechnicianService {
 
     async getTechnicianDetailsById(req: TechIdDto): Promise<CommonResponse> {
         try {
-            const Technician = await this.repo.createQueryBuilder('Technician')
-                .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
-                .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
-                .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
-                .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
-                .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
-                .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')
+            console.log(req, "+++++++++++")
 
-                .where('Technician.id = :id', { id: req.id })
-                .andWhere('Technician.companyCode = :companyCode', { companyCode: req.companyCode })
-                .andWhere('Technician.unitCode = :unitCode', { unitCode: req.unitCode })
-                .getOne();
+            const Technician = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'backEndStaffRelation', 'applicationId', 'clientId', 'vehicleId', 'serviceId', 'subDealerId'] });
 
             if (!Technician) {
-                return new CommonResponse(false, 404, 'work not found');
+                return new CommonResponse(false, 404, 'Technician not found');
             }
-            console.log(Technician);  // Log the result before conversion to DTO
-
-            // const data = this.adapter.convertEntityToDto([Technician]);
-            // console.log(data);  // Log the result before conversion to DTO
-
-            return new CommonResponse(true, 200, 'work details fetched successfully', Technician);
+            else {
+                return new CommonResponse(true, 200, 'Technician details fetched successfully', Technician);
+            }
         } catch (error) {
-            console.error("Error in getTechnicianDetailsById service:", error);
-            return new CommonResponse(false, 500, 'Error fetching Technician details');
+            throw new ErrorResponse(500, error.message);
         }
     }
+    // async getTechnicianDetailsById(req: TechIdDto): Promise<CommonResponse> {
+    //     try {
+    //         const Technician = await this.repo.createQueryBuilder('Technician')
+    //             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
+    //             .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
+    //             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
+    //             .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
+    //             .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
+    //             .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')
+
+    //             .where('Technician.id = :id', { id: req.id })
+    //             .andWhere('Technician.company_code = :companyCode', { companyCode: req.companyCode })
+    //             .andWhere('Technician.unit_code = :unitCode', { unitCode: req.unitCode })
+    //             .getOne();
+
+    //         if (!Technician) {
+    //             return new CommonResponse(false, 404, 'work not found');
+    //         }
+    //         console.log(Technician);  // Log the result before conversion to DTO
+
+    //         // const data = this.adapter.convertEntityToDto([Technician]);
+    //         // console.log(data);  // Log the result before conversion to DTO
+
+    //         return new CommonResponse(true, 200, 'work details fetched successfully', Technician);
+    //     } catch (error) {
+    //         console.error("Error in getTechnicianDetailsById service:", error);
+    //         return new CommonResponse(false, 500, 'Error fetching Technician details');
+    //     }
+    // }
 
     async getTotalWorkAllocation(req: {
         companyCode?: string;
@@ -485,8 +642,24 @@ export class TechnicianService {
 
     }
 
+    async getJobCompleted(req: {
+        companyCode: string;
+        unitCode: string;
+        date?: string;
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getJobCompleted(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
     async getWorkStatusCards(req: {
-        companyCode: string; unitCode: string; date?: string
+        companyCode: string;
+        unitCode: string;
+        date?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getWorkStatusCards(req)
         if (!VoucherData) {
@@ -497,6 +670,17 @@ export class TechnicianService {
 
     }
 
+    async getSubDealerServiceTypesCards(req: {
+        companyCode: string; unitCode: string; date?: string
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getSubDealerServiceTypesCards(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
     async getUpCommingWorkAllocationDetails(req: {
         companyCode?: string;
         unitCode?: string

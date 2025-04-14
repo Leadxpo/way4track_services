@@ -34,6 +34,8 @@ export class TechnicianController {
                 { name: 'photo9', maxCount: 1 },
                 { name: 'photo10', maxCount: 1 },
                 { name: 'screenShot', maxCount: 1 },
+                { name: 'image', maxCount: 10 },
+                { name: 'videos', maxCount: 10 }
 
             ],
             multerOptions
@@ -53,7 +55,9 @@ export class TechnicianController {
             photo8?: Express.Multer.File[],
             photo9?: Express.Multer.File[],
             photo10?: Express.Multer.File[],
-            screenShot?: Express.Multer.File[]
+            screenShot?: Express.Multer.File[],
+            image?: Express.Multer.File[],
+            videos?: Express.Multer.File[]
         }
     ): Promise<CommonResponse> {
         if (dto.id) {
@@ -165,6 +169,34 @@ export class TechnicianController {
             return new CommonResponse(false, 500, 'Error deleting vendor details');
         }
     }
+
+    @Post('getJobCompleted')
+    async getJobCompleted(@Body() req: {
+        companyCode: string; unitCode: string; date?: string
+    }) {
+        try {
+            return this.techService.getJobCompleted(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getSubDealerServiceTypesCards')
+    async getSubDealerServiceTypesCards(@Body() req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate?: string;
+        toDate?: string;
+    }) {
+        try {
+            return this.techService.getSubDealerServiceTypesCards(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
 
     @Post('getUpCommingWorkAllocationDetails')
     async getUpCommingWorkAllocationDetails(@Body() req: {

@@ -4,6 +4,7 @@ import { TicketsEntity } from './entity/tickets.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { GetTicketsResDto } from './dto/get-tickets-res.dto';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 
 
 @Injectable()
@@ -18,6 +19,13 @@ export class TicketsAdapter {
         staff.id = dto.staffId;
         entity.staff = staff;
 
+        if (dto.subDealerId) {
+            const sub = new SubDealerEntity();
+            sub.id = dto.subDealerId;
+            entity.subDealerId = sub;
+        }
+
+
         const branch = new BranchEntity();
         branch.id = dto.branchId;
         entity.branch = branch;
@@ -28,7 +36,7 @@ export class TicketsAdapter {
         if (dto.id) {
             entity.id = dto.id;  // This might not be necessary for a new ticket
         }
-        
+
         return entity;
     }
 

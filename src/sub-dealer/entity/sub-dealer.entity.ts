@@ -1,11 +1,14 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
@@ -53,6 +56,9 @@ export class SubDealerEntity {
   @OneToMany(() => RequestRaiseEntity, (product) => product.subDealerId)
   request: RequestRaiseEntity[];
 
+  @OneToMany(() => TicketsEntity, (product) => product.subDealerId)
+  tickets: TicketsEntity[];
+
   @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.subDealer, { nullable: true })
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
@@ -86,4 +92,10 @@ export class SubDealerEntity {
 
   @OneToMany(() => SubDelaerStaffEntity, (SubDelaerStaffEntity) => SubDelaerStaffEntity.subDealerId)
   subDealerStaff: SubDelaerStaffEntity[];
+
+  @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.subDealerId)
+  note: NotificationEntity[];
+
+  @OneToMany(() => ProductEntity, (asserts) => asserts.subDealerId)
+  product: ProductEntity[];
 }

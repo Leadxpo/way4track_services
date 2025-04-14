@@ -37,19 +37,6 @@ export class VoucherAdapter {
       fromAccount.id = dto.fromAccount;
       entity.fromAccount = fromAccount;
     }
-
-    if (!dto.productDetails || dto.productDetails.length === 0) {
-      entity.productDetails = [];
-    } else {
-      entity.productDetails = dto.productDetails.map((productDetail) => {
-        return {
-          productName: productDetail.productName,
-          quantity: productDetail.quantity,
-          rate: productDetail.rate,
-          totalCost: productDetail.totalCost || 0,
-        };
-      });
-    }
     // Client
     const client = new ClientEntity();
     client.clientId = dto.clientId;
@@ -192,8 +179,9 @@ export class VoucherAdapter {
           voucher.estimate?.id || null,
           voucher.estimate?.invoiceId,
           voucher.staffId?.name || "",
-          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : ""
-
+          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
+          voucher?.dueDate ? voucher.dueDate : null,
+          voucher?.productDetails ? voucher.productDetails : [],
         );
       });
     } else {
@@ -249,7 +237,10 @@ export class VoucherAdapter {
           voucher.estimate?.id || null,
           voucher.estimate?.invoiceId,
           voucher.staffId?.name || "",
-          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : ""
+          voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
+          voucher?.dueDate ? voucher.dueDate : null,
+          voucher?.productDetails ? voucher.productDetails : [],
+
 
         )
       ];

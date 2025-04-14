@@ -93,4 +93,18 @@ export class ProductController {
     }
   }
 
+
+  @Post('productAssignDetails')
+  async productAssignDetails(@Body() req: {
+    branchName?: string;
+    subDealerId?: string
+    companyCode?: string;
+    unitCode?: string;
+  }): Promise<CommonResponse> {
+    try {
+      return this.productService.productAssignDetails(req);
+    } catch (error) {
+      return new CommonResponse(false, 500, 'Error fetching branch type details');
+    }
+  }
 }

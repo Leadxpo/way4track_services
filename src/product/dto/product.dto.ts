@@ -39,6 +39,10 @@ export class ProductDto {
   productTypeId?: number
   productStatus?: ProductStatusEnum
   productType?: string
+  branchId?: number
+  subDealerId?: number
+  staffId?: number
+  assignTime?: Date;
 
 }
 

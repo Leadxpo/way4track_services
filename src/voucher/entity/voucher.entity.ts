@@ -130,8 +130,8 @@ export class VoucherEntity {
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;
 
-    @Column({ name: 'voucher_gst', type: 'float', nullable: true })
-    voucherGST: number;
+    @Column({ name: 'voucher_gst', type: 'varchar', nullable: true })
+    voucherGST: string;
 
     @Column({ name: 'igst', type: 'float', nullable: true })
     IGST: number;

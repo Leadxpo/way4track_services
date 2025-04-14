@@ -1,5 +1,6 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
@@ -62,4 +63,8 @@ export class TicketsEntity {
 
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
+
+    @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.tickets, { nullable: true })
+    @JoinColumn({ name: 'sub_dealer_id' })
+    subDealerId: SubDealerEntity;
 }

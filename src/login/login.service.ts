@@ -24,10 +24,13 @@ export class LoginService {
         if (!req.staffId || !req.password || !req.designation || !req.companyCode || !req.unitCode) {
             throw new Error('Missing required login details.');
         }
-        if (designation === 'subdealer') {
+
+        if (designation === 'sub dealer') {
             login = await this.subDealerService.getSubDealerProfileDetails(req);
+            console.log(login, ">>")
         } else {
             login = await this.staffService.getStaffProfileDetails(req);
+            console.log(login, "{{{")
         }
         if (!login) {
             return new CommonResponse(false, 401, "Data does not match the credentials.", []);

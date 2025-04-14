@@ -135,6 +135,8 @@ export class VoucherService {
                         ? JSON.parse(voucherDto.productDetails)
                         : voucherDto.productDetails;
 
+                console.log(productDetailsArray, "+++++++++++++++++")
+
                 if (!Array.isArray(productDetailsArray)) {
                     throw new Error("Invalid productDetails format. Expected an array.");
                 }
@@ -155,23 +157,22 @@ export class VoucherService {
                         description: productDetail.description,
                     };
                 });
-                // ✅ Apply GST, TDS, and TCS on totalCost, not per product
-                const cgstRate = parseFloat(voucherDto.CGST?.toString() || "0");
-                const sgstRate = parseFloat(voucherDto.SGST?.toString() || "0");
-                const igstRate = parseFloat(voucherDto.IGST?.toString() || "0");
-                const tdsRate = parseFloat(voucherDto.TDS?.toString() || "0");
-                const tcsRate = parseFloat(voucherDto.TCS?.toString() || "0");
+                // // ✅ Apply GST, TDS, and TCS on totalCost, not per product
+                // const cgstRate = parseFloat(voucherDto.CGST?.toString() || "0");
+                // const sgstRate = parseFloat(voucherDto.SGST?.toString() || "0");
+                // const igstRate = parseFloat(voucherDto.IGST?.toString() || "0");
+                // const tdsRate = parseFloat(voucherDto.TDS?.toString() || "0");
+                // const tcsRate = parseFloat(voucherDto.TCS?.toString() || "0");
 
-                let totalGST = 0;
-                if (igstRate > 0) {
-                    totalGST = (igstRate * totalCost) / 100;
-                } else {
-                    totalGST = ((cgstRate + sgstRate) * totalCost) / 100;
-                }
+                // let totalGST = 0;
+                // if (igstRate > 0) {
+                //     totalGST = (igstRate * totalCost) / 100;
+                // } else {
+                //     totalGST = ((cgstRate + sgstRate) * totalCost) / 100;
+                // }
 
-                const totalTDS = (tdsRate * totalCost) / 100;
-                const totalTCS = (tcsRate * totalCost) / 100;
-                voucherEntity.amount = totalCost + totalGST - totalTDS + totalTCS;
+                // const totalTDS = (tdsRate * totalCost) / 100;
+                // const totalTCS = (tcsRate * totalCost) / 100;
                 console.log("Processed Product Details:", productDetails);
             }
             // ✅ Final Amount Calculation
@@ -310,7 +311,6 @@ export class VoucherService {
         if (!ledger) {
             throw new NotFoundException('Ledger not found.');
         }
-
         const pendingVouchers = await this.voucherRepository.find({
             where: {
                 ledgerId: ledger, // Use the full entity instead of ledger.id
@@ -318,7 +318,6 @@ export class VoucherService {
             },
             select: ['invoiceId', 'amount', 'paidAmount', 'reminigAmount'], // Return only invoiceId and amount
         });
-
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
 

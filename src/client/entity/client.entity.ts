@@ -30,26 +30,26 @@ export class ClientEntity extends BaseEntity {
     // @Column({ name: 'dob', type: 'date', nullable: true })
     // dob: string;
 
-    @Column({ name: 'tds', type: 'boolean', default: false })
+    @Column({ name: 'tds', type: 'boolean', default: false, nullable: true })
     tds: boolean;
 
-    @Column({ name: 'tcs', type: 'boolean', default: false })
+    @Column({ name: 'tcs', type: 'boolean', default: false, nullable: true })
     tcs: boolean;
 
-    @Column({ name: 'bill_wise_date', type: 'boolean', default: false })
+    @Column({ name: 'bill_wise_date', type: 'boolean', default: false, nullable: true })
     billWiseDate: boolean;
 
-    @Column({ name: 'email', type: 'varchar', length: 150, unique: true })
+    @Column({ name: 'email', type: 'varchar', length: 150, unique: true, nullable: true })
     email: string;
 
     @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
     GSTNumber: string;
 
-    @Column({ name: 'address', type: 'text' })
+    @Column({ name: 'address', type: 'text', nullable: true })
     address: string;
 
     @Column({ name: 'joining_date', type: 'date', nullable: true })
-    joiningDate: string;
+    joiningDate: Date;
 
     @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.clientId)
     technician: TechnicianWorksEntity[];
@@ -57,7 +57,7 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
     dispatch: DispatchEntity[];
 
-    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client,{nullable:true})
+    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 

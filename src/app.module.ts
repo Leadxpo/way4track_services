@@ -88,7 +88,6 @@ import { SubDelaerStaffEntity } from './sub-dealer-staff/entity/sub-dealer-staff
     AssertModule,
     ClientModule,
     StaffModule,
-    OTPModule,
     VendorModule,
     SubDealerModule,
     ProductModule,
@@ -119,7 +118,8 @@ import { SubDelaerStaffEntity } from './sub-dealer-staff/entity/sub-dealer-staff
     GroupsModule,
     VehicleTypeModule,
     ServiceTypeModule,
-    SubDealerStaffModule
+    SubDealerStaffModule,
+
   ],
   controllers: [],
   providers: [],

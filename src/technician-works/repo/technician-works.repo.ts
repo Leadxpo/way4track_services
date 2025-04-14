@@ -11,6 +11,8 @@ import { CommonReq } from "src/models/common-req";
 import { BranchChartDto } from "src/voucher/dto/balance-chart.dto";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { ServiceTypeEntity } from "src/service-type/entity/service.entity";
+import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
 
 
 
@@ -197,12 +199,18 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
-                'wa.remark as remark'
+                'wa.remark as remark',
+                'br.id as branchId',
+                'br.id AS branchId',
+                'pt.name as applicationName',
+                'wa.user_name as userName',
+                'wa.paid_amount as paidAmount'
 
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = wa.application_id')
             .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
             .leftJoinAndSelect(ClientEntity, 'client', 'wa.client_id = client.id')
             .andWhere('staff.staff_id = :staffId', { staffId: req.staffId })
@@ -211,6 +219,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.status) {
             query.andWhere(`wa.work_status=:status`, { status: req.status })
         }
+        query.orderBy('wa.start_date', 'ASC')
 
         const result = await query.getRawMany();
         return result;
@@ -494,8 +503,13 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(ve.amount) AS totalAmount',
                 've.id AS id',
                 've.technician_number as technicianNumber',
+                've.remark as remark',
+                've.paid_amount as paidAmount',
+                've.user_name as userName',
+                'pt.name as applicationName',
             ])
-            .leftJoin(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .leftJoinAndSelect(StaffEntity, 'staff', 've.staff_id = staff.id')
+            .leftJoinAndSelect(ProductTypeEntity, 'pt', 'pt.id = ve.application_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -523,14 +537,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
 
     async getBackendSupportWorkAllocation(req: {
         staffId?: string;
-        subDealerId?: string
+        subDealerId?: string;
         supporterId?: string;
         companyCode?: string;
         unitCode?: string;
         fromDate?: string;
         toDate?: string;
         branchName?: string;
-        status?: string
+        status?: string;
     }) {
         const query = this.createQueryBuilder('wa')
             .select([
@@ -553,6 +567,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.end_date AS endDate',
                 'wa.service_or_product AS serviceOrProduct',
                 'br.name AS branchName',
+                'br.id AS branchId',
                 'staff.id as staffId',
                 'st.id as backSupporterId',
                 'wa.amount as amount',
@@ -575,7 +590,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
-                'wa.remark as remark'
+                'wa.remark as remark',
+                'wa.paid_amount as paidAmount'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
@@ -609,59 +625,9 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.subDealerId) {
             query.andWhere(`sb.sub_dealer_id=:subDealerId`, { subDealerId: req.subDealerId })
         }
-
+        query.orderBy('wa.start_date', 'ASC')
         return await query.getRawMany();
     }
-
-    // async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
-    //     const baseQuery = this.createQueryBuilder('wa')
-    //         .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
-    //         .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
-    //         .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
-
-
-    //     if (req.date) {
-    //         baseQuery.andWhere('wa.start_date = :date', { date: req.date });
-    //     }
-
-    //     const overallQuery = baseQuery.clone()
-    //         .select([
-    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
-    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
-    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
-    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
-    //         ]);
-
-    //     const branchWiseQuery = baseQuery.clone()
-    //         .select([
-    //             'br.name AS branchName',
-    //             'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
-    //             'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
-    //             'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-    //             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
-    //             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
-    //         ])
-    //         .groupBy('br.name');
-
-    //     const params = {
-    //         install: WorkStatusEnum.INSTALL,
-    //         accept: WorkStatusEnum.ACCEPT,
-    //         activate: WorkStatusEnum.ACTIVATE,
-    //         pending: WorkStatusEnum.PENDING,
-    //         completed: WorkStatusEnum.COMPLETED,
-    //     };
-
-    //     const [overall, branchWise] = await Promise.all([
-    //         overallQuery.setParameters(params).getRawOne(),
-    //         branchWiseQuery.setParameters(params).getRawMany(),
-    //     ]);
-
-    //     return {
-    //         overall,
-    //         branchWise,
-    //     };
-    // }
 
     async getWorkStatusCards(req: { companyCode: string; unitCode: string; date?: string }) {
         const baseQuery = this.createQueryBuilder('wa')
@@ -731,6 +697,152 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 totalActivateWork: overall?.totalActivateWork || 0,
                 totalPendingWork: overall?.totalPendingWork || 0,
                 totalCompletedWork: overall?.totalCompletedWork || 0,
+            },
+            branchWise: branchWise || [],
+            subDealer: subDealer || []
+        };
+
+
+    }
+
+    async getSubDealerServiceTypesCards(req: {
+        companyCode: string;
+        unitCode: string;
+        fromDate?: string;
+        toDate?: string;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .leftJoin(ServiceTypeEntity, 'st', 'st.id = wa.service_id')
+            .select([
+                'sb.id AS subDealerId',
+                'sb.name AS subDealerName',
+                'st.name AS serviceName',
+                'COUNT(*) AS totalServices',
+                'SUM(CAST(wa.amount AS float)) AS totalAmount'
+            ])
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.fromDate) {
+            query.andWhere('wa.start_date >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('wa.end_date <= :toDate', { toDate: req.toDate });
+        }
+
+        query.groupBy('sb.id')
+            .addGroupBy('sb.name')
+            .addGroupBy('st.name');
+
+        const result = await query.getRawMany();
+
+        // Optional: group into nested structure in JS
+        const groupedResult = result.reduce((acc, row) => {
+            const subDealerId = row.subDealerId;
+            if (!acc[subDealerId]) {
+                acc[subDealerId] = {
+                    subDealerId,
+                    subDealerName: row.subDealerName,
+                    services: []
+                };
+            }
+
+            acc[subDealerId].services.push({
+                serviceName: row.serviceName,
+                totalServices: +row.totalServices,
+                totalAmount: +row.totalAmount
+            });
+
+            return acc;
+        }, {} as Record<string, any>);
+
+        return Object.values(groupedResult);
+    }
+
+    async getSubDealerPendingPayments(req: {
+        subDealerId?: number;
+    }) {
+        const query = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .select([
+                'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalActivateWork',
+                'SUM(CASE WHEN wa.payment_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CAST(wa.amount AS float)) AS totalAmount'
+            ])
+            .andWhere('sb.id = :subDealerId', { subDealerId: req.subDealerId });
+
+        const params = {
+            accept: WorkStatusEnum.ACCEPT,
+            pending: PaymentStatus.PENDING,
+        };
+
+        const [subDealer] = await Promise.all([
+            query.setParameters(params).getRawOne()
+        ]);
+
+        return {
+            subDealer: subDealer || []
+        };
+    }
+
+    async getJobCompleted(req: { companyCode: string; unitCode: string; date?: string }) {
+        const baseQuery = this.createQueryBuilder('wa')
+            .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        const baseQuery1 = this.createQueryBuilder('wa')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
+
+        if (req.date) {
+            baseQuery.andWhere('wa.activate_date = :date', { date: req.date });
+            baseQuery1.andWhere('wa.activate_date = :date', { date: req.date });
+        }
+        const overallQuery = baseQuery.clone()
+            .select([
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ]);
+
+        const branchWiseQuery = baseQuery.clone()
+            .select([
+                'br.name AS branchName',
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ])
+            .groupBy('br.name');
+
+        const branchWiseQuery1 = baseQuery1.clone()
+            .select([
+                'sb.sub_dealer_id AS subDealerId',
+
+                'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
+
+            ])
+            .groupBy('sb.sub_dealer_id');
+
+        const params = {
+            activate: WorkStatusEnum.ACTIVATE,
+        };
+
+        const [overall, branchWise, subDealer] = await Promise.all([
+            overallQuery.setParameters(params).getRawOne(),
+            branchWiseQuery.setParameters(params).getRawMany(),
+            branchWiseQuery1.setParameters(params).getRawMany()
+        ]);
+
+
+        return {
+            overall: {
+
+                totalActivateWork: overall?.totalActivateWork || 0,
+
             },
             branchWise: branchWise || [],
             subDealer: subDealer || []

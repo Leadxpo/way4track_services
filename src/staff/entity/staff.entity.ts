@@ -17,6 +17,7 @@ import { DesignationEntity } from 'src/designation/entity/designation.entity';
 import { StaffStatus } from '../enum/staff-status';
 import { Letters } from '../enum/qualifications.enum';
 import { Experience } from '../dto/staff.dto';
+import { ProductEntity } from 'src/product/entity/product.entity';
 
 
 export enum Gender {
@@ -202,6 +203,9 @@ export class StaffEntity extends BaseEntity {
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;
 
+  @Column('varchar', { name: 'unique_id', length: 20, nullable: true })
+  uniqueId: string;
+
   @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
   unitCode: string;
 
@@ -231,8 +235,8 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => AppointmentEntity, (appointmentEntity) => appointmentEntity.staffId)
   appointment: AppointmentEntity[];
 
-  @OneToMany(() => OtpEntity, (OtpEntity) => OtpEntity.staff)
-  otpGeneration: OtpEntity[];
+  // @OneToMany(() => OtpEntity, (OtpEntity) => OtpEntity.staff)
+  // otpGeneration: OtpEntity[];
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.staffId)
   technician: TechnicianWorksEntity[];
@@ -291,5 +295,8 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ type: 'json', name: 'experience_details', nullable: true })
   experienceDetails: Experience[];
+
+  @OneToMany(() => ProductEntity, (asserts) => asserts.staffId)
+  product: ProductEntity[];
 
 }

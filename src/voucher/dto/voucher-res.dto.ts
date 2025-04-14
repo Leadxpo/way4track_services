@@ -4,6 +4,7 @@ import { VoucherTypeEnum } from "../enum/voucher-type-enum";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ProductType } from "src/product/dto/product-type.enum";
 import { DebitORCreditEnum } from "../entity/voucher.entity";
+import { ProductDetailDto } from "./voucher.dto";
 
 export class VoucherResDto {
     id: number;
@@ -55,11 +56,11 @@ export class VoucherResDto {
     invoiceId?: string
     paymentTo?: string
     receiptPdfUrl?: string
-    products?: {
-        name: string; quantity: number; amount: number
-    }[];
+    // products?: {
+    //     name: string; quantity: number; amount: number
+    // }[];
     dueDate: Date;
-
+    productDetails?: ProductDetailDto[];
     constructor(
         id: number,
         name: string,
@@ -110,10 +111,11 @@ export class VoucherResDto {
         invoiceId?: string,
         paymentTo?: string,
         receiptPdfUrl?: string,
-        products?: {
-            name: string; quantity: number; amount: number
-        }[],
-        dueDate?: Date
+        // products?: {
+        //     name: string; quantity: number; amount: number
+        // }[],
+        dueDate?: Date,
+        productDetails?: ProductDetailDto[]
 
     ) {
         this.id = id;
@@ -165,7 +167,7 @@ export class VoucherResDto {
         this.invoiceId = invoiceId;
         this.paymentTo = paymentTo
         this.receiptPdfUrl = receiptPdfUrl
-        this.products = products
         this.dueDate = dueDate
+        this.productDetails = productDetails
     }
 }

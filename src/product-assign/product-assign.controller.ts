@@ -17,47 +17,47 @@ const multerOptions = {
 export class ProductAssignController {
     constructor(private readonly productAssignService: ProductAssignService) { }
 
-    @Post('handleProductDetails')
-    @UseInterceptors(FileInterceptor('file', multerOptions))
-    async handleProductDetails(@Body() dto: ProductAssignDto, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
-        try {
-            if (dto.id) {
-                dto.id = Number(dto.id);
-            }
-            return await this.productAssignService.handleProductDetails(dto, file);
-        } catch (error) {
-            console.error('Error in save product assignment in service:', error);
-            return new CommonResponse(false, 500, 'Error saving product assignment');
-        }
-    }
+    // @Post('handleProductDetails')
+    // @UseInterceptors(FileInterceptor('file', multerOptions))
+    // async handleProductDetails(@Body() dto: ProductAssignDto, @UploadedFile() file: Express.Multer.File): Promise<CommonResponse> {
+    //     try {
+    //         if (dto.id) {
+    //             dto.id = Number(dto.id);
+    //         }
+    //         return await this.productAssignService.handleProductDetails(dto, file);
+    //     } catch (error) {
+    //         console.error('Error in save product assignment in service:', error);
+    //         return new CommonResponse(false, 500, 'Error saving product assignment');
+    //     }
+    // }
 
-    @Post('deleteProductAssign')
-    async deleteProductAssign(@Body() dto: ProductAssignIdDto): Promise<CommonResponse> {
-        try {
-            return await this.productAssignService.deleteProductAssign(dto);
-        } catch (error) {
-            console.error('Error in delete product assignment in service:', error);
-            return new CommonResponse(false, 500, 'Error deleting product assignment');
-        }
-    }
+    // @Post('deleteProductAssign')
+    // async deleteProductAssign(@Body() dto: ProductAssignIdDto): Promise<CommonResponse> {
+    //     try {
+    //         return await this.productAssignService.deleteProductAssign(dto);
+    //     } catch (error) {
+    //         console.error('Error in delete product assignment in service:', error);
+    //         return new CommonResponse(false, 500, 'Error deleting product assignment');
+    //     }
+    // }
 
-    @Post('getProductAssign')
-    async getProductAssign(@Body() req: ProductAssignIdDto): Promise<CommonResponse> {
-        try {
-            return await this.productAssignService.getProductAssign(req);
-        } catch (error) {
-            console.error('Error in get product assignment in service:', error);
-            return new CommonResponse(false, 500, 'Error fetching product assignment');
-        }
-    }
+    // @Post('getProductAssign')
+    // async getProductAssign(@Body() req: ProductAssignIdDto): Promise<CommonResponse> {
+    //     try {
+    //         return await this.productAssignService.getProductAssign(req);
+    //     } catch (error) {
+    //         console.error('Error in get product assignment in service:', error);
+    //         return new CommonResponse(false, 500, 'Error fetching product assignment');
+    //     }
+    // }
 
-    @Post('getAllProductAssign')
-    async getAllProductAssign(@Body() req: CommonReq): Promise<CommonResponse> {
-        try {
-            return await this.productAssignService.getAllProductAssign(req);
-        } catch (error) {
-            console.error('Error in get product assignment in service:', error);
-            return new CommonResponse(false, 500, 'Error fetching product assignment');
-        }
-    }
+    // @Post('getAllProductAssign')
+    // async getAllProductAssign(@Body() req: CommonReq): Promise<CommonResponse> {
+    //     try {
+    //         return await this.productAssignService.getAllProductAssign(req);
+    //     } catch (error) {
+    //         console.error('Error in get product assignment in service:', error);
+    //         return new CommonResponse(false, 500, 'Error fetching product assignment');
+    //     }
+    // }
 }

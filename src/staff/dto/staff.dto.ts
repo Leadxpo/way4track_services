@@ -68,6 +68,7 @@ export class StaffDto {
     carryForwardLeaves: number;
     experienceDetails?: Experience[]
     accountBranch?: string;
+    uniqueId?: string;
 
 }
 
