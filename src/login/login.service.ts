@@ -7,6 +7,7 @@ import { StaffRepository } from "src/staff/repo/staff-repo";
 import { SubDealerRepository } from "src/sub-dealer/repo/sub-dealer.repo";
 import { SubDealerService } from "src/sub-dealer/sub-dealer.service";
 import { StaffService } from "src/staff/staff-services";
+import { SubDealerStaffService } from "src/sub-dealer-staff/sub-dealer.staff.service";
 
 @Injectable()
 export class LoginService {
@@ -16,7 +17,8 @@ export class LoginService {
         private staffRepository: StaffRepository,
         private subDealerRepo: SubDealerRepository,
         private subDealerService: SubDealerService,
-        private staffService: StaffService
+        private staffService: StaffService,
+        private subDealerStaff: SubDealerStaffService
     ) { }
     async LoginDetails(req: LoginDto): Promise<CommonResponse> {
         const designation = req.designation.toLowerCase();
@@ -28,7 +30,10 @@ export class LoginService {
         if (designation === 'sub dealer') {
             login = await this.subDealerService.getSubDealerProfileDetails(req);
             console.log(login, ">>")
-        } else {
+        } else if (designation === 'sub dealer staff') {
+            login = await this.subDealerStaff.getSubDealerStaffLogin(req);
+        }
+        else {
             login = await this.staffService.getStaffProfileDetails(req);
             console.log(login, "{{{")
         }

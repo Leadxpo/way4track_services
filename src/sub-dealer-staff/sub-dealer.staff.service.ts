@@ -8,6 +8,7 @@ import { SubDealerStaffAdapter } from './sub-dealer-staff.adapter';
 import { SubDealerStaffRepository } from './repo/sub-dealer-staff.repo';
 import { CreateSubDealerStaffDto } from './dto/sub-dealer-staff.dto';
 import { StaffSearchDto } from 'src/staff/dto/staff-search.dto';
+import { LoginDto } from 'src/login/dto/login.dto';
 
 
 
@@ -151,6 +152,20 @@ export class SubDealerStaffService {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
             return new CommonResponse(true, 200, "Data retrieved successfully", staffData)
+        }
+    }
+
+    async getSubDealerStaffLogin(req: LoginDto): Promise<CommonResponse> {
+        try {
+            const subDealerStaff = await this.repo.find({ where: { staffId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!subDealerStaff) {
+                return new CommonResponse(false, 404, 'subDealerStaff not found');
+            }
+            //   const resDto = this.subDealerStaffAdapter.convertEntityToDto(subDealerStaff);
+
+            return new CommonResponse(true, 200, 'subDealerStaff details fetched successfully', subDealerStaff);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
         }
     }
 }
