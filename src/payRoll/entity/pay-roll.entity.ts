@@ -21,7 +21,7 @@ export class PayrollEntity {
     @Column({ name: 'designation', type: 'varchar', length: 255 })
     designation: string;
 
-    @Column({ name: 'staff_photo', type: 'varchar', length: 500, nullable: true })
+    @Column({ name: 'staff_photo', type: 'varchar', length: 255, nullable: true })
     staffPhoto: string;
 
     @Column({ name: 'year', type: 'int', nullable: true })

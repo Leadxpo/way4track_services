@@ -15,10 +15,10 @@ export class ServiceTypeEntity extends BaseEntity {
     @Column({ name: 'duration', type: 'varchar', length: 100, nullable: true })
     duration: string;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

@@ -28,19 +28,19 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ type: 'enum', enum: PaymentStatus, name: 'payment_status', default: PaymentStatus.PENDING, nullable: true })
     paymentStatus: PaymentStatus;
 
-    @Column({ name: 'imei_number', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'imei_number', type: 'varchar', length: 200, nullable: true })
     imeiNumber: string;
 
-    @Column({ name: 'vehicle_type', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'vehicle_type', type: 'varchar', length: 200, nullable: true })
     vehicleType: string;
 
-    @Column({ name: 'vehicle_number', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'vehicle_number', type: 'varchar', length: 200, nullable: true })
     vehicleNumber: string;
 
-    @Column({ name: 'chassis_number', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'chassis_number', type: 'varchar', length: 200, nullable: true })
     chassisNumber: string;
 
-    @Column({ name: 'engine_number', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'engine_number', type: 'varchar', length: 200, nullable: true })
     engineNumber: string;
 
     @Column({ name: 'vehicle_photo_1', type: 'varchar', length: 255, nullable: true })
@@ -126,10 +126,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     @JoinColumn({ name: 'work_id' })
     workId: WorkAllocationEntity;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
     @Column({ name: 'description', type: 'text', nullable: true })

@@ -19,10 +19,10 @@ export class ProductTypeEntity extends BaseEntity {
     // @Column({ name: 'blog_image', type: 'varchar', length: 255, nullable: true })
     // blogImage: string;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

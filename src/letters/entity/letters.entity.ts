@@ -12,13 +12,13 @@ export class LettersEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: true })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: true })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: true })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: true })
     unitCode: string;
 
-    // @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    // @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     // staffId: string;
 
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.Letters)

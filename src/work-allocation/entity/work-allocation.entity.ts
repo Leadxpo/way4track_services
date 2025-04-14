@@ -66,13 +66,13 @@ export class WorkAllocationEntity extends BaseEntity {
     @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.workId)
     technician: TechnicianWorksEntity[];
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
-    // @Column({ name: 'imei_number', type: 'varchar', length: 20 })
+    // @Column({ name: 'imei_number', type: 'varchar', length: 200 })
     // imeiNumber: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -87,7 +87,7 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'amount', type: 'float', nullable: true })
     amount: number;
 
-    @Column('varchar', { name: 'visitingNumber', length: 20, nullable: true })
+    @Column('varchar', { name: 'visitingNumber', length: 200, nullable: true })
     visitingNumber: string;
 
     @ManyToOne(() => StaffEntity, (designation) => designation.sales, { nullable: true })

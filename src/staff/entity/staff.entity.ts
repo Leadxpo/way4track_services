@@ -86,22 +86,22 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'office_email', type: 'varchar', length: 150, nullable: true })
   officeEmail: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 200, unique: true, nullable: true })
   aadharNumber: string;
 
-  @Column({ name: 'pan_card_number', type: 'varchar', length: 20, unique: true, nullable: true })
+  @Column({ name: 'pan_card_number', type: 'varchar', length: 200, unique: true, nullable: true })
   panCardNumber: string;
 
   @Column({ name: 'driving_licence', type: 'enum', enum: YesNo, nullable: true })
   drivingLicence: YesNo;
 
-  @Column({ name: 'driving_licence_number', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'driving_licence_number', type: 'varchar', length: 200, nullable: true })
   drivingLicenceNumber: string;
 
-  @Column({ name: 'uan_number', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'uan_number', type: 'varchar', length: 200, nullable: true })
   uanNumber: string;
 
-  @Column({ name: 'esic_number', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'esic_number', type: 'varchar', length: 200, nullable: true })
   esicNumber: string;
 
   @Column({ name: 'blood_group', type: 'varchar', length: 50, nullable: true })
@@ -116,13 +116,13 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'bank_name', type: 'varchar', length: 255, nullable: true })
   bankName: string;
 
-  @Column({ name: 'account_number', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'account_number', type: 'varchar', length: 200, nullable: true })
   accountNumber: string;
 
-  @Column({ name: 'account_branch', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'account_branch', type: 'varchar', length: 200, nullable: true })
   accountBranch: string;
 
-  @Column({ name: 'ifsc_code', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'ifsc_code', type: 'varchar', length: 200, nullable: true })
   ifscCode: string;
 
   @Column({ name: 'address', type: 'text', nullable: true })
@@ -161,7 +161,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'vehicle_photo', type: 'text', nullable: true })
   vehiclePhoto: string;
 
-  @Column({ name: 'bike_number', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'bike_number', type: 'varchar', length: 200, nullable: true })
   bikeNumber: string;
 
   @Column({ name: 'mobile_allocation', type: 'enum', enum: YesNo, nullable: true })
@@ -176,7 +176,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'mobile_number', type: 'varchar', length: 15, nullable: true })
   mobileNumber: string;
 
-  @Column({ name: 'imei_number', type: 'varchar', length: 50, nullable: true })
+  @Column({ name: 'imei_number', type: 'varchar', length: 250, nullable: true })
   imeiNumber: string;
 
   @Column({ name: 'termination_date', type: 'date', nullable: true, default: null })
@@ -188,7 +188,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'final_settlement_date', type: 'date', nullable: true, default: null })
   finalSettlementDate: Date;
 
-  @Column({ name: 'insurance_number', type: 'varchar', length: 50, nullable: true })
+  @Column({ name: 'insurance_number', type: 'varchar', length: 250, nullable: true })
   insuranceNumber: string;
 
   @Column({ name: 'insurance_eligibility_date', type: 'date', nullable: true, default: null })
@@ -200,19 +200,19 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'description', type: 'text', nullable: true })
   description: string;
 
-  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'company_code', length: 200, nullable: false })
   companyCode: string;
 
-  @Column('varchar', { name: 'unique_id', length: 20, nullable: true })
+  @Column('varchar', { name: 'unique_id', length: 200, nullable: true })
   uniqueId: string;
 
-  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
   unitCode: string;
 
-  @Column('varchar', { name: 'latitude', length: 20, nullable: true })
+  @Column('varchar', { name: 'latitude', length: 200, nullable: true })
   latitude: string;
 
-  @Column('varchar', { name: 'longitude', length: 20, nullable: true })
+  @Column('varchar', { name: 'longitude', length: 200, nullable: true })
   longitude: string;
 
   @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -283,7 +283,7 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => LettersEntity, (LettersEntity) => LettersEntity.staffId)
   Letters: LettersEntity[];
 
-  @Column('varchar', { name: 'designation', length: 20, nullable: false })
+  @Column('varchar', { name: 'designation', length: 200, nullable: false })
   designation: string;
 
   @ManyToOne(() => DesignationEntity, (designation) => designation.staff, { nullable: true })

@@ -18,10 +18,10 @@ export class SubDelaerStaffEntity extends BaseEntity {
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
@@ -54,10 +54,10 @@ export class SubDelaerStaffEntity extends BaseEntity {
     @Column({ name: 'password', type: 'varchar' })
     password: string;
 
-    @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })
+    @Column({ name: 'aadhar_number', type: 'varchar', length: 200, unique: true, nullable: true })
     aadharNumber: string;
 
-    @Column({ name: 'pan_card_number', type: 'varchar', length: 20, unique: true, nullable: true })
+    @Column({ name: 'pan_card_number', type: 'varchar', length: 200, unique: true, nullable: true })
     panCardNumber: string;
 
     @Column({ name: 'address', type: 'text', nullable: true })

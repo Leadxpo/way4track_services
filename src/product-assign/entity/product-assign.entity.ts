@@ -28,19 +28,19 @@ export class ProductAssignEntity extends BaseEntity {
   @JoinColumn({ name: 'product_id' })
   productId: ProductEntity;
 
-  @Column({ name: 'imei_number_from', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'imei_number_from', type: 'varchar', length: 200, nullable: true })
   imeiNumberFrom: string;
 
-  @Column({ name: 'imei_number_to', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'imei_number_to', type: 'varchar', length: 200, nullable: true })
   imeiNumberTo: string;
 
   @Column({ name: 'number_of_products', type: 'int', nullable: true })
   numberOfProducts: number;
 
-  @Column({ name: 'sim_number_from', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'sim_number_from', type: 'varchar', length: 200, nullable: true })
   simNumberFrom: string;
 
-  @Column({ name: 'sim_number_to', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'sim_number_to', type: 'varchar', length: 200, nullable: true })
   simNumberTo: string;
 
   @ManyToOne(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.productAssign, { nullable: true })
@@ -54,7 +54,7 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'product_assign_photo', type: 'text', nullable: true })
   productAssignPhoto: string;
 
-  @Column({ name: 'branch_person', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'branch_person', type: 'varchar', length: 200, nullable: true })
   branchOrPerson: string;
 
   // @Column({ name: 'assigned_qty', type: 'int', nullable: true, default: null })
@@ -76,10 +76,10 @@ export class ProductAssignEntity extends BaseEntity {
   @Column({ name: 'in_hands', type: 'varchar', default: false, nullable: true })
   inHands: string;
 
-  @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'company_code', length: 200, nullable: false })
   companyCode: string;
 
-  @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+  @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
   unitCode: string;
 
   @Column({ name: 'status', type: 'enum', enum: ProductStatusEnum, default: ProductStatusEnum.available })

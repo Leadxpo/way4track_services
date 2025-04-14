@@ -45,6 +45,7 @@ export class ProductTypeAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.name = dto.name;
+        entity.type = dto.type
         // entity.productPhoto = dto.productPhoto;
         // entity.blogImage = dto.blogImage
         // entity.description = dto.description

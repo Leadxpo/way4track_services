@@ -15,7 +15,7 @@ export class VendorEntity {
   @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
   name: string;
 
-  @Column({ name: 'vendor_id', type: 'varchar', length: 20, unique: true, nullable: true })
+  @Column({ name: 'vendor_id', type: 'varchar', length: 200, unique: true, nullable: true })
   vendorId: string;
 
   @Column({ name: 'vendor_phone_number', type: 'varchar', length: 15, default: '', nullable: true })
@@ -36,7 +36,7 @@ export class VendorEntity {
   @Column({ name: 'email', type: 'varchar', length: 150, nullable: true, unique: true })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true, nullable: true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 200, unique: true, nullable: true })
   aadharNumber: string;
 
   @Column({ name: 'address', type: 'text', nullable: true })
@@ -64,10 +64,10 @@ export class VendorEntity {
   @JoinColumn({ name: 'branch_id' })
   branch: BranchEntity;
 
-  @Column('varchar', { name: 'company_code', length: 20, nullable: true, default: 'WAY4TRACK' })
+  @Column('varchar', { name: 'company_code', length: 200, nullable: true, default: 'WAY4TRACK' })
   companyCode: string;
 
-  @Column('varchar', { name: 'unit_code', length: 20, nullable: true, default: 'WAY4' })
+  @Column('varchar', { name: 'unit_code', length: 200, nullable: true, default: 'WAY4' })
   unitCode: string;
 
   @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })

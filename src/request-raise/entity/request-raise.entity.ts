@@ -66,10 +66,10 @@ export class RequestRaiseEntity extends BaseEntity {
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
 
-    @Column('varchar', { name: 'company_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
 
-    @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
+    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
     unitCode: string;
 
     @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.request)
