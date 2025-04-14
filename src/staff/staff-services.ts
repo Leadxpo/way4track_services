@@ -469,7 +469,7 @@ export class StaffService {
                     companyCode: req.companyCode,
                     unitCode: req.unitCode,
                     designation: req.designation, // Optional: remove if not part of login
-                }, relations: ['branch']
+                }, relations: ['branch', 'permissions']
             });
 
             if (!staff) {
