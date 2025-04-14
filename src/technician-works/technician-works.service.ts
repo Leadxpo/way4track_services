@@ -482,35 +482,6 @@ export class TechnicianService {
             throw new ErrorResponse(500, error.message);
         }
     }
-    // async getTechnicianDetailsById(req: TechIdDto): Promise<CommonResponse> {
-    //     try {
-    //         const Technician = await this.repo.createQueryBuilder('Technician')
-    //             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = Technician.branch_id')
-    //             .leftJoinAndSelect(StaffEntity, 'sf', 'sf.id = Technician.staff_id')
-    //             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = Technician.back_supporter_id')
-    //             .leftJoinAndSelect(ProductEntity, 'pa', 'pa.id = Technician.product_id')
-    //             .leftJoinAndSelect(ClientEntity, 'cl', 'cl.id = Technician.client_id')
-    //             .leftJoinAndSelect(VoucherEntity, 've', 've.id = Technician.voucher_id')
-
-    //             .where('Technician.id = :id', { id: req.id })
-    //             .andWhere('Technician.company_code = :companyCode', { companyCode: req.companyCode })
-    //             .andWhere('Technician.unit_code = :unitCode', { unitCode: req.unitCode })
-    //             .getOne();
-
-    //         if (!Technician) {
-    //             return new CommonResponse(false, 404, 'work not found');
-    //         }
-    //         console.log(Technician);  // Log the result before conversion to DTO
-
-    //         // const data = this.adapter.convertEntityToDto([Technician]);
-    //         // console.log(data);  // Log the result before conversion to DTO
-
-    //         return new CommonResponse(true, 200, 'work details fetched successfully', Technician);
-    //     } catch (error) {
-    //         console.error("Error in getTechnicianDetailsById service:", error);
-    //         return new CommonResponse(false, 500, 'Error fetching Technician details');
-    //     }
-    // }
 
     async getTotalWorkAllocation(req: {
         companyCode?: string;
@@ -519,6 +490,18 @@ export class TechnicianService {
         date: string
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getTotalWorkAllocation(req)
+        if (!VoucherData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", VoucherData)
+        }
+
+    }
+
+    async getSubDealerPendingPayments(req: {
+        subDealerId: number
+    }): Promise<CommonResponse> {
+        const VoucherData = await this.repo.getSubDealerPendingPayments(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

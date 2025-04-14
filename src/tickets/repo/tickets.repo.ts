@@ -57,20 +57,42 @@ export class TicketsRepository extends Repository<TicketsEntity> {
 
 
     async totalTicketsBranchWise(req: CommonReq): Promise<any> {
-        const query = this.createQueryBuilder('tc')
+        const pendingStatus = WorkStatusEnum.PENDING;
+
+        // Branch-wise ticket aggregation
+        const branchQuery = this.createQueryBuilder('tc')
             .select([
                 'COUNT(tc.ticket_number) AS totalTickets',
-                'br.name as branchName',
+                'br.name AS branchName',
                 'SUM(CASE WHEN tc.work_status = :pending THEN 1 ELSE 0 END) AS pendingTickets',
             ])
-            .leftJoin(BranchEntity, 'br', 'tc.branch_id=br.id')
+            .leftJoin(BranchEntity, 'br', 'tc.branch_id = br.id')
             .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
             .groupBy('tc.branch_id');
 
-        const branchWiseTickets = await query.setParameter('pending', WorkStatusEnum.PENDING).getRawMany();
+        const branchWiseTickets = await branchQuery
+            .setParameter('pending', pendingStatus)
+            .getRawMany();
 
-        // Query to get overall total tickets
+        // Sub-dealer-wise ticket aggregation
+        const subDealerQuery = this.createQueryBuilder('tc')
+            .select([
+                'COUNT(tc.ticket_number) AS totalTickets',
+                'sb.sub_dealer_id AS subDealerId',
+                'sb.name AS subDealerName',
+                'SUM(CASE WHEN tc.work_status = :pending THEN 1 ELSE 0 END) AS pendingTickets',
+            ])
+            .leftJoin(SubDealerEntity, 'sb', 'tc.sub_dealer_id = sb.id')
+            .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('tc.unit_code = :unitCode', { unitCode: req.unitCode })
+            .groupBy('tc.sub_dealer_id');
+
+        const subDealerWiseTickets = await subDealerQuery
+            .setParameter('pending', pendingStatus)
+            .getRawMany();
+
+        // Total tickets
         const totalQuery = this.createQueryBuilder('tc')
             .select(['COUNT(tc.ticket_number) AS totalTickets'])
             .where('tc.company_code = :companyCode', { companyCode: req.companyCode })
@@ -80,15 +102,18 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         const totalTickets = totalResult?.totalTickets || 0;
 
         return {
-            totalTickets, // Overall total tickets
-            branchWiseTickets, // Total tickets and pending tickets per branch
+            totalTickets,
+            branchWiseTickets,
+            subDealerWiseTickets, // ✅ typo fixed here
         };
     }
 
 
 
+
     async getTicketDetails(req: {
         ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,
+        subDealerId?: string;
         unitCode?: string
     }) {
         const query = this.createQueryBuilder('ticket')
@@ -102,11 +127,15 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'ticket.unit_code AS unitCode',
                 'branch.name AS branchName',
                 'staff.name AS staffName',
+                'sb.sub_dealer_id AS subDealerId',
+                'sb.name AS subDealerName',
             ])
             .leftJoin('ticket.branch', 'branch')
             .leftJoin('ticket.staff', 'staff')
-            .where(`ticket.company_code = "${req.companyCode}"`)
-            .andWhere(`ticket.unit_code = "${req.unitCode}"`)
+            .leftJoin(SubDealerEntity, 'sb', 'ticket.sub_dealer_id = sb.id')
+            .where('ticket.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('ticket.unit_code = :unitCode', { unitCode: req.unitCode })
+
         if (req.ticketNumber) {
             query.andWhere('ticket.ticket_number = :ticketNumber', { ticketNumber: req.ticketNumber });
         }
@@ -117,6 +146,10 @@ export class TicketsRepository extends Repository<TicketsEntity> {
 
         if (req.staffName) {
             query.andWhere('staff.name = :staffName', { staffName: req.staffName });
+        }
+
+        if (req.subDealerId) {
+            query.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId: req.subDealerId });
         }
         const result = await query.getRawMany();
         return result;
@@ -152,6 +185,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
             'wa.staff_id AS staffId',
             'staff.name AS staffName',
             'sb.sub_dealer_id AS subDealerId',
+            'sb.name AS subDealerName',
             'COUNT(wa.id) AS totalTickets',
             'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingTickets',
             'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalSuccessTickets',
@@ -162,7 +196,9 @@ export class TicketsRepository extends Repository<TicketsEntity> {
         query
             .groupBy('wa.staff_id')
             .addGroupBy('staff.name')
-            .addGroupBy('sb.sub_dealer_id');
+            .addGroupBy('sb.sub_dealer_id')
+            .addGroupBy('sb.name')
+
 
         const result = await query
             .setParameter('completed', WorkStatusEnum.COMPLETED)

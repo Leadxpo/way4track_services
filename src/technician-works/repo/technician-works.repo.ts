@@ -256,11 +256,13 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     async getPaymentStatusPayments(req: BranchChartDto) {
         const query = this.createQueryBuilder('wa')
             .select([
-                `COALESCE(SUM(wa.amount), 0) AS totalPayment`,
-                `COALESCE(SUM(CASE WHEN wa.payment_status = :PENDING THEN wa.amount ELSE 0 END), 0) AS totalPendingPayment`,
-                `COALESCE(SUM(CASE WHEN wa.payment_status = :COMPLETED THEN wa.amount ELSE 0 END), 0) AS totalSuccessPayment`
+                'COALESCE(SUM(wa.amount), 0) AS "totalPayment"',
+                'COALESCE(SUM(CASE WHEN wa.payment_status = :PENDING THEN wa.amount ELSE 0 END), 0) AS "totalPendingPayment"',
+                'COALESCE(SUM(CASE WHEN wa.payment_status = :COMPLETED THEN wa.amount ELSE 0 END), 0) AS "totalSuccessPayment"',
             ])
+
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
 
@@ -276,6 +278,10 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         }
         if (req.branchName) {
             query.andWhere(`LOWER(br.name) = LOWER(:branchName)`, { branchName: req.branchName });
+        }
+
+        if (req.subDealerId) {
+            query.andWhere(`sb.sub_dealer_id=:subDealerId`, { subDealerId: req.subDealerId })
         }
 
         return query

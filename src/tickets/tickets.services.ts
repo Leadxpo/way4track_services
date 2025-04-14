@@ -105,7 +105,7 @@ export class TicketsService {
 
     async getTicketDetails(req: {
         ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,
-        unitCode?: string
+        unitCode?: string ;subDealerId?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.ticketsRepository.getTicketDetails(req)
         if (!VoucherData) {
@@ -122,6 +122,7 @@ export class TicketsService {
         unitCode?: string
         staffId: string;
         date: string
+        subDealerId?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.ticketsRepository.getTotalPendingAndSucessTickets(req)
         if (!VoucherData) {

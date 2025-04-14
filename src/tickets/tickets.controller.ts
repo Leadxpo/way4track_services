@@ -37,6 +37,7 @@ export class TicketsController {
         unitCode?: string
         staffId: string;
         date: string
+        subDealerId?: string;
     }) {
         try {
             return this.ticketsService.getTotalPendingAndSucessTickets(req);
@@ -59,7 +60,7 @@ export class TicketsController {
     @Post('getTicketDetails')
     async getTicketDetails(@Body() req: {
         ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,
-        unitCode?: string
+        unitCode?: string; subDealerId?: string;
     }) {
         try {
             return this.ticketsService.getTicketDetails(req);

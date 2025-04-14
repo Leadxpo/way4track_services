@@ -5,5 +5,5 @@ export class BranchChartDto {
     companyCode?: string;
     unitCode?: string
     branchName?: string
-
+subDealerId?:string
 }
