@@ -651,6 +651,18 @@ export class DashboardController {
         }
     }
 
+    @Post('calculateGstReturns')
+    async calculateGstReturns(@Body() req: {
+        companyCode: string; unitCode: string; fromDate: string; toDate: string
+    }): Promise<CommonResponse> {
+        try {
+            return await this.voucherDashboardService.calculateGstReturns(req)
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            // return new CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
     @Post('getBranchWiseSolidLiquidCash')
     async getBranchWiseSolidLiquidCash(@Body() req: CommonReq): Promise<CommonResponse> {
         try {

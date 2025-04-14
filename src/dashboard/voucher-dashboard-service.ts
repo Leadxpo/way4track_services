@@ -495,6 +495,17 @@ export class VoucherDashboardService {
         }
     }
 
+    async calculateGstReturns(req: {companyCode: string; unitCode: string; fromDate: string; toDate: string
+    }): Promise<CommonResponse> {
+        try {
+            const voucherData = await this.voucherRepository.calculateGstReturns(req);
+            return new CommonResponse(true, 200, 'Data retrieved successfully', voucherData);
+        } catch (err) {
+            console.error('Error in getSalesForTable:', err);
+            return new CommonResponse(false, 500, 'An error occurred while fetching data');
+        }
+    }
+
 
     async getPurchaseData(req: CommonReq): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getPurchaseData(req)
