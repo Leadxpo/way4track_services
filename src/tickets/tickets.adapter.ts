@@ -5,6 +5,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { GetTicketsResDto } from './dto/get-tickets-res.dto';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { DesignationEntity } from 'src/designation/entity/designation.entity';
 
 
 @Injectable()
@@ -36,7 +37,9 @@ export class TicketsAdapter {
         if (dto.id) {
             entity.id = dto.id;  // This might not be necessary for a new ticket
         }
-
+        const des = new DesignationEntity()
+        des.id = dto.designationRelation
+        entity.designationRelation = des
         return entity;
     }
 

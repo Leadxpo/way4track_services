@@ -1,4 +1,5 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { DesignationEntity } from 'src/designation/entity/designation.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
@@ -67,4 +68,8 @@ export class TicketsEntity {
     @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.tickets, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
+
+    @ManyToOne(() => DesignationEntity, (designation) => designation.ticket, { nullable: true })
+    @JoinColumn({ name: 'designation_id', referencedColumnName: 'id' }) // Use the primary key of DesignationEntity
+    designationRelation: DesignationEntity;
 }

@@ -13,4 +13,5 @@ export class TicketsDto {
     workStatus: WorkStatusEnum;
     description: string;
     subDealerId?:number
+    designationRelation?:number
 }

@@ -1,6 +1,7 @@
 import { Roles } from 'src/permissions/dto/role.enum';
 import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import {
     Column,
     Entity,
@@ -38,4 +39,7 @@ export class DesignationEntity {
 
     @OneToMany(() => StaffEntity, (staff) => staff.designationRelation)
     staff: StaffEntity[];
+
+    @OneToMany(() => TicketsEntity, (staff) => staff.designationRelation)
+    ticket: TicketsEntity[];
 }
