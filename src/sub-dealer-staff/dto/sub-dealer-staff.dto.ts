@@ -17,4 +17,5 @@ export class CreateSubDealerStaffDto {
     aadharNumber?: string;
     panCardNumber?: string;
     address?: string;
+    subDealerId?:number
 }

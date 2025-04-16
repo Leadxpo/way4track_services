@@ -1,3 +1,4 @@
+import { DeviceEntity } from 'src/devices/entity/devices-entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
@@ -47,7 +48,12 @@ export class WebsiteProductEntity extends BaseEntity {
 
     @Column({ name: 'blog_image', type: 'varchar', length: 255, nullable: true })
     blogImage: string;
-    steps
 
+    @Column('json', { name: 'steps' })
+    steps: {
+        desc: string;
+    }[];
 
+    @OneToMany(() => DeviceEntity, (staff) => staff.webProduct)
+    device: DeviceEntity[];
 }

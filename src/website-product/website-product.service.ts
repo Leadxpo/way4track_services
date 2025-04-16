@@ -1,4 +1,164 @@
 import { Injectable } from '@nestjs/common';
+import { CommonResponse } from 'src/models/common-response';
+import { ErrorResponse } from 'src/models/error-response';
+import { CommonReq } from 'src/models/common-req';
+import { WebsiteProductRepository } from './repo/website-product.repo';
+import { WebsiteProductDto } from './dto/website.dto';
+import { WebsiteProductAdapter } from './website-product.adapter';
+import { WebsiteProductIdDto } from './dto/website-product-id.dto';
+import { Storage } from '@google-cloud/storage';
 
 @Injectable()
-export class WebsiteProductService {}
+export class WebsiteProductService {
+    private storage: Storage;
+    private bucketName: string;
+    constructor(
+        private readonly websiteProductRepository: WebsiteProductRepository,
+        private readonly adapter: WebsiteProductAdapter
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
+
+    async handleWebsiteProductDetails(dto: WebsiteProductDto,
+        photos: {
+            homeBanner?: Express.Multer.File[];
+            banner1?: Express.Multer.File[];
+            banner2?: Express.Multer.File[];
+            banner3?: Express.Multer.File[];
+            blogImage?: Express.Multer.File[];
+        } = {}): Promise<CommonResponse> {
+        let filePaths: Record<keyof typeof photos, string | undefined> = {
+            homeBanner: undefined,
+            banner2: undefined,
+            banner3: undefined,
+            banner1: undefined,
+            blogImage: undefined,
+        };
+        for (const [key, fileArray] of Object.entries(photos)) {
+            if (!fileArray || fileArray.length === 0) continue;
+
+            const file = fileArray[0];
+            const uniqueFileName = `web_product_photos/${Date.now()}-${file.originalname}`;
+            const storageFile = this.storage.bucket(this.bucketName).file(uniqueFileName);
+
+            await storageFile.save(file.buffer, {
+                contentType: file.mimetype,
+                resumable: false,
+            });
+
+            filePaths[key as keyof typeof filePaths] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+       
+        try {
+            if (dto.id) {
+                return this.updateWebsiteProductDetails(dto, filePaths);
+            } else {
+                return this.createWebsiteProductDetails(dto, filePaths);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async createWebsiteProductDetails(dto: WebsiteProductDto, filePaths?: Record<string, string | null>,): Promise<CommonResponse> {
+        try {
+            const entity = this.adapter.convertDtoToEntity(dto);
+            if (filePaths) {
+                entity.homeBanner = filePaths.homeBanner;
+                entity.banner1 = filePaths.banner1;
+                entity.banner2 = filePaths.banner2;
+                entity.banner3 = filePaths.banner3;
+                entity.blogImage = filePaths.blogImage;
+            }
+
+            await this.websiteProductRepository.insert(entity);
+            return new CommonResponse(true, 201, 'WebsiteProduct created successfully');
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async updateWebsiteProductDetails(dto: WebsiteProductDto, filePaths: Record<string, string | null> = {}): Promise<CommonResponse> {
+        try {
+            const existing = await this.websiteProductRepository.findOne({ where: { id: dto.id } });
+
+            if (!existing) throw new Error('WebsiteProduct not found');
+            filePaths = filePaths ?? {};
+            console.log(filePaths, "files")
+            if (filePaths) {
+                existing.homeBanner = filePaths.homeBanner || existing.homeBanner;
+                existing.banner1 = filePaths.banner1 || existing.banner1;
+                existing.banner2 = filePaths.banner2 || existing.banner2;
+                existing.banner3 = filePaths.banner3 || existing.banner3;
+                existing.blogImage = filePaths.blogImage || existing.blogImage;
+            }
+            await this.websiteProductRepository.update(dto.id, dto);
+            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async deleteWebsiteProductDetails(dto: WebsiteProductIdDto): Promise<CommonResponse> {
+        try {
+            const existing = await this.websiteProductRepository.findOne({
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
+            });
+
+            if (!existing) {
+                return new CommonResponse(false, 404, 'WebsiteProduct not found');
+            }
+
+            await this.websiteProductRepository.delete({ id: existing.id });
+            return new CommonResponse(true, 200, 'WebsiteProduct deleted successfully');
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getWebsiteProductDetailsById(req: WebsiteProductIdDto): Promise<CommonResponse> {
+        try {
+            const item = await this.websiteProductRepository.findOne({
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device']
+            });
+
+            if (!item) return new CommonResponse(false, 404, 'WebsiteProduct not found');
+            return new CommonResponse(true, 200, 'WebsiteProduct fetched successfully', item);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getWebsiteProductDetails(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const items = await this.websiteProductRepository.find({
+                where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device']
+            });
+
+            if (!items || !items.length) return new CommonResponse(false, 404, 'WebsiteProduct not found');
+
+            const data = this.adapter.convertEntityToDto(items);
+            return new CommonResponse(true, 200, 'WebsiteProduct list fetched', data);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getWebsiteProductDropdown(): Promise<CommonResponse> {
+        try {
+            const data = await this.websiteProductRepository.find({ select: ['id', 'name'] });
+            if (data.length) {
+                return new CommonResponse(true, 200, 'Dropdown fetched', data);
+            }
+            return new CommonResponse(false, 404, 'No WebsiteProduct entries');
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+}
