@@ -321,8 +321,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.phone_number AS phoneNumber',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.staffId) {
