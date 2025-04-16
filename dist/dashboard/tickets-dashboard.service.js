@@ -27,15 +27,25 @@ let TicketsDashboardService = class TicketsDashboardService {
             return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", data);
         }
     }
+    async totalTicketsBranchWise(req) {
+        const data = await this.ticketsRepositort.totalTicketsBranchWise(req);
+        if (!data) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", data);
+        }
+    }
     async getTicketDetailsAgainstSearch(req) {
         try {
             const queryBuilder = this.ticketsRepositort.createQueryBuilder('ticket')
                 .select([
-                'ticket.ticket_number',
+                'ticket.id as ticketId',
+                'ticket.ticket_number as ticketNumber',
                 'staff.name AS staffName',
-                'ticket.addressing_department',
+                'ticket.addressing_department as addressingDepartment',
                 'branch.name AS branchName',
-                'ticket.date',
+                'ticket.date as date',
             ])
                 .leftJoin('ticket.staff', 'staff')
                 .leftJoin('ticket.branch', 'branch')

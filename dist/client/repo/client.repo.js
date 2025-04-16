@@ -11,10 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientRepository = void 0;
 const common_1 = require("@nestjs/common");
-const client_entity_1 = require("../entity/client.entity");
-const typeorm_1 = require("typeorm");
-const voucher_entity_1 = require("../../voucher/entity/voucher.entity");
 const branch_entity_1 = require("../../branch/entity/branch.entity");
+const typeorm_1 = require("typeorm");
+const client_entity_1 = require("../entity/client.entity");
 let ClientRepository = class ClientRepository extends typeorm_1.Repository {
     constructor(dataSource) {
         super(client_entity_1.ClientEntity, dataSource.createEntityManager());
@@ -30,15 +29,15 @@ let ClientRepository = class ClientRepository extends typeorm_1.Repository {
             'vr.payment_status AS paymentStatus',
             'vr.amount AS amount',
             'vr.voucher_id as voucherId',
+            'cl.status as status'
         ])
-            .leftJoin(voucher_entity_1.VoucherEntity, 'vr', 'vr.id = cl.voucher_id')
+            .leftJoin('cl.voucherId', 'vr')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
             .getRawMany();
         return query;
     }
     async getDetailClientData(req) {
-        console.log(req, "++++++++++++++++++++++");
         const query = await this.createQueryBuilder('cl')
             .select([
             'cl.client_id AS clientId',
@@ -48,23 +47,22 @@ let ClientRepository = class ClientRepository extends typeorm_1.Repository {
             'vr.payment_status AS paymentStatus',
             'vr.amount AS amount',
             'vr.voucher_id AS voucherId',
+            'vr.quantity as quantity',
             'br.name AS branchName',
             'cl.email AS email',
-            'cl.dob AS dob',
-            'cl.status AS status',
             'cl.address AS address',
             'vr.name AS voucherName',
             'vr.generation_date AS generationDate',
             'vr.product_type AS productType',
+            'cl.status as status'
         ])
-            .leftJoin(voucher_entity_1.VoucherEntity, 'vr', 'vr.id = cl.voucher_id')
+            .leftJoin('cl.voucherId', 'vr')
             .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.client_id='${req.clientId}'`)
             .andWhere(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
             .groupBy(`vr.voucher_id `)
-            .getRawOne();
-        console.log(query, "++++++++++++++++++++++++++++++");
+            .getRawMany();
         return query;
     }
     async getSearchDetailClient(req) {
@@ -76,17 +74,17 @@ let ClientRepository = class ClientRepository extends typeorm_1.Repository {
             'cl.joining_date AS joiningDate',
             'vr.payment_status AS paymentStatus',
             'vr.amount AS amount',
+            'vr.quantity as quantity',
             'vr.voucher_id AS voucherId',
-            'br.name AS branchName',
+            'br.name AS branch',
             'cl.email AS email',
-            'cl.dob AS dob',
             'cl.address AS address',
-            'cl.status AS status',
             'vr.name AS voucherName',
             'vr.generation_date AS generationDate',
             'vr.product_type AS productType',
+            'cl.status as status'
         ])
-            .leftJoin(voucher_entity_1.VoucherEntity, 'vr', 'vr.id = cl.voucher_id')
+            .leftJoin('cl.voucherId', 'vr')
             .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`);
@@ -96,11 +94,12 @@ let ClientRepository = class ClientRepository extends typeorm_1.Repository {
         if (req.name) {
             query.andWhere('cl.name LIKE :name', { name: `%${req.name}%` });
         }
-        if (req.status) {
-            query.andWhere('cl.status = :status', { status: req.status });
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
-        const result = await query.groupBy('vr.voucher_id').getRawMany();
-        console.log(result, "++++++++++++++++++++++++++++++");
+        const result = await query
+            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name, cl.joining_date, vr.payment_status, vr.amount, br.name, cl.email,cl.address, vr.name, vr.generation_date, vr.product_type`)
+            .getRawMany();
         return result;
     }
 };

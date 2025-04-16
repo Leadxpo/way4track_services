@@ -23,6 +23,12 @@ let HiringAdapter = class HiringAdapter {
         entity.status = dto.status;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
+        entity.levelWiseData = dto.levelWiseData;
+        entity.drivingLicence = dto.drivingLicence;
+        if (entity.id) {
+            entity.id = dto.id;
+        }
+        entity.drivingLicenceNumber = dto.drivingLicenceNumber;
         return entity;
     }
 };

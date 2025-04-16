@@ -18,6 +18,25 @@ let BranchRepository = class BranchRepository extends typeorm_1.Repository {
         super(branch_entity_1.BranchEntity, dataSource.createEntityManager());
         this.dataSource = dataSource;
     }
+    async getBranchStaff(req) {
+        const query = await this.createQueryBuilder('br')
+            .select([
+            'st.name AS name',
+            'st.designation AS designation',
+            'br.name AS branchName',
+            'st.staff_photo AS staffPhoto',
+            'as.asserts_name AS assertsName',
+            'as.asserts_photo AS assertsPhoto',
+            'as.asserts_amount AS assertsAmount'
+        ])
+            .leftJoin('br.staff', 'st')
+            .leftJoin('br.asserts', 'as')
+            .where('br.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('br.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('br.id = :id', { id: req.id })
+            .getRawMany();
+        return query;
+    }
 };
 exports.BranchRepository = BranchRepository;
 exports.BranchRepository = BranchRepository = __decorate([

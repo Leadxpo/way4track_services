@@ -15,6 +15,10 @@ const product_service_1 = require("./product.service");
 const product_repo_1 = require("./repo/product.repo");
 const vendor_module_1 = require("../vendor/vendor.module");
 const voucher_repo_1 = require("../voucher/repo/voucher.repo");
+const product_type_module_1 = require("../product-type/product-type.module");
+const branch_module_1 = require("../branch/branch.module");
+const sub_dealer_module_1 = require("../sub-dealer/sub-dealer.module");
+const staff_module_1 = require("../staff/staff.module");
 let ProductModule = class ProductModule {
 };
 exports.ProductModule = ProductModule;
@@ -23,6 +27,10 @@ exports.ProductModule = ProductModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([product_entity_1.ProductEntity, voucher_repo_1.VoucherRepository]),
             (0, common_1.forwardRef)(() => vendor_module_1.VendorModule),
+            (0, common_1.forwardRef)(() => product_type_module_1.ProductTypeModule),
+            (0, common_1.forwardRef)(() => branch_module_1.BranchModule),
+            (0, common_1.forwardRef)(() => sub_dealer_module_1.SubDealerModule),
+            (0, common_1.forwardRef)(() => staff_module_1.StaffModule),
         ],
         controllers: [product_controller_1.ProductController],
         providers: [product_service_1.ProductService, product_repo_1.ProductRepository],

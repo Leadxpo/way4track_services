@@ -1,9 +1,9 @@
-import { AppointmentStatus, AppointmentType } from "../entity/appointement.entity";
+import { AppointmentStatus, AppointmentType, TimePeriodEnum } from "../entity/appointement.entity";
 export declare class AppointmentResDto {
     id: number;
     name: string;
     clientPhoneNumber: string;
-    clientId: number;
+    clientId: string;
     clientAddress: string;
     clientName: string;
     branchId: number;
@@ -11,11 +11,14 @@ export declare class AppointmentResDto {
     appointmentType: AppointmentType;
     staffId: number;
     assignedTo: string;
-    slot: Date;
+    date: string;
+    slot: string;
+    period: TimePeriodEnum;
     description: string;
     status: AppointmentStatus;
     appointmentId: string;
     companyCode: string;
     unitCode: string;
-    constructor(id: number, name: string, clientPhoneNumber: string, clientId: number, clientAddress: string, clientName: string, branchId: number, branchName: string, appointmentType: AppointmentType, staffId: number, assignedTo: string, slot: Date, description: string, status: AppointmentStatus, appointmentId: string, companyCode: string, unitCode: string);
+    voucherId?: string;
+    constructor(id: number, name: string, clientPhoneNumber: string, clientId: string, clientAddress: string, clientName: string, branchId: number, branchName: string, appointmentType: AppointmentType, staffId: number, assignedTo: string, date: string, slot: string, period: TimePeriodEnum, description: string, status: AppointmentStatus, appointmentId: string, companyCode: string, unitCode: string, voucherId?: string);
 }

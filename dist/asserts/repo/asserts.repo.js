@@ -21,40 +21,84 @@ let AssertsRepository = class AssertsRepository extends typeorm_1.Repository {
     }
     async assertsCardData(req) {
         try {
-            console.log('Service input:', req);
-            const office_asserts = await this.createQueryBuilder('as')
+            const groupedBranchesQuery = this.createQueryBuilder('as')
+                .select(['branch.name AS branchName'])
+                .leftJoin(branch_entity_1.BranchEntity, 'branch', 'branch.id = as.branch_id')
+                .where('as.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode });
+            if (req.branch) {
+                groupedBranchesQuery.andWhere('branch.name = :branchName', { branchName: req.branch });
+            }
+            const groupedBranches = await groupedBranchesQuery.groupBy('branch.name').getRawMany();
+            const officeAssertsQuery = this.createQueryBuilder('as')
                 .select('SUM(as.quantity)', 'total_office_asserts')
                 .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = as.branch_id')
                 .where('as.asset_type = :officeAssetType', { officeAssetType: asserts_entity_1.AssetType.OFFICE_ASSET })
                 .andWhere('as.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode })
-                .getRawOne();
-            console.log(office_asserts?.total_office_asserts, "++++=");
-            const transport_asserts = await this.createQueryBuilder('as')
+                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode });
+            if (req.branch) {
+                officeAssertsQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
+            const officeAsserts = await officeAssertsQuery.getRawOne();
+            const transportAssertsQuery = this.createQueryBuilder('as')
                 .select('SUM(as.quantity)', 'total_transport_asserts')
                 .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = as.branch_id')
                 .where('as.asset_type = :transportAssetType', { transportAssetType: asserts_entity_1.AssetType.TRANSPORT_ASSET })
                 .andWhere('as.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode })
-                .getRawOne();
-            console.log(transport_asserts?.total_transport_asserts, "++++=");
-            const totalAsserts = await this.createQueryBuilder('as')
+                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode });
+            if (req.branch) {
+                transportAssertsQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
+            const transportAsserts = await transportAssertsQuery.getRawOne();
+            const totalAssertsQuery = this.createQueryBuilder('as')
                 .select('SUM(as.quantity)', 'total_asserts')
                 .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = as.branch_id')
                 .where('as.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode })
-                .getRawOne();
-            console.log(totalAsserts?.total_asserts, "++++=");
-            return {
-                officeAsserts: office_asserts?.total_office_asserts || 0,
-                transportAsserts: transport_asserts?.total_transport_asserts || 0,
-                totalAsserts: totalAsserts?.total_asserts || 0,
+                .andWhere('as.unit_code = :unitCode', { unitCode: req.unitCode });
+            if (req.branch) {
+                totalAssertsQuery.andWhere('br.name = :branchName', { branchName: req.branch });
+            }
+            const totalAsserts = await totalAssertsQuery.getRawOne();
+            const results = {
+                groupedBranches: groupedBranches.map(branch => ({
+                    branchName: branch.branchName || 'N/A',
+                })),
+                officeAsserts: Number(officeAsserts?.total_office_asserts || 0),
+                transportAsserts: Number(transportAsserts?.total_transport_asserts || 0),
+                totalAsserts: Number(totalAsserts?.total_asserts || 0),
             };
+            return results;
         }
         catch (error) {
-            console.error("Error in assertsCardData:", error);
+            console.error('Error in assertsCardData:', error);
             throw new Error('Error retrieving asserts card data');
         }
+    }
+    async getAssetDataByDate(req) {
+        const query = this.createQueryBuilder('asset')
+            .select([
+            'asset.description AS description',
+            'asset.asset_type AS assetType',
+            'asset.payment_type AS paymentType',
+            'asset.purchase_date AS purchaseDate',
+            'asset.asserts_name AS assetName',
+            'asset.asserts_amount AS assetAmount',
+            'asset.quantity AS quantity'
+        ])
+            .leftJoin(branch_entity_1.BranchEntity, 'branch', 'branch.id = asset.branch_id')
+            .where('asset.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('asset.unit_code = :unitCode', { unitCode: req.unitCode });
+        if (req.fromDate) {
+            query.andWhere('asset.purchase_date >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('asset.purchase_date <= :toDate', { toDate: req.toDate });
+        }
+        if (req.branch) {
+            query.andWhere('branch.name = :branchName', { branchName: req.branch });
+        }
+        const result = await query.getRawMany();
+        return result;
     }
 };
 exports.AssertsRepository = AssertsRepository;

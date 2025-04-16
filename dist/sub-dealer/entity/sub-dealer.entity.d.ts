@@ -1,3 +1,14 @@
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
+import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
+import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
+import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 export declare class SubDealerEntity {
     id: number;
@@ -12,7 +23,20 @@ export declare class SubDealerEntity {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: VoucherEntity;
+    voucherId: VoucherEntity[];
+    request: RequestRaiseEntity[];
+    tickets: TicketsEntity[];
+    branch: BranchEntity;
     companyCode: string;
     unitCode: string;
+    createdAt: Date;
+    updatedAt: Date;
+    permissions: PermissionEntity[];
+    ledger: LedgerEntity[];
+    dispatch: DispatchEntity[];
+    productAssign: ProductAssignEntity[];
+    techWork: TechnicianWorksEntity[];
+    subDealerStaff: SubDelaerStaffEntity[];
+    note: NotificationEntity[];
+    product: ProductEntity[];
 }

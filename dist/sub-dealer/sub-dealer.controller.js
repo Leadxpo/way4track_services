@@ -19,13 +19,24 @@ const sub_dealer_service_1 = require("./sub-dealer.service");
 const sub_dealer_id_dto_1 = require("./dto/sub-dealer-id.dto");
 const common_response_1 = require("../models/common-response");
 const platform_express_1 = require("@nestjs/platform-express");
+const common_req_1 = require("../models/common-req");
+const multer = require("multer");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let SubDealerController = class SubDealerController {
     constructor(subDealerService) {
         this.subDealerService = subDealerService;
     }
-    async handleSubDealerDetails(dto) {
+    async handleSubDealerDetails(dto, photo) {
         try {
-            return await this.subDealerService.handleSubDealerDetails(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return await this.subDealerService.handleSubDealerDetails(dto, photo);
         }
         catch (error) {
             console.log("Error in create address in services..", error);
@@ -38,6 +49,15 @@ let SubDealerController = class SubDealerController {
         catch (error) {
             console.log("Error in delete assert details in service..", error);
             return new common_response_1.CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+    async getSubDealerDetailById(dto) {
+        try {
+            return await this.subDealerService.getSubDealerDetailById(dto);
+        }
+        catch (error) {
+            console.log("Error in create address in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching staff type details');
         }
     }
     async getSubDealerDetails(dto) {
@@ -57,22 +77,15 @@ let SubDealerController = class SubDealerController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
-    async uploadPhoto(subDealerId, photo) {
-        try {
-            return await this.subDealerService.uploadSubDealerPhoto(subDealerId, photo);
-        }
-        catch (error) {
-            console.error('Error uploading subDealer photo:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
 };
 exports.SubDealerController = SubDealerController;
 __decorate([
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', multerOptions)),
     (0, common_1.Post)('handleSubDealerDetails'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [sub_dealer_dto_1.SubDealerDto]),
+    __metadata("design:paramtypes", [sub_dealer_dto_1.SubDealerDto, Object]),
     __metadata("design:returntype", Promise)
 ], SubDealerController.prototype, "handleSubDealerDetails", null);
 __decorate([
@@ -83,10 +96,17 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SubDealerController.prototype, "deleteSubDealerDetails", null);
 __decorate([
-    (0, common_1.Post)('getSubDealerDetails'),
+    (0, common_1.Post)('getSubDealerDetailById'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [sub_dealer_id_dto_1.SubDealerIdDto]),
+    __metadata("design:returntype", Promise)
+], SubDealerController.prototype, "getSubDealerDetailById", null);
+__decorate([
+    (0, common_1.Post)('getSubDealerDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
 ], SubDealerController.prototype, "getSubDealerDetails", null);
 __decorate([
@@ -95,15 +115,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], SubDealerController.prototype, "getSubDealerNamesDropDown", null);
-__decorate([
-    (0, common_1.Post)('uploadPhoto'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo')),
-    __param(0, (0, common_1.Body)('subDealerId')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], SubDealerController.prototype, "uploadPhoto", null);
 exports.SubDealerController = SubDealerController = __decorate([
     (0, common_1.Controller)('subdealer'),
     __metadata("design:paramtypes", [sub_dealer_service_1.SubDealerService])

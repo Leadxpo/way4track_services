@@ -13,27 +13,34 @@ exports.AppointmentRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const appointement_entity_1 = require("../entity/appointement.entity");
+const branch_entity_1 = require("../../branch/entity/branch.entity");
+const client_entity_1 = require("../../client/entity/client.entity");
+const staff_entity_1 = require("../../staff/entity/staff.entity");
 let AppointmentRepository = class AppointmentRepository extends typeorm_1.Repository {
     constructor(dataSource) {
         super(appointement_entity_1.AppointmentEntity, dataSource.createEntityManager());
         this.dataSource = dataSource;
     }
     async getAllAppointmentDetails(req) {
+        const acceptedStatus = 'accepted';
         const groupedBranches = await this.createQueryBuilder('appointment')
             .select([
             'branch.name AS branchName',
             'COUNT(appointment.id) AS totalAppointments',
+            'SUM(CASE WHEN appointment.status = :accepted THEN 1 ELSE 0 END) AS totalSuccessAppointments'
         ])
-            .leftJoin('appointment.branchId', 'branch')
-            .where(`appointment.company_code = "${req.companyCode}"`)
-            .andWhere(`appointment.unit_code = "${req.unitCode}"`)
-            .groupBy('branch.name')
-            .orderBy('branch.name', 'ASC')
-            .getRawMany();
-        const appointments = await this.createQueryBuilder('appointment')
+            .leftJoin(branch_entity_1.BranchEntity, 'branch', 'branch.id = appointment.branch_id')
+            .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode })
+            .setParameter('accepted', acceptedStatus);
+        if (req.branch) {
+            groupedBranches.andWhere('branch.name = :branchName', { branchName: req.branch });
+        }
+        const result = await groupedBranches.groupBy('branch.name').getRawMany();
+        const appointments = this.createQueryBuilder('appointment')
             .select([
-            'appointment.id',
-            'appointment.name',
+            'appointment.id AS appointment_id',
+            'appointment.name AS appointment_name',
             'client.id AS clientId',
             'client.name AS clientName',
             'client.phone_number AS clientPhoneNumber',
@@ -41,20 +48,25 @@ let AppointmentRepository = class AppointmentRepository extends typeorm_1.Reposi
             'branch.id AS branchId',
             'branch.name AS branchName',
             'appointment.appointment_type AS appointmentType',
-            'appointment.slot AS slot',
+            'appointment.time AS slot',
             'appointment.description AS description',
             'appointment.status AS status',
-            'staff.id AS staffId',
+            'staff.staff_id AS staffId',
             'staff.name AS assignedTo',
         ])
-            .leftJoin('appointment.clientId', 'client')
-            .leftJoin('appointment.branchId', 'branch')
-            .leftJoin('appointment.staffId', 'staff')
-            .where(`appointment.company_code = "${req.companyCode}"`)
-            .andWhere(`appointment.unit_code = "${req.unitCode}"`)
-            .orderBy('branch.name', 'ASC')
-            .getRawMany();
-        return { groupedBranches, appointments };
+            .leftJoin(client_entity_1.ClientEntity, 'client', 'appointment.client_id = client.id')
+            .leftJoin(branch_entity_1.BranchEntity, 'branch', 'branch.id = appointment.branch_id')
+            .leftJoin(staff_entity_1.StaffEntity, 'staff', 'staff.id = appointment.staff_id')
+            .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
+        if (req.branch) {
+            appointments.andWhere('branch.name = :branchName', { branchName: req.branch });
+        }
+        if (req.staffId) {
+            appointments.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+        }
+        const appointmentsResult = await appointments.orderBy('branch.name', 'ASC').getRawMany();
+        return { result, appointments: appointmentsResult };
     }
 };
 exports.AppointmentRepository = AppointmentRepository;

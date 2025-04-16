@@ -8,36 +8,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientAdapter = void 0;
 const common_1 = require("@nestjs/common");
-const client_entity_1 = require("./entity/client.entity");
 const branch_entity_1 = require("../branch/entity/branch.entity");
 const client_res_dto_1 = require("./dto/client-res.dto");
-const voucher_entity_1 = require("../voucher/entity/voucher.entity");
+const client_entity_1 = require("./entity/client.entity");
 let ClientAdapter = class ClientAdapter {
     convertDtoToEntity(dto) {
         const entity = new client_entity_1.ClientEntity();
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         const branchEntity = new branch_entity_1.BranchEntity();
-        branchEntity.id = dto.branchId;
+        branchEntity.id = dto.branch;
         entity.branch = branchEntity;
         entity.clientPhoto = dto.clientPhoto;
-        entity.dob = dto.dob;
         entity.email = dto.email;
         entity.address = dto.address;
-        entity.joiningDate = dto.joiningDate;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        const voucherEntity = new voucher_entity_1.VoucherEntity();
-        voucherEntity.id = dto.voucherId;
-        entity.voucherId = voucherEntity;
+        if (entity.joiningDate) {
+            entity.joiningDate = dto.joiningDate;
+        }
         if (dto.id) {
             entity.id = dto.id;
         }
+        entity.hsnCode = dto.hsnCode;
+        entity.SACCode = dto.SACCode;
+        if (dto.clientId) {
+            entity.clientId = dto.clientId;
+        }
+        entity.tcs = dto.tcs;
+        entity.tds = dto.tds;
+        entity.billWiseDate = dto.billWiseDate;
+        entity.status = dto.status;
         return entity;
     }
     convertEntityToDto(entity) {
         return entity.map((client) => {
-            return new client_res_dto_1.ClientResDto(client.id, client.name, client.phoneNumber, client.clientId, client.clientPhoto, client?.branch?.id, client?.branch?.branchName, client.dob, client.email, client.address, client.joiningDate, client?.voucherId?.voucherId, client.companyCode, client.unitCode);
+            return new client_res_dto_1.ClientResDto(client.id, client.name, client.phoneNumber, client.clientId, client.clientPhoto, client?.branch?.id, client?.branch?.branchName, client.email, client.address, client.joiningDate, client.companyCode, client.unitCode, client.status);
         });
     }
 };

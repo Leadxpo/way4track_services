@@ -1,19 +1,23 @@
-import { DesignationEnum } from 'src/staff/entity/staff.entity';
 import { Roles } from '../dto/role.enum';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { StaffStatus } from 'src/staff/enum/staff-status';
 export declare class PermissionEntity {
     id: number;
-    userId: string;
-    userName: string;
-    phoneNumber: string;
     permissions: Permission[];
-    designation: DesignationEnum;
     role: Roles;
     companyCode: string;
     unitCode: string;
+    staffId: StaffEntity;
+    subDealerId: SubDealerEntity;
+    staffStatus: StaffStatus;
+    startDate: Date;
+    endDate: Date;
 }
 export declare class Permission {
-    name: string;
+    name: Roles;
     add: boolean;
     edit: boolean;
     view: boolean;
+    delete: boolean;
 }

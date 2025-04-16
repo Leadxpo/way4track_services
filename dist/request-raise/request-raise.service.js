@@ -15,10 +15,15 @@ const common_response_1 = require("../models/common-response");
 const error_response_1 = require("../models/error-response");
 const request_raise_adapter_1 = require("./request-raise.adapter");
 const request_raise_repo_1 = require("./repo/request-raise.repo");
+const notification_entity_1 = require("../notifications/entity/notification.entity");
+const notification_service_1 = require("../notifications/notification.service");
+const branch_entity_1 = require("../branch/entity/branch.entity");
+const staff_entity_1 = require("../staff/entity/staff.entity");
 let RequestRaiseService = class RequestRaiseService {
-    constructor(requestAdapter, requestRepository) {
+    constructor(requestAdapter, requestRepository, notificationService) {
         this.requestAdapter = requestAdapter;
         this.requestRepository = requestRepository;
+        this.notificationService = notificationService;
     }
     async updateRequestDetails(dto) {
         try {
@@ -42,12 +47,25 @@ let RequestRaiseService = class RequestRaiseService {
         }
     }
     async createRequestDetails(dto) {
+        let successResponse;
+        let entity;
         try {
-            const entity = this.requestAdapter.convertDtoToEntity(dto);
-            entity.id = undefined;
+            entity = this.requestAdapter.convertDtoToEntity(dto);
+            entity.id = null;
             entity.requestId = `RR-${(await this.requestRepository.count() + 1).toString().padStart(5, '0')}`;
-            await this.requestRepository.insert(entity);
-            return new common_response_1.CommonResponse(true, 201, 'Request details created successfully');
+            console.log("Saving entity:", entity);
+            const insertResult = await this.requestRepository.insert(entity);
+            if (!insertResult.identifiers.length) {
+                throw new Error('Failed to save request details');
+            }
+            successResponse = new common_response_1.CommonResponse(true, 201, 'Request details created successfully');
+            try {
+                await this.notificationService.createNotification(entity, notification_entity_1.NotificationEnum.Request);
+            }
+            catch (notificationError) {
+                console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+            }
+            return successResponse;
         }
         catch (error) {
             console.error(`Error creating request details: ${error.message}`, error.stack);
@@ -55,7 +73,7 @@ let RequestRaiseService = class RequestRaiseService {
         }
     }
     async handleRequestDetails(dto) {
-        if (dto.id || dto.requestId) {
+        if (dto.id && dto.id !== null || (dto.requestId && dto.requestId.trim() !== '')) {
             return await this.updateRequestDetails(dto);
         }
         else {
@@ -87,6 +105,18 @@ let RequestRaiseService = class RequestRaiseService {
             throw new error_response_1.ErrorResponse(500, error.message);
         }
     }
+    async getAllRequestDetails(req) {
+        try {
+            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!request) {
+                return new common_response_1.CommonResponse(false, 404, 'Request not found');
+            }
+            return new common_response_1.CommonResponse(true, 200, 'Request details fetched successfully', request);
+        }
+        catch (error) {
+            throw new error_response_1.ErrorResponse(500, error.message);
+        }
+    }
     async getRequestsDropDown() {
         const data = await this.requestRepository.find({ select: ['id', 'requestId'] });
         if (data.length) {
@@ -96,29 +126,39 @@ let RequestRaiseService = class RequestRaiseService {
             return new common_response_1.CommonResponse(false, 4579, "There Is No branch names");
         }
     }
+    async getRequestBranchWise(req) {
+        const data = await this.requestRepository.getRequestBranchWise(req);
+        return data.length
+            ? new common_response_1.CommonResponse(true, 75483, "Data Retrieved Successfully", data)
+            : new common_response_1.CommonResponse(true, 4579, "There are no branch names", data);
+    }
     async getRequests(filter) {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
             'req.request_id AS requestNumber',
-            'client.name AS client',
+            'req.id AS requestId',
+            'branch.name AS branchName',
             'req.created_date AS paymentDate',
-            'req.request_type AS amount',
+            'req.request_type AS requestType',
             'req.status AS status',
-            'req.request_to as RequestTo'
+            'sf.name AS RequestTo'
         ])
-            .leftJoin('req.client_id', 'client')
-            .where(`req.company_code = "${filter.companyCode}"`)
-            .andWhere(`req.unit_code = "${filter.unitCode}"`)
-            .groupBy('req.id, client.id, req.created_date')
+            .leftJoin(branch_entity_1.BranchEntity, 'branch', 'req.branch_id = branch.id')
+            .leftJoin(staff_entity_1.StaffEntity, 'sf', 'req.request_to = sf.id')
+            .where('req.company_code = :companyCode', { companyCode: filter.companyCode })
+            .andWhere('req.unit_code = :unitCode', { unitCode: filter.unitCode })
             .orderBy('req.created_date', 'DESC');
+        if (filter.staffId) {
+            query.andWhere('sf.staff_id = :staffId', { staffId: filter.staffId });
+        }
+        if (filter.branchName) {
+            query.andWhere('branch.name = :branchName', { branchName: filter.branchName });
+        }
         if (filter.fromDate) {
-            query.andWhere('req.created_date >= :fromDate', { fromDate: filter.fromDate });
+            query.andWhere('DATE(req.created_date) >= :fromDate', { fromDate: filter.fromDate });
         }
         if (filter.toDate) {
-            query.andWhere('req.created_date <= :toDate', { toDate: filter.toDate });
-        }
-        if (filter.status) {
-            query.andWhere('req.status = :status', { status: filter.status });
+            query.andWhere('DATE(req.created_date) <= :toDate', { toDate: filter.toDate });
         }
         const result = await query.getRawMany();
         return result;
@@ -128,6 +168,7 @@ exports.RequestRaiseService = RequestRaiseService;
 exports.RequestRaiseService = RequestRaiseService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [request_raise_adapter_1.RequestRaiseAdapter,
-        request_raise_repo_1.RequestRaiseRepository])
+        request_raise_repo_1.RequestRaiseRepository,
+        notification_service_1.NotificationService])
 ], RequestRaiseService);
 //# sourceMappingURL=request-raise.service.js.map

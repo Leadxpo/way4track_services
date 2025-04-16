@@ -8,5 +8,6 @@ var HiringStatus;
     HiringStatus["QUALIFIED"] = "Qualified";
     HiringStatus["APPLIED"] = "APPLIED";
     HiringStatus["INTERVIEWED"] = "INTERVIEWED";
+    HiringStatus["ONBOARDED"] = "Onboarded";
 })(HiringStatus || (exports.HiringStatus = HiringStatus = {}));
 //# sourceMappingURL=hiring-status.enum.js.map

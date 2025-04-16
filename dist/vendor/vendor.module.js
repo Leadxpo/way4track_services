@@ -17,6 +17,7 @@ const vendor_adapter_1 = require("./vendor.adapter");
 const product_module_1 = require("../product/product.module");
 const branch_module_1 = require("../branch/branch.module");
 const branch_repo_1 = require("../branch/repo/branch.repo");
+const platform_express_1 = require("@nestjs/platform-express");
 let VendorModule = class VendorModule {
 };
 exports.VendorModule = VendorModule;
@@ -26,6 +27,9 @@ exports.VendorModule = VendorModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([vendor_entity_1.VendorEntity, vendor_repo_1.VendorRepository]),
             (0, common_1.forwardRef)(() => product_module_1.ProductModule),
             (0, common_1.forwardRef)(() => branch_module_1.BranchModule),
+            platform_express_1.MulterModule.register({
+                dest: './uploads',
+            }),
         ],
         controllers: [vendor_controller_1.VendorController],
         providers: [vendor_service_1.VendorService, vendor_adapter_1.VendorAdapter, vendor_repo_1.VendorRepository, branch_repo_1.BranchRepository],

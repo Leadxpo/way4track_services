@@ -1,3 +1,4 @@
+import { ClientStatus } from "../enum/client-status.enum";
 export declare class ClientResDto {
     id: number;
     name: string;
@@ -6,12 +7,11 @@ export declare class ClientResDto {
     clientPhoto: string;
     branchId: number;
     branchName: string;
-    dob: Date;
     email: string;
     address: string;
     joiningDate: Date;
-    voucherId: string;
     companyCode: string;
     unitCode: string;
-    constructor(id: number, name: string, phoneNumber: string, clientId: string, clientPhoto: string, branchId: number, branchName: string, dob: Date, email: string, address: string, joiningDate: Date, voucherId: string, companyCode: string, unitCode: string);
+    status: ClientStatus;
+    constructor(id: number, name: string, phoneNumber: string, clientId: string, clientPhoto: string, branchId: number, branchName: string, email: string, address: string, joiningDate: Date, companyCode: string, unitCode: string, status: ClientStatus);
 }

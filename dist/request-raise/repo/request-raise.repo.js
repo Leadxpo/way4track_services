@@ -13,10 +13,60 @@ exports.RequestRaiseRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const request_raise_entity_1 = require("../entity/request-raise.entity");
+const branch_entity_1 = require("../../branch/entity/branch.entity");
+const client_status_enum_1 = require("../../client/enum/client-status.enum");
 let RequestRaiseRepository = class RequestRaiseRepository extends typeorm_1.Repository {
     constructor(dataSource) {
         super(request_raise_entity_1.RequestRaiseEntity, dataSource.createEntityManager());
         this.dataSource = dataSource;
+    }
+    async getRequestBranchWise(req) {
+        const query = this.createQueryBuilder('re')
+            .select([
+            'br.name AS branch',
+            're.products AS products',
+        ])
+            .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = re.branch_id')
+            .where('re.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('re.unit_code = :unitCode', { unitCode: req.unitCode })
+            .andWhere('re.status = :status', { status: client_status_enum_1.ClientStatusEnum.pending })
+            .andWhere('re.request_type = :requestType', { requestType: request_raise_entity_1.RequestType.products });
+        if (req.branch) {
+            query.andWhere('br.name = :branch', { branch: req.branch });
+        }
+        query.groupBy('br.name, re.products');
+        const result = await query.getRawMany();
+        const transformedResult = [];
+        result.forEach((item) => {
+            const existingBranch = transformedResult.find(branch => branch.location === item.branch);
+            const productList = typeof item.products === 'string'
+                ? JSON.parse(item.products)
+                : item.products || [];
+            if (existingBranch) {
+                productList.forEach((product) => {
+                    const existingProduct = existingBranch.requests.find(req => req.name === product.productType);
+                    if (existingProduct) {
+                        existingProduct.count += product.quantity;
+                    }
+                    else {
+                        existingBranch.requests.push({
+                            name: product.productType,
+                            count: product.quantity,
+                        });
+                    }
+                });
+            }
+            else {
+                transformedResult.push({
+                    location: item.branch,
+                    requests: productList.map(product => ({
+                        name: product.productType,
+                        count: product.quantity,
+                    })),
+                });
+            }
+        });
+        return transformedResult;
     }
 };
 exports.RequestRaiseRepository = RequestRaiseRepository;

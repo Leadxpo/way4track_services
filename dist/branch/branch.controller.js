@@ -19,17 +19,23 @@ const branch_dto_1 = require("./dto/branch.dto");
 const branch_id_dto_1 = require("./dto/branch-id.dto");
 const common_response_1 = require("../models/common-response");
 const platform_express_1 = require("@nestjs/platform-express");
+const common_req_1 = require("../models/common-req");
+const multer = require("multer");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let BranchController = class BranchController {
     constructor(branchService) {
         this.branchService = branchService;
     }
-    async saveBranchDetails(dto) {
-        try {
-            return this.branchService.saveBranchDetails(dto);
+    async saveBranchDetails(dto, photos) {
+        if (dto.id) {
+            dto.id = Number(dto.id);
         }
-        catch (error) {
-            console.log("Error in create address in services..", error);
-        }
+        return this.branchService.saveBranchDetails(dto, photos);
     }
     async deleteBranchDetails(dto) {
         try {
@@ -49,6 +55,24 @@ let BranchController = class BranchController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
+    async getBranchDetailsById(req) {
+        try {
+            return this.branchService.getBranchDetailsById(req);
+        }
+        catch (error) {
+            console.log("Error in create address in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+    async getBranchStaff(req) {
+        try {
+            return this.branchService.getBranchStaff(req);
+        }
+        catch (error) {
+            console.log("Error in create address in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
     async getBranchNamesDropDown() {
         try {
             return this.branchService.getBranchNamesDropDown();
@@ -57,22 +81,18 @@ let BranchController = class BranchController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
-    async uploadPhoto(branchId, photo) {
-        try {
-            return await this.branchService.uploadBranchPhoto(branchId, photo);
-        }
-        catch (error) {
-            console.error('Error uploading branch photo:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
 };
 exports.BranchController = BranchController;
 __decorate([
-    (0, common_1.Post)('saveBranchDetails'),
+    (0, common_1.Post)("saveBranchDetails"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileFieldsInterceptor)([
+        { name: 'photo', maxCount: 1 },
+        { name: 'image', maxCount: 1 },
+    ], multerOptions)),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [branch_dto_1.BranchDto]),
+    __metadata("design:paramtypes", [branch_dto_1.BranchDto, Object]),
     __metadata("design:returntype", Promise)
 ], BranchController.prototype, "saveBranchDetails", null);
 __decorate([
@@ -86,24 +106,29 @@ __decorate([
     (0, common_1.Post)('getBranchDetails'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [branch_id_dto_1.BranchIdDto]),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
 ], BranchController.prototype, "getBranchDetails", null);
+__decorate([
+    (0, common_1.Post)('getBranchDetailsById'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [branch_id_dto_1.BranchIdDto]),
+    __metadata("design:returntype", Promise)
+], BranchController.prototype, "getBranchDetailsById", null);
+__decorate([
+    (0, common_1.Post)('getBranchStaff'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [branch_id_dto_1.BranchIdDto]),
+    __metadata("design:returntype", Promise)
+], BranchController.prototype, "getBranchStaff", null);
 __decorate([
     (0, common_1.Post)('getBranchNamesDropDown'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BranchController.prototype, "getBranchNamesDropDown", null);
-__decorate([
-    (0, common_1.Post)('uploadPhoto'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo')),
-    __param(0, (0, common_1.Body)('branchId')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], BranchController.prototype, "uploadPhoto", null);
 exports.BranchController = BranchController = __decorate([
     (0, common_1.Controller)('branch'),
     __metadata("design:paramtypes", [branch_service_1.BranchService])

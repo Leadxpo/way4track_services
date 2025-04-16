@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VoucherIdDto = void 0;
 class VoucherIdDto {
-    constructor(id, companyCode, unitCode) {
-        this.id = id;
+    constructor(voucherId, companyCode, unitCode) {
+        this.voucherId = voucherId;
         this.companyCode = companyCode;
         this.unitCode = unitCode;
     }

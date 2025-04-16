@@ -4,6 +4,22 @@ import { CommonResponse } from 'src/models/common-response';
 export declare class AttendanceController {
     private readonly attendanceService;
     constructor(attendanceService: AttendanceService);
-    createAttendance(dto: CreateAttendanceDto): Promise<CommonResponse>;
-    getAttendance(staffId?: number, branchId?: number): Promise<import("./entity/attendence.entity").AttendanceEntity[] | CommonResponse>;
+    updateAttendanceDetails(dto: CreateAttendanceDto): Promise<CommonResponse>;
+    getAttendanceDetails(): Promise<CommonResponse>;
+    getAttendanceDetailsById(req: CreateAttendanceDto): Promise<CommonResponse>;
+    getStaffAttendance(req: {
+        staffId?: string;
+        fromDate?: string;
+        toDate?: string;
+        branchName?: string;
+        companyCode?: string;
+        unitCode?: string;
+    }): Promise<CommonResponse>;
+    uploadAttendance(file: Express.Multer.File): Promise<{
+        message: string;
+        inserted: number;
+        missingStaffIds: string | number[];
+    } | {
+        message: string;
+    }>;
 }

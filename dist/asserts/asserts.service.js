@@ -10,26 +10,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssertsService = void 0;
+const storage_1 = require("@google-cloud/storage");
 const common_1 = require("@nestjs/common");
-const asserts_repo_1 = require("./repo/asserts.repo");
+const branch_repo_1 = require("../branch/repo/branch.repo");
 const common_response_1 = require("../models/common-response");
 const error_response_1 = require("../models/error-response");
-const path_1 = require("path");
-const fs_1 = require("fs");
 const voucher_repo_1 = require("../voucher/repo/voucher.repo");
 const asserts_adapter_1 = require("./asserts.adapter");
-const branch_repo_1 = require("../branch/repo/branch.repo");
+const asserts_repo_1 = require("./repo/asserts.repo");
 let AssertsService = class AssertsService {
     constructor(adapter, assertsRepository, voucherRepo, branchRepo) {
         this.adapter = adapter;
         this.assertsRepository = assertsRepository;
         this.voucherRepo = voucherRepo;
         this.branchRepo = branchRepo;
+        this.storage = new storage_1.Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
     async getAssertDetails(req) {
         try {
             const assert = await this.assertsRepository.findOne({
-                relations: ['branchId', 'voucherId'],
+                relations: ['branchId'],
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
             });
             if (!assert) {
@@ -43,32 +48,84 @@ let AssertsService = class AssertsService {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching assert details');
         }
     }
-    async create(createAssertsDto) {
+    async getAllAssertDetails(req) {
         try {
-            const branchEntity = await this.branchRepo.findOne({ where: { id: createAssertsDto.branchId } });
-            if (!branchEntity) {
-                throw new Error('Branch not found');
-            }
-            const voucher = await this.voucherRepo.findOne({
-                where: { id: createAssertsDto.voucherId }
+            const assert = await this.assertsRepository.find({
+                relations: ['branchId'],
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
             });
-            if (!voucher) {
-                throw new Error('Voucher not found');
+            if (!assert) {
+                return new common_response_1.CommonResponse(false, 404, 'Assert not found');
             }
-            const entity = this.adapter.convertDtoToEntity(createAssertsDto);
+            return new common_response_1.CommonResponse(true, 6541, 'Data Retrieved Successfully', assert);
+        }
+        catch (error) {
+            console.error('Error in getAssertDetails service:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching assert details');
+        }
+    }
+    async create(createAssertsDto, photo) {
+        try {
+            console.log(createAssertsDto, "+========");
+            let entity = null;
+            if (createAssertsDto.id) {
+                entity = await this.assertsRepository.findOneBy({ id: createAssertsDto.id });
+                if (!entity) {
+                    throw new error_response_1.ErrorResponse(404, 'Asset not found');
+                }
+                const { branchId, ...rest } = createAssertsDto;
+                entity = this.assertsRepository.merge(entity, rest);
+                if (branchId) {
+                    const branchEntity = await this.branchRepo.findOne({ where: { id: branchId } });
+                    if (!branchEntity) {
+                        throw new Error(`Branch with ID ${branchId} not found`);
+                    }
+                    entity.branchId = branchEntity;
+                }
+                if (photo && entity.assetPhoto) {
+                    const existingFilePath = entity.assetPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+                    try {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    }
+                    catch (error) {
+                        console.error(`Error deleting old file from GCS: ${error.message}`);
+                    }
+                }
+            }
+            else {
+                entity = await this.adapter.convertDtoToEntity(createAssertsDto);
+            }
+            let filePath = null;
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `assert_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                entity.assetPhoto = filePath;
+            }
             await this.assertsRepository.save(entity);
             const message = createAssertsDto.id
                 ? 'Assert Details Updated Successfully'
                 : 'Assert Details Created Successfully';
-            return new common_response_1.CommonResponse(true, 65152, message);
+            return new common_response_1.CommonResponse(true, 200, message, { photoPath: filePath });
         }
         catch (error) {
-            throw new error_response_1.ErrorResponse(5416, error.message);
+            console.error('Error saving asset details:', error);
+            throw new error_response_1.ErrorResponse(500, error.message);
         }
     }
     async deleteAssertDetails(dto) {
         try {
+            console.log(dto, "++++");
             const assertExists = await this.assertsRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            console.log(assertExists, "++++");
             if (!assertExists) {
                 throw new error_response_1.ErrorResponse(404, `assert with ID ${dto.id} does not exist`);
             }
@@ -77,22 +134,6 @@ let AssertsService = class AssertsService {
         }
         catch (error) {
             throw new error_response_1.ErrorResponse(5417, error.message);
-        }
-    }
-    async uploadAssertPhoto(assertId, photo) {
-        try {
-            const assert = await this.assertsRepository.findOne({ where: { id: assertId } });
-            if (!assert) {
-                return new common_response_1.CommonResponse(false, 404, 'assert not found');
-            }
-            const filePath = (0, path_1.join)(__dirname, '../../uploads/assert_photos', `${assertId}-${Date.now()}.jpg`);
-            await fs_1.promises.writeFile(filePath, photo.buffer);
-            assert.assetPhoto = filePath;
-            await this.assertsRepository.save(assert);
-            return new common_response_1.CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        }
-        catch (error) {
-            throw new error_response_1.ErrorResponse(500, error.message);
         }
     }
 };

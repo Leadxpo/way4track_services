@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetTicketsResDto = void 0;
 class GetTicketsResDto {
-    constructor(staffId, staffName, staffNumber, problem, date, branchId, branchName, ticketNumber, addressingDepartment, companyCode, unitCOde) {
+    constructor(staffId, staffName, staffNumber, problem, date, branchId, branchName, ticketNumber, addressingDepartment, companyCode, unitCOde, workStatus, description, subDealerId, designationRelation) {
         this.staffId = staffId;
         this.staffName = staffName;
         this.staffNumber = staffNumber;
@@ -14,6 +14,10 @@ class GetTicketsResDto {
         this.addressingDepartment = addressingDepartment;
         this.companyCode = companyCode;
         this.unitCOde = unitCOde;
+        this.workStatus = workStatus;
+        this.description = description;
+        this.subDealerId = subDealerId;
+        this.designationRelation = designationRelation;
     }
 }
 exports.GetTicketsResDto = GetTicketsResDto;

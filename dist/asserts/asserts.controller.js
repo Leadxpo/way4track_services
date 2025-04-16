@@ -14,23 +14,28 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AssertsController = void 0;
 const common_1 = require("@nestjs/common");
-const asserts_dto_1 = require("./dto/asserts.dto");
-const asserts_id_dto_1 = require("./dto/asserts-id.dto");
-const asserts_service_1 = require("./asserts.service");
-const common_response_1 = require("../models/common-response");
 const platform_express_1 = require("@nestjs/platform-express");
+const common_req_1 = require("../models/common-req");
+const common_response_1 = require("../models/common-response");
+const asserts_service_1 = require("./asserts.service");
+const asserts_id_dto_1 = require("./dto/asserts-id.dto");
+const asserts_dto_1 = require("./dto/asserts.dto");
+const multer = require("multer");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let AssertsController = class AssertsController {
     constructor(assertsService) {
         this.assertsService = assertsService;
     }
-    async saveAssertDetails(dto) {
-        try {
-            return this.assertsService.create(dto);
+    async createAssert(createAssertsDto, photo) {
+        if (createAssertsDto.id) {
+            createAssertsDto.id = Number(createAssertsDto.id);
         }
-        catch (error) {
-            console.log("Error in save assert details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error saving assert details');
-        }
+        return this.assertsService.create(createAssertsDto, photo);
     }
     async deleteAssertDetails(dto) {
         try {
@@ -50,24 +55,26 @@ let AssertsController = class AssertsController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching assert details');
         }
     }
-    async uploadPhoto(assertId, photo) {
+    async getAllAssertDetails(req) {
         try {
-            return await this.assertsService.uploadAssertPhoto(assertId, photo);
+            return this.assertsService.getAllAssertDetails(req);
         }
         catch (error) {
-            console.error('Error uploading assert photo:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error uploading photo');
+            console.log("Error in get assert details in service..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching assert details');
         }
     }
 };
 exports.AssertsController = AssertsController;
 __decorate([
-    (0, common_1.Post)('saveAssertDetails'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', multerOptions)),
+    (0, common_1.Post)('create'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [asserts_dto_1.AssertsDto]),
+    __metadata("design:paramtypes", [asserts_dto_1.AssertsDto, Object]),
     __metadata("design:returntype", Promise)
-], AssertsController.prototype, "saveAssertDetails", null);
+], AssertsController.prototype, "createAssert", null);
 __decorate([
     (0, common_1.Post)('deleteAssertDetails'),
     __param(0, (0, common_1.Body)()),
@@ -83,14 +90,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AssertsController.prototype, "getAssertDetails", null);
 __decorate([
-    (0, common_1.Post)('uploadPhoto'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo')),
-    __param(0, (0, common_1.Body)('assertId')),
-    __param(1, (0, common_1.UploadedFile)()),
+    (0, common_1.Post)('getAllAssertDetails'),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
-], AssertsController.prototype, "uploadPhoto", null);
+], AssertsController.prototype, "getAllAssertDetails", null);
 exports.AssertsController = AssertsController = __decorate([
     (0, common_1.Controller)('asserts'),
     __metadata("design:paramtypes", [asserts_service_1.AssertsService])

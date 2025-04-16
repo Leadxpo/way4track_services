@@ -1,6 +1,6 @@
 export declare class VoucherIdDto {
-    id: number;
+    voucherId: string;
     companyCode?: string;
     unitCode?: string;
-    constructor(id: number, companyCode?: string, unitCode?: string);
+    constructor(voucherId: string, companyCode?: string, unitCode?: string);
 }

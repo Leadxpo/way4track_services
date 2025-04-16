@@ -16,15 +16,25 @@ exports.VoucherController = void 0;
 const common_1 = require("@nestjs/common");
 const voucher_dto_1 = require("./dto/voucher.dto");
 const common_response_1 = require("../models/common-response");
-const voucher_id_dto_1 = require("./dto/voucher-id.dto");
 const voucher_service_1 = require("./voucher-service");
+const multer = require("multer");
+const platform_express_1 = require("@nestjs/platform-express");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let VoucherController = class VoucherController {
     constructor(voucherService) {
         this.voucherService = voucherService;
     }
-    async saveVoucher(dto) {
+    async saveVoucher(dto, file) {
         try {
-            const savedVoucher = await this.voucherService.createVoucher(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            const savedVoucher = await this.voucherService.handleVoucher(dto, file);
             return new common_response_1.CommonResponse(true, 200, 'Voucher saved successfully', savedVoucher);
         }
         catch (error) {
@@ -35,6 +45,15 @@ let VoucherController = class VoucherController {
     async deleteVoucher(dto) {
         try {
             return await this.voucherService.deleteVoucherDetails(dto);
+        }
+        catch (error) {
+            console.error('Error in delete voucher details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting voucher details', error.message);
+        }
+    }
+    async getPendingVouchers(dto) {
+        try {
+            return await this.voucherService.getPendingVouchers(dto);
         }
         catch (error) {
             console.error('Error in delete voucher details:', error);
@@ -62,19 +81,28 @@ let VoucherController = class VoucherController {
 };
 exports.VoucherController = VoucherController;
 __decorate([
-    (0, common_1.Post)('save'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', multerOptions)),
+    (0, common_1.Post)('saveVoucher'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [voucher_dto_1.VoucherDto]),
+    __metadata("design:paramtypes", [voucher_dto_1.VoucherDto, Object]),
     __metadata("design:returntype", Promise)
 ], VoucherController.prototype, "saveVoucher", null);
 __decorate([
     (0, common_1.Post)('deleteVoucher'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [voucher_id_dto_1.VoucherIdDto]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], VoucherController.prototype, "deleteVoucher", null);
+__decorate([
+    (0, common_1.Post)('getPendingVouchers'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], VoucherController.prototype, "getPendingVouchers", null);
 __decorate([
     (0, common_1.Post)('getAllVouchers'),
     __metadata("design:type", Function),

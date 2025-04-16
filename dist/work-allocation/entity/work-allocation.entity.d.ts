@@ -1,14 +1,37 @@
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BaseEntity } from 'typeorm';
+import { WorkStatusEnum } from '../enum/work-status-enum';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 export declare class WorkAllocationEntity extends BaseEntity {
     id: number;
     workAllocationNumber: string;
     serviceOrProduct: string;
     otherInformation: string;
+    description: string;
+    service: string;
+    workStatus: WorkStatusEnum;
     date: Date;
     staffId: StaffEntity;
+    branchId: BranchEntity;
+    productId: ProductEntity;
+    vendorId: VendorEntity;
     clientId: ClientEntity;
+    voucherId: VoucherEntity;
+    technician: TechnicianWorksEntity[];
     companyCode: string;
     unitCode: string;
+    createdAt: Date;
+    updatedAt: Date;
+    productName: string;
+    amount: number;
+    visitingNumber: string;
+    salesStaffRelation: StaffEntity;
+    estimateId: EstimateEntity;
+    invoiceId: EstimateEntity;
 }

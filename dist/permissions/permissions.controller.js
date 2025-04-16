@@ -22,9 +22,20 @@ let PermissionsController = class PermissionsController {
     constructor(service) {
         this.service = service;
     }
-    async handlePermissionDetails(dto) {
+    async updatePermissionDetails(dto) {
         try {
-            return this.service.handlePermissionDetails(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return this.service.updatePermissionDetails(dto);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+        }
+    }
+    async savePermissionDetails(dto) {
+        try {
+            return this.service.savePermissionDetails(dto);
         }
         catch (error) {
             console.log("Error in create Permission in services..", error);
@@ -39,6 +50,51 @@ let PermissionsController = class PermissionsController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
         }
     }
+    async getStaffPermissions(req) {
+        try {
+            return this.service.getStaffPermissions(req);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+    async editPermissions({ staffId, companyCode, unitCode }) {
+        try {
+            return this.service.editPermissions(staffId, companyCode, unitCode);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+    async addPermissions({ staffId, companyCode, unitCode }) {
+        try {
+            return this.service.addPermissions(staffId, companyCode, unitCode);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+    async viewPermissions({ staffId, companyCode, unitCode }) {
+        try {
+            return this.service.viewPermissions(staffId, companyCode, unitCode);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
+    async deletePermissions(staffId, companyCode, unitCode) {
+        try {
+            return this.service.deletePermissions(staffId, companyCode, unitCode);
+        }
+        catch (error) {
+            console.log("Error in create Permission in services..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching Permission type details');
+        }
+    }
 };
 exports.PermissionsController = PermissionsController;
 __decorate([
@@ -47,7 +103,14 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [permissions_dto_1.PermissionsDto]),
     __metadata("design:returntype", Promise)
-], PermissionsController.prototype, "handlePermissionDetails", null);
+], PermissionsController.prototype, "updatePermissionDetails", null);
+__decorate([
+    (0, common_1.Post)('savePermissionDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [permissions_dto_1.PermissionsDto]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "savePermissionDetails", null);
 __decorate([
     (0, common_1.Post)('getPermissionDetails'),
     __param(0, (0, common_1.Body)()),
@@ -55,6 +118,44 @@ __decorate([
     __metadata("design:paramtypes", [permission_id_dto_1.PermissionIdDto]),
     __metadata("design:returntype", Promise)
 ], PermissionsController.prototype, "getPermissionDetails", null);
+__decorate([
+    (0, common_1.Post)('getStaffPermissions'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "getStaffPermissions", null);
+__decorate([
+    (0, common_1.Post)('editPermissions'),
+    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "editPermissions", null);
+__decorate([
+    (0, common_1.Post)('addPermissions'),
+    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "addPermissions", null);
+__decorate([
+    (0, common_1.Post)('viewPermissions'),
+    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "viewPermissions", null);
+__decorate([
+    (0, common_1.Post)('deletePermissions'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", Promise)
+], PermissionsController.prototype, "deletePermissions", null);
 exports.PermissionsController = PermissionsController = __decorate([
     (0, common_1.Controller)('permissions'),
     __metadata("design:paramtypes", [permissions_services_1.PermissionsService])

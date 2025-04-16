@@ -8,9 +8,10 @@ export declare class VendorResDto {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: number;
-    voucherNames: string;
     companyCode?: string;
     unitCode?: string;
-    constructor(id: number | undefined, name: string, vendorPhoneNumber: string, alternatePhoneNumber: string | undefined, productType: string, startingDate: Date, emailId: string, aadharNumber: string, address: string, voucherId: number, voucherNames: string, companyCode?: string, unitCode?: string);
+    vendorPhoto?: string;
+    branchId: number;
+    branchNames: string;
+    constructor(id: number | undefined, name: string, vendorPhoneNumber: string, alternatePhoneNumber: string | undefined, productType: string, startingDate: Date, emailId: string, aadharNumber: string, address: string, companyCode?: string, unitCode?: string, vendorPhoto?: string, branchId?: number, branchNames?: string);
 }

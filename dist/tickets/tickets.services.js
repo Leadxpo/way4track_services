@@ -15,10 +15,13 @@ const tickets_adapter_1 = require("./tickets.adapter");
 const common_response_1 = require("../models/common-response");
 const error_response_1 = require("../models/error-response");
 const tickets_repo_1 = require("./repo/tickets.repo");
+const notification_entity_1 = require("../notifications/entity/notification.entity");
+const notification_service_1 = require("../notifications/notification.service");
 let TicketsService = class TicketsService {
-    constructor(ticketsAdapter, ticketsRepository) {
+    constructor(ticketsAdapter, ticketsRepository, notificationService) {
         this.ticketsAdapter = ticketsAdapter;
         this.ticketsRepository = ticketsRepository;
+        this.notificationService = notificationService;
     }
     async updateTicketDetails(dto) {
         try {
@@ -39,11 +42,18 @@ let TicketsService = class TicketsService {
     }
     async createTicketDetails(dto) {
         try {
+            console.error('Ticket DTO:', dto);
             const newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
-            const count = await this.ticketsRepository.count();
-            newTicket.ticketNumber = `Tickets-${(count + 1).toString().padStart(5, '0')}`;
-            await this.ticketsRepository.save(newTicket);
-            return new common_response_1.CommonResponse(true, 201, 'Ticket details created successfully', newTicket.ticketNumber);
+            const lastTicket = await this.ticketsRepository
+                .createQueryBuilder("ticket")
+                .select("MAX(ticket.ticket_number)", "max")
+                .getRawOne();
+            const nextId = (lastTicket.max ?? 0) + 1;
+            newTicket.ticketNumber = `Tickets-${nextId.toString().padStart(5, '0')}`;
+            console.log('New Ticket Data:', newTicket);
+            await this.ticketsRepository.insert(newTicket);
+            await this.notificationService.createNotification(newTicket, notification_entity_1.NotificationEnum.Ticket);
+            return new common_response_1.CommonResponse(true, 65152, ' Details and Permissions Created Successfully');
         }
         catch (error) {
             console.error(`Error creating ticket details: ${error.message}`, error.stack);
@@ -93,11 +103,21 @@ let TicketsService = class TicketsService {
             return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", VoucherData);
         }
     }
+    async getTotalPendingAndSucessTickets(req) {
+        const VoucherData = await this.ticketsRepository.getTotalPendingAndSucessTickets(req);
+        if (!VoucherData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", VoucherData);
+        }
+    }
 };
 exports.TicketsService = TicketsService;
 exports.TicketsService = TicketsService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [tickets_adapter_1.TicketsAdapter,
-        tickets_repo_1.TicketsRepository])
+        tickets_repo_1.TicketsRepository,
+        notification_service_1.NotificationService])
 ], TicketsService);
 //# sourceMappingURL=tickets.services.js.map

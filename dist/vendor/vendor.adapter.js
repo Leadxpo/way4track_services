@@ -10,7 +10,7 @@ exports.VendorAdapter = void 0;
 const common_1 = require("@nestjs/common");
 const vendor_entity_1 = require("./entity/vendor.entity");
 const vendor_res_dto_1 = require("./dto/vendor-res.dto");
-const voucher_entity_1 = require("../voucher/entity/voucher.entity");
+const branch_entity_1 = require("../branch/entity/branch.entity");
 let VendorAdapter = class VendorAdapter {
     convertDtoToEntity(dto) {
         const entity = new vendor_entity_1.VendorEntity();
@@ -26,15 +26,16 @@ let VendorAdapter = class VendorAdapter {
         entity.address = dto.address;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        const voucher = new voucher_entity_1.VoucherEntity();
-        voucher.id = dto.voucherId;
-        entity.voucherId = voucher;
+        entity.vendorPhoto = dto.vendorPhoto;
+        const branch = new branch_entity_1.BranchEntity();
+        branch.id = dto.branchId;
+        entity.branch = branch;
         return entity;
     }
     convertEntityToDto(entity) {
         return entity.map((vendor) => {
-            const { id, name, vendorPhoneNumber, alternatePhoneNumber, productType, startingDate, emailId, aadharNumber, address, voucherId, companyCode, unitCode } = vendor;
-            return new vendor_res_dto_1.VendorResDto(id, name, vendorPhoneNumber, alternatePhoneNumber, productType, startingDate, emailId, aadharNumber, address, voucherId?.id, voucherId?.name ?? '', companyCode, unitCode);
+            const { id, name, vendorPhoneNumber, alternatePhoneNumber, productType, startingDate, emailId, aadharNumber, address, voucherId, companyCode, unitCode, vendorPhoto, } = vendor;
+            return new vendor_res_dto_1.VendorResDto(id, name, vendorPhoneNumber, alternatePhoneNumber, productType, startingDate, emailId, aadharNumber, address, companyCode, unitCode, vendorPhoto, vendor.branch?.id, vendor.branch?.branchName);
         });
     }
 };

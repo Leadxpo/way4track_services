@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubDealerAdapter = void 0;
 const common_1 = require("@nestjs/common");
 const sub_dealer_entity_1 = require("./entity/sub-dealer.entity");
-const voucher_entity_1 = require("../voucher/entity/voucher.entity");
 const sub_dealer_res_dto_1 = require("./dto/sub-dealer-res.dto");
+const branch_entity_1 = require("../branch/entity/branch.entity");
 let SubDealerAdapter = class SubDealerAdapter {
     convertDtoToEntity(dto) {
         const entity = new sub_dealer_entity_1.SubDealerEntity();
@@ -25,18 +25,21 @@ let SubDealerAdapter = class SubDealerAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.password = dto.password;
-        const voucher = new voucher_entity_1.VoucherEntity();
-        voucher.id = dto.voucherId;
-        entity.voucherId = voucher;
+        entity.subDealerPhoto = dto.subDealerPhoto;
+        if (dto.branchId) {
+            const branch = new branch_entity_1.BranchEntity();
+            branch.id = dto.branchId;
+            entity.branch = branch;
+        }
         if (dto.id) {
             entity.id = dto.id;
         }
         return entity;
     }
     convertEntityToDto(entity) {
-        return entity.map((vendor) => {
-            const { id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, voucherId, subDealerPhoto, subDealerId, companyCode, unitCode } = vendor;
-            return new sub_dealer_res_dto_1.SubDealerResDto(id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, voucherId?.voucherId, voucherId?.name ?? '', subDealerPhoto, subDealerId, companyCode, unitCode);
+        return entity.map((subDealer) => {
+            const { id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, password, subDealerPhoto, subDealerId, companyCode, unitCode, branch } = subDealer;
+            return new sub_dealer_res_dto_1.SubDealerResDto(id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, password, subDealerPhoto, subDealerId, companyCode, unitCode, branch?.id ?? null, branch?.branchName ?? '');
         });
     }
 };

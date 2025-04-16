@@ -14,16 +14,20 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WorkAllocationController = void 0;
 const common_1 = require("@nestjs/common");
-const work_allocation_service_1 = require("./work-allocation.service");
-const work_allocation_dto_1 = require("./dto/work-allocation.dto");
-const work_allocation_id_dto_1 = require("./dto/work-allocation-id.dto");
 const common_response_1 = require("../models/common-response");
+const work_allocation_id_dto_1 = require("./dto/work-allocation-id.dto");
+const work_allocation_dto_1 = require("./dto/work-allocation.dto");
+const work_allocation_service_1 = require("./work-allocation.service");
+const balance_chart_dto_1 = require("../voucher/dto/balance-chart.dto");
 let WorkAllocationController = class WorkAllocationController {
     constructor(workAllocationService) {
         this.workAllocationService = workAllocationService;
     }
     async handleWorkAllocationDetails(dto) {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return this.workAllocationService.handleWorkAllocationDetails(dto);
         }
         catch (error) {
@@ -52,6 +56,33 @@ let WorkAllocationController = class WorkAllocationController {
     async getWorkAllocation(req) {
         try {
             return this.workAllocationService.getWorkAllocation(req);
+        }
+        catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+    async getTotalWorkAllocation(req) {
+        try {
+            return this.workAllocationService.getTotalWorkAllocation(req);
+        }
+        catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+    async getMonthTotalWorkAllocation(req) {
+        try {
+            return this.workAllocationService.getMonthTotalWorkAllocation(req);
+        }
+        catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+    async getTotalPendingAndCompletedPercentage(req) {
+        try {
+            return this.workAllocationService.getTotalPendingAndCompletedPercentage(req);
         }
         catch (error) {
             console.error('Error in delete vendor details:', error);
@@ -88,6 +119,27 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], WorkAllocationController.prototype, "getWorkAllocation", null);
+__decorate([
+    (0, common_1.Post)('getTotalWorkAllocation'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], WorkAllocationController.prototype, "getTotalWorkAllocation", null);
+__decorate([
+    (0, common_1.Post)('getMonthTotalWorkAllocation'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], WorkAllocationController.prototype, "getMonthTotalWorkAllocation", null);
+__decorate([
+    (0, common_1.Post)('getTotalPendingAndCompletedPercentage'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], WorkAllocationController.prototype, "getTotalPendingAndCompletedPercentage", null);
 exports.WorkAllocationController = WorkAllocationController = __decorate([
     (0, common_1.Controller)('work-allocations'),
     __metadata("design:paramtypes", [work_allocation_service_1.WorkAllocationService])

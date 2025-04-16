@@ -4,4 +4,5 @@ export declare class StaffSearchDto {
     branchName?: string;
     companyCode?: string;
     unitCode?: string;
+    subDealerId?: string;
 }

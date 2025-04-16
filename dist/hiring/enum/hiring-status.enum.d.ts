@@ -3,5 +3,6 @@ export declare enum HiringStatus {
     REJECTED = "Rejected",
     QUALIFIED = "Qualified",
     APPLIED = "APPLIED",
-    INTERVIEWED = "INTERVIEWED"
+    INTERVIEWED = "INTERVIEWED",
+    ONBOARDED = "Onboarded"
 }

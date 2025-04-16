@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductAssignResDto = void 0;
 class ProductAssignResDto {
-    constructor(id, staffId, staffName, branchId, branchName, productName, productType, imeiNumberFrom, imeiNumberTo, numberOfProducts, productAssignPhoto, companyCode, unitCode) {
+    constructor(id, staffId, staffName, branchId, branchName, productName, productType, imeiNumberFrom, imeiNumberTo, numberOfProducts, productAssignPhoto, companyCode, unitCode, requestId, request, status) {
         this.id = id;
         this.staffId = staffId;
         this.staffName = staffName;
@@ -16,6 +16,9 @@ class ProductAssignResDto {
         this.productAssignPhoto = productAssignPhoto;
         this.companyCode = companyCode;
         this.unitCode = unitCode;
+        this.request = request;
+        this.requestId = requestId;
+        this.status = status;
     }
 }
 exports.ProductAssignResDto = ProductAssignResDto;

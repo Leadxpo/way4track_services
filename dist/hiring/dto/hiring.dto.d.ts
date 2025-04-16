@@ -1,5 +1,7 @@
+import { YesNo } from "src/staff/entity/staff.entity";
 import { HiringLevel } from "../enum/hiring-level.enum";
 import { HiringStatus } from "../enum/hiring-status.enum";
+import { InterviewWith } from "../entity/hiring.entity";
 export declare class HiringDto {
     id?: number;
     hiringLevel: HiringLevel;
@@ -12,9 +14,21 @@ export declare class HiringDto {
         marks: number;
         yearOfPass: number;
     }[];
+    levelWiseData: {
+        dateOfConductor: string;
+        conductorBy: InterviewWith.HR;
+        conductorPlace: string;
+        result: string;
+        review: string;
+        type?: string;
+    }[];
     resumePath?: string;
     dateOfUpload: Date;
     status: HiringStatus;
     companyCode: string;
     unitCode: string;
+    drivingLicence: YesNo;
+    drivingLicenceNumber: string;
+    joiningDate: string;
+    noticePeriod: string;
 }

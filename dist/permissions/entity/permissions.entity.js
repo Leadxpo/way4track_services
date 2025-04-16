@@ -10,9 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Permission = exports.PermissionEntity = void 0;
-const staff_entity_1 = require("../../staff/entity/staff.entity");
 const typeorm_1 = require("typeorm");
 const role_enum_1 = require("../dto/role.enum");
+const sub_dealer_entity_1 = require("../../sub-dealer/entity/sub-dealer.entity");
+const staff_entity_1 = require("../../staff/entity/staff.entity");
+const staff_status_1 = require("../../staff/enum/staff-status");
 let PermissionEntity = class PermissionEntity {
 };
 exports.PermissionEntity = PermissionEntity;
@@ -21,34 +23,14 @@ __decorate([
     __metadata("design:type", Number)
 ], PermissionEntity.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 100, name: 'user_id', nullable: false }),
-    __metadata("design:type", String)
-], PermissionEntity.prototype, "userId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 100, name: 'user_name', nullable: false }),
-    __metadata("design:type", String)
-], PermissionEntity.prototype, "userName", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 15, name: 'phone_number', nullable: false }),
-    __metadata("design:type", String)
-], PermissionEntity.prototype, "phoneNumber", void 0);
-__decorate([
     (0, typeorm_1.Column)({
         type: 'json',
         name: 'permissions',
-        nullable: false,
-        comment: 'Array of permissions with add, edit, and view flags',
+        nullable: true,
+        comment: 'Array of permissions with add, edit, view, and delete flags',
     }),
     __metadata("design:type", Array)
 ], PermissionEntity.prototype, "permissions", void 0);
-__decorate([
-    (0, typeorm_1.Column)({
-        name: 'designation',
-        type: 'enum',
-        enum: staff_entity_1.DesignationEnum
-    }),
-    __metadata("design:type", String)
-], PermissionEntity.prototype, "designation", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         name: 'role',
@@ -65,26 +47,38 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'unit_code', length: 20, nullable: false }),
     __metadata("design:type", String)
 ], PermissionEntity.prototype, "unitCode", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => staff_entity_1.StaffEntity, (staffEntity) => staffEntity.permissions),
+    (0, typeorm_1.JoinColumn)({ name: 'staff_id' }),
+    __metadata("design:type", staff_entity_1.StaffEntity)
+], PermissionEntity.prototype, "staffId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => sub_dealer_entity_1.SubDealerEntity, (SubDealerEntity) => SubDealerEntity.permissions),
+    (0, typeorm_1.JoinColumn)({ name: 'sub_dealer_id' }),
+    __metadata("design:type", sub_dealer_entity_1.SubDealerEntity)
+], PermissionEntity.prototype, "subDealerId", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        type: 'enum',
+        name: 'staffs_status',
+        enum: staff_status_1.StaffStatus,
+        nullable: true,
+        default: staff_status_1.StaffStatus.ACTIVE
+    }),
+    __metadata("design:type", String)
+], PermissionEntity.prototype, "staffStatus", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'start_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], PermissionEntity.prototype, "startDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'end_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], PermissionEntity.prototype, "endDate", void 0);
 exports.PermissionEntity = PermissionEntity = __decorate([
     (0, typeorm_1.Entity)('permissions')
 ], PermissionEntity);
 class Permission {
 }
 exports.Permission = Permission;
-__decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 100, nullable: false, name: 'name' }),
-    __metadata("design:type", String)
-], Permission.prototype, "name", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false, nullable: false, name: 'add' }),
-    __metadata("design:type", Boolean)
-], Permission.prototype, "add", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false, nullable: false, name: 'edit' }),
-    __metadata("design:type", Boolean)
-], Permission.prototype, "edit", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false, nullable: false, name: 'view' }),
-    __metadata("design:type", Boolean)
-], Permission.prototype, "view", void 0);
 //# sourceMappingURL=permissions.entity.js.map

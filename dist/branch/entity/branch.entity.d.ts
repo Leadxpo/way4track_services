@@ -1,13 +1,19 @@
+import { AccountEntity } from 'src/account/entity/account.entity';
 import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
-import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
+import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
+import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
-export declare class BranchEntity {
+import { BaseEntity } from 'typeorm';
+export declare class BranchEntity extends BaseEntity {
     id: number;
     branchName: string;
     branchNumber: string;
@@ -20,15 +26,27 @@ export declare class BranchEntity {
     branchOpening: Date;
     email: string;
     branchPhoto: string;
+    qrPhoto: string;
     asserts: AssertsEntity[];
+    notifications: NotificationEntity[];
+    workAllocation: [
+    ];
     client: ClientEntity[];
     staff: StaffEntity[];
-    attendance: AttendanceEntity[];
+    product: ProductEntity[];
+    technician: TechnicianWorksEntity[];
+    accounts: AccountEntity[];
     productAssign: ProductAssignEntity[];
     voucher: VoucherEntity[];
+    vendor: VendorEntity[];
+    subDealer: SubDealerEntity[];
     appointment: AppointmentEntity[];
     request: RequestRaiseEntity[];
     tickets: TicketsEntity[];
     companyCode: string;
     unitCode: string;
+    latitude: string;
+    longitude: string;
+    CIN: string;
+    GST: string;
 }

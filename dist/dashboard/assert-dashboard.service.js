@@ -21,8 +21,17 @@ let AssertDashboardService = class AssertDashboardService {
     constructor(assertRepo) {
         this.assertRepo = assertRepo;
     }
-    async assertCardData(req) {
+    async assertsCardData(req) {
         const cardData = await this.assertRepo.assertsCardData(req);
+        if (!cardData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", cardData);
+        }
+    }
+    async getAssertDataByDate(req) {
+        const cardData = await this.assertRepo.getAssetDataByDate(req);
         if (!cardData) {
             return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
         }

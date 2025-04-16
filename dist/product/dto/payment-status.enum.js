@@ -6,6 +6,10 @@ var PaymentStatus;
     PaymentStatus["ACCEPTED"] = "ACCEPTED";
     PaymentStatus["Declained"] = "Declained";
     PaymentStatus["SENT"] = "SENT";
+    PaymentStatus["PARTIALLY_PAID"] = "PARTIALLY_PAID";
     PaymentStatus["Expired"] = "Expired";
+    PaymentStatus["COMPLETED"] = "COMPLETED";
+    PaymentStatus["PENDING"] = "PENDING";
+    PaymentStatus["UNPAID"] = "UNPAID";
 })(PaymentStatus || (exports.PaymentStatus = PaymentStatus = {}));
 //# sourceMappingURL=payment-status.enum.js.map

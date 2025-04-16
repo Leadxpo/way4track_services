@@ -1,25 +1,27 @@
 import { AttendanceStatus } from "src/staff/enum/attendence-status.enum";
 export declare class CreateAttendanceDto {
     id: number;
-    staffId: number;
-    branchId: number;
+    staffId: string;
     day: Date;
-    companyCode: string;
-    unitCode: string;
-    inTime?: Date;
-    outTime?: Date;
+    branchName: string;
+    inTime?: string;
+    outTime?: string;
+    inTimeRemark?: string;
+    staffName?: string;
+    outTimeRemark?: string;
     status: AttendanceStatus;
     remarks?: string;
+    remark: string;
 }
 export declare class GetAttendanceDto {
-    staffId: number;
-    branchId: number;
+    staffId: string;
     day: Date;
-    inTime: Date;
-    outTime: Date;
+    inTime: string;
+    inTimeRemark?: string;
+    outTime: string;
+    outTimeRemark?: string;
     status: AttendanceStatus;
     staffName: string;
     branchName: string;
-    companyCode: string;
-    unitCode: string;
+    remark: string;
 }

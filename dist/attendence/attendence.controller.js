@@ -17,45 +17,93 @@ const common_1 = require("@nestjs/common");
 const attendence_service_1 = require("./attendence.service");
 const attendence_dto_1 = require("./dto/attendence.dto");
 const common_response_1 = require("../models/common-response");
+const platform_express_1 = require("@nestjs/platform-express");
 let AttendanceController = class AttendanceController {
     constructor(attendanceService) {
         this.attendanceService = attendanceService;
     }
-    async createAttendance(dto) {
+    async updateAttendanceDetails(dto) {
         try {
-            return this.attendanceService.saveAttendance(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return this.attendanceService.updateAttendanceDetails(dto);
         }
         catch (error) {
             console.error('Error in save attendance details:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error saving attendance details');
         }
     }
-    async getAttendance(staffId, branchId) {
+    async getAttendanceDetails() {
         try {
-            return this.attendanceService.getAttendance(staffId, branchId);
+            return this.attendanceService.getAttendanceDetails();
+        }
+        catch (error) {
+            console.error('Error in save attendance details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error saving attendance details');
+        }
+    }
+    async getAttendanceDetailsById(req) {
+        try {
+            return this.attendanceService.getAttendanceDetailsById(req);
+        }
+        catch (error) {
+            console.error('Error in save attendance details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error saving attendance details');
+        }
+    }
+    async getStaffAttendance(req) {
+        try {
+            return this.attendanceService.getStaffAttendance(req);
         }
         catch (error) {
             console.error('Error in get attendance details:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error fetching attendance details');
         }
     }
+    async uploadAttendance(file) {
+        if (!file) {
+            return { message: 'No file uploaded' };
+        }
+        return await this.attendanceService.processAttendanceExcel(file);
+    }
 };
 exports.AttendanceController = AttendanceController;
 __decorate([
-    (0, common_1.Post)('createAttendance'),
+    (0, common_1.Post)('updateAttendanceDetails'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [attendence_dto_1.CreateAttendanceDto]),
     __metadata("design:returntype", Promise)
-], AttendanceController.prototype, "createAttendance", null);
+], AttendanceController.prototype, "updateAttendanceDetails", null);
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Query)('staffId')),
-    __param(1, (0, common_1.Query)('branchId')),
+    (0, common_1.Post)('getAttendanceDetails'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Number]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AttendanceController.prototype, "getAttendance", null);
+], AttendanceController.prototype, "getAttendanceDetails", null);
+__decorate([
+    (0, common_1.Post)('getAttendanceDetailsById'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [attendence_dto_1.CreateAttendanceDto]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "getAttendanceDetailsById", null);
+__decorate([
+    (0, common_1.Post)('getStaffAttendance'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "getStaffAttendance", null);
+__decorate([
+    (0, common_1.Post)('upload'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "uploadAttendance", null);
 exports.AttendanceController = AttendanceController = __decorate([
     (0, common_1.Controller)('attendance'),
     __metadata("design:paramtypes", [attendence_service_1.AttendanceService])

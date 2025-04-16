@@ -19,19 +19,35 @@ const hiring_service_1 = require("./hiring.service");
 const common_response_1 = require("../models/common-response");
 const hiring_id_dto_1 = require("./dto/hiring-id.dto");
 const platform_express_1 = require("@nestjs/platform-express");
-const hiring_filter_dto_1 = require("./dto/hiring-filter.dto");
+const common_req_1 = require("../models/common-req");
+const multer = require("multer");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let HiringController = class HiringController {
     constructor(hiringService) {
         this.hiringService = hiringService;
     }
-    async saveHiringDetails(dto) {
+    async saveHiringDetailsWithResume(dto, file) {
         try {
-            return await this.hiringService.saveHiringDetails(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return await this.hiringService.saveHiringDetails(dto, file);
         }
         catch (error) {
-            console.error('Error in save hiring details in service:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error saving hiring details');
+            console.error('Error in save hiring details with resume in service:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error saving hiring details with resume');
         }
+    }
+    async getCandidatesStatsLast30Days(req) {
+        return await this.hiringService.getCandidatesStatsLast30Days(req);
+    }
+    async getHiringTodayDetails(req) {
+        return await this.hiringService.getHiringTodayDetails(req);
     }
     async deleteHiringDetails(dto) {
         try {
@@ -40,6 +56,15 @@ let HiringController = class HiringController {
         catch (error) {
             console.error('Error in delete hiring details in service:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error deleting hiring details');
+        }
+    }
+    async getHiringDetailsById(dto) {
+        try {
+            return await this.hiringService.getHiringDetailsById(dto);
+        }
+        catch (error) {
+            console.error('Error in get hiring details in service:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching hiring details');
         }
     }
     async getHiringDetails(dto) {
@@ -51,27 +76,40 @@ let HiringController = class HiringController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching hiring details');
         }
     }
-    async uploadResume(hiringId, file) {
+    async getHiringSearchDetails(dto) {
         try {
-            return await this.hiringService.uploadResume(hiringId, file);
+            return await this.hiringService.getHiringSearchDetails(dto);
         }
         catch (error) {
-            console.error('Error in upload resume in service:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error uploading resume');
+            console.error('Error in get hiring details in service:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching hiring details');
         }
-    }
-    async getHiringSearchDetails(req) {
-        return this.hiringService.getHiringSearchDetails(req);
     }
 };
 exports.HiringController = HiringController;
 __decorate([
-    (0, common_1.Post)('saveHiringDetails'),
+    (0, common_1.Post)('saveHiringDetailsWithResume'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file', multerOptions)),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [hiring_dto_1.HiringDto, Object]),
+    __metadata("design:returntype", Promise)
+], HiringController.prototype, "saveHiringDetailsWithResume", null);
+__decorate([
+    (0, common_1.Post)('getCandidatesStatsLast30Days'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [hiring_dto_1.HiringDto]),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
-], HiringController.prototype, "saveHiringDetails", null);
+], HiringController.prototype, "getCandidatesStatsLast30Days", null);
+__decorate([
+    (0, common_1.Post)('getHiringTodayDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], HiringController.prototype, "getHiringTodayDetails", null);
 __decorate([
     (0, common_1.Post)('deleteHiringDetails'),
     __param(0, (0, common_1.Body)()),
@@ -80,26 +118,24 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], HiringController.prototype, "deleteHiringDetails", null);
 __decorate([
-    (0, common_1.Post)('getHiringDetails'),
+    (0, common_1.Post)('getHiringDetailsById'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [hiring_id_dto_1.HiringIdDto]),
     __metadata("design:returntype", Promise)
-], HiringController.prototype, "getHiringDetails", null);
+], HiringController.prototype, "getHiringDetailsById", null);
 __decorate([
-    (0, common_1.Post)('uploadResume'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    (0, common_1.Post)('getHiringDetails'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
-], HiringController.prototype, "uploadResume", null);
+], HiringController.prototype, "getHiringDetails", null);
 __decorate([
     (0, common_1.Post)('getHiringSearchDetails'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [hiring_filter_dto_1.HiringFilterDto]),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
 ], HiringController.prototype, "getHiringSearchDetails", null);
 exports.HiringController = HiringController = __decorate([

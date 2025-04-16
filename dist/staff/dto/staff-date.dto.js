@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StaffAttendanceQueryDto = void 0;
 class StaffAttendanceQueryDto {
-    constructor(date, staffId, companyCode, unitCode) {
+    constructor(staffId, companyCode, date, unitCode) {
         this.date = date;
         this.staffId = staffId;
         this.companyCode = companyCode;

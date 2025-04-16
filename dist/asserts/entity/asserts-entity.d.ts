@@ -17,10 +17,6 @@ export declare class AssertsEntity {
     purchaseDate: Date;
     voucherId: VoucherEntity;
     paymentType: PaymentType;
-    initialPayment: number;
-    numberOfEmi: number;
-    emiNumber: number;
-    emiAmount: number;
     companyCode: string;
     unitCode: string;
 }

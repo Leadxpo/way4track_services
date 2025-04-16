@@ -1,12 +1,25 @@
 import { DataSource, Repository } from "typeorm";
 import { AssertsEntity } from "../entity/asserts-entity";
-import { CommonReq } from "src/models/common-req";
 export declare class AssertsRepository extends Repository<AssertsEntity> {
     private dataSource;
     constructor(dataSource: DataSource);
-    assertsCardData(req: CommonReq): Promise<{
-        officeAsserts: any;
-        transportAsserts: any;
-        totalAsserts: any;
+    assertsCardData(req: {
+        unitCode: string;
+        companyCode: string;
+        branch?: string;
+    }): Promise<{
+        groupedBranches: {
+            branchName: any;
+        }[];
+        officeAsserts: number;
+        transportAsserts: number;
+        totalAsserts: number;
     }>;
+    getAssetDataByDate(req: {
+        fromDate?: Date;
+        toDate?: Date;
+        companyCode?: string;
+        unitCode?: string;
+        branch?: string;
+    }): Promise<any[]>;
 }

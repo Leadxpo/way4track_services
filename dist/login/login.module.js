@@ -15,6 +15,8 @@ const login_service_1 = require("./login.service");
 const staff_repo_1 = require("../staff/repo/staff-repo");
 const sub_dealer_repo_1 = require("../sub-dealer/repo/sub-dealer.repo");
 const login_controller_1 = require("./login.controller");
+const sub_dealer_staff_module_1 = require("../sub-dealer-staff/sub-dealer-staff.module");
+const sub_dealer_staff_repo_1 = require("../sub-dealer-staff/repo/sub-dealer-staff.repo");
 let LoginModule = class LoginModule {
 };
 exports.LoginModule = LoginModule;
@@ -24,11 +26,13 @@ exports.LoginModule = LoginModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([]),
             (0, common_1.forwardRef)(() => sub_dealer_module_1.SubDealerModule),
             (0, common_1.forwardRef)(() => staff_module_1.StaffModule),
+            (0, common_1.forwardRef)(() => sub_dealer_staff_module_1.SubDealerStaffModule),
         ],
         providers: [
             login_service_1.LoginService,
             staff_repo_1.StaffRepository,
             sub_dealer_repo_1.SubDealerRepository,
+            sub_dealer_staff_repo_1.SubDealerStaffRepository
         ],
         controllers: [login_controller_1.LoginController],
     })

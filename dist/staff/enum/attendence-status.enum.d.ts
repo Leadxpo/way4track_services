@@ -1,5 +1,7 @@
 export declare enum AttendanceStatus {
-    PRESENT = "Present",
-    ABSENT = "Absent",
-    OFF_LEAVE = "Off Leave"
+    PRESENT = "P",
+    LEAVE = "L",
+    SICK_LEAVE = "S",
+    WEEKLY_OFF = "W/O",
+    ABSENT = "A"
 }

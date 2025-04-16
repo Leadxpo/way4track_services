@@ -1,5 +1,5 @@
 export declare class BranchDto {
-    id: number;
+    id?: number;
     branchName: string;
     branchNumber: string;
     branchAddress?: string;
@@ -13,4 +13,9 @@ export declare class BranchDto {
     branchPhoto?: string;
     companyCode: string;
     unitCode: string;
+    latitude: string;
+    longitude: string;
+    CIN: string;
+    GST: string;
+    qrPhoto?: string;
 }

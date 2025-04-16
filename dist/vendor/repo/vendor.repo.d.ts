@@ -11,5 +11,5 @@ export declare class VendorRepository extends Repository<VendorEntity> {
         companyCode?: string;
         unitCode?: string;
     }): Promise<any[]>;
-    getDetailvendorData(req: VendorDetail): Promise<any>;
+    getDetailvendorData(req: VendorDetail): Promise<any[]>;
 }

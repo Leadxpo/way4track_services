@@ -1,15 +1,18 @@
-import { AppointmentStatus, AppointmentType } from "../entity/appointement.entity";
+import { AppointmentStatus, AppointmentType, TimePeriodEnum } from "../entity/appointement.entity";
 export declare class AppointmentDto {
     id?: number;
     appointmentId?: string;
     appointmentType: AppointmentType;
     name: string;
-    assignedToId: number;
-    slot: Date;
+    assignedTo: number;
+    date: string;
+    slot: string;
+    period: TimePeriodEnum;
     branchId: number;
     clientId: number;
     description?: string;
     status?: AppointmentStatus;
     companyCode: string;
     unitCode: string;
+    voucherId?: number;
 }

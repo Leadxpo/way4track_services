@@ -18,6 +18,11 @@ const branch_module_1 = require("../branch/branch.module");
 const vendor_module_1 = require("../vendor/vendor.module");
 const sub_dealer_module_1 = require("../sub-dealer/sub-dealer.module");
 const client_module_1 = require("../client/client.module");
+const account_module_1 = require("../account/account.module");
+const estimate_module_1 = require("../estimate/estimate.module");
+const emi_payment_repo_1 = require("./repo/emi-payment-repo");
+const product_module_1 = require("../product/product.module");
+const ledger_module_1 = require("../ledger/ledger.module");
 let VoucherModule = class VoucherModule {
 };
 exports.VoucherModule = VoucherModule;
@@ -29,9 +34,13 @@ exports.VoucherModule = VoucherModule = __decorate([
             (0, common_1.forwardRef)(() => vendor_module_1.VendorModule),
             (0, common_1.forwardRef)(() => sub_dealer_module_1.SubDealerModule),
             (0, common_1.forwardRef)(() => client_module_1.ClientModule),
+            (0, common_1.forwardRef)(() => account_module_1.AccountModule),
+            (0, common_1.forwardRef)(() => estimate_module_1.EstimateModule),
+            (0, common_1.forwardRef)(() => ledger_module_1.LedgerModule),
+            (0, common_1.forwardRef)(() => product_module_1.ProductModule)
         ],
         controllers: [voucher_controller_1.VoucherController],
-        providers: [voucher_service_1.VoucherService, voucher_adapter_1.VoucherAdapter, voucher_repo_1.VoucherRepository],
+        providers: [voucher_service_1.VoucherService, voucher_adapter_1.VoucherAdapter, voucher_repo_1.VoucherRepository, emi_payment_repo_1.EmiPaymentRepository],
         exports: [voucher_repo_1.VoucherRepository, voucher_service_1.VoucherService],
     })
 ], VoucherModule);

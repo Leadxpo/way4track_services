@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PermissionDto = exports.PermissionsDto = void 0;
+exports.Permission = exports.PermissionsDto = void 0;
 class PermissionsDto {
 }
 exports.PermissionsDto = PermissionsDto;
-class PermissionDto {
+class Permission {
 }
-exports.PermissionDto = PermissionDto;
+exports.Permission = Permission;
 //# sourceMappingURL=permissions.dto.js.map

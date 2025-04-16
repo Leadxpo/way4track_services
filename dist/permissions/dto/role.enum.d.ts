@@ -7,12 +7,13 @@ export declare enum Roles {
     Vendor = "vendor",
     SubDealer = "subdealer",
     Hiring = "hiring",
-    Bank = "bak",
+    Bank = "bank",
     Product = "product",
     ProductAssign = "productassign",
     Tickets = "tickets",
     Voucher = "voucher",
     WorkAllocation = "work-allocation",
     Estimate = "estimate",
-    Attendance = "attendance"
+    Attendance = "attendance",
+    RequestRaise = "requests"
 }

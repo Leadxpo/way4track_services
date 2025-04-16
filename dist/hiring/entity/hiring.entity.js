@@ -9,10 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HiringEntity = void 0;
+exports.HiringEntity = exports.InterviewWith = void 0;
 const typeorm_1 = require("typeorm");
 const hiring_status_enum_1 = require("../enum/hiring-status.enum");
 const hiring_level_enum_1 = require("../enum/hiring-level.enum");
+const staff_entity_1 = require("../../staff/entity/staff.entity");
+var InterviewWith;
+(function (InterviewWith) {
+    InterviewWith["Sunil"] = "Sunil";
+    InterviewWith["Ashok"] = "Ashok";
+    InterviewWith["HR"] = "HR";
+})(InterviewWith || (exports.InterviewWith = InterviewWith = {}));
 let HiringEntity = class HiringEntity extends typeorm_1.BaseEntity {
 };
 exports.HiringEntity = HiringEntity;
@@ -45,15 +52,27 @@ __decorate([
     __metadata("design:type", Array)
 ], HiringEntity.prototype, "qualifications", void 0);
 __decorate([
+    (0, typeorm_1.Column)('json', { name: 'level_wise_data', nullable: true }),
+    __metadata("design:type", Array)
+], HiringEntity.prototype, "levelWiseData", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'resume_path', type: 'varchar', nullable: true }),
     __metadata("design:type", String)
 ], HiringEntity.prototype, "resumePath", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'date_of_upload', type: 'timestamp' }),
+    (0, typeorm_1.Column)({ name: 'joining_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", String)
+], HiringEntity.prototype, "joiningDate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'notice_period', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", String)
+], HiringEntity.prototype, "noticePeriod", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'date_of_upload', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
 ], HiringEntity.prototype, "dateOfUpload", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'status', type: 'enum', enum: hiring_status_enum_1.HiringStatus, default: hiring_status_enum_1.HiringStatus.INTERVIEWED }),
+    (0, typeorm_1.Column)({ name: 'status', type: 'enum', enum: hiring_status_enum_1.HiringStatus, default: hiring_status_enum_1.HiringStatus.PENDING }),
     __metadata("design:type", String)
 ], HiringEntity.prototype, "status", void 0);
 __decorate([
@@ -64,6 +83,22 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'unit_code', length: 20, nullable: false }),
     __metadata("design:type", String)
 ], HiringEntity.prototype, "unitCode", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], HiringEntity.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], HiringEntity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'driving_licence_number', type: 'varchar', length: 20, nullable: true }),
+    __metadata("design:type", String)
+], HiringEntity.prototype, "drivingLicenceNumber", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'driving_licence', type: 'enum', enum: staff_entity_1.YesNo, default: staff_entity_1.YesNo.NO }),
+    __metadata("design:type", String)
+], HiringEntity.prototype, "drivingLicence", void 0);
 exports.HiringEntity = HiringEntity = __decorate([
     (0, typeorm_1.Entity)('hiring')
 ], HiringEntity);

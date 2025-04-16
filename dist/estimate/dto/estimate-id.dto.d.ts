@@ -1,5 +1,5 @@
 export declare class EstimateIdDto {
-    id: number;
+    estimateId: string;
     companyCode: string;
     unitCode: string;
 }

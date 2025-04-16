@@ -10,17 +10,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BranchEntity = void 0;
+const account_entity_1 = require("../../account/entity/account.entity");
 const appointement_entity_1 = require("../../appointment/entity/appointement.entity");
 const asserts_entity_1 = require("../../asserts/entity/asserts-entity");
-const attendence_entity_1 = require("../../attendence/entity/attendence.entity");
 const client_entity_1 = require("../../client/entity/client.entity");
+const notification_entity_1 = require("../../notifications/entity/notification.entity");
 const product_assign_entity_1 = require("../../product-assign/entity/product-assign.entity");
+const product_entity_1 = require("../../product/entity/product.entity");
 const request_raise_entity_1 = require("../../request-raise/entity/request-raise.entity");
 const staff_entity_1 = require("../../staff/entity/staff.entity");
+const sub_dealer_entity_1 = require("../../sub-dealer/entity/sub-dealer.entity");
+const technician_works_entity_1 = require("../../technician-works/entity/technician-works.entity");
 const tickets_entity_1 = require("../../tickets/entity/tickets.entity");
+const vendor_entity_1 = require("../../vendor/entity/vendor.entity");
 const voucher_entity_1 = require("../../voucher/entity/voucher.entity");
+const work_allocation_entity_1 = require("../../work-allocation/entity/work-allocation.entity");
 const typeorm_1 = require("typeorm");
-let BranchEntity = class BranchEntity {
+let BranchEntity = class BranchEntity extends typeorm_1.BaseEntity {
 };
 exports.BranchEntity = BranchEntity;
 __decorate([
@@ -72,9 +78,21 @@ __decorate([
     __metadata("design:type", String)
 ], BranchEntity.prototype, "branchPhoto", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'qr_photo', type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], BranchEntity.prototype, "qrPhoto", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => asserts_entity_1.AssertsEntity, (asserts) => asserts.branchId),
     __metadata("design:type", Array)
 ], BranchEntity.prototype, "asserts", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => notification_entity_1.NotificationEntity, (asserts) => asserts.branch),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "notifications", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => work_allocation_entity_1.WorkAllocationEntity, (asserts) => asserts.branchId),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "workAllocation", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => client_entity_1.ClientEntity, (asserts) => asserts.branch),
     __metadata("design:type", Array)
@@ -84,9 +102,17 @@ __decorate([
     __metadata("design:type", Array)
 ], BranchEntity.prototype, "staff", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => attendence_entity_1.AttendanceEntity, (asserts) => asserts.branchId),
+    (0, typeorm_1.OneToMany)(() => product_entity_1.ProductEntity, (asserts) => asserts.branchId),
     __metadata("design:type", Array)
-], BranchEntity.prototype, "attendance", void 0);
+], BranchEntity.prototype, "product", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => technician_works_entity_1.TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.branchId),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "technician", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => account_entity_1.AccountEntity, (asserts) => asserts.branch),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "accounts", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => product_assign_entity_1.ProductAssignEntity, (asserts) => asserts.branchId),
     __metadata("design:type", Array)
@@ -95,6 +121,14 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => voucher_entity_1.VoucherEntity, (voucherEntity) => voucherEntity.branchId),
     __metadata("design:type", Array)
 ], BranchEntity.prototype, "voucher", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => vendor_entity_1.VendorEntity, (VendorEntity) => VendorEntity.branch),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "vendor", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => sub_dealer_entity_1.SubDealerEntity, (SubDealerEntity) => SubDealerEntity.branch),
+    __metadata("design:type", Array)
+], BranchEntity.prototype, "subDealer", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => appointement_entity_1.AppointmentEntity, (appointmentEntity) => appointmentEntity.branchId),
     __metadata("design:type", Array)
@@ -115,6 +149,22 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'unit_code', length: 20, nullable: false }),
     __metadata("design:type", String)
 ], BranchEntity.prototype, "unitCode", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { name: 'latitude', length: 20, nullable: true }),
+    __metadata("design:type", String)
+], BranchEntity.prototype, "latitude", void 0);
+__decorate([
+    (0, typeorm_1.Column)('varchar', { name: 'longitude', length: 20, nullable: true }),
+    __metadata("design:type", String)
+], BranchEntity.prototype, "longitude", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'CIN', type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], BranchEntity.prototype, "CIN", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'GST', type: 'varchar', nullable: true }),
+    __metadata("design:type", String)
+], BranchEntity.prototype, "GST", void 0);
 exports.BranchEntity = BranchEntity = __decorate([
     (0, typeorm_1.Entity)('branches')
 ], BranchEntity);

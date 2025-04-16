@@ -40,6 +40,10 @@ const appointement_module_1 = require("../appointment/appointement.module");
 const estimate_module_1 = require("../estimate/estimate.module");
 const estimate_dashboard_service_1 = require("./estimate-dashboard.service");
 const estimate_repo_1 = require("../estimate/repo/estimate.repo");
+const account_dashboard_service_1 = require("./account.dashboard.service");
+const account_module_1 = require("../account/account.module");
+const pay_roll_module_1 = require("../payRoll/pay-roll.module");
+const payroll_repo_1 = require("../payRoll/repo/payroll.repo");
 let DashboardModule = class DashboardModule {
 };
 exports.DashboardModule = DashboardModule;
@@ -57,9 +61,12 @@ exports.DashboardModule = DashboardModule = __decorate([
             (0, common_1.forwardRef)(() => staff_module_1.StaffModule),
             (0, common_1.forwardRef)(() => appointement_module_1.AppointmentModule),
             (0, common_1.forwardRef)(() => estimate_module_1.EstimateModule),
+            (0, common_1.forwardRef)(() => account_module_1.AccountModule),
+            (0, common_1.forwardRef)(() => pay_roll_module_1.PayRollModule),
         ],
         providers: [
             product_assign_dashboard_service_1.ProductAssignDashboardService,
+            account_dashboard_service_1.AccountDashboardService,
             client_dashboards_service_1.ClientDashboardService,
             assert_dashboard_service_1.AssertDashboardService,
             staff_dashboard_service_1.StaffDashboardService,
@@ -78,7 +85,8 @@ exports.DashboardModule = DashboardModule = __decorate([
             tickets_repo_1.TicketsRepository,
             voucher_repo_1.VoucherRepository,
             appointement_repo_1.AppointmentRepository,
-            estimate_repo_1.EstimateRepository
+            estimate_repo_1.EstimateRepository,
+            payroll_repo_1.PayrollRepository
         ],
         controllers: [dashboard_controller_1.DashboardController],
     })

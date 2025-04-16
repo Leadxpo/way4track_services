@@ -8,8 +8,10 @@ export declare class VendorDto {
     emailId: string;
     aadharNumber: string;
     address: string;
-    voucherId: number;
+    voucherId?: number;
+    branchId?: number;
     companyCode?: string;
     unitCode?: string;
     vendorId?: string;
+    vendorPhoto?: string;
 }

@@ -15,13 +15,17 @@ const client_service_1 = require("./client.service");
 const client_repo_1 = require("./repo/client.repo");
 const client_adapter_1 = require("./client.adapter");
 const branch_module_1 = require("../branch/branch.module");
+const platform_express_1 = require("@nestjs/platform-express");
 let ClientModule = class ClientModule {
 };
 exports.ClientModule = ClientModule;
 exports.ClientModule = ClientModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([client_entity_1.ClientEntity]),
-            (0, common_1.forwardRef)(() => branch_module_1.BranchModule)],
+            (0, common_1.forwardRef)(() => branch_module_1.BranchModule),
+            platform_express_1.MulterModule.register({
+                dest: './uploads',
+            }),],
         controllers: [client_controller_1.ClientController],
         providers: [client_service_1.ClientService, client_repo_1.ClientRepository, client_adapter_1.ClientAdapter],
         exports: [client_repo_1.ClientRepository, client_service_1.ClientService]

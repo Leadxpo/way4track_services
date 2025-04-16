@@ -11,50 +11,152 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClientService = void 0;
 const common_1 = require("@nestjs/common");
-const client_repo_1 = require("./repo/client.repo");
+const branch_entity_1 = require("../branch/entity/branch.entity");
+const branch_repo_1 = require("../branch/repo/branch.repo");
 const common_response_1 = require("../models/common-response");
 const error_response_1 = require("../models/error-response");
 const client_adapter_1 = require("./client.adapter");
-const branch_repo_1 = require("../branch/repo/branch.repo");
-const path_1 = require("path");
-const fs_1 = require("fs");
+const client_repo_1 = require("./repo/client.repo");
+const storage_1 = require("@google-cloud/storage");
 let ClientService = class ClientService {
     constructor(clientAdapter, clientRepository, branchRepo) {
         this.clientAdapter = clientAdapter;
         this.clientRepository = clientRepository;
         this.branchRepo = branchRepo;
+        this.storage = new storage_1.Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
-    async saveClientDetails(dto) {
+    async handleClientDetails(dto, photo) {
         try {
-            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branchId } });
+            let photoPath = null;
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `client_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+            }
+            if (dto.id || (dto.clientId && dto.clientId.trim() !== '')) {
+                console.log(dto, "updateClientDetails{{{{{{{{{{{{{");
+                return await this.updateClientDetails(dto, photoPath);
+            }
+            else {
+                console.log(dto, "createClientDetails{{{{{{{{{{{{{");
+                return await this.createClientDetails(dto, photoPath);
+            }
+        }
+        catch (error) {
+            console.error(`Error handling client details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to handle client details: ${error.message}`);
+        }
+    }
+    async createClientDetails(dto, photoPath) {
+        try {
+            console.log(dto, "KKKKKKKKKKKKKK");
+            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
             if (!branchEntity) {
                 throw new Error('Branch not found');
             }
             const entity = this.clientAdapter.convertDtoToEntity(dto);
-            if (!entity.clientId) {
-                const clientCount = await this.clientRepository.count({
-                    where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
-                });
-                entity.clientId = this.generateClientId(branchEntity.branchName, clientCount + 1);
+            entity.clientId = `CLI(${branchEntity.branchName})-${(await this.clientRepository.count() + 1).toString().padStart(5, '0')}`;
+            if (photoPath) {
+                entity.clientPhoto = photoPath;
             }
-            await this.clientRepository.save(entity);
-            const message = dto.id
-                ? 'Client details updated successfully'
-                : 'Client details created successfully';
-            return new common_response_1.CommonResponse(true, 201, message);
+            const branch = new branch_entity_1.BranchEntity();
+            branch.id = dto.branch;
+            entity.branch = branch;
+            console.log(entity, "entity");
+            await this.clientRepository.insert(entity);
+            return new common_response_1.CommonResponse(true, 201, 'Client details created successfully');
+        }
+        catch (error) {
+            console.error(`Error creating client details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to create client details: ${error.message}`);
+        }
+    }
+    async updateClientDetails(dto, photoPath) {
+        try {
+            let existingClient = null;
+            if (dto.id) {
+                existingClient = await this.clientRepository.findOne({ where: { id: dto.id } });
+            }
+            else if (dto.clientId) {
+                existingClient = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
+            }
+            if (!existingClient) {
+                throw new Error('Client not found');
+            }
+            if (photoPath && existingClient.clientPhoto) {
+                const existingFilePath = existingClient.clientPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                }
+                catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
+            const entity = this.clientAdapter.convertDtoToEntity(dto);
+            if (dto.branch) {
+                const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
+                if (!branchEntity) {
+                    throw new Error(`Branch with name '${dto.branch}' not found`);
+                }
+                entity.branch = branchEntity;
+            }
+            const updatedClient = {
+                ...existingClient,
+                ...entity,
+                clientPhoto: photoPath ?? existingClient.clientPhoto,
+            };
+            console.log('Updated client payload:', updatedClient);
+            await this.clientRepository.save(updatedClient);
+            return new common_response_1.CommonResponse(true, 200, 'Client details updated successfully');
+        }
+        catch (error) {
+            console.error(`Error updating client details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to update client details: ${error.message}`);
+        }
+    }
+    async deleteClientDetails(dto) {
+        try {
+            const client = await this.clientRepository.findOne({
+                where: {
+                    clientId: String(dto.clientId),
+                    companyCode: dto.companyCode,
+                    unitCode: dto.unitCode
+                }
+            });
+            if (!client) {
+                return new common_response_1.CommonResponse(false, 404, 'Client not found');
+            }
+            await this.clientRepository.delete({ clientId: String(dto.clientId) });
+            return new common_response_1.CommonResponse(true, 200, 'Client details deleted successfully');
         }
         catch (error) {
             throw new error_response_1.ErrorResponse(500, error.message);
         }
     }
-    async deleteClientDetails(dto) {
+    async getClientDetailsById(req) {
         try {
-            const client = await this.clientRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            console.log(req, "+++++++++++");
+            const client = await this.clientRepository.findOne({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            console.log(client, "+++++++++++");
             if (!client) {
                 return new common_response_1.CommonResponse(false, 404, 'Client not found');
             }
-            await this.clientRepository.delete(dto.id);
-            return new common_response_1.CommonResponse(true, 200, 'Client details deleted successfully');
+            else {
+                return new common_response_1.CommonResponse(true, 200, 'Client details fetched successfully', client);
+            }
         }
         catch (error) {
             throw new error_response_1.ErrorResponse(500, error.message);
@@ -62,7 +164,7 @@ let ClientService = class ClientService {
     }
     async getClientDetails(req) {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new common_response_1.CommonResponse(false, 404, 'Client not found');
             }
@@ -75,10 +177,6 @@ let ClientService = class ClientService {
             throw new error_response_1.ErrorResponse(500, error.message);
         }
     }
-    generateClientId(branchName, sequenceNumber) {
-        const paddedNumber = sequenceNumber.toString().padStart(4, '0');
-        return `CLI(${branchName})-${paddedNumber}`;
-    }
     async getClientNamesDropDown() {
         const data = await this.clientRepository.find({ select: ['name', 'id', 'clientId'] });
         if (data.length) {
@@ -88,20 +186,39 @@ let ClientService = class ClientService {
             return new common_response_1.CommonResponse(false, 4579, "There Is No branch names");
         }
     }
-    async uploadClientPhoto(clientId, photo) {
-        try {
-            const client = await this.clientRepository.findOne({ where: { id: clientId } });
-            if (!client) {
-                return new common_response_1.CommonResponse(false, 404, 'Client not found');
-            }
-            const filePath = (0, path_1.join)(__dirname, '../../uploads/client_photos', `${clientId}-${Date.now()}.jpg`);
-            await fs_1.promises.writeFile(filePath, photo.buffer);
-            client.clientPhoto = filePath;
-            await this.clientRepository.save(client);
-            return new common_response_1.CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
+    async updateIsStatus(req) {
+        const client = await this.clientRepository.findOne({ where: { id: req.id } });
+        if (!client) {
+            return new common_response_1.CommonResponse(false, 6541, "No Data Found");
         }
-        catch (error) {
-            throw new error_response_1.ErrorResponse(500, error.message);
+        const updatedFields = {};
+        if (req.hasOwnProperty('tds')) {
+            updatedFields.tds = !client.tds;
+        }
+        if (req.hasOwnProperty('tcs')) {
+            updatedFields.tcs = !client.tcs;
+        }
+        if (req.hasOwnProperty('billWiseDate')) {
+            updatedFields.billWiseDate = !client.billWiseDate;
+        }
+        if (Object.keys(updatedFields).length > 0) {
+            await this.clientRepository.update({ id: req.id }, updatedFields);
+        }
+        return new common_response_1.CommonResponse(true, 65152, "Status updated successfully");
+    }
+    async getClientVerification(req) {
+        let data = null;
+        if (req.phoneNumber) {
+            data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+        }
+        else if (req.email) {
+            data = await this.clientRepository.findOne({ where: { email: req.email } });
+        }
+        if (data) {
+            return new common_response_1.CommonResponse(false, 75483, "Data already exists", 'false');
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 4579, "No matching data found", 'true');
         }
     }
 };

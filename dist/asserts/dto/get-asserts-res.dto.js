@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetAssertsResDto = void 0;
 class GetAssertsResDto {
-    constructor(id, branchId, branchName, assertsName, assertsAmount, assetType, price, quantity, description, purchaseDate, assetPhoto, voucherEntity, voucherId, paymentType, companyCode, unitCode, initialPayment, numberOfEmi, emiNumber, emiAmount) {
+    constructor(id, branchId, branchName, assertsName, assertsAmount, assetType, price, quantity, description, purchaseDate, assetPhoto, paymentType, companyCode, unitCode, initialPayment, numberOfEmi, emiNumber, emiAmount) {
         this.id = id;
         this.branchId = branchId;
         this.branchName = branchName;
@@ -14,8 +14,6 @@ class GetAssertsResDto {
         this.description = description;
         this.purchaseDate = purchaseDate;
         this.assetPhoto = assetPhoto;
-        this.voucherId = voucherId;
-        this.voucherId = voucherId;
         this.paymentType = paymentType;
         this.initialPayment = initialPayment;
         this.numberOfEmi = numberOfEmi;

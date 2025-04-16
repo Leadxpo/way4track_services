@@ -30,6 +30,15 @@ let LoginController = class LoginController {
             return new common_response_1.CommonResponse(false, 500, 'Error in login details.');
         }
     }
+    async ProfileDetails(req) {
+        try {
+            return await this.loginService.ProfileDetails(req);
+        }
+        catch (error) {
+            console.error("Error in LoginDetails service:", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error in login details.');
+        }
+    }
 };
 exports.LoginController = LoginController;
 __decorate([
@@ -39,6 +48,13 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], LoginController.prototype, "LoginDetails", null);
+__decorate([
+    (0, common_1.Post)('ProfileDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto]),
+    __metadata("design:returntype", Promise)
+], LoginController.prototype, "ProfileDetails", null);
 exports.LoginController = LoginController = __decorate([
     (0, common_1.Controller)('login'),
     __metadata("design:paramtypes", [login_service_1.LoginService])

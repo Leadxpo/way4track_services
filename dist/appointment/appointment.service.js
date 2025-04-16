@@ -40,9 +40,20 @@ let AppointmentService = class AppointmentService {
     async createAppointmentDetails(dto) {
         try {
             const entity = this.appointmentAdapter.convertDtoToEntity(dto);
-            const count = await this.appointmentRepository.count();
-            entity.appointmentId = `A-${(count + 1).toString().padStart(5, '0')}`;
-            await this.appointmentRepository.save(entity);
+            console.log(dto, "::::::::::");
+            const lastAppointment = await this.appointmentRepository
+                .createQueryBuilder('appointment')
+                .select('appointment.appointmentId')
+                .orderBy('appointment.id', 'DESC')
+                .limit(1)
+                .getOne();
+            let nextNumber = 1;
+            if (lastAppointment && lastAppointment.appointmentId) {
+                const match = lastAppointment.appointmentId.match(/\d+/);
+                nextNumber = match ? parseInt(match[0]) + 1 : 1;
+            }
+            entity.appointmentId = `A-${nextNumber.toString().padStart(5, '0')}`;
+            await this.appointmentRepository.insert(entity);
             return new common_response_1.CommonResponse(true, 201, 'Appointment details created successfully');
         }
         catch (error) {
@@ -51,7 +62,8 @@ let AppointmentService = class AppointmentService {
         }
     }
     async handleAppointmentDetails(dto) {
-        if (dto.id) {
+        if (dto.id && dto.id !== null && dto.id !== undefined) {
+            dto.id = Number(dto.id);
             return await this.updateAppointmentDetails(dto);
         }
         else {
@@ -60,13 +72,31 @@ let AppointmentService = class AppointmentService {
     }
     async getAppointmentDetails(dto) {
         try {
-            const entity = await this.appointmentRepository.find({
-                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode }, relations: ['branchId', 'staffId', 'clientId']
+            const appointments = await this.appointmentRepository.findOne({
+                where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['voucherId', 'clientId', 'staffId', 'branchId']
             });
-            if (!entity) {
+            if (!appointments) {
                 throw new error_response_1.ErrorResponse(404, 'Appointment not found');
             }
-            const result = this.appointmentAdapter.convertEntityToDto(entity);
+            const result = this.appointmentAdapter.convertEntityToDto([appointments]);
+            return new common_response_1.CommonResponse(true, 200, 'Details fetched successfully', result);
+        }
+        catch (error) {
+            console.error('Error in getAppointmentDetails service:', error);
+            throw new error_response_1.ErrorResponse(500, 'Error fetching appointment details');
+        }
+    }
+    async getAllAppointmentDetails(dto) {
+        try {
+            const appointments = await this.appointmentRepository.find({
+                where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['voucherId', 'clientId', 'staffId', 'branchId']
+            });
+            if (!appointments) {
+                throw new error_response_1.ErrorResponse(404, 'Appointment not found');
+            }
+            const result = this.appointmentAdapter.convertEntityToDto(appointments);
             return new common_response_1.CommonResponse(true, 200, 'Details fetched successfully', result);
         }
         catch (error) {

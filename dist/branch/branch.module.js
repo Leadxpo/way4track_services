@@ -14,12 +14,15 @@ const branch_controller_1 = require("./branch.controller");
 const branch_service_1 = require("./branch.service");
 const branch_repo_1 = require("./repo/branch.repo");
 const branch_adapter_1 = require("./branch.adapter");
+const platform_express_1 = require("@nestjs/platform-express");
 let BranchModule = class BranchModule {
 };
 exports.BranchModule = BranchModule;
 exports.BranchModule = BranchModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([branch_entity_1.BranchEntity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([branch_entity_1.BranchEntity]), platform_express_1.MulterModule.register({
+                dest: './uploads',
+            }),],
         controllers: [branch_controller_1.BranchController],
         providers: [branch_service_1.BranchService, branch_repo_1.BranchRepository, branch_adapter_1.BranchAdapter],
         exports: [branch_repo_1.BranchRepository, branch_service_1.BranchService],

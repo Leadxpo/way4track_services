@@ -35,8 +35,12 @@ const staff_search_dto_1 = require("../staff/dto/staff-search.dto");
 const ticket_search_dto_1 = require("../tickets/dto/ticket-search.dto");
 const estimate_dashboard_service_1 = require("./estimate-dashboard.service");
 const common_req_1 = require("../models/common-req");
+const account_dashboard_service_1 = require("./account.dashboard.service");
+const client_search_dto_1 = require("../client/dto/client-search.dto");
+const estimate_send_dto_1 = require("../estimate/dto/estimate.send.dto");
+const product_id_dto_1 = require("../product/dto/product.id.dto");
 let DashboardController = class DashboardController {
-    constructor(assertService, staffDashboardService, productAssignDashboardService, clientDashboardService, vendorDashboardService, subDealerDashboardService, appointmentDashboardService, ticketsDashboardService, voucherDashboardService, estimateDashboardService) {
+    constructor(assertService, staffDashboardService, productAssignDashboardService, clientDashboardService, vendorDashboardService, subDealerDashboardService, appointmentDashboardService, ticketsDashboardService, voucherDashboardService, estimateDashboardService, accountDashboardService) {
         this.assertService = assertService;
         this.staffDashboardService = staffDashboardService;
         this.productAssignDashboardService = productAssignDashboardService;
@@ -47,10 +51,53 @@ let DashboardController = class DashboardController {
         this.ticketsDashboardService = ticketsDashboardService;
         this.voucherDashboardService = voucherDashboardService;
         this.estimateDashboardService = estimateDashboardService;
+        this.accountDashboardService = accountDashboardService;
     }
-    async assertCardData(req) {
+    async sendReciept(dto) {
         try {
-            return await this.assertService.assertCardData(req);
+            return await this.estimateDashboardService.sendReceipt(dto);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async sendInvoice(dto) {
+        try {
+            return await this.estimateDashboardService.sendInvoice(dto);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async sendReceipt(dto) {
+        try {
+            return await this.estimateDashboardService.sendReceipt(dto);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async sendEstimate(dto) {
+        try {
+            return await this.estimateDashboardService.sendEstimate(dto);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+    async assertsCardData(req) {
+        try {
+            return await this.assertService.assertsCardData(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+    async getAssertDataByDate(req) {
+        try {
+            return await this.assertService.getAssertDataByDate(req);
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
@@ -63,7 +110,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getStaffSearchDetails(req) {
@@ -72,7 +118,46 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getStaff(req) {
+        try {
+            return await this.staffDashboardService.getStaff(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getStaffCardsDetails(req) {
+        try {
+            return await this.staffDashboardService.getStaffCardsDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getTotalStaffDetails(req) {
+        try {
+            return await this.staffDashboardService.getTotalStaffDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBranchStaffDetails(req) {
+        try {
+            return await this.staffDashboardService.getBranchStaffDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getAllBranchStaffDetails(req) {
+        try {
+            return await this.staffDashboardService.getAllBranchStaffDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async payRoll(req) {
@@ -81,7 +166,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async productAssignDetails(req) {
@@ -90,7 +174,46 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getProductAssignmentSummaryBySubDealer(req) {
+        try {
+            return await this.productAssignDashboardService.getProductAssignmentSummaryBySubDealer(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async productSubDealerAssignDetails(req) {
+        try {
+            return await this.productAssignDashboardService.productSubDealerAssignDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getProductDetailsBySubDealer(req) {
+        try {
+            return await this.productAssignDashboardService.getProductDetailsBySubDealer(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getSearchDetailProductAssign(req) {
+        try {
+            return await this.productAssignDashboardService.getSearchDetailProduct(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getStockSummary(req) {
+        try {
+            return await this.productAssignDashboardService.getStockSummary(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getTicketDetailsAgainstSearch(req) {
@@ -99,7 +222,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getEstimates(req) {
@@ -108,7 +230,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getEstimatesForReport(req) {
+        try {
+            return await this.estimateDashboardService.getEstimatesForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getTotalAssignedAndStockLast30Days(req) {
@@ -117,16 +246,54 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
-    async getAssignedQtyLast30Days(req) {
+    async getProductAssignmentSummary(req) {
         try {
-            return await this.productAssignDashboardService.getAssignedQtyLast30Days(req);
+            return await this.productAssignDashboardService.getProductAssignmentSummary(req);
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getProductDetailsByBranch(req) {
+        try {
+            return await this.productAssignDashboardService.getProductDetailsByBranch(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getProductWareHouseDetails(req) {
+        try {
+            return await this.productAssignDashboardService.getProductWareHouseDetails(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getWareHouseProductDetailsByBranch(req) {
+        try {
+            return await this.productAssignDashboardService.getWareHouseProductDetailsByBranch(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getProductDetailsBy(req) {
+        try {
+            return await this.productAssignDashboardService.getProductDetailsBy(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBranchManagerDetailProduct(req) {
+        try {
+            return await this.productAssignDashboardService.getBranchManagerDetailProduct(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getDetailVendorData(req) {
@@ -135,7 +302,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async totalProducts(req) {
+        try {
+            return await this.productAssignDashboardService.totalProducts(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getDetailSubDealerData(req) {
@@ -144,7 +318,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getClientData(req) {
@@ -153,7 +326,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getDetailClientData(req) {
@@ -162,7 +334,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getSearchDetailClient(req) {
+        try {
+            return await this.clientDashboardService.getSearchDetailClient(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getVendorData(req) {
@@ -171,7 +350,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getSubDealerData(req) {
@@ -180,7 +358,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getAllAppointmentDetails(req) {
@@ -189,7 +366,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async totalTickets(req) {
@@ -198,7 +374,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async totalTicketsBranchWise(req) {
+        try {
+            return await this.ticketsDashboardService.totalTicketsBranchWise(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getDayBookData(req) {
@@ -207,7 +390,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getSolidLiquidCash(req) {
@@ -216,7 +398,94 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in delete assert details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error deleting assert details');
+        }
+    }
+    async getReceivableAmountForTable(req) {
+        try {
+            return await this.voucherDashboardService.getReceivableAmountForTable(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getAllPaymentsVouchers(req) {
+        try {
+            return await this.voucherDashboardService.getAllPaymentsVouchers(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getSalesForTable(req) {
+        try {
+            return await this.voucherDashboardService.getSalesForTable(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getPayableAmountForTable(req) {
+        try {
+            return await this.voucherDashboardService.getPayableAmountForTable(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getPurchaseDataForTable(req) {
+        try {
+            return await this.voucherDashboardService.getPurchaseDataForTable(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getAmountDetails(req) {
+        try {
+            return await this.voucherDashboardService.getAmountDetails(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getVoucherAmountDetails(req) {
+        try {
+            return await this.voucherDashboardService.getVoucherAmountDetails(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async calculateGstReturns(req) {
+        try {
+            return await this.voucherDashboardService.calculateGstReturns(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getBranchWiseSolidLiquidCash(req) {
+        try {
+            return await this.voucherDashboardService.getBranchWiseSolidLiquidCash(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getBranchWiseAccountAmounts(req) {
+        try {
+            return await this.voucherDashboardService.getBranchWiseAccountAmounts(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
+        }
+    }
+    async getTotalPayableAndReceivablePercentage(req) {
+        try {
+            return await this.voucherDashboardService.getTotalPayableAndReceivablePercentage(req);
+        }
+        catch (error) {
+            console.log("Error in delete assert details in service..", error);
         }
     }
     async getVoucherData(req) {
@@ -225,7 +494,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getExpansesTableData(req) {
+        try {
+            return await this.voucherDashboardService.getExpansesTableData(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getDetailInVoiceData(req) {
@@ -234,7 +510,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getReceiptData(req) {
@@ -243,7 +518,182 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getProductsPhotos(req) {
+        try {
+            return await this.voucherDashboardService.getProductsPhotos(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getTrialBalance(req) {
+        try {
+            return await this.voucherDashboardService.getTrialBalance(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBalanceSheet(req) {
+        try {
+            return await this.voucherDashboardService.getBalanceSheet(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getSalesReturns(req) {
+        try {
+            return await this.voucherDashboardService.getSalesReturns(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getTDSReport(req) {
+        try {
+            return await this.voucherDashboardService.getTDSReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getTCSReport(req) {
+        try {
+            return await this.voucherDashboardService.getTCSReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getDEBITNOTEReport(req) {
+        try {
+            return await this.voucherDashboardService.getDEBITNOTEReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getCREDITNOTEReport(req) {
+        try {
+            return await this.voucherDashboardService.getCREDITNOTEReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getJOURNALReport(req) {
+        try {
+            return await this.voucherDashboardService.getJOURNALReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getPURCHASEReport(req) {
+        try {
+            return await this.voucherDashboardService.getPURCHASEReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getSALESReport(req) {
+        try {
+            return await this.voucherDashboardService.getSALESReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getLedgerReport(req) {
+        try {
+            return await this.voucherDashboardService.getLedgerReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getPayableAmountForReport(req) {
+        try {
+            return await this.voucherDashboardService.getPayableAmountForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getCashFlow(req) {
+        try {
+            return await this.voucherDashboardService.getCashFlow(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBankReconciliationReport(req) {
+        try {
+            return await this.voucherDashboardService.getBankReconciliationReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBankStmtForReport(req) {
+        try {
+            return await this.voucherDashboardService.getBankStmtForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getCashStmtForReport(req) {
+        try {
+            return await this.voucherDashboardService.getCashStmtForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getLoansAndInterestsForReport(req) {
+        try {
+            return await this.voucherDashboardService.getLoansAndInterestsForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getFixedAssertsForReport(req) {
+        try {
+            return await this.voucherDashboardService.getFixedAssertsForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getProfitAndLoss(req) {
+        try {
+            return await this.voucherDashboardService.getProfitAndLoss(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async generateIncomeStatement(req) {
+        try {
+            return await this.voucherDashboardService.generateIncomeStatement(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getTotalSalesForReport(req) {
+        try {
+            return await this.voucherDashboardService.getTotalSalesForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getPaymentData(req) {
@@ -252,7 +702,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getPurchaseData(req) {
@@ -261,16 +710,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
-    async getLedgerData(req) {
+    async getClientPurchaseOrderDataTable(req) {
         try {
-            return await this.voucherDashboardService.getLedgerData(req);
+            return await this.voucherDashboardService.getClientPurchaseOrderDataTable(req);
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getAllVouchers(req) {
@@ -279,16 +726,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
-        }
-    }
-    async getDetailLedgerData(req) {
-        try {
-            return await this.voucherDashboardService.getDetailLedgerData(req);
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getMonthWiseBalance(req) {
@@ -297,7 +734,30 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getTotalProductAndServiceSales(req) {
+        try {
+            return await this.voucherDashboardService.getTotalProductAndServiceSales(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getDayBookDataForReport(req) {
+        try {
+            return await this.voucherDashboardService.getDayBookDataForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getReceiptDataForReport(req) {
+        try {
+            return await this.voucherDashboardService.getReceiptDataForReport(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getYearWiseCreditAndDebitPercentages(req) {
@@ -306,7 +766,14 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async get4YearWiseCreditAndDebitPercentages(req) {
+        try {
+            return await this.voucherDashboardService.get4YearWiseCreditAndDebitPercentages(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
     async getPurchaseCount(req) {
@@ -315,16 +782,6 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
-        }
-    }
-    async getExpenseData(req) {
-        try {
-            return await this.voucherDashboardService.getExpenseData(req);
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
         }
     }
     async getLast30DaysCreditAndDebitPercentages(req) {
@@ -333,18 +790,124 @@ let DashboardController = class DashboardController {
         }
         catch (error) {
             console.log("Error in details in service..", error);
-            return new common_response_1.CommonResponse(false, 500, 'Error details');
+        }
+    }
+    async getProductTypeCreditAndDebitPercentages(req) {
+        try {
+            return await this.voucherDashboardService.getProductTypeCreditAndDebitPercentages(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async get4ProductTypeCreditAndDebitPercentages(req) {
+        try {
+            return await this.voucherDashboardService.get4ProductTypeCreditAndDebitPercentages(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getOverAllYearlySales(req) {
+        try {
+            return await this.voucherDashboardService.getOverAllYearlySales(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBranchWiseMonthlySales(req) {
+        try {
+            return await this.voucherDashboardService.getBranchWiseMonthlySales(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getBranchWiseYearlySales(req) {
+        try {
+            return await this.voucherDashboardService.getBranchWiseYearlySales(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getSalesBreakdown(req) {
+        try {
+            return await this.voucherDashboardService.getSalesBreakdown(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getPaymentDataTable(req) {
+        try {
+            return await this.voucherDashboardService.getPaymentDataTable(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getPurchaseOrderDataTable(req) {
+        try {
+            return await this.voucherDashboardService.getPurchaseOrderDataTable(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
+        }
+    }
+    async getAccountBySearch(req) {
+        try {
+            return await this.accountDashboardService.getAccountBySearch(req);
+        }
+        catch (error) {
+            console.log("Error in details in service..", error);
         }
     }
 };
 exports.DashboardController = DashboardController;
 __decorate([
-    (0, common_1.Post)('assertCardData'),
+    (0, common_1.Get)('sendReciept'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:paramtypes", [estimate_send_dto_1.EstimateSendDto]),
     __metadata("design:returntype", Promise)
-], DashboardController.prototype, "assertCardData", null);
+], DashboardController.prototype, "sendReciept", null);
+__decorate([
+    (0, common_1.Get)('sendInvoice'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [estimate_send_dto_1.EstimateSendDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "sendInvoice", null);
+__decorate([
+    (0, common_1.Get)('sendReceipt'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [estimate_send_dto_1.EstimateSendDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "sendReceipt", null);
+__decorate([
+    (0, common_1.Get)('sendEstimate'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [estimate_send_dto_1.EstimateSendDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "sendEstimate", null);
+__decorate([
+    (0, common_1.Post)('assertsCardData'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "assertsCardData", null);
+__decorate([
+    (0, common_1.Post)('getAssertDataByDate'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getAssertDataByDate", null);
 __decorate([
     (0, common_1.Post)('staffAttendanceDetails'),
     __param(0, (0, common_1.Body)()),
@@ -360,19 +923,89 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getStaffSearchDetails", null);
 __decorate([
-    (0, common_1.Post)('payRoll'),
+    (0, common_1.Post)('getStaff'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getStaff", null);
+__decorate([
+    (0, common_1.Post)('getStaffCardsDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [staff_search_dto_1.StaffSearchDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getStaffCardsDetails", null);
+__decorate([
+    (0, common_1.Post)('getTotalStaffDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [staff_search_dto_1.StaffSearchDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTotalStaffDetails", null);
+__decorate([
+    (0, common_1.Post)('getBranchStaffDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [staff_search_dto_1.StaffSearchDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchStaffDetails", null);
+__decorate([
+    (0, common_1.Post)('getAllBranchStaffDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [staff_search_dto_1.StaffSearchDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getAllBranchStaffDetails", null);
+__decorate([
+    (0, common_1.Post)('payRoll'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "payRoll", null);
 __decorate([
     (0, common_1.Post)('productAssignDetails'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "productAssignDetails", null);
+__decorate([
+    (0, common_1.Post)('getProductAssignmentSummaryBySubDealer'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductAssignmentSummaryBySubDealer", null);
+__decorate([
+    (0, common_1.Post)('productSubDealerAssignDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "productSubDealerAssignDetails", null);
+__decorate([
+    (0, common_1.Post)('getProductDetailsBySubDealer'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductDetailsBySubDealer", null);
+__decorate([
+    (0, common_1.Post)('getSearchDetailProductAssign'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [product_id_dto_1.ProductIdDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSearchDetailProductAssign", null);
+__decorate([
+    (0, common_1.Post)('getStockSummary'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [product_id_dto_1.ProductIdDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getStockSummary", null);
 __decorate([
     (0, common_1.Post)('getTicketDetailsAgainstSearch'),
     __param(0, (0, common_1.Body)()),
@@ -388,6 +1021,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getEstimates", null);
 __decorate([
+    (0, common_1.Post)('getEstimatesForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getEstimatesForReport", null);
+__decorate([
     (0, common_1.Post)('getTotalAssignedAndStockLast30Days'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -395,12 +1035,47 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getTotalAssignedAndStockLast30Days", null);
 __decorate([
-    (0, common_1.Post)('getAssignedQtyLast30Days'),
+    (0, common_1.Post)('getProductAssignmentSummary'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], DashboardController.prototype, "getAssignedQtyLast30Days", null);
+], DashboardController.prototype, "getProductAssignmentSummary", null);
+__decorate([
+    (0, common_1.Post)('getProductDetailsByBranch'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductDetailsByBranch", null);
+__decorate([
+    (0, common_1.Post)('getProductWareHouseDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductWareHouseDetails", null);
+__decorate([
+    (0, common_1.Post)('getWareHouseProductDetailsByBranch'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getWareHouseProductDetailsByBranch", null);
+__decorate([
+    (0, common_1.Post)('getProductDetailsBy'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductDetailsBy", null);
+__decorate([
+    (0, common_1.Post)('getBranchManagerDetailProduct'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchManagerDetailProduct", null);
 __decorate([
     (0, common_1.Post)('getDetailVendorData'),
     __param(0, (0, common_1.Body)()),
@@ -408,6 +1083,13 @@ __decorate([
     __metadata("design:paramtypes", [vendor_id_deatil_1.VendorDetail]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getDetailVendorData", null);
+__decorate([
+    (0, common_1.Post)('totalProducts'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "totalProducts", null);
 __decorate([
     (0, common_1.Post)('getDetailSubDealerData'),
     __param(0, (0, common_1.Body)()),
@@ -430,6 +1112,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getDetailClientData", null);
 __decorate([
+    (0, common_1.Post)('getSearchDetailClient'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [client_search_dto_1.ClientSearchDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSearchDetailClient", null);
+__decorate([
     (0, common_1.Post)('getVendorData'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -447,7 +1136,7 @@ __decorate([
     (0, common_1.Post)('getAllAppointmentDetails'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getAllAppointmentDetails", null);
 __decorate([
@@ -457,6 +1146,13 @@ __decorate([
     __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "totalTickets", null);
+__decorate([
+    (0, common_1.Post)('totalTicketsBranchWise'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "totalTicketsBranchWise", null);
 __decorate([
     (0, common_1.Post)('getDayBookData'),
     __param(0, (0, common_1.Body)()),
@@ -472,12 +1168,96 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getSolidLiquidCash", null);
 __decorate([
+    (0, common_1.Post)('getReceivableAmountForTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getReceivableAmountForTable", null);
+__decorate([
+    (0, common_1.Post)('getAllPaymentsVouchers'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getAllPaymentsVouchers", null);
+__decorate([
+    (0, common_1.Post)('getSalesForTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSalesForTable", null);
+__decorate([
+    (0, common_1.Post)('getPayableAmountForTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPayableAmountForTable", null);
+__decorate([
+    (0, common_1.Post)('getPurchaseDataForTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPurchaseDataForTable", null);
+__decorate([
+    (0, common_1.Post)('getAmountDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getAmountDetails", null);
+__decorate([
+    (0, common_1.Post)('getVoucherAmountDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getVoucherAmountDetails", null);
+__decorate([
+    (0, common_1.Post)('calculateGstReturns'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "calculateGstReturns", null);
+__decorate([
+    (0, common_1.Post)('getBranchWiseSolidLiquidCash'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchWiseSolidLiquidCash", null);
+__decorate([
+    (0, common_1.Post)('getBranchWiseAccountAmounts'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchWiseAccountAmounts", null);
+__decorate([
+    (0, common_1.Post)('getTotalPayableAndReceivablePercentage'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTotalPayableAndReceivablePercentage", null);
+__decorate([
     (0, common_1.Post)('getVoucherData'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [invoice_dto_1.InvoiceDto]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getVoucherData", null);
+__decorate([
+    (0, common_1.Post)('getExpansesTableData'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [invoice_dto_1.InvoiceDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getExpansesTableData", null);
 __decorate([
     (0, common_1.Post)('getDetailInVoiceData'),
     __param(0, (0, common_1.Body)()),
@@ -493,6 +1273,160 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getReceiptData", null);
 __decorate([
+    (0, common_1.Post)('getProductsPhotos'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductsPhotos", null);
+__decorate([
+    (0, common_1.Post)('getTrialBalance'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTrialBalance", null);
+__decorate([
+    (0, common_1.Post)('getBalanceSheet'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBalanceSheet", null);
+__decorate([
+    (0, common_1.Post)('getSalesReturns'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSalesReturns", null);
+__decorate([
+    (0, common_1.Post)('getTDSReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTDSReport", null);
+__decorate([
+    (0, common_1.Post)('getTCSReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTCSReport", null);
+__decorate([
+    (0, common_1.Post)('getDEBITNOTEReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getDEBITNOTEReport", null);
+__decorate([
+    (0, common_1.Post)('getCREDITNOTEReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getCREDITNOTEReport", null);
+__decorate([
+    (0, common_1.Post)('getJOURNALReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getJOURNALReport", null);
+__decorate([
+    (0, common_1.Post)('getPURCHASEReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPURCHASEReport", null);
+__decorate([
+    (0, common_1.Post)('getSALESReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSALESReport", null);
+__decorate([
+    (0, common_1.Post)('getLedgerReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getLedgerReport", null);
+__decorate([
+    (0, common_1.Post)('getPayableAmountForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPayableAmountForReport", null);
+__decorate([
+    (0, common_1.Post)('getCashFlow'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getCashFlow", null);
+__decorate([
+    (0, common_1.Post)('getBankReconciliationReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBankReconciliationReport", null);
+__decorate([
+    (0, common_1.Post)('getBankStmtForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBankStmtForReport", null);
+__decorate([
+    (0, common_1.Post)('getCashStmtForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getCashStmtForReport", null);
+__decorate([
+    (0, common_1.Post)('getLoansAndInterestsForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getLoansAndInterestsForReport", null);
+__decorate([
+    (0, common_1.Post)('getFixedAssertsForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getFixedAssertsForReport", null);
+__decorate([
+    (0, common_1.Post)('getProfitAndLoss'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProfitAndLoss", null);
+__decorate([
+    (0, common_1.Post)('generateIncomeStatement'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "generateIncomeStatement", null);
+__decorate([
+    (0, common_1.Post)('getTotalSalesForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTotalSalesForReport", null);
+__decorate([
     (0, common_1.Post)('getPaymentData'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -507,12 +1441,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getPurchaseData", null);
 __decorate([
-    (0, common_1.Post)('getLedgerData'),
+    (0, common_1.Post)('getClientPurchaseOrderDataTable'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], DashboardController.prototype, "getLedgerData", null);
+], DashboardController.prototype, "getClientPurchaseOrderDataTable", null);
 __decorate([
     (0, common_1.Post)('getAllVouchers'),
     __param(0, (0, common_1.Body)()),
@@ -521,19 +1455,33 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getAllVouchers", null);
 __decorate([
-    (0, common_1.Post)('getDetailLedgerData'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [voucher_id_res_dto_1.VoucherIDResDTo]),
-    __metadata("design:returntype", Promise)
-], DashboardController.prototype, "getDetailLedgerData", null);
-__decorate([
     (0, common_1.Post)('getMonthWiseBalance'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getMonthWiseBalance", null);
+__decorate([
+    (0, common_1.Post)('getTotalProductAndServiceSales'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getTotalProductAndServiceSales", null);
+__decorate([
+    (0, common_1.Post)('getDayBookDataForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getDayBookDataForReport", null);
+__decorate([
+    (0, common_1.Post)('getReceiptDataForReport'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getReceiptDataForReport", null);
 __decorate([
     (0, common_1.Post)('getYearWiseCreditAndDebitPercentages'),
     __param(0, (0, common_1.Body)()),
@@ -542,6 +1490,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getYearWiseCreditAndDebitPercentages", null);
 __decorate([
+    (0, common_1.Post)('get4YearWiseCreditAndDebitPercentages'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "get4YearWiseCreditAndDebitPercentages", null);
+__decorate([
     (0, common_1.Post)('getPurchaseCount'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -549,19 +1504,75 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getPurchaseCount", null);
 __decorate([
-    (0, common_1.Post)('getExpenseData'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
-    __metadata("design:returntype", Promise)
-], DashboardController.prototype, "getExpenseData", null);
-__decorate([
     (0, common_1.Post)('getLast30DaysCreditAndDebitPercentages'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getLast30DaysCreditAndDebitPercentages", null);
+__decorate([
+    (0, common_1.Post)('getProductTypeCreditAndDebitPercentages'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getProductTypeCreditAndDebitPercentages", null);
+__decorate([
+    (0, common_1.Post)('get4ProductTypeCreditAndDebitPercentages'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "get4ProductTypeCreditAndDebitPercentages", null);
+__decorate([
+    (0, common_1.Post)('getOverAllYearlySales'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getOverAllYearlySales", null);
+__decorate([
+    (0, common_1.Post)('getBranchWiseMonthlySales'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchWiseMonthlySales", null);
+__decorate([
+    (0, common_1.Post)('getBranchWiseYearlySales'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getBranchWiseYearlySales", null);
+__decorate([
+    (0, common_1.Post)('getSalesBreakdown'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [balance_chart_dto_1.BranchChartDto]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getSalesBreakdown", null);
+__decorate([
+    (0, common_1.Post)('getPaymentDataTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPaymentDataTable", null);
+__decorate([
+    (0, common_1.Post)('getPurchaseOrderDataTable'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getPurchaseOrderDataTable", null);
+__decorate([
+    (0, common_1.Post)('getAccountBySearch'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], DashboardController.prototype, "getAccountBySearch", null);
 exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboards'),
     __metadata("design:paramtypes", [assert_dashboard_service_1.AssertDashboardService,
@@ -573,6 +1584,7 @@ exports.DashboardController = DashboardController = __decorate([
         appointment_dashboard_service_1.AppointmentDashboardService,
         tickets_dashboard_service_1.TicketsDashboardService,
         voucher_dashboard_service_1.VoucherDashboardService,
-        estimate_dashboard_service_1.EstimateDashboardService])
+        estimate_dashboard_service_1.EstimateDashboardService,
+        account_dashboard_service_1.AccountDashboardService])
 ], DashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

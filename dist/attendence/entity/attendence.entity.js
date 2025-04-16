@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttendanceEntity = void 0;
 const typeorm_1 = require("typeorm");
 const staff_entity_1 = require("../../staff/entity/staff.entity");
-const branch_entity_1 = require("../../branch/entity/branch.entity");
 const attendence_status_enum_1 = require("../../staff/enum/attendence-status.enum");
 let AttendanceEntity = class AttendanceEntity {
 };
@@ -22,45 +21,52 @@ __decorate([
     __metadata("design:type", Number)
 ], AttendanceEntity.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'day', type: 'date' }),
+    (0, typeorm_1.ManyToOne)(() => staff_entity_1.StaffEntity, (staff) => staff.attendance, { nullable: false, onDelete: 'CASCADE' }),
+    (0, typeorm_1.JoinColumn)({ name: 'staff_id' }),
+    __metadata("design:type", staff_entity_1.StaffEntity)
+], AttendanceEntity.prototype, "staff", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'staff_name', type: 'varchar', length: 100, nullable: false }),
+    __metadata("design:type", String)
+], AttendanceEntity.prototype, "staffName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'branch_name', type: 'varchar', length: 100, nullable: true }),
+    __metadata("design:type", String)
+], AttendanceEntity.prototype, "branchName", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'day', type: 'date', nullable: false }),
     __metadata("design:type", Date)
 ], AttendanceEntity.prototype, "day", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'in_time', type: 'datetime', nullable: true }),
-    __metadata("design:type", Date)
+    (0, typeorm_1.Column)({ name: 'in_time', type: 'varchar', length: 100, nullable: true }),
+    __metadata("design:type", String)
 ], AttendanceEntity.prototype, "inTime", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'out_time', type: 'datetime', nullable: true }),
-    __metadata("design:type", Date)
+    (0, typeorm_1.Column)({ name: 'in_time_remark', type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", String)
+], AttendanceEntity.prototype, "inTimeRemark", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'out_time', type: 'varchar', length: 100, nullable: true }),
+    __metadata("design:type", String)
 ], AttendanceEntity.prototype, "outTime", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'out_time_remark', type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", String)
+], AttendanceEntity.prototype, "outTimeRemark", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'remark', type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", String)
+], AttendanceEntity.prototype, "remark", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         name: 'status',
         type: 'enum',
         enum: attendence_status_enum_1.AttendanceStatus,
-        default: attendence_status_enum_1.AttendanceStatus.PRESENT
+        default: attendence_status_enum_1.AttendanceStatus.PRESENT,
     }),
     __metadata("design:type", String)
 ], AttendanceEntity.prototype, "status", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => staff_entity_1.StaffEntity, (staffEntity) => staffEntity.staffId),
-    (0, typeorm_1.JoinColumn)({ name: 'staff_id' }),
-    __metadata("design:type", staff_entity_1.StaffEntity)
-], AttendanceEntity.prototype, "staffId", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => branch_entity_1.BranchEntity, (branchEntity) => branchEntity.attendance),
-    (0, typeorm_1.JoinColumn)({ name: 'branch_id' }),
-    __metadata("design:type", branch_entity_1.BranchEntity)
-], AttendanceEntity.prototype, "branchId", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { name: 'company_code', length: 20, nullable: false }),
-    __metadata("design:type", String)
-], AttendanceEntity.prototype, "companyCode", void 0);
-__decorate([
-    (0, typeorm_1.Column)('varchar', { name: 'unit_code', length: 20, nullable: false }),
-    __metadata("design:type", String)
-], AttendanceEntity.prototype, "unitCode", void 0);
 exports.AttendanceEntity = AttendanceEntity = __decorate([
-    (0, typeorm_1.Entity)('attendance')
+    (0, typeorm_1.Entity)('attendances')
 ], AttendanceEntity);
 //# sourceMappingURL=attendence.entity.js.map

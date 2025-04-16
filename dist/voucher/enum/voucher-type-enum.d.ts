@@ -1,8 +1,12 @@
 export declare enum VoucherTypeEnum {
-    RECEIPT = "receipt",
-    PAYMENT = "payment",
-    JOURNAL = "journal",
-    CONTRA = "contra",
-    PURCHASE = "purchase",
-    INVOICE = "invoice"
+    RECEIPT = "RECEIPT",
+    PAYMENT = "PAYMENT",
+    JOURNAL = "JOURNAL",
+    CONTRA = "CONTRA",
+    PURCHASE = "PURCHASE",
+    DEBITNOTE = "DEBITNOTE",
+    CREDITNOTE = "CREDITNOTE",
+    SALESORDER = "SALESORDER",
+    PURCHASEORDER = "PURCHASEORDER",
+    SALES = "SALES"
 }

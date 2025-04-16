@@ -26,6 +26,51 @@ let ProductAssignDashboardService = class ProductAssignDashboardService {
             return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
         }
     }
+    async productSubDealerAssignDetails(req) {
+        const productData = await this.productAssignRepo.productSubDealerAssignDetails(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getProductAssignmentSummaryBySubDealer(req) {
+        const productData = await this.productAssignRepo.getProductAssignmentSummaryBySubDealer(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getProductDetailsBySubDealer(req) {
+        const productData = await this.productAssignRepo.getProductDetailsBySubDealer(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getSearchDetailProduct(req) {
+        const productData = await this.productAssignRepo.getSearchDetailProduct(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getStockSummary(req) {
+        const productData = await this.productAssignRepo.getStockSummary(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
     async getTotalAssignedAndStockLast30Days(req) {
         const productData = await this.productAssignRepo.getTotalAssignedAndStockLast30Days(req);
         if (!productData) {
@@ -35,8 +80,62 @@ let ProductAssignDashboardService = class ProductAssignDashboardService {
             return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
         }
     }
-    async getAssignedQtyLast30Days(req) {
-        const productData = await this.productAssignRepo.getAssignedQtyLast30Days(req);
+    async getProductAssignmentSummary(req) {
+        const productData = await this.productAssignRepo.getProductAssignmentSummary(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getProductDetailsByBranch(req) {
+        const productData = await this.productAssignRepo.getProductDetailsByBranch(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getProductWareHouseDetails(req) {
+        const productData = await this.productAssignRepo.getProductWareHouseDetails(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getWareHouseProductDetailsByBranch(req) {
+        const productData = await this.productAssignRepo.getWareHouseProductDetailsByBranch(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getProductDetailsBy(req) {
+        const productData = await this.productAssignRepo.getProductDetailsBy(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async getBranchManagerDetailProduct(req) {
+        const productData = await this.productAssignRepo.getBranchManagerDetailProduct(req);
+        if (!productData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", productData);
+        }
+    }
+    async totalProducts(req) {
+        const productData = await this.productAssignRepo.totalProducts(req);
         if (!productData) {
             return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
         }

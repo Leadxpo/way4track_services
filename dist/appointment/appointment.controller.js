@@ -18,12 +18,16 @@ const appointment_service_1 = require("./appointment.service");
 const common_response_1 = require("../models/common-response");
 const appointment_id_dto_1 = require("./dto/appointment-id.dto");
 const appointement_dto_1 = require("./dto/appointement.dto");
+const common_req_1 = require("../models/common-req");
 let AppointmentController = class AppointmentController {
     constructor(appointmentService) {
         this.appointmentService = appointmentService;
     }
     async handleAppointmentDetails(dto) {
         try {
+            if (dto.id && dto.id !== null) {
+                dto.id = Number(dto.id);
+            }
             return await this.appointmentService.handleAppointmentDetails(dto);
         }
         catch (error) {
@@ -43,6 +47,15 @@ let AppointmentController = class AppointmentController {
     async getAppointmentDetails(dto) {
         try {
             return await this.appointmentService.getAppointmentDetails(dto);
+        }
+        catch (error) {
+            console.error('Error in get appointment details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching appointment details');
+        }
+    }
+    async getAllAppointmentDetails(dto) {
+        try {
+            return await this.appointmentService.getAllAppointmentDetails(dto);
         }
         catch (error) {
             console.error('Error in get appointment details:', error);
@@ -72,6 +85,13 @@ __decorate([
     __metadata("design:paramtypes", [appointment_id_dto_1.AppointmentIdDto]),
     __metadata("design:returntype", Promise)
 ], AppointmentController.prototype, "getAppointmentDetails", null);
+__decorate([
+    (0, common_1.Post)('getAllAppointmentDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], AppointmentController.prototype, "getAllAppointmentDetails", null);
 exports.AppointmentController = AppointmentController = __decorate([
     (0, common_1.Controller)('appointment'),
     __metadata("design:paramtypes", [appointment_service_1.AppointmentService])

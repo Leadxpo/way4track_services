@@ -11,7 +11,7 @@ var Roles;
     Roles["Vendor"] = "vendor";
     Roles["SubDealer"] = "subdealer";
     Roles["Hiring"] = "hiring";
-    Roles["Bank"] = "bak";
+    Roles["Bank"] = "bank";
     Roles["Product"] = "product";
     Roles["ProductAssign"] = "productassign";
     Roles["Tickets"] = "tickets";
@@ -19,5 +19,6 @@ var Roles;
     Roles["WorkAllocation"] = "work-allocation";
     Roles["Estimate"] = "estimate";
     Roles["Attendance"] = "attendance";
+    Roles["RequestRaise"] = "requests";
 })(Roles || (exports.Roles = Roles = {}));
 //# sourceMappingURL=role.enum.js.map

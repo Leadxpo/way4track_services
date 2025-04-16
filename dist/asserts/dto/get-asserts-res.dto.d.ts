@@ -12,8 +12,6 @@ export declare class GetAssertsResDto {
     description: string;
     purchaseDate: Date;
     assetPhoto: string;
-    voucherEntity: number;
-    voucherId: string;
     paymentType: PaymentType;
     initialPayment?: number;
     numberOfEmi?: number;
@@ -21,5 +19,5 @@ export declare class GetAssertsResDto {
     emiAmount?: number;
     companyCode: string;
     unitCode: string;
-    constructor(id: number, branchId: number, branchName: string, assertsName: string, assertsAmount: number, assetType: AssetType, price: number, quantity: number, description: string, purchaseDate: Date, assetPhoto: string, voucherEntity: number, voucherId: string, paymentType: PaymentType, companyCode: string, unitCode: string, initialPayment?: number, numberOfEmi?: number, emiNumber?: number, emiAmount?: number);
+    constructor(id: number, branchId: number, branchName: string, assertsName: string, assertsAmount: number, assetType: AssetType, price: number, quantity: number, description: string, purchaseDate: Date, assetPhoto: string, paymentType: PaymentType, companyCode: string, unitCode: string, initialPayment?: number, numberOfEmi?: number, emiNumber?: number, emiAmount?: number);
 }

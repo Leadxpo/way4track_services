@@ -9,11 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TicketsEntity = void 0;
+exports.TicketsEntity = exports.AddressingDepartment = void 0;
 const branch_entity_1 = require("../../branch/entity/branch.entity");
+const designation_entity_1 = require("../../designation/entity/designation.entity");
 const staff_entity_1 = require("../../staff/entity/staff.entity");
+const sub_dealer_entity_1 = require("../../sub-dealer/entity/sub-dealer.entity");
+const work_status_enum_1 = require("../../work-allocation/enum/work-status-enum");
 const typeorm_1 = require("typeorm");
-const tickets_enum_1 = require("../enum/tickets.enum");
+var AddressingDepartment;
+(function (AddressingDepartment) {
+    AddressingDepartment["CEO"] = "CEO";
+    AddressingDepartment["HR"] = "HR";
+    AddressingDepartment["Accountant"] = "Accountant";
+    AddressingDepartment["Operator"] = "Operator";
+    AddressingDepartment["WarehouseManager"] = "Warehouse Manager";
+    AddressingDepartment["BranchManager"] = "Branch Manager";
+    AddressingDepartment["SubDealer"] = "Sub Dealer";
+    AddressingDepartment["Technician"] = "Technician";
+    AddressingDepartment["SalesMan"] = "Sales Man";
+    AddressingDepartment["CallCenter"] = "Call Center";
+})(AddressingDepartment || (exports.AddressingDepartment = AddressingDepartment = {}));
 let TicketsEntity = class TicketsEntity {
 };
 exports.TicketsEntity = TicketsEntity;
@@ -22,16 +37,16 @@ __decorate([
     __metadata("design:type", Number)
 ], TicketsEntity.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => staff_entity_1.StaffEntity, { eager: true }),
+    (0, typeorm_1.ManyToOne)(() => staff_entity_1.StaffEntity, (branchEntity) => branchEntity.tickets, { nullable: true }),
     (0, typeorm_1.JoinColumn)({ name: 'staff_id' }),
     __metadata("design:type", staff_entity_1.StaffEntity)
 ], TicketsEntity.prototype, "staff", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'problem', type: 'text' }),
+    (0, typeorm_1.Column)({ name: 'problem', type: 'text', nullable: true }),
     __metadata("design:type", String)
 ], TicketsEntity.prototype, "problem", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'date', type: 'date' }),
+    (0, typeorm_1.Column)({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
     __metadata("design:type", Date)
 ], TicketsEntity.prototype, "date", void 0);
 __decorate([
@@ -44,11 +59,19 @@ __decorate([
     __metadata("design:type", String)
 ], TicketsEntity.prototype, "ticketNumber", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'description', type: 'text', nullable: true }),
+    __metadata("design:type", String)
+], TicketsEntity.prototype, "description", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'enum', enum: work_status_enum_1.WorkStatusEnum, name: 'work_status', default: work_status_enum_1.WorkStatusEnum.PENDING, nullable: true }),
+    __metadata("design:type", String)
+], TicketsEntity.prototype, "workStatus", void 0);
+__decorate([
     (0, typeorm_1.Column)({
         name: 'addressing_department',
         type: 'enum',
-        enum: tickets_enum_1.AddressingDepartment,
-        default: tickets_enum_1.AddressingDepartment.HR
+        enum: AddressingDepartment,
+        default: AddressingDepartment.CEO
     }),
     __metadata("design:type", String)
 ], TicketsEntity.prototype, "addressingDepartment", void 0);
@@ -60,6 +83,24 @@ __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'unit_code', length: 20, nullable: false }),
     __metadata("design:type", String)
 ], TicketsEntity.prototype, "unitCode", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], TicketsEntity.prototype, "createdAt", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' }),
+    __metadata("design:type", Date)
+], TicketsEntity.prototype, "updatedAt", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => sub_dealer_entity_1.SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.tickets, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'sub_dealer_id' }),
+    __metadata("design:type", sub_dealer_entity_1.SubDealerEntity)
+], TicketsEntity.prototype, "subDealerId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => designation_entity_1.DesignationEntity, (designation) => designation.ticket, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'designation_id', referencedColumnName: 'id' }),
+    __metadata("design:type", designation_entity_1.DesignationEntity)
+], TicketsEntity.prototype, "designationRelation", void 0);
 exports.TicketsEntity = TicketsEntity = __decorate([
     (0, typeorm_1.Entity)('tickets')
 ], TicketsEntity);

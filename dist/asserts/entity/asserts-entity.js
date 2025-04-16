@@ -35,7 +35,7 @@ __decorate([
     __metadata("design:type", String)
 ], AssertsEntity.prototype, "assetPhoto", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'asserts_amount', type: 'float' }),
+    (0, typeorm_1.Column)({ name: 'asserts_amount', type: 'float', nullable: true }),
     __metadata("design:type", Number)
 ], AssertsEntity.prototype, "assertsAmount", void 0);
 __decorate([
@@ -48,7 +48,7 @@ __decorate([
     __metadata("design:type", String)
 ], AssertsEntity.prototype, "assetType", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'quantity', type: 'int' }),
+    (0, typeorm_1.Column)({ name: 'quantity', type: 'int', nullable: true }),
     __metadata("design:type", Number)
 ], AssertsEntity.prototype, "quantity", void 0);
 __decorate([
@@ -61,11 +61,11 @@ __decorate([
     __metadata("design:type", String)
 ], AssertsEntity.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'purchase_date', type: 'timestamp' }),
+    (0, typeorm_1.Column)({ name: 'purchase_date', type: 'timestamp', nullable: true }),
     __metadata("design:type", Date)
 ], AssertsEntity.prototype, "purchaseDate", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => voucher_entity_1.VoucherEntity, (voucher) => voucher.assert),
+    (0, typeorm_1.ManyToOne)(() => voucher_entity_1.VoucherEntity, (voucher) => voucher.assert, { nullable: true }),
     (0, typeorm_1.JoinColumn)({ name: 'voucher_id' }),
     __metadata("design:type", voucher_entity_1.VoucherEntity)
 ], AssertsEntity.prototype, "voucherId", void 0);
@@ -74,26 +74,9 @@ __decorate([
         type: 'enum',
         name: 'payment_type',
         enum: payment_type_enum_1.PaymentType,
-        default: payment_type_enum_1.PaymentType.CASH,
     }),
     __metadata("design:type", String)
 ], AssertsEntity.prototype, "paymentType", void 0);
-__decorate([
-    (0, typeorm_1.Column)('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true }),
-    __metadata("design:type", Number)
-], AssertsEntity.prototype, "initialPayment", void 0);
-__decorate([
-    (0, typeorm_1.Column)('int', { name: 'emi_count', nullable: true }),
-    __metadata("design:type", Number)
-], AssertsEntity.prototype, "numberOfEmi", void 0);
-__decorate([
-    (0, typeorm_1.Column)('int', { name: 'emi_number', nullable: true }),
-    __metadata("design:type", Number)
-], AssertsEntity.prototype, "emiNumber", void 0);
-__decorate([
-    (0, typeorm_1.Column)('decimal', { name: 'emi_amount', precision: 10, scale: 2, nullable: true }),
-    __metadata("design:type", Number)
-], AssertsEntity.prototype, "emiAmount", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'company_code', length: 20, nullable: false }),
     __metadata("design:type", String)

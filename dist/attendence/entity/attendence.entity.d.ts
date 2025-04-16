@@ -1,14 +1,15 @@
 import { StaffEntity } from 'src/staff/entity/staff.entity';
-import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { AttendanceStatus } from 'src/staff/enum/attendence-status.enum';
 export declare class AttendanceEntity {
     id: number;
+    staff: StaffEntity;
+    staffName: string;
+    branchName: string;
     day: Date;
-    inTime: Date;
-    outTime: Date;
+    inTime: string;
+    inTimeRemark: string;
+    outTime: string;
+    outTimeRemark: string;
+    remark: string;
     status: AttendanceStatus;
-    staffId: StaffEntity;
-    branchId: BranchEntity;
-    companyCode: string;
-    unitCode: string;
 }

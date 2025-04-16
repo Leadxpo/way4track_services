@@ -5,28 +5,30 @@ const attendence_entity_1 = require("./entity/attendence.entity");
 class AttendanceAdapter {
     toEntity(dto) {
         const entity = new attendence_entity_1.AttendanceEntity();
-        entity.staffId = { id: dto.staffId };
-        entity.branchId = { id: dto.branchId };
+        entity.staff = { staffId: dto.staffId };
         entity.day = dto.day;
-        entity.inTime = dto.inTime;
-        entity.outTime = dto.outTime;
         entity.status = dto.status;
-        entity.companyCode = dto.companyCode;
-        entity.unitCode = dto.unitCode;
+        entity.inTime = dto.inTime;
+        entity.inTimeRemark = dto.inTimeRemark;
+        entity.staffName = dto.staffName;
+        entity.outTime = dto.outTime;
+        entity.outTimeRemark = dto.outTimeRemark;
+        entity.branchName = dto.branchName;
+        entity.remark = dto.remark;
         return entity;
     }
     toDto(attendance) {
         return {
-            staffId: attendance.staffId.id,
-            branchId: attendance.branchId.id,
+            staffId: attendance.staff?.staffId ?? null,
             day: attendance.day,
             inTime: attendance.inTime,
+            inTimeRemark: attendance.inTimeRemark,
             outTime: attendance.outTime,
+            outTimeRemark: attendance.outTimeRemark,
             status: attendance.status,
-            staffName: attendance.staffId.name,
-            branchName: attendance.branchId.branchName,
-            companyCode: attendance.companyCode,
-            unitCode: attendance.unitCode
+            staffName: attendance.staff?.name ?? 'Unknown',
+            branchName: attendance.branchName,
+            remark: attendance.remark
         };
     }
 }

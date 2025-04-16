@@ -23,8 +23,13 @@ let BranchAdapter = class BranchAdapter {
         entity.branchOpening = dto.branchOpening;
         entity.email = dto.email;
         entity.branchPhoto = dto.branchPhoto;
+        entity.qrPhoto = dto.qrPhoto;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
+        entity.latitude = dto.latitude;
+        entity.longitude = dto.longitude;
+        entity.GST = dto.GST;
+        entity.CIN = dto.CIN;
         if (entity.id) {
             entity.id = dto.id;
         }

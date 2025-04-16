@@ -14,10 +14,10 @@ const branch_entity_1 = require("../branch/entity/branch.entity");
 const attendence_entity_1 = require("./entity/attendence.entity");
 const attendence_controller_1 = require("./attendence.controller");
 const attendence_service_1 = require("./attendence.service");
-const attendence_adapter_1 = require("./attendence.adapter");
 const attendence_repo_1 = require("./repo/attendence.repo");
 const branch_module_1 = require("../branch/branch.module");
 const staff_module_1 = require("../staff/staff.module");
+const attendence_adapter_1 = require("./attendence.adapter");
 let AttendanceModule = class AttendanceModule {
 };
 exports.AttendanceModule = AttendanceModule;
@@ -28,7 +28,7 @@ exports.AttendanceModule = AttendanceModule = __decorate([
             (0, common_1.forwardRef)(() => staff_module_1.StaffModule),
         ],
         controllers: [attendence_controller_1.AttendanceController],
-        providers: [attendence_service_1.AttendanceService, attendence_adapter_1.AttendanceAdapter, attendence_repo_1.AttendenceRepository],
+        providers: [attendence_service_1.AttendanceService, attendence_repo_1.AttendenceRepository, attendence_adapter_1.AttendanceAdapter],
         exports: [attendence_repo_1.AttendenceRepository, attendence_service_1.AttendanceService]
     })
 ], AttendanceModule);

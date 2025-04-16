@@ -5,4 +5,5 @@ export declare class LoginController {
     private readonly loginService;
     constructor(loginService: LoginService);
     LoginDetails(req: LoginDto): Promise<CommonResponse>;
+    ProfileDetails(req: LoginDto): Promise<CommonResponse>;
 }

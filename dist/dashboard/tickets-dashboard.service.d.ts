@@ -6,5 +6,6 @@ export declare class TicketsDashboardService {
     private ticketsRepositort;
     constructor(ticketsRepositort: TicketsRepository);
     totalTickets(req: CommonReq): Promise<CommonResponse>;
+    totalTicketsBranchWise(req: CommonReq): Promise<CommonResponse>;
     getTicketDetailsAgainstSearch(req: TicketsSearchDto): Promise<any>;
 }

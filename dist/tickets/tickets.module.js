@@ -14,12 +14,17 @@ const tickets_adapter_1 = require("./tickets.adapter");
 const tickets_entity_1 = require("./entity/tickets.entity");
 const tickets_services_1 = require("./tickets.services");
 const tickets_repo_1 = require("./repo/tickets.repo");
+const notification_module_1 = require("../notifications/notification.module");
+const designation_entity_1 = require("../designation/entity/designation.entity");
 let TicketsModule = class TicketsModule {
 };
 exports.TicketsModule = TicketsModule;
 exports.TicketsModule = TicketsModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([tickets_entity_1.TicketsEntity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([tickets_entity_1.TicketsEntity]),
+            (0, common_1.forwardRef)(() => notification_module_1.NotificationModule),
+            (0, common_1.forwardRef)(() => designation_entity_1.DesignationEntity),
+        ],
         controllers: [tickets_controller_1.TicketsController],
         providers: [tickets_services_1.TicketsService, tickets_adapter_1.TicketsAdapter, tickets_repo_1.TicketsRepository],
         exports: [tickets_repo_1.TicketsRepository, tickets_services_1.TicketsService]

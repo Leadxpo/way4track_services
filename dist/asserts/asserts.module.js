@@ -16,20 +16,31 @@ const asserts_adapter_1 = require("./asserts.adapter");
 const asserts_repo_1 = require("./repo/asserts.repo");
 const voucher_module_1 = require("../voucher/voucher-module");
 const branch_module_1 = require("../branch/branch.module");
+const voucher_entity_1 = require("../voucher/entity/voucher.entity");
+const voucher_repo_1 = require("../voucher/repo/voucher.repo");
+const platform_express_1 = require("@nestjs/platform-express");
 let AssertModule = class AssertModule {
 };
 exports.AssertModule = AssertModule;
 exports.AssertModule = AssertModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([asserts_entity_1.AssertsEntity]),
+        imports: [
+            typeorm_1.TypeOrmModule.forFeature([asserts_entity_1.AssertsEntity, voucher_entity_1.VoucherEntity]),
+            platform_express_1.MulterModule.register({ dest: './uploads' }),
             (0, common_1.forwardRef)(() => voucher_module_1.VoucherModule),
-            (0, common_1.forwardRef)(() => branch_module_1.BranchModule)],
+            (0, common_1.forwardRef)(() => branch_module_1.BranchModule)
+        ],
         controllers: [asserts_controller_1.AssertsController],
-        providers: [asserts_service_1.AssertsService, asserts_adapter_1.AssertsAdapter, {
+        providers: [
+            asserts_service_1.AssertsService,
+            asserts_adapter_1.AssertsAdapter,
+            voucher_repo_1.VoucherRepository,
+            {
                 provide: asserts_repo_1.AssertsRepository,
                 useClass: asserts_repo_1.AssertsRepository,
-            },],
-        exports: [asserts_repo_1.AssertsRepository, asserts_service_1.AssertsService]
+            },
+        ],
+        exports: [asserts_repo_1.AssertsRepository, asserts_service_1.AssertsService],
     })
 ], AssertModule);
 //# sourceMappingURL=asserts.module.js.map

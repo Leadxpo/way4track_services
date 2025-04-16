@@ -1,4 +1,3 @@
-import { RoleEnum } from '../enum/role-enum';
 import { VoucherTypeEnum } from '../enum/voucher-type-enum';
 import { PaymentType } from 'src/asserts/enum/payment-type.enum';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
@@ -9,46 +8,88 @@ import { ClientEntity } from 'src/client/entity/client.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { AccountEntity } from 'src/account/entity/account.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
+import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
+export declare enum DebitORCreditEnum {
+    Debit = "Debit",
+    Credit = "Credit"
+}
+export declare enum TypeEnum {
+    Rectifications = "Rectifications",
+    Renewables = "Renewables",
+    Replacements = "Replacements",
+    Product_Sales = "ProductSales",
+    Service_Sales = "ServiceSales",
+    Others = "Others"
+}
 export declare class VoucherEntity {
     id: number;
     name: string;
     quantity: number;
+    upiId: string;
+    checkNumber: string;
+    cardNumber: string;
+    fromAccount: AccountEntity;
+    toAccount: AccountEntity;
     voucherId: string;
+    technician: TechnicianWorksEntity[];
     branchId: BranchEntity;
-    role: RoleEnum;
-    purpose: string;
-    creditAmount: number;
-    paymentType: PaymentType;
-    paymentTo: string;
-    debitAmount: number;
-    transferredBy: string;
-    bankFrom: string;
-    bankTo: string;
-    voucherType: VoucherTypeEnum;
-    generationDate: Date;
-    expireDate: Date;
-    shippingAddress: string;
-    buildingAddress: string;
-    balanceAmount: number;
-    total: number;
-    hsnCode: string;
-    GST: number;
-    SCST: number;
-    CGST: number;
-    amount: number;
-    product: ProductEntity[];
-    paymentStatus: PaymentStatus;
-    productType: ProductType;
-    client: ClientEntity[];
-    vendor: VendorEntity[];
-    initialPayment: number;
-    numberOfEmi: number;
-    emiNumber: number;
-    emiAmount: number;
-    ifscCode: string;
-    bankAccountNumber: string;
-    assert: AssertsEntity[];
-    subDealer: SubDealerEntity[];
+    ledgerId: LedgerEntity;
     companyCode: string;
     unitCode: string;
+    purpose: string;
+    paymentType: PaymentType;
+    voucherType: VoucherTypeEnum;
+    generationDate: Date;
+    dueDate: Date;
+    expireDate: Date;
+    shippingAddress: string;
+    supplierLocation: string;
+    buildingAddress: string;
+    hsnCode: string;
+    journalType: DebitORCreditEnum;
+    SGST: number;
+    CGST: number;
+    voucherGST: string;
+    IGST: number;
+    TDS: number;
+    TCS: number;
+    amount: number;
+    creditAmount: number;
+    reminigAmount: number;
+    product: ProductEntity;
+    paymentStatus: PaymentStatus;
+    productType: ProductType;
+    vendorId: VendorEntity;
+    clientId: ClientEntity;
+    staffId: StaffEntity;
+    paymentTo: StaffEntity;
+    assert: AssertsEntity[];
+    appointments: AppointmentEntity[];
+    workAllocation: WorkAllocationEntity[];
+    subDealer: SubDealerEntity;
+    createdAt: Date;
+    updatedAt: Date;
+    invoiceId: string;
+    estimate: EstimateEntity;
+    paidAmount: number;
+    productDetails: {
+        type?: TypeEnum;
+        productName: string;
+        quantity: number;
+        rate: number;
+        totalCost: number;
+        description?: string;
+    }[];
+    pendingInvoices: {
+        invoiceId: string;
+        paidAmount: number;
+        amount: number;
+        reminigAmount: number;
+    }[];
 }

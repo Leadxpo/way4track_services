@@ -15,13 +15,15 @@ const estimate_service_1 = require("./estimate.service");
 const estimate_repo_1 = require("./repo/estimate.repo");
 const estimate_adapter_1 = require("./estimate.adapter");
 const client_module_1 = require("../client/client.module");
+const product_module_1 = require("../product/product.module");
 let EstimateModule = class EstimateModule {
 };
 exports.EstimateModule = EstimateModule;
 exports.EstimateModule = EstimateModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([estimate_entity_1.EstimateEntity]),
-            (0, common_1.forwardRef)(() => client_module_1.ClientModule)],
+            (0, common_1.forwardRef)(() => client_module_1.ClientModule),
+            (0, common_1.forwardRef)(() => product_module_1.ProductModule)],
         controllers: [estimate_controller_1.EstimateController],
         providers: [estimate_service_1.EstimateService, estimate_repo_1.EstimateRepository, estimate_adapter_1.EstimateAdapter],
         exports: [estimate_repo_1.EstimateRepository, estimate_service_1.EstimateService]

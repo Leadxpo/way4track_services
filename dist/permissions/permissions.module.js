@@ -14,12 +14,17 @@ const permissions_controller_1 = require("./permissions.controller");
 const permissions_services_1 = require("./permissions.services");
 const permissions_repo_1 = require("./repo/permissions.repo");
 const permissions_adapter_1 = require("./permissions.adapter");
+const staff_module_1 = require("../staff/staff.module");
+const designation_module_1 = require("../designation/designation.module");
 let PermissionModule = class PermissionModule {
 };
 exports.PermissionModule = PermissionModule;
 exports.PermissionModule = PermissionModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([permissions_entity_1.PermissionEntity])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([permissions_entity_1.PermissionEntity]),
+            (0, common_1.forwardRef)(() => staff_module_1.StaffModule),
+            (0, common_1.forwardRef)(() => designation_module_1.DesignationModule),
+        ],
         controllers: [permissions_controller_1.PermissionsController],
         providers: [permissions_services_1.PermissionsService, permissions_repo_1.PermissionRepository, permissions_adapter_1.PermissionAdapter],
         exports: [permissions_repo_1.PermissionRepository, permissions_services_1.PermissionsService],

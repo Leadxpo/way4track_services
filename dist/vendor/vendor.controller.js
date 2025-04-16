@@ -19,13 +19,24 @@ const vendor_dto_1 = require("./dto/vendor.dto");
 const vendor_id_dto_1 = require("./dto/vendor-id.dto");
 const common_response_1 = require("../models/common-response");
 const platform_express_1 = require("@nestjs/platform-express");
+const common_req_1 = require("../models/common-req");
+const multer = require("multer");
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 let VendorController = class VendorController {
     constructor(vendorService) {
         this.vendorService = vendorService;
     }
-    async handleVendorDetails(dto) {
+    async handleVendorDetails(dto, photo) {
         try {
-            return await this.vendorService.handleVendorDetails(dto);
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
+            return await this.vendorService.handleVendorDetails(dto, photo);
         }
         catch (error) {
             console.error('Error in save vendor details:', error);
@@ -39,6 +50,15 @@ let VendorController = class VendorController {
         catch (error) {
             console.error('Error in delete vendor details:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+    async getVendorDetailsById(req) {
+        try {
+            return await this.vendorService.getVendorDetailsById(req);
+        }
+        catch (error) {
+            console.error('Error in get vendor details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching vendor details');
         }
     }
     async getVendorDetails(req) {
@@ -58,22 +78,15 @@ let VendorController = class VendorController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching branch type details');
         }
     }
-    async uploadPhoto(vendorId, photo) {
-        try {
-            return await this.vendorService.uploadVendorPhoto(vendorId, photo);
-        }
-        catch (error) {
-            console.error('Error uploading vendor photo:', error);
-            return new common_response_1.CommonResponse(false, 500, 'Error uploading photo');
-        }
-    }
 };
 exports.VendorController = VendorController;
 __decorate([
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo', multerOptions)),
     (0, common_1.Post)('handleVendorDetails'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [vendor_dto_1.VendorDto]),
+    __metadata("design:paramtypes", [vendor_dto_1.VendorDto, Object]),
     __metadata("design:returntype", Promise)
 ], VendorController.prototype, "handleVendorDetails", null);
 __decorate([
@@ -84,10 +97,17 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], VendorController.prototype, "deleteVendorDetails", null);
 __decorate([
-    (0, common_1.Post)('getVendorDetails'),
+    (0, common_1.Post)('getVendorDetailsById'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [vendor_id_dto_1.VendorIdDto]),
+    __metadata("design:returntype", Promise)
+], VendorController.prototype, "getVendorDetailsById", null);
+__decorate([
+    (0, common_1.Post)('getVendorDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
     __metadata("design:returntype", Promise)
 ], VendorController.prototype, "getVendorDetails", null);
 __decorate([
@@ -96,15 +116,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], VendorController.prototype, "getVendorNamesDropDown", null);
-__decorate([
-    (0, common_1.Post)('uploadPhoto'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('photo')),
-    __param(0, (0, common_1.Body)('vendorId')),
-    __param(1, (0, common_1.UploadedFile)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], VendorController.prototype, "uploadPhoto", null);
 exports.VendorController = VendorController = __decorate([
     (0, common_1.Controller)('vendor'),
     __metadata("design:paramtypes", [vendor_service_1.VendorService])

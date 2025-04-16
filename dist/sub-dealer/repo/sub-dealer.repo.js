@@ -13,8 +13,6 @@ exports.SubDealerRepository = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const sub_dealer_entity_1 = require("../entity/sub-dealer.entity");
-const voucher_entity_1 = require("../../voucher/entity/voucher.entity");
-const staff_entity_1 = require("../../staff/entity/staff.entity");
 let SubDealerRepository = class SubDealerRepository extends typeorm_1.Repository {
     constructor(dataSource) {
         super(sub_dealer_entity_1.SubDealerEntity, dataSource.createEntityManager());
@@ -31,7 +29,7 @@ let SubDealerRepository = class SubDealerRepository extends typeorm_1.Repository
             'vr.amount AS amount',
             'vr.voucher_id as voucherId',
         ])
-            .leftJoin(voucher_entity_1.VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
+            .leftJoin('sb.voucherId', 'vr')
             .where(`sb.company_code = "${req.companyCode}"`)
             .andWhere(`sb.unit_code = "${req.unitCode}"`);
         if (req.fromDate) {
@@ -55,6 +53,7 @@ let SubDealerRepository = class SubDealerRepository extends typeorm_1.Repository
             'sb.starting_date AS joiningDate',
             'vr.payment_status AS paymentStatus',
             'vr.amount AS amount',
+            'vr.quantity as quantity',
             'vr.voucher_id AS voucherId',
             'sb.email AS email',
             'sb.address AS address',
@@ -62,7 +61,7 @@ let SubDealerRepository = class SubDealerRepository extends typeorm_1.Repository
             'vr.generation_date AS generationDate',
             'vr.product_type AS productType',
         ])
-            .leftJoin(voucher_entity_1.VoucherEntity, 'vr', 'vr.id = sb.voucher_id')
+            .leftJoin('sb.voucherId', 'vr')
             .where(`sb.sub_dealer_id='${req.subDealerId}'`)
             .andWhere(`sb.company_code = "${req.companyCode}"`)
             .andWhere(`sb.unit_code = "${req.unitCode}"`)
@@ -74,12 +73,14 @@ let SubDealerRepository = class SubDealerRepository extends typeorm_1.Repository
         const query = this.createQueryBuilder('sf')
             .select(`
                 sf.sub_dealer_id AS staffId,
-                sf.password AS staffPassword
+                sf.password AS staffPassword,
+                sf.name as staffName,
+                pa.permissions AS staffPermissions
             `)
-            .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword AND sf.designation = :designation`, {
+            .leftJoin('sf.permissions', 'pa')
+            .where(`sf.sub_dealer_id = :staffId AND sf.password = :staffPassword`, {
             staffId: req.staffId,
-            staffPassword: req.password,
-            designation: staff_entity_1.DesignationEnum.SubDealer
+            staffPassword: req.password
         })
             .andWhere(`sf.company_code = :companyCode AND sf.unit_code = :unitCode`, {
             companyCode: req.companyCode,

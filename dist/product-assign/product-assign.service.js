@@ -11,42 +11,253 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductAssignService = void 0;
 const common_1 = require("@nestjs/common");
+const branch_entity_1 = require("../branch/entity/branch.entity");
+const branch_repo_1 = require("../branch/repo/branch.repo");
 const common_response_1 = require("../models/common-response");
+const error_response_1 = require("../models/error-response");
+const product_entity_1 = require("../product/entity/product.entity");
+const staff_entity_1 = require("../staff/entity/staff.entity");
+const typeorm_1 = require("typeorm");
 const product_assign_adapter_1 = require("./product-assign.adapter");
 const product_assign_repo_1 = require("./repo/product-assign.repo");
-const error_response_1 = require("../models/error-response");
-const product_assign_res_dto_1 = require("./dto/product-assign-res.dto");
-const path_1 = require("path");
-const fs_1 = require("fs");
+const storage_1 = require("@google-cloud/storage");
+const sub_dealer_repo_1 = require("../sub-dealer/repo/sub-dealer.repo");
+const sub_dealer_entity_1 = require("../sub-dealer/entity/sub-dealer.entity");
 let ProductAssignService = class ProductAssignService {
-    constructor(productAssignRepository, productAssignAdapter) {
+    constructor(productAssignRepository, productAssignAdapter, branchRepo, dataSource, subRepo) {
         this.productAssignRepository = productAssignRepository;
         this.productAssignAdapter = productAssignAdapter;
+        this.branchRepo = branchRepo;
+        this.dataSource = dataSource;
+        this.subRepo = subRepo;
+        this.storage = new storage_1.Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
-    async saveProductAssign(dto) {
+    async assignProductsByImei(imeiNumberFrom, imeiNumberTo, branchId, staffId, numberOfProducts, simNumberFrom, simNumberTo, subDealerId) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.startTransaction();
         try {
-            const internalMessage = dto.id
-                ? 'Product assignment updated successfully'
-                : 'Product assignment created successfully';
-            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
-            await this.productAssignRepository.save(entity);
-            return new common_response_1.CommonResponse(true, 200, internalMessage);
+            let status = "not_assigned";
+            let location = "warehouse";
+            if (branchId) {
+                const branch = await queryRunner.manager.findOne(branch_entity_1.BranchEntity, { where: { id: branchId } });
+                if (branch) {
+                    location = branch.branchName;
+                    status = "isAssign";
+                }
+            }
+            else if (staffId) {
+                const staff = await queryRunner.manager.findOne(staff_entity_1.StaffEntity, { where: { id: staffId } });
+                if (staff) {
+                    location = staff.name;
+                    status = "inHand";
+                }
+                else if (subDealerId) {
+                    const sub = await queryRunner.manager.findOne(sub_dealer_entity_1.SubDealerEntity, { where: { id: subDealerId } });
+                    if (sub) {
+                        location = sub.subDealerId;
+                        status = 'isAssign';
+                    }
+                }
+            }
+            let imeiUpdateResult, simUpdateResult;
+            if (imeiNumberFrom) {
+                const imeiFrom = parseInt(imeiNumberFrom, 10);
+                const imeiTo = imeiNumberTo ? parseInt(imeiNumberTo, 10) : imeiFrom;
+                if (isNaN(imeiFrom) || isNaN(imeiTo) || imeiFrom > imeiTo) {
+                    throw new Error(`Invalid IMEI range: ${imeiNumberFrom} - ${imeiNumberTo}`);
+                }
+                imeiUpdateResult = await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(product_entity_1.ProductEntity)
+                    .set({ status, location })
+                    .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                    .execute();
+            }
+            if (simNumberFrom) {
+                const simFrom = parseInt(simNumberFrom, 10);
+                const simTo = simNumberTo ? parseInt(simNumberTo, 10) : simFrom;
+                if (isNaN(simFrom) || isNaN(simTo) || simFrom > simTo) {
+                    throw new Error(`Invalid SIM range: ${simNumberFrom} - ${simNumberTo}`);
+                }
+                simUpdateResult = await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(product_entity_1.ProductEntity)
+                    .set({ status, location })
+                    .where("CAST(sim_no AS UNSIGNED) BETWEEN :simFrom AND :simTo", { simFrom, simTo })
+                    .execute();
+            }
+            await queryRunner.commitTransaction();
+            const updatedCount = (imeiUpdateResult?.affected || 0) + (simUpdateResult?.affected || 0);
+            console.log(`✅ Assigned ${updatedCount} product(s) successfully.`);
         }
         catch (error) {
-            throw new error_response_1.ErrorResponse(500, error.message);
+            await queryRunner.rollbackTransaction();
+            console.error("❌ Error assigning products:", error);
+            throw new Error(`Failed to assign products: ${error.message}`);
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async saveProductAssign(dto, photoPath) {
+        try {
+            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
+            if (photoPath) {
+                entity.productAssignPhoto = photoPath;
+            }
+            console.log(entity, "??????????????");
+            await this.productAssignRepository.insert(entity);
+            await this.assignProductsByImei(dto.imeiNumberFrom, dto.imeiNumberTo, dto.branchId, dto.staffId, dto.numberOfProducts, dto.simNumberFrom, dto.simNumberTo);
+            return new common_response_1.CommonResponse(true, 201, 'Product details created successfully');
+        }
+        catch (error) {
+            console.error(`Error creating Product details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to create Product details: ${error.message}`);
+        }
+    }
+    async updateProductAssign(dto, photoPath) {
+        try {
+            const existingProduct = await this.productAssignRepository.findOne({ where: { id: dto.id } });
+            if (!existingProduct) {
+                throw new Error('Product not found');
+            }
+            if (photoPath && existingProduct.productAssignPhoto) {
+                const existingFilePath = existingProduct.productAssignPhoto.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                }
+                catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
+            const entity = this.productAssignAdapter.convertDtoToEntity(dto);
+            const updatedProduct = {
+                ...existingProduct,
+                ...entity,
+                productAssignPhoto: photoPath || existingProduct.productAssignPhoto,
+            };
+            const imeiFrom = parseInt(dto.imeiNumberFrom, 10);
+            const imeiTo = parseInt(dto.imeiNumberTo, 10) || imeiFrom;
+            const queryRunner = this.dataSource.createQueryRunner();
+            await queryRunner.startTransaction();
+            try {
+                let status = "not_assigned";
+                let location = "warehouse";
+                if (dto.branchId) {
+                    const branch = await queryRunner.manager.findOne(branch_entity_1.BranchEntity, { where: { id: dto.branchId } });
+                    if (branch) {
+                        location = branch.branchName;
+                        status = "isAssign";
+                    }
+                }
+                else if (dto.staffId) {
+                    const staff = await queryRunner.manager.findOne(staff_entity_1.StaffEntity, { where: { id: dto.staffId } });
+                    if (staff) {
+                        location = staff.name;
+                        status = "inHand";
+                    }
+                }
+                else if (dto.subDealerId) {
+                    const sub = await queryRunner.manager.findOne(sub_dealer_entity_1.SubDealerEntity, { where: { id: dto.subDealerId } });
+                    if (sub) {
+                        location = sub.subDealerId;
+                        status = "isAssign";
+                    }
+                }
+                await queryRunner.manager
+                    .createQueryBuilder()
+                    .update(product_entity_1.ProductEntity)
+                    .set({ status, location })
+                    .where("CAST(imei_number AS UNSIGNED) BETWEEN :imeiFrom AND :imeiTo", { imeiFrom, imeiTo })
+                    .execute();
+                if (dto.simNumberFrom) {
+                    const simFrom = parseInt(dto.simNumberFrom, 10);
+                    const simTo = dto.simNumberTo ? parseInt(dto.simNumberTo, 10) : simFrom;
+                    await queryRunner.manager
+                        .createQueryBuilder()
+                        .update(product_entity_1.ProductEntity)
+                        .set({ status, location })
+                        .where("CAST(sim_no AS UNSIGNED) BETWEEN :simFrom AND :simTo", { simFrom, simTo })
+                        .execute();
+                }
+                await this.productAssignRepository.save(updatedProduct);
+                await queryRunner.commitTransaction();
+                console.log(`✅ Product assignment updated successfully.`);
+                return new common_response_1.CommonResponse(true, 200, 'Product details updated successfully');
+            }
+            catch (error) {
+                await queryRunner.rollbackTransaction();
+                console.error("❌ Error updating product assignment:", error);
+                throw new Error(`Failed to update Product assignment: ${error.message}`);
+            }
+            finally {
+                await queryRunner.release();
+            }
+        }
+        catch (error) {
+            console.error(`❌ Error updating Product details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to update Product details: ${error.message}`);
+        }
+    }
+    async handleProductDetails(dto, photo) {
+        try {
+            let photoPath = null;
+            if (photo) {
+                const bucket = this.storage.bucket(this.bucketName);
+                const uniqueFileName = `productAssign_photos/${Date.now()}-${photo.originalname}`;
+                const file = bucket.file(uniqueFileName);
+                await file.save(photo.buffer, {
+                    contentType: photo.mimetype,
+                    resumable: false,
+                });
+                console.log(`File uploaded to GCS: ${uniqueFileName}`);
+                photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+            }
+            if (dto.id) {
+                console.log(dto, "<<<<");
+                return await this.updateProductAssign(dto, photoPath);
+            }
+            else {
+                return await this.saveProductAssign(dto, photoPath);
+            }
+        }
+        catch (error) {
+            console.error(`Error handling Product details: ${error.message}`, error.stack);
+            throw new error_response_1.ErrorResponse(500, `Failed to handle Product details: ${error.message}`);
         }
     }
     async getProductAssign(dto) {
         try {
             const productAssign = await this.productAssignRepository.findOne({
                 where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode },
-                relations: ['branchId', 'staffId', 'productId'],
+                relations: ['branchId', 'staffId', 'productId', 'requestId'],
             });
             if (!productAssign) {
                 throw new Error('Product assignment not found');
             }
-            const responseDto = new product_assign_res_dto_1.ProductAssignResDto(productAssign.id, productAssign.staffId.id.toString(), productAssign.staffId.name, productAssign.branchId.id, productAssign.branchId.branchName, productAssign.productId.productName, productAssign.productId.categoryName, productAssign.imeiNumberFrom, productAssign.imeiNumberTo, productAssign.numberOfProducts, productAssign.productAssignPhoto, productAssign.companyCode, productAssign.unitCode);
-            return new common_response_1.CommonResponse(true, 200, 'Product assignment fetched successfully', responseDto);
+            return new common_response_1.CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
+        }
+        catch (error) {
+            throw new error_response_1.ErrorResponse(500, error.message);
+        }
+    }
+    async getAllProductAssign(dto) {
+        try {
+            const productAssign = await this.productAssignRepository.find({
+                where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
+                relations: ['branchId', 'staffId', 'productId', 'requestId'],
+            });
+            if (!productAssign) {
+                throw new Error('Product assignment not found');
+            }
+            return new common_response_1.CommonResponse(true, 200, 'Product assignment fetched successfully', productAssign);
         }
         catch (error) {
             throw new error_response_1.ErrorResponse(500, error.message);
@@ -66,57 +277,14 @@ let ProductAssignService = class ProductAssignService {
             throw new Error('Error deleting product assignment');
         }
     }
-    async assignProduct(assignData) {
-        const { productId, staffId, assignedQty, productType, assignTo, companyCode, unitCode } = assignData;
-        const productAssign = await this.productAssignRepository.findOne({ where: { productId } });
-        if (!productAssign) {
-            throw new Error('Product assignment not found');
-        }
-        if (productAssign.numberOfProducts < assignedQty) {
-            throw new Error('Not enough products to assign');
-        }
-        productAssign.isAssign = true;
-        productAssign.assignedQty = assignedQty;
-        productAssign.companyCode = companyCode;
-        productAssign.unitCode = unitCode;
-        productAssign.assignTime = new Date();
-        productAssign.assignTo = assignTo;
-        productAssign.productType = productType;
-        productAssign.inHands = false;
-        productAssign.numberOfProducts -= assignedQty;
-        await this.productAssignRepository.save(productAssign);
-        return productAssign;
-    }
-    async markInHands(productAssignId, companyCode, unitCode) {
-        const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId, companyCode: companyCode, unitCode: unitCode } });
-        if (!productAssign) {
-            throw new Error('Product assignment not found');
-        }
-        productAssign.inHands = true;
-        await this.productAssignRepository.save(productAssign);
-        return productAssign;
-    }
-    async uploadproductAssignPhoto(productAssignId, photo) {
-        try {
-            const productAssign = await this.productAssignRepository.findOne({ where: { id: productAssignId } });
-            if (!productAssign) {
-                return new common_response_1.CommonResponse(false, 404, 'productAssign not found');
-            }
-            const filePath = (0, path_1.join)(__dirname, '../../uploads/productAssign_photos', `${productAssignId}-${Date.now()}.jpg`);
-            await fs_1.promises.writeFile(filePath, photo.buffer);
-            productAssign.productAssignPhoto = filePath;
-            await this.productAssignRepository.save(productAssign);
-            return new common_response_1.CommonResponse(true, 200, 'Photo uploaded successfully', { photoPath: filePath });
-        }
-        catch (error) {
-            throw new error_response_1.ErrorResponse(500, error.message);
-        }
-    }
 };
 exports.ProductAssignService = ProductAssignService;
 exports.ProductAssignService = ProductAssignService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [product_assign_repo_1.ProductAssignRepository,
-        product_assign_adapter_1.ProductAssignAdapter])
+        product_assign_adapter_1.ProductAssignAdapter,
+        branch_repo_1.BranchRepository,
+        typeorm_1.DataSource,
+        sub_dealer_repo_1.SubDealerRepository])
 ], ProductAssignService);
 //# sourceMappingURL=product-assign.service.js.map

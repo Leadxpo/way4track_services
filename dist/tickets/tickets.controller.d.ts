@@ -7,6 +7,13 @@ export declare class TicketsController {
     constructor(ticketsService: TicketsService);
     handleTicketDetails(dto: TicketsDto): Promise<CommonResponse>;
     deleteTicketDetails(dto: TicketsIdDto): Promise<CommonResponse>;
+    getTotalPendingAndSucessTickets(req: {
+        companyCode?: string;
+        unitCode?: string;
+        staffId: string;
+        date: string;
+        subDealerId?: string;
+    }): Promise<CommonResponse>;
     getTicketDetailsById(dto: TicketsIdDto): Promise<CommonResponse>;
     getTicketDetails(req: {
         ticketNumber?: string;
@@ -14,5 +21,6 @@ export declare class TicketsController {
         staffName?: string;
         companyCode?: string;
         unitCode?: string;
+        subDealerId?: string;
     }): Promise<CommonResponse>;
 }

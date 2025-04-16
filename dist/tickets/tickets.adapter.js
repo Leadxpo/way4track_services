@@ -12,6 +12,8 @@ const tickets_entity_1 = require("./entity/tickets.entity");
 const staff_entity_1 = require("../staff/entity/staff.entity");
 const branch_entity_1 = require("../branch/entity/branch.entity");
 const get_tickets_res_dto_1 = require("./dto/get-tickets-res.dto");
+const sub_dealer_entity_1 = require("../sub-dealer/entity/sub-dealer.entity");
+const designation_entity_1 = require("../designation/entity/designation.entity");
 let TicketsAdapter = class TicketsAdapter {
     convertDtoToEntity(dto) {
         const entity = new tickets_entity_1.TicketsEntity();
@@ -21,16 +23,29 @@ let TicketsAdapter = class TicketsAdapter {
         const staff = new staff_entity_1.StaffEntity();
         staff.id = dto.staffId;
         entity.staff = staff;
+        if (dto.subDealerId) {
+            const sub = new sub_dealer_entity_1.SubDealerEntity();
+            sub.id = dto.subDealerId;
+            entity.subDealerId = sub;
+        }
         const branch = new branch_entity_1.BranchEntity();
         branch.id = dto.branchId;
         entity.branch = branch;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
+        entity.workStatus = dto.workStatus;
+        entity.description = dto.description;
+        if (dto.id) {
+            entity.id = dto.id;
+        }
+        const des = new designation_entity_1.DesignationEntity();
+        des.id = dto.designationRelation;
+        entity.designationRelation = des;
         return entity;
     }
     convertEntityToDto(entities) {
         return entities.map((entity) => {
-            return new get_tickets_res_dto_1.GetTicketsResDto(entity.staff?.id || 0, entity.staff?.name || '', entity.staff?.phoneNumber || '', entity.problem, entity.date, entity.branch?.id || 0, entity.branch?.branchName || '', entity.ticketNumber, entity.addressingDepartment, entity.companyCode, entity.unitCode);
+            return new get_tickets_res_dto_1.GetTicketsResDto(entity.staff?.id || null, entity.staff?.name || '', entity.staff?.phoneNumber || '', entity.problem, entity.date, entity.branch?.id || 0, entity.branch?.branchName || '', entity.ticketNumber, entity.addressingDepartment, entity.companyCode, entity.unitCode, entity.workStatus, entity.description);
         });
     }
 };

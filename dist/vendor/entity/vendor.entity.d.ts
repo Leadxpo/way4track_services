@@ -1,5 +1,10 @@
+import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
+import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 export declare class VendorEntity {
     id: number;
     name: string;
@@ -13,7 +18,15 @@ export declare class VendorEntity {
     aadharNumber: string;
     address: string;
     product: ProductEntity[];
-    voucherId: VoucherEntity;
+    technician: TechnicianWorksEntity[];
+    workAllocation: WorkAllocationEntity[];
+    voucherId: VoucherEntity[];
+    ledger: LedgerEntity[];
+    estimate: EstimateEntity[];
+    branch: BranchEntity;
     companyCode: string;
     unitCode: string;
+    GSTNumber: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

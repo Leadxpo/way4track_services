@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SubDealerResDto = void 0;
 class SubDealerResDto {
-    constructor(id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, voucherId, voucherNames, password, subDealerPhoto, subDealerId, companyCode, unitCode) {
+    constructor(id, name, subDealerPhoneNumber, alternatePhoneNumber, startingDate, emailId, aadharNumber, address, password, subDealerPhoto, subDealerId, companyCode, unitCode, branchId, branchName) {
         this.id = id;
         this.name = name;
         this.subDealerPhoneNumber = subDealerPhoneNumber;
@@ -11,13 +11,13 @@ class SubDealerResDto {
         this.emailId = emailId;
         this.aadharNumber = aadharNumber;
         this.address = address;
-        this.voucherId = voucherId;
-        this.voucherNames = voucherNames;
+        this.password = password;
         this.subDealerPhoto = subDealerPhoto;
         this.subDealerId = subDealerId;
         this.companyCode = companyCode;
         this.unitCode = unitCode;
-        this.password = password;
+        this.branchId = branchId;
+        this.branchName = branchName;
     }
 }
 exports.SubDealerResDto = SubDealerResDto;

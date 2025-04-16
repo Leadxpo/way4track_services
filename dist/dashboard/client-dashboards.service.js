@@ -35,6 +35,15 @@ let ClientDashboardService = class ClientDashboardService {
             return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", clientData);
         }
     }
+    async getSearchDetailClient(req) {
+        const clientData = await this.clientRepository.getSearchDetailClient(req);
+        if (!clientData) {
+            return new common_response_1.CommonResponse(false, 56416, "Data Not Found With Given Input", []);
+        }
+        else {
+            return new common_response_1.CommonResponse(true, 200, "Data retrieved successfully", clientData);
+        }
+    }
 };
 exports.ClientDashboardService = ClientDashboardService;
 exports.ClientDashboardService = ClientDashboardService = __decorate([

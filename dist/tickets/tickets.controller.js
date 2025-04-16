@@ -24,6 +24,9 @@ let TicketsController = class TicketsController {
     }
     async handleTicketDetails(dto) {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.ticketsService.handleTicketDetails(dto);
         }
         catch (error) {
@@ -38,6 +41,15 @@ let TicketsController = class TicketsController {
         catch (error) {
             console.error('Error in delete ticket details in service:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error deleting ticket details');
+        }
+    }
+    async getTotalPendingAndSucessTickets(req) {
+        try {
+            return this.ticketsService.getTotalPendingAndSucessTickets(req);
+        }
+        catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
         }
     }
     async getTicketDetailsById(dto) {
@@ -74,6 +86,13 @@ __decorate([
     __metadata("design:paramtypes", [tickets_id_dto_1.TicketsIdDto]),
     __metadata("design:returntype", Promise)
 ], TicketsController.prototype, "deleteTicketDetails", null);
+__decorate([
+    (0, common_1.Post)('getTotalPendingAndSucessTickets'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], TicketsController.prototype, "getTotalPendingAndSucessTickets", null);
 __decorate([
     (0, common_1.Post)('getTicketDetailsById'),
     __param(0, (0, common_1.Body)()),

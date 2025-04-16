@@ -1,17 +1,23 @@
-import { ClientStatusEnum } from "../enum/client-status.enum";
+import { ClientStatus } from "../enum/client-status.enum";
 export declare class ClientDto {
-    id: number;
+    id?: number;
     name: string;
-    branchId: number;
+    branch: number;
     phoneNumber: string;
-    dob: Date;
+    dob: string;
     email: string;
     address: string;
-    status: ClientStatusEnum;
     joiningDate: Date;
-    amount: number;
     clientPhoto?: string;
+    clientId?: string;
     voucherId?: number;
     companyCode: string;
     unitCode: string;
+    hsnCode: string;
+    SACCode: string;
+    tds: boolean;
+    tcs: boolean;
+    billWiseDate: boolean;
+    status: ClientStatus;
+    branchName?: string;
 }

@@ -36,7 +36,7 @@ export class TicketsService {
             console.error(`Error updating ticket details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update ticket details: ${error.message}`);
         }
-    }
+    }      
 
     async createTicketDetails(dto: TicketsDto): Promise<CommonResponse> {
         try {
@@ -44,9 +44,18 @@ export class TicketsService {
 
 
             const newTicket = this.ticketsAdapter.convertDtoToEntity(dto);
+            const lastTicket = await this.ticketsRepository
+            .createQueryBuilder("ticket")
+            .select("MAX(ticket.ticket_number)", "max")
+            .getRawOne();
+          
+          const nextId = (lastTicket.max ?? 0) + 1;
+          newTicket.ticketNumber = `Tickets-${nextId.toString().padStart(5, '0')}`;
+          
+
+            // newTicket.ticketNumber = `Tickets-${(await this.ticketsRepository.count() + 1).toString().padStart(5, '0')}`;
 
 
-            newTicket.ticketNumber = `Tickets-${(await this.ticketsRepository.count() + 1).toString().padStart(5, '0')}`;
             console.log('New Ticket Data:', newTicket);
             await this.ticketsRepository.insert(newTicket); // 
 

@@ -18,12 +18,16 @@ const common_response_1 = require("../models/common-response");
 const request_raise_id_dto_1 = require("./dto/request-raise-id.dto");
 const request_raise_dto_1 = require("./dto/request-raise.dto");
 const request_raise_service_1 = require("./request-raise.service");
+const common_req_1 = require("../models/common-req");
 let RequestRaiseController = class RequestRaiseController {
     constructor(requestService) {
         this.requestService = requestService;
     }
     async handleRequestDetails(dto) {
         try {
+            if (dto.id) {
+                dto.id = Number(dto.id);
+            }
             return await this.requestService.handleRequestDetails(dto);
         }
         catch (error) {
@@ -49,6 +53,15 @@ let RequestRaiseController = class RequestRaiseController {
             return new common_response_1.CommonResponse(false, 500, 'Error fetching request details');
         }
     }
+    async getAllRequestDetails(dto) {
+        try {
+            return await this.requestService.getAllRequestDetails(dto);
+        }
+        catch (error) {
+            console.error('Error in get request details in service:', error);
+            return new common_response_1.CommonResponse(false, 500, 'Error fetching request details');
+        }
+    }
     async getRequestsDropDown() {
         try {
             return this.requestService.getRequestsDropDown();
@@ -64,6 +77,15 @@ let RequestRaiseController = class RequestRaiseController {
         catch (error) {
             console.error('Error in delete vendor details:', error);
             return new common_response_1.CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+    async getRequestBranchWise(req) {
+        try {
+            return await this.requestService.getRequestBranchWise(req);
+        }
+        catch (error) {
+            console.error('Error in getTodayRequestBranchWise:', error);
+            return new common_response_1.CommonResponse(false, 500, "Error fetching today's requests");
         }
     }
 };
@@ -90,6 +112,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RequestRaiseController.prototype, "getRequestDetails", null);
 __decorate([
+    (0, common_1.Post)('getAllRequestDetails'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [common_req_1.CommonReq]),
+    __metadata("design:returntype", Promise)
+], RequestRaiseController.prototype, "getAllRequestDetails", null);
+__decorate([
     (0, common_1.Post)('getRequestsDropDown'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -102,6 +131,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], RequestRaiseController.prototype, "getRequests", null);
+__decorate([
+    (0, common_1.Post)('getRequestBranchWise'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], RequestRaiseController.prototype, "getRequestBranchWise", null);
 exports.RequestRaiseController = RequestRaiseController = __decorate([
     (0, common_1.Controller)('requests'),
     __metadata("design:paramtypes", [request_raise_service_1.RequestRaiseService])
