@@ -69,6 +69,13 @@ import { ServiceTypeEntity } from './service-type/entity/service.entity';
 import { ServiceTypeModule } from './service-type/service.module';
 import { SubDealerStaffModule } from './sub-dealer-staff/sub-dealer-staff.module';
 import { SubDelaerStaffEntity } from './sub-dealer-staff/entity/sub-dealer-staff.entity';
+import { WebsiteProductModule } from './website-product/website_product.module';
+import { WebsiteProductService } from './website-product/website-product.service';
+import { ApplicationModule } from './application/application.module';
+import { AmenitiesModule } from './amenities/amenities.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { PromotionalModule } from './promotional/promotional.module';
+
 
 @Module({
   imports: [
@@ -78,7 +85,7 @@ import { SubDelaerStaffEntity } from './sub-dealer-staff/entity/sub-dealer-staff
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'localdb',
+      database: 'way4',
       entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity],
       synchronize: true,
       logging: true,
@@ -119,10 +126,15 @@ import { SubDelaerStaffEntity } from './sub-dealer-staff/entity/sub-dealer-staff
     VehicleTypeModule,
     ServiceTypeModule,
     SubDealerStaffModule,
+    WebsiteProductModule,
+    ApplicationModule,
+    AmenitiesModule,
+    ReviewsModule,
+    PromotionalModule,
 
   ],
   controllers: [],
-  providers: [],
+  providers: [WebsiteProductService],
 })
 export class AppModule { }
 
