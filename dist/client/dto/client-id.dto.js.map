@@ -1,1 +1,0 @@
-{"version":3,"file":"client-id.dto.js","sourceRoot":"","sources":["../../../src/client/dto/client-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,WAAW;IAIpB,YAAY,EAAU,EAAE,WAAmB,EACvC,QAAgB;QAChB,IAAI,CAAC,EAAE,GAAG,EAAE,CAAC;QACb,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC5B,CAAC;CACJ;AAVD,kCAUC"}

@@ -73,7 +73,6 @@ import { WebsiteProductModule } from './website-product/website_product.module';
 import { WebsiteProductService } from './website-product/website-product.service';
 import { ApplicationModule } from './application/application.module';
 import { AmenitiesModule } from './amenities/amenities.module';
-import { PromotionalModule } from './promotional/promotional.module';
 import { WebsiteProductEntity } from './website-product/entity/website-entity';
 import { DeviceEntity } from './devices/entity/devices-entity';
 import { DevicesModule } from './devices/devices.module';
@@ -81,6 +80,7 @@ import { ApplicationEntity } from './application/entity/application-entity';
 import { AmenitiesEntity } from './amenities/entity/amenities-entity';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ReviewEntity } from './reviews/entity/reviews-entity';
+import { PromotionalModule } from './promotional/promotional.module';
 
 
 @Module({

@@ -1,1 +1,0 @@
-{"version":3,"file":"product-assign-id.dto.js","sourceRoot":"","sources":["../../../src/product-assign/dto/product-assign-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,kBAAkB;IAI3B,YAAY,EAAU,EAAE,WAAmB,EACvC,QAAgB;QAChB,IAAI,CAAC,EAAE,GAAG,EAAE,CAAA;QACZ,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC5B,CAAC;CACJ;AAVD,gDAUC"}

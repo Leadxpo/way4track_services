@@ -1,1 +1,0 @@
-{"version":3,"file":"sub-dealer-id.dto.js","sourceRoot":"","sources":["../../../src/sub-dealer/dto/sub-dealer-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,cAAc;IAIzB,YAAY,WAAmB,EAAE,WAAoB,EACnD,QAAiB;QACjB,IAAI,CAAC,WAAW,GAAG,WAAW,CAAC;QAC/B,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC1B,CAAC;CACF;AAVD,wCAUC"}

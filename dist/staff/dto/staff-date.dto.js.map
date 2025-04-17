@@ -1,1 +1,0 @@
-{"version":3,"file":"staff-date.dto.js","sourceRoot":"","sources":["../../../src/staff/dto/staff-date.dto.ts"],"names":[],"mappings":";;;AAEA,MAAa,uBAAuB;IAKhC,YAAY,IAAY,EAAE,OAAe,EAAE,WAAoB,EAC3D,QAAiB;QACjB,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAA;QACtB,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC5B,CAAC;CACJ;AAZD,0DAYC"}
