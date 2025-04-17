@@ -145,7 +145,7 @@ export class SubDealerService {
       }
       const resDto = this.subDealerAdapter.convertEntityToDto(subDealer);
 
-      return new CommonResponse(true, 200, 'SubDealer details fetched successfully', resDto);
+      return new CommonResponse(true, 200, 'SubDealer details fetched successfully', subDealer);
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
