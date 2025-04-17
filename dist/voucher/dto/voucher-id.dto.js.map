@@ -1,1 +1,0 @@
-{"version":3,"file":"voucher-id.dto.js","sourceRoot":"","sources":["../../../src/voucher/dto/voucher-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,YAAY;IAIrB,YAAY,SAAiB,EAAE,WAAoB,EAC/C,QAAiB;QACjB,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;IAC5B,CAAC;CACJ;AAVD,oCAUC"}
