@@ -1,1 +1,0 @@
-{"version":3,"file":"staff-id.dto.js","sourceRoot":"","sources":["../../../src/staff/dto/staff-id.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,UAAU;IAKnB,YAAY,OAAe,EAAE,WAAoB,EAC7C,EAAW,EACX,QAAiB;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC;QACvB,IAAI,CAAC,WAAW,GAAG,WAAW,CAAA;QAC9B,IAAI,CAAC,QAAQ,GAAG,QAAQ,CAAA;QACxB,IAAI,CAAC,EAAE,GAAG,EAAE,CAAA;IAChB,CAAC;CACJ;AAbD,gCAaC"}
