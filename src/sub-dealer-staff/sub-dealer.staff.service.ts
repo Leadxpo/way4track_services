@@ -129,8 +129,8 @@ export class SubDealerStaffService {
                 return new CommonResponse(false, 404, 'SubDealerStaff not found');
             }
             else {
-                const data = this.adapter.toResponseDtoList(SubDealerStaff)
-                return new CommonResponse(true, 200, 'SubDealerStaff details fetched successfully', data);
+                // const data = this.adapter.toResponseDtoList(SubDealerStaff)
+                return new CommonResponse(true, 200, 'SubDealerStaff details fetched successfully', SubDealerStaff);
             }
         } catch (error) {
             throw new ErrorResponse(500, error.message);
