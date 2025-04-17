@@ -31,8 +31,8 @@ let ProductRepository = class ProductRepository extends typeorm_1.Repository {
             `SUM(CASE WHEN pr.status = 'inHand' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS inHandStock`,
         ])
             .leftJoin(product_type_entity_1.ProductTypeEntity, 'pt', 'pt.id = pr.product_type_id')
-            .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode });
+            .where('pt.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
         if (req.productName) {
             query.andWhere('pt.name LIKE :productName', { productName: `%${req.productName}%` });
         }
@@ -80,7 +80,7 @@ let ProductRepository = class ProductRepository extends typeorm_1.Repository {
             'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
             'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
             'pa.product_status AS productStatus',
-            'pa.assign_time AS assignTime'
+            'MAX(pa.assign_time) AS assignTime'
         ])
             .leftJoin(branch_entity_1.BranchEntity, 'br', 'br.id = pa.branch_id')
             .where('pa.company_code = :companyCode', { companyCode })
@@ -92,9 +92,7 @@ let ProductRepository = class ProductRepository extends typeorm_1.Repository {
         if (toDate)
             detailedBranchAssignQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
         const rawBranchResults = await detailedBranchAssignQuery
-            .groupBy('pa.imei_number')
-            .addGroupBy('br.name')
-            .addGroupBy('sf.name')
+            .groupBy('br.name')
             .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .orderBy('br.name', 'ASC')
@@ -123,7 +121,7 @@ let ProductRepository = class ProductRepository extends typeorm_1.Repository {
             'pa.product_name AS productName',
             'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
             'pa.product_status AS productStatus',
-            'pa.assign_time AS assignTime'
+            'MAX(pa.assign_time) AS assignTime'
         ])
             .leftJoin(sub_dealer_entity_1.SubDealerEntity, 'sb', 'sb.id = pa.sub_dealer_id')
             .where('pa.company_code = :companyCode', { companyCode })
@@ -161,13 +159,13 @@ let ProductRepository = class ProductRepository extends typeorm_1.Repository {
             'pa.product_name AS productName',
             'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
             'pa.product_status AS productStatus',
-            'pa.assign_time AS assignTime'
+            'MAX(pa.assign_time) AS assignTime'
         ])
             .leftJoin(staff_entity_1.StaffEntity, 'sf', 'sf.id = pa.staff_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
         if (staffId)
-            detailedStaffQuery.andWhere('sf.id = :staffId', { staffId });
+            detailedStaffQuery.andWhere('sf.staff_id = :staffId', { staffId });
         if (fromDate)
             detailedStaffQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate)

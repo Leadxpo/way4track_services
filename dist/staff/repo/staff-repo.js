@@ -288,8 +288,8 @@ let StaffRepository = class StaffRepository extends typeorm_1.Repository {
             'staff.phone_number AS phoneNumber',
         ])
             .leftJoinAndSelect(branch_entity_1.BranchEntity, 'branch', 'branch.id = staff.branch_id')
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
         if (req.staffId) {
             query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });

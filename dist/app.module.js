@@ -75,6 +75,12 @@ const service_entity_1 = require("./service-type/entity/service.entity");
 const service_module_1 = require("./service-type/service.module");
 const sub_dealer_staff_module_1 = require("./sub-dealer-staff/sub-dealer-staff.module");
 const sub_dealer_staff_entity_1 = require("./sub-dealer-staff/entity/sub-dealer-staff.entity");
+const website_product_module_1 = require("./website-product/website_product.module");
+const website_product_service_1 = require("./website-product/website-product.service");
+const application_module_1 = require("./application/application.module");
+const amenities_module_1 = require("./amenities/amenities.module");
+const reviews_module_1 = require("./reviews/reviews.module");
+const promotional_module_1 = require("./promotional/promotional.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -127,9 +133,14 @@ exports.AppModule = AppModule = __decorate([
             vehicle_type_module_1.VehicleTypeModule,
             service_module_1.ServiceTypeModule,
             sub_dealer_staff_module_1.SubDealerStaffModule,
+            website_product_module_1.WebsiteProductModule,
+            application_module_1.ApplicationModule,
+            amenities_module_1.AmenitiesModule,
+            reviews_module_1.ReviewsModule,
+            promotional_module_1.PromotionalModule,
         ],
         controllers: [],
-        providers: [],
+        providers: [website_product_service_1.WebsiteProductService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

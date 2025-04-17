@@ -29,8 +29,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                 `SUM(CASE WHEN pr.status = 'inHand' THEN COALESCE(pr.quantity, 0) ELSE 0 END) AS inHandStock`,
             ])
             .leftJoin(ProductTypeEntity, 'pt', 'pt.id = pr.product_type_id')
-            .where('pr.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pr.unit_code = :unitCode', { unitCode: req.unitCode });
+            .where('pt.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.productName) {
             query.andWhere('pt.name LIKE :productName', { productName: `%${req.productName}%` });
@@ -65,6 +65,145 @@ export class ProductRepository extends Repository<ProductEntity> {
         const result = await query.getRawOne();
         return result;
     }
+    // async productAssignDetails(req: {
+    //     branchName?: string;
+    //     subDealerId?: string;
+    //     staffId?: string;
+    //     companyCode?: string;
+    //     unitCode?: string;
+    //     fromDate?: string;
+    //     toDate?: string;
+    // }): Promise<any> {
+    //     const response: any = {};
+
+    //     const { companyCode, unitCode, fromDate, toDate, branchName, subDealerId, staffId } = req;
+
+    //     // ====================== BRANCH ======================
+    //     const branchQuery = this.createQueryBuilder('pa')
+    //         .select(['br.name AS branchName'])
+    //         .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (branchName) branchQuery.andWhere('br.name = :branchName', { branchName });
+    //     if (fromDate) branchQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) branchQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const branchResults = await branchQuery.groupBy('br.name').getRawMany();
+    //     response.branchList = branchResults.filter(b => b.branchName !== null);
+
+    //     const detailedBranchAssignQuery = this.createQueryBuilder('pa')
+    //         .select([
+    //             'br.name AS branchName',
+    //             'pa.product_name AS productName',
+    //             'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
+    //             'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
+    //             'pa.product_status AS productStatus',
+    //             'pa.assign_time AS assignTime'
+    //         ])
+    //         .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (branchName) detailedBranchAssignQuery.andWhere('br.name = :branchName', { branchName });
+    //     if (fromDate) detailedBranchAssignQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) detailedBranchAssignQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const rawBranchResults = await detailedBranchAssignQuery
+    //         .groupBy('pa.imei_number')
+    //         .addGroupBy('br.name')
+    //         .addGroupBy('pa.product_name')
+    //         .addGroupBy('pa.product_status')
+    //         .orderBy('br.name', 'ASC')
+    //         .getRawMany();
+
+    //     response.branchDetails = rawBranchResults.filter(item => item.branchName !== null);
+
+    //     // ====================== SUB DEALER ======================
+    //     const subDealerQuery = this.createQueryBuilder('pa')
+    //         .select([
+    //             'sb.name AS subDealerName',
+    //             'sb.sub_dealer_id AS subDealerId'
+    //         ])
+    //         .leftJoin(SubDealerEntity, 'sb', 'sb.id = pa.sub_dealer_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (subDealerId) subDealerQuery.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId });
+    //     if (fromDate) subDealerQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) subDealerQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const subDealerResults = await subDealerQuery.groupBy('sb.sub_dealer_id, sb.name').getRawMany();
+    //     response.subDealerList = subDealerResults.filter(sd => sd.subDealerName && sd.subDealerId);
+
+    //     const detailedSubDealerAssignQuery = this.createQueryBuilder('pa')
+    //         .select([
+    //             'sb.name AS subDealerName',
+    //             'sb.sub_dealer_id AS subDealerId',
+    //             'pa.product_name AS productName',
+    //             'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
+    //             'pa.product_status AS productStatus',
+    //             'pa.assign_time AS assignTime'
+    //         ])
+    //         .leftJoin(SubDealerEntity, 'sb', 'sb.id = pa.sub_dealer_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (subDealerId) detailedSubDealerAssignQuery.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId });
+    //     if (fromDate) detailedSubDealerAssignQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) detailedSubDealerAssignQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const rawSubDealerResults = await detailedSubDealerAssignQuery
+    //         .groupBy('sb.name')
+    //         .addGroupBy('sb.sub_dealer_id')
+    //         .addGroupBy('pa.product_name')
+    //         .addGroupBy('pa.product_status')
+    //         .orderBy('sb.sub_dealer_id')
+    //         .getRawMany();
+
+    //     response.subDealerDetails = rawSubDealerResults.filter(item => item.subDealerName && item.subDealerId);
+
+    //     // ====================== STAFF ======================
+    //     const staffQuery = this.createQueryBuilder('pa')
+    //         .select(['sf.name AS staffName'])
+    //         .leftJoin(StaffEntity, 'sf', 'sf.id = pa.staff_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (staffId) staffQuery.andWhere('sf.id = :staffId', { staffId });
+    //     if (fromDate) staffQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) staffQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const staffResults = await staffQuery.groupBy('sf.name').getRawMany();
+    //     response.staffList = staffResults.filter(s => s.staffName !== null);
+
+    //     const detailedStaffQuery = this.createQueryBuilder('pa')
+    //         .select([
+    //             'sf.name AS staffName',
+    //             'pa.product_name AS productName',
+    //             'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
+    //             'pa.product_status AS productStatus',
+    //             'pa.assign_time AS assignTime'
+    //         ])
+    //         .leftJoin(StaffEntity, 'sf', 'sf.id = pa.staff_id')
+    //         .where('pa.company_code = :companyCode', { companyCode })
+    //         .andWhere('pa.unit_code = :unitCode', { unitCode });
+
+    //     if (staffId) detailedStaffQuery.andWhere('sf.id = :staffId', { staffId });
+    //     if (fromDate) detailedStaffQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
+    //     if (toDate) detailedStaffQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
+
+    //     const rawStaffResults = await detailedStaffQuery
+    //         .groupBy('sf.name')
+    //         .addGroupBy('pa.product_name')
+    //         .addGroupBy('pa.product_status')
+    //         .getRawMany();
+
+    //     response.staffDetails = rawStaffResults.filter(item => item.staffName !== null);
+
+    //     return response;
+    // }
+
     async productAssignDetails(req: {
         branchName?: string;
         subDealerId?: string;
@@ -75,23 +214,22 @@ export class ProductRepository extends Repository<ProductEntity> {
         toDate?: string;
     }): Promise<any> {
         const response: any = {};
-
         const { companyCode, unitCode, fromDate, toDate, branchName, subDealerId, staffId } = req;
-
-        // ====================== BRANCH ======================
+    
+        // ========== BRANCH ==========
         const branchQuery = this.createQueryBuilder('pa')
             .select(['br.name AS branchName'])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
+    
         if (branchName) branchQuery.andWhere('br.name = :branchName', { branchName });
         if (fromDate) branchQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) branchQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const branchResults = await branchQuery.groupBy('br.name').getRawMany();
         response.branchList = branchResults.filter(b => b.branchName !== null);
-
+    
         const detailedBranchAssignQuery = this.createQueryBuilder('pa')
             .select([
                 'br.name AS branchName',
@@ -99,28 +237,26 @@ export class ProductRepository extends Repository<ProductEntity> {
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
-                'pa.assign_time AS assignTime'
+                'MAX(pa.assign_time) AS assignTime'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
+    
         if (branchName) detailedBranchAssignQuery.andWhere('br.name = :branchName', { branchName });
         if (fromDate) detailedBranchAssignQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) detailedBranchAssignQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const rawBranchResults = await detailedBranchAssignQuery
-            .groupBy('pa.imei_number')
-            .addGroupBy('br.name')
-            .addGroupBy('sf.name')
+            .groupBy('br.name')
             .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .orderBy('br.name', 'ASC')
             .getRawMany();
-
+    
         response.branchDetails = rawBranchResults.filter(item => item.branchName !== null);
-
-        // ====================== SUB DEALER ======================
+    
+        // ========== SUB DEALER ==========
         const subDealerQuery = this.createQueryBuilder('pa')
             .select([
                 'sb.name AS subDealerName',
@@ -129,14 +265,14 @@ export class ProductRepository extends Repository<ProductEntity> {
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = pa.sub_dealer_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
+    
         if (subDealerId) subDealerQuery.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId });
         if (fromDate) subDealerQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) subDealerQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const subDealerResults = await subDealerQuery.groupBy('sb.sub_dealer_id, sb.name').getRawMany();
         response.subDealerList = subDealerResults.filter(sd => sd.subDealerName && sd.subDealerId);
-
+    
         const detailedSubDealerAssignQuery = this.createQueryBuilder('pa')
             .select([
                 'sb.name AS subDealerName',
@@ -144,16 +280,16 @@ export class ProductRepository extends Repository<ProductEntity> {
                 'pa.product_name AS productName',
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'pa.product_status AS productStatus',
-                'pa.assign_time AS assignTime'
+                'MAX(pa.assign_time) AS assignTime'
             ])
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = pa.sub_dealer_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
+    
         if (subDealerId) detailedSubDealerAssignQuery.andWhere('sb.sub_dealer_id = :subDealerId', { subDealerId });
         if (fromDate) detailedSubDealerAssignQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) detailedSubDealerAssignQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const rawSubDealerResults = await detailedSubDealerAssignQuery
             .groupBy('sb.name')
             .addGroupBy('sb.sub_dealer_id')
@@ -161,49 +297,48 @@ export class ProductRepository extends Repository<ProductEntity> {
             .addGroupBy('pa.product_status')
             .orderBy('sb.sub_dealer_id')
             .getRawMany();
-
+    
         response.subDealerDetails = rawSubDealerResults.filter(item => item.subDealerName && item.subDealerId);
-
-        // ====================== STAFF ======================
+    
+        // ========== STAFF ==========
         const staffQuery = this.createQueryBuilder('pa')
             .select(['sf.name AS staffName'])
             .leftJoin(StaffEntity, 'sf', 'sf.id = pa.staff_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
+    
         if (staffId) staffQuery.andWhere('sf.id = :staffId', { staffId });
         if (fromDate) staffQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) staffQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const staffResults = await staffQuery.groupBy('sf.name').getRawMany();
         response.staffList = staffResults.filter(s => s.staffName !== null);
-
+    
         const detailedStaffQuery = this.createQueryBuilder('pa')
             .select([
                 'sf.name AS staffName',
                 'pa.product_name AS productName',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
-                'pa.assign_time AS assignTime'
+                'MAX(pa.assign_time) AS assignTime'
             ])
             .leftJoin(StaffEntity, 'sf', 'sf.id = pa.staff_id')
             .where('pa.company_code = :companyCode', { companyCode })
             .andWhere('pa.unit_code = :unitCode', { unitCode });
-
-        if (staffId) detailedStaffQuery.andWhere('sf.id = :staffId', { staffId });
+    
+        if (staffId) detailedStaffQuery.andWhere('sf.staff_id = :staffId', { staffId });
         if (fromDate) detailedStaffQuery.andWhere('DATE(pa.assign_time) >= :fromDate', { fromDate });
         if (toDate) detailedStaffQuery.andWhere('DATE(pa.assign_time) <= :toDate', { toDate });
-
+    
         const rawStaffResults = await detailedStaffQuery
             .groupBy('sf.name')
             .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .getRawMany();
-
+    
         response.staffDetails = rawStaffResults.filter(item => item.staffName !== null);
-
+    
         return response;
     }
-
-
+    
 }
