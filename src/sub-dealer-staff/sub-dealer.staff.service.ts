@@ -109,7 +109,7 @@ export class SubDealerStaffService {
         try {
             console.log(req, "+++++++++++")
 
-            const SubDealerStaff = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const SubDealerStaff = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['subDealerId'] });
 
             if (!SubDealerStaff) {
                 return new CommonResponse(false, 404, 'SubDealerStaff not found');
@@ -124,7 +124,7 @@ export class SubDealerStaffService {
 
     async getSubDealerStaffDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const SubDealerStaff = await this.repo.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const SubDealerStaff = await this.repo.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['subDealerId'] });
             if (!SubDealerStaff) {
                 return new CommonResponse(false, 404, 'SubDealerStaff not found');
             }
