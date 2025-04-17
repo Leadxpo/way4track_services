@@ -18,6 +18,7 @@ export class SubDealerStaffResponseDto {
     address?: string;
     createdAt: Date;
     updatedAt: Date;
+    subDealerId?: string
 
     constructor(partial: Partial<SubDealerStaffResponseDto>) {
         Object.assign(this, partial);

@@ -18,5 +18,4 @@ export class CreateSubDealerStaffDto {
     panCardNumber?: string;
     address?: string;
     subDealerId?:number
-    
 }
