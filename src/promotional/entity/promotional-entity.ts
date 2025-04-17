@@ -1,12 +1,4 @@
-import { AmenitiesEntity } from 'src/amenities/entity/amenities-entity';
-import { ApplicationEntity } from 'src/application/entity/application-entity';
-import { DeviceEntity } from 'src/devices/entity/devices-entity';
-import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
-import { ProductEntity } from 'src/product/entity/product.entity';
-import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
-
-
 @Entity('promotion')
 export class PromotionEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -15,17 +7,11 @@ export class PromotionEntity extends BaseEntity {
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
-    @Column({ name: 'layout_type', type: 'varchar', length: 100, nullable: true })
-    layoutType: string;
+    @Column({ name: 'header', type: 'varchar', length: 100, nullable: true })
+    header: string;
 
     @Column({ name: 'short_description', type: 'varchar', length: 100, nullable: true })
     shortDescription: string;
-
-    @Column('varchar', { name: 'company_code', length: 200, nullable: false })
-    companyCode: string;
-
-    @Column('varchar', { name: 'unit_code', length: 200, nullable: false })
-    unitCode: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
@@ -33,35 +19,15 @@ export class PromotionEntity extends BaseEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column({ name: 'description', type: 'text', nullable: true })
-    description: string;
+    @Column({ name: 'theme', type: 'text', nullable: true })
+    theme: string;
 
-    @Column({ name: 'banner_1', type: 'varchar', length: 255, nullable: true })
-    banner1: string;
-
-    @Column({ name: 'banner_2', type: 'varchar', length: 255, nullable: true })
-    banner2: string;
-
-    @Column({ name: 'banner_3', type: 'varchar', length: 255, nullable: true })
-    banner3: string;
-
-    @Column({ name: 'home_banner', type: 'varchar', length: 255, nullable: true })
-    homeBanner: string;
-
-    @Column({ name: 'blog_image', type: 'varchar', length: 255, nullable: true })
-    blogImage: string;
+    @Column({ name: 'image', type: 'varchar', length: 255, nullable: true })
+    image: string;
 
     @Column('json', { name: 'steps' })
-    steps: {
+    list: {
+        photo?: string;
         desc: string;
     }[];
-
-    @OneToMany(() => DeviceEntity, (staff) => staff.webProduct)
-    device: DeviceEntity[];
-
-    @OneToMany(() => AmenitiesEntity, (staff) => staff.webProduct)
-    amenities: AmenitiesEntity[];
-
-    @OneToMany(() => ApplicationEntity, (staff) => staff.webProduct)
-    application: ApplicationEntity[];
 }

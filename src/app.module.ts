@@ -81,6 +81,7 @@ import { AmenitiesEntity } from './amenities/entity/amenities-entity';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ReviewEntity } from './reviews/entity/reviews-entity';
 import { PromotionalModule } from './promotional/promotional.module';
+import { PromotionEntity } from './promotional/entity/promotional-entity';
 
 
 @Module({
@@ -92,11 +93,11 @@ import { PromotionalModule } from './promotional/promotional.module';
       username: 'root',
       password: 'root',
       database: 'way4',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
