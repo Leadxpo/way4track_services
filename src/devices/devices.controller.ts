@@ -1,25 +1,28 @@
 
-
-
-
-
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
 
 import { CommonResponse } from 'src/models/common-response';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonReq } from 'src/models/common-req';
 import { DeviceService } from './devices.service';
 import { DeviceDto } from './dto/devices.dto';
-
+import * as multer from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express';
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 @Controller('device')
 export class DeviceController {
     constructor(private readonly service: DeviceService) { }
-
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('handleDeviceDetails')
-    async handleDeviceDetails(@Body() dto: DeviceDto): Promise<CommonResponse> {
+    async handleDeviceDetails(@Body() dto: DeviceDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
         try {
             if (dto.id) dto.id = Number(dto.id);
-            return await this.service.handleDeviceDetails(dto);
+            return await this.service.handleDeviceDetails(dto, photo);
         } catch (error) {
             return new CommonResponse(false, 500, 'Error saving Device details');
         }

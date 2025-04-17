@@ -1,10 +1,9 @@
-import { ApplicationDto } from "./dto/application.dto";
-import { ApplicationEntity } from "./entity/application-entity";
+import { AmenitiesDto } from './dto/amenities.dto';
+import { AmenitiesEntity } from './entity/amenities-entity';
 
-
-export class ApplicationAdapter {
-    convertDtoToEntity(dto: ApplicationDto): ApplicationEntity {
-        const entity = new ApplicationEntity();
+export class AmenitiesAdapter {
+    convertDtoToEntity(dto: AmenitiesDto): AmenitiesEntity {
+        const entity = new AmenitiesEntity();
         entity.id = dto.id;
         entity.webProduct = dto.webProductId ? { id: dto.webProductId } as any : null;
         entity.webProductName = dto.webProductName;
@@ -14,7 +13,7 @@ export class ApplicationAdapter {
         return entity;
     }
 
-    convertEntityToDto(entity: ApplicationEntity): ApplicationDto {
+    convertEntityToDto(entity: AmenitiesEntity): AmenitiesDto {
         return {
             id: entity.id,
             webProductId: entity.webProduct?.id,
@@ -25,7 +24,7 @@ export class ApplicationAdapter {
         };
     }
 
-    convertEntityListToDto(entities: ApplicationEntity[]): ApplicationDto[] {
+    convertEntityListToDto(entities: AmenitiesEntity[]): AmenitiesDto[] {
         return entities.map(e => this.convertEntityToDto(e));
     }
 }

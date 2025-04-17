@@ -25,21 +25,24 @@ export class WebsiteProductService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleWebsiteProductDetails(dto: WebsiteProductDto,
+    async handleWebsiteProductDetails(
+        dto: WebsiteProductDto,
         photos: {
             homeBanner?: Express.Multer.File[];
             banner1?: Express.Multer.File[];
             banner2?: Express.Multer.File[];
             banner3?: Express.Multer.File[];
             blogImage?: Express.Multer.File[];
-        } = {}): Promise<CommonResponse> {
-        let filePaths: Record<keyof typeof photos, string | undefined> = {
+        } = {}
+    ): Promise<CommonResponse> {
+        const filePaths: Partial<Record<keyof typeof photos, string| undefined>> = {
             homeBanner: undefined,
-            banner2: undefined,
-            banner3: undefined,
-            banner1: undefined,
-            blogImage: undefined,
+             banner2: undefined,
+             banner3: undefined,
+             banner1: undefined,
+             blogImage: undefined,
         };
+
         for (const [key, fileArray] of Object.entries(photos)) {
             if (!fileArray || fileArray.length === 0) continue;
 
@@ -52,19 +55,20 @@ export class WebsiteProductService {
                 resumable: false,
             });
 
-            filePaths[key as keyof typeof filePaths] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+            filePaths[key as keyof typeof photos] = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
-       
+
         try {
             if (dto.id) {
-                return this.updateWebsiteProductDetails(dto, filePaths);
+                return await this.updateWebsiteProductDetails(dto, filePaths);
             } else {
-                return this.createWebsiteProductDetails(dto, filePaths);
+                return await this.createWebsiteProductDetails(dto, filePaths);
             }
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
+
 
     async createWebsiteProductDetails(dto: WebsiteProductDto, filePaths?: Record<string, string | null>,): Promise<CommonResponse> {
         try {
@@ -84,26 +88,32 @@ export class WebsiteProductService {
         }
     }
 
-    async updateWebsiteProductDetails(dto: WebsiteProductDto, filePaths: Record<string, string | null> = {}): Promise<CommonResponse> {
+    async updateWebsiteProductDetails(
+        dto: WebsiteProductDto,
+        filePaths: Partial<Record<keyof WebsiteProductDto, string>> = {}
+      ): Promise<CommonResponse> {
         try {
-            const existing = await this.websiteProductRepository.findOne({ where: { id: dto.id } });
-
-            if (!existing) throw new Error('WebsiteProduct not found');
-            filePaths = filePaths ?? {};
-            console.log(filePaths, "files")
-            if (filePaths) {
-                existing.homeBanner = filePaths.homeBanner || existing.homeBanner;
-                existing.banner1 = filePaths.banner1 || existing.banner1;
-                existing.banner2 = filePaths.banner2 || existing.banner2;
-                existing.banner3 = filePaths.banner3 || existing.banner3;
-                existing.blogImage = filePaths.blogImage || existing.blogImage;
-            }
-            await this.websiteProductRepository.update(dto.id, dto);
-            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
+          const existing = await this.websiteProductRepository.findOne({ where: { id: dto.id } });
+          if (!existing) throw new Error('WebsiteProduct not found');
+      
+          // Replace image URLs only if new files were uploaded
+          const updatedEntity = {
+            ...existing,
+            ...dto, // Other fields
+            homeBanner: filePaths.homeBanner ?? existing.homeBanner,
+            banner1: filePaths.banner1 ?? existing.banner1,
+            banner2: filePaths.banner2 ?? existing.banner2,
+            banner3: filePaths.banner3 ?? existing.banner3,
+            blogImage: filePaths.blogImage ?? existing.blogImage,
+          };
+      
+          await this.websiteProductRepository.save(updatedEntity);
+          return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+          throw new ErrorResponse(500, error.message);
         }
-    }
+      }
+      
 
     async deleteWebsiteProductDetails(dto: WebsiteProductIdDto): Promise<CommonResponse> {
         try {

@@ -1,3 +1,5 @@
+import { AmenitiesEntity } from 'src/amenities/entity/amenities-entity';
+import { ApplicationEntity } from 'src/application/entity/application-entity';
 import { DeviceEntity } from 'src/devices/entity/devices-entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
@@ -56,4 +58,10 @@ export class WebsiteProductEntity extends BaseEntity {
 
     @OneToMany(() => DeviceEntity, (staff) => staff.webProduct)
     device: DeviceEntity[];
+
+    @OneToMany(() => AmenitiesEntity, (staff) => staff.webProduct)
+    amenities: AmenitiesEntity[];
+
+    @OneToMany(() => ApplicationEntity, (staff) => staff.webProduct)
+    application: ApplicationEntity[];
 }
