@@ -336,7 +336,9 @@ export class StaffRepository extends Repository<StaffEntity> {
         }
 
         // Use getRawMany if you want to use custom column aliases
-        const staffDetails = await query.getRawMany();
+        const staffDetails = await query.getRawMany()
+        query.orderBy('staff.staff_id', 'ASC')
+            ;
         return staffDetails;
     }
 
@@ -352,8 +354,9 @@ export class StaffRepository extends Repository<StaffEntity> {
         if (req.staffId) {
             query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
-
-        return await query.getMany(); // Fetch all columns
+        query.orderBy('staff.staff_id', 'ASC')
+        return await query.getMany()
+            ; // Fetch all columns
     }
 
 
@@ -394,7 +397,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         if (req.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: req.branchName });
         }
-
+        query.orderBy('staff.staff_id', 'ASC')
         const result = await query.groupBy('branch.name').getRawMany();
 
         // Fetching individual staff details and associating with the branch manager
@@ -420,7 +423,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         if (req.branchName) {
             staffDetailsQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
         }
-
+        staffDetailsQuery.orderBy('staff.staff_id', 'ASC')
         const staffResult = await staffDetailsQuery.getRawMany();
 
         return { result, staff: staffResult };
@@ -450,7 +453,6 @@ export class StaffRepository extends Repository<StaffEntity> {
             if (req.branchName) {
                 query.andWhere('branch.name = :branchName', { branchName: req.branchName });
             }
-
             const result = await query.groupBy(`
                 branch.name, 
                 branchManager.id, 
@@ -468,6 +470,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) = :designation', { designation: 'technician' })
+                .orderBy('staff.staff_id', 'ASC')
+
                 .getMany();
 
             // Fetch sales staff
@@ -479,6 +483,8 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) = :designation', { designation: 'salesman' })
+                .orderBy('staff.staff_id', 'ASC')
+
                 .getMany();
 
             // Fetch non-technical staff
@@ -489,7 +495,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
                 .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
                 .andWhere('LOWER(staff.designation) NOT IN (:...designations)', { designations: ['technician', 'salesman'] })
-                .getMany();
+                .orderBy('staff.staff_id', 'ASC')
+                .getMany()
+
 
             // Map branch data
             const branchesMap = new Map<string, any>();
@@ -564,7 +572,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 )
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
-                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .orderBy('staff.staff_id', 'ASC')
+
 
             if (req.branchName) {
                 branchQuery.andWhere('branch.name = :branchName', { branchName: req.branchName });
@@ -577,7 +587,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 .leftJoinAndSelect('staff.branch', 'branch')
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
                 .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
-                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
+                .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
+                .orderBy('staff.staff_id', 'ASC')
+
 
             if (req.branchName) {
                 staffResults.andWhere('branch.name = :branchName', { branchName: req.branchName });
