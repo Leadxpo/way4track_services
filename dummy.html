@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+
+
+        body {
+            background-color: #2E3537;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        :root {
+            --cards: 4;
+            --cardHeight: 87vh;
+            --cardTopPadding: 1.5em;
+            --cardMargin: 4vw;
+        }
+        
+        .container {
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        #cards {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(var(--cards), var(--cardHeight));
+            gap: var(--cardMargin);
+            padding-bottom: calc(var(--cards) * var(--cardTopPadding));
+            margin-bottom: var(--cardMargin);
+        }
+
+        @media (max-width: 768px) {
+            .card-body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .cardimg {
+                order: -1; /* Ensure the image appears first */
+            }
+            h2, p, button {
+                margin-top: 10px;
+            }
+        
+    }
+        
+        #card1 {
+            --index: 1;
+        }
+        #card2 {
+            --index: 2;
+        }
+        #card3 {
+            --index: 3;
+        }
+        #card4 {
+            --index: 4;
+        }
+        #card5 {
+            --index: 4;
+        }
+        
+        .card {
+            position: sticky;
+            top: 0;
+            padding-top: calc(var(--index) * var(--cardTopPadding));
+        }
+        
+        #card1 .card-body {
+            background-color: #52B2CF;
+        }
+        #card2 .card-body {
+            /* background-color: #7EC4CF; */
+            background-color: #E5A36F;
+        }
+        #card3 .card-body {
+            background-color: #9CADCE;
+        }
+        #card4 .card-body {
+            background-color: #D4AFB9;
+        }
+        #card5 .card-body {
+            background-color: #333333;
+        }
+        
+        .card-body {
+            box-sizing: border-box;
+            padding: 30px;
+            border-radius: 50px;
+            box-shadow: 0 0 30px 0 rgba(0,0,0,0.3);
+            height: var(--cardHeight);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s;
+        }
+        
+        h2 {
+            font-size: 2.5em;
+        }
+
+        .cardimg {
+            height: 500px;width: 300px;
+
+        }
+        
+        </style>
+        
+</head>
+<body class="bg-purple-700 flex justify-center items-center min-h-screen">
+    <div class="container mx-auto p-5">
+        <ul id="cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <li class="card bg-white rounded-2xl p-6 shadow-lg" id="card1">
+                <div class="card-body flex flex-col md:flex-row items-center md:text-left">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-bold text-orange-500">Vaastu Shastra</h2>
+                        <p class="text-gray-700 mt-2">VAASHTU SHASTRA for everyone by Dr. Ravi Rao guides readers through the principles of Vaastu Shastra...</p>
+                        <button onclick="handleClick('Card 1')" class="mt-4 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">Get Your Copy Now!</button>
+                    </div>
+                    <img class="cardimg" src="https://images.unsplash.com/photo-1620207418302-439b387441b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=100" alt="Vaastu Shastra Book" class="w-32 h-32 mx-auto mb-4 rounded-lg">
+                </div>
+            </li>
+            <li class="card bg-white rounded-2xl p-6 shadow-lg" id="card2">
+                <div class="card-body flex flex-col md:flex-row items-center md:text-left">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-bold text-orange-500">Vaastu Shastra</h2>
+                        <p class="text-gray-700 mt-2">VAASHTU SHASTRA for everyone by Dr. Ravi Rao guides readers through the principles of Vaastu Shastra...</p>
+                        <button onclick="handleClick('Card 1')" class="mt-4 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">Get Your Copy Now!</button>
+                    </div>
+                    <img class="cardimg" src="https://images.unsplash.com/photo-1620207418302-439b387441b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=100" alt="Vaastu Shastra Book" class="w-32 h-32 mx-auto mb-4 rounded-lg">
+                </div>
+            </li>
+            <li class="card bg-white rounded-2xl p-6 shadow-lg" id="card3">
+                <div class="card-body flex flex-col md:flex-row items-center md:text-left">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-bold text-orange-500">Vaastu Shastra</h2>
+                        <p class="text-gray-700 mt-2">VAASHTU SHASTRA for everyone by Dr. Ravi Rao guides readers through the principles of Vaastu Shastra...</p>
+                        <button onclick="handleClick('Card 1')" class="mt-4 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">Get Your Copy Now!</button>
+                    </div>
+                    <img class="cardimg" src="https://images.unsplash.com/photo-1620207418302-439b387441b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=100" alt="Vaastu Shastra Book" class="w-32 h-32 mx-auto mb-4 rounded-lg">
+                </div>
+            </li>
+            <li class="card bg-white rounded-2xl p-6 shadow-lg" id="card4">
+                <div class="card-body flex flex-col md:flex-row items-center md:text-left">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-bold text-orange-500">Vaastu Shastra</h2>
+                        <p class="text-gray-700 mt-2">VAASHTU SHASTRA for everyone by Dr. Ravi Rao guides readers through the principles of Vaastu Shastra...</p>
+                        <button onclick="handleClick('Card 1')" class="mt-4 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">Get Your Copy Now!</button>
+                    </div>
+                    <img class="cardimg" src="https://images.unsplash.com/photo-1620207418302-439b387441b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=100" alt="Vaastu Shastra Book" class="w-32 h-32 mx-auto mb-4 rounded-lg">
+                </div>
+            </li>
+            <li class="card bg-white rounded-2xl p-6 shadow-lg" id="card5">
+                <div class="card-body flex flex-col md:flex-row items-center md:text-left">
+                    <div class="p-4">
+                        <h2 class="text-2xl font-bold text-orange-500">Vaastu Shastra</h2>
+                        <p class="text-gray-700 mt-2">VAASHTU SHASTRA for everyone by Dr. Ravi Rao guides readers through the principles of Vaastu Shastra...</p>
+                        <button onclick="handleClick('Card 1')" class="mt-4 bg-red-500 text-white px-5 py-2 rounded-full hover:bg-red-600">Get Your Copy Now!</button>
+                    </div>
+                    <img class="cardimg" src="https://images.unsplash.com/photo-1620207418302-439b387441b0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=100" alt="Vaastu Shastra Book" class="w-32 h-32 mx-auto mb-4 rounded-lg">
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <script>
+        function handleClick(cardName) {
+            alert(cardName + ' button clicked!');
+        }
+    </script>
+</body>
+</html>
+
