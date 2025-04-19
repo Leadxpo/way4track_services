@@ -21,7 +21,7 @@ export class PayrollService {
 
     async createOrUpdatePayroll(dtoArray: PayrollDto[]): Promise<CommonResponse> {
         const entities = this.adapter.toEntity(dtoArray);
-
+        console.log(dtoArray, "|||||||}}}}}}")
         const updatedEntities = await Promise.all(
             entities.map(async (entity) => {
                 if (entity.id) {
@@ -39,7 +39,7 @@ export class PayrollService {
                 return await this.payrollRepo.save(entity);
             })
         );
-
+        console.log(updatedEntities, "updatedEntities")
         return new CommonResponse(true, 200, 'Payroll processed successfully', updatedEntities);
     }
 
@@ -58,6 +58,7 @@ export class PayrollService {
                 year
             },
         });
+        console.log(branch, "}}}}}}}}}}|||||")
 
         if (!branch) {
             return new CommonResponse(false, 35416, "There Is No List");
@@ -66,6 +67,26 @@ export class PayrollService {
         }
     }
 
+    async getPayRollDetails(req: { month: string; year: string }): Promise<CommonResponse> {
+        const month = Number(req.month);
+        const year = Number(req.year);
 
+        if (isNaN(month) || isNaN(year)) {
+            return new CommonResponse(false, 35416, "Invalid month or year provided.");
+        }
+
+        const branch = await this.payrollRepo.find({
+            where: {
+                month,
+                year
+            },
+        });
+        console.log(branch, "||||||||||||||||||")
+        if (!branch) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        } else {
+            return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", branch);
+        }
+    }
 
 }
