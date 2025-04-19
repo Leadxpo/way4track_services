@@ -552,7 +552,8 @@ export class ProductService {
             console.log(designationEntity, 'designationEntity');
 
             productDto.productType = designationEntity.name; // Store name
-            productDto.productTypeId = designationEntity; // Store relation
+            productDto.productTypeId = designationEntity;
+            productDto.productName=designationEntity.name // Store relation
         }
         if (productDto.branchId) {
             designationEntity = await this.branchRepo.findOne({
