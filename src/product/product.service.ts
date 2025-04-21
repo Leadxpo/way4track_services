@@ -614,7 +614,7 @@ export class ProductService {
 
     async getproductDetails(req: ProductIdDto): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.findOne({ relations: ['vendorId', 'voucherId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const product = await this.productRepository.findOne({where: { id: req.id} });
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
@@ -626,9 +626,9 @@ export class ProductService {
         }
     }
 
-    async getAllproductDetails(req: CommonReq): Promise<CommonResponse> {
+    async getAllproductDetails(): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.find({ relations: ['vendorId', 'voucherId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const product = await this.productRepository.find();
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
