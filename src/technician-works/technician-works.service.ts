@@ -271,8 +271,29 @@ export class TechnicianService {
             }
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
-            console.error(`Error creating Technician details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to create Technician details: ${error.message}`);
+            console.error('Error creating Technician details:', error);
+
+            // Handle TypeORM QueryFailedError (e.g., unique constraint, null value, etc.)
+            const code = error.driverError?.code;
+            let errorMessage = 'Database error occurred.';
+            let field = '';
+
+            switch (code) {
+                case '23505': // unique_violation
+                    field = error.driverError.detail?.match(/\(([^)]+)\)/)?.[1] || '';
+                    errorMessage = 'Duplicate entry found.';
+                    break;
+                case '23502': // not_null_violation
+                    field = error.driverError.column || '';
+                    errorMessage = 'A required field is missing.';
+                    break;
+                case '23503': // foreign_key_violation
+                    field = error.driverError.constraint || '';
+                    errorMessage = 'Invalid reference to another table.';
+                    break;
+            }
+
+            throw new ErrorResponse(400, `${errorMessage} ${field ? 'Field: ' + field : ''}`);
         }
     }
 
@@ -411,8 +432,29 @@ export class TechnicianService {
 
             return new CommonResponse(true, 65152, 'Work Details Updated Successfully', existingTechnician.id);
         } catch (error) {
-            console.error(`Error updating work details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to update work details: ${error.message}`);
+            console.error('Error updating work details:', error);
+
+            // Handle TypeORM QueryFailedError (e.g., unique constraint, null value, etc.)
+            const code = error.driverError?.code;
+            let errorMessage = 'Database error occurred.';
+            let field = '';
+
+            switch (code) {
+                case '23505': // unique_violation
+                    field = error.driverError.detail?.match(/\(([^)]+)\)/)?.[1] || '';
+                    errorMessage = 'Duplicate entry found.';
+                    break;
+                case '23502': // not_null_violation
+                    field = error.driverError.column || '';
+                    errorMessage = 'A required field is missing.';
+                    break;
+                case '23503': // foreign_key_violation
+                    field = error.driverError.constraint || '';
+                    errorMessage = 'Invalid reference to another table.';
+                    break;
+            }
+
+            throw new ErrorResponse(400, `${errorMessage} ${field ? 'Field: ' + field : ''}`);
         }
     }
 

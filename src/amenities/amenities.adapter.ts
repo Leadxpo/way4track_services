@@ -10,6 +10,8 @@ export class AmenitiesAdapter {
         entity.image = dto.image;
         entity.name = dto.name;
         entity.desc = dto.desc;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         return entity;
     }
 
@@ -21,6 +23,8 @@ export class AmenitiesAdapter {
             image: entity.image,
             name: entity.name,
             desc: entity.desc,
+            companyCode: entity.companyCode,
+            unitCode: entity.unitCode
         };
     }
 

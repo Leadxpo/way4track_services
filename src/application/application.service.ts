@@ -88,7 +88,7 @@ export class ApplicationService {
 
     async deleteApplicationDetails(dto: HiringIdDto): Promise<CommonResponse> {
         try {
-            const existing = await this.repo.findOne({ where: { id: dto.id } });
+            const existing = await this.repo.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
 
             if (!existing) return new CommonResponse(false, 404, 'not found');
 
@@ -102,7 +102,7 @@ export class ApplicationService {
     async getApplicationDetailsById(req: HiringIdDto): Promise<CommonResponse> {
         try {
             const item = await this.repo.findOne({
-                where: { id: req.id },
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
 
@@ -114,10 +114,10 @@ export class ApplicationService {
     }
 
 
-    async getApplicationDetails(req: CommonReq): Promise<CommonResponse> {
+    async getApplicationDetails(dto: CommonReq): Promise<CommonResponse> {
         try {
             const items = await this.repo.find({
-                relations: ['webProduct'],
+                relations: ['webProduct'], where: { companyCode: dto.companyCode, unitCode: dto.unitCode }
             });
 
             if (!items || !items.length) return new CommonResponse(false, 404, 'Application not found');

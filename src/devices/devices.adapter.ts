@@ -12,6 +12,8 @@ export class DeviceAdapter {
         entity.webProductName = dto.webProductName;
         entity.image = dto.image;
         entity.model = dto.model;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         return entity;
     }
 
@@ -22,6 +24,8 @@ export class DeviceAdapter {
             webProductName: entity.webProductName,
             image: entity.image,
             model: entity.model,
+            companyCode: entity.companyCode,
+            unitCode: entity.unitCode
         }));
     }
 }

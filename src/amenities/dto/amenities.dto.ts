@@ -5,4 +5,6 @@ export class AmenitiesDto {
     image?: string;
     name?: string;
     desc?: string;
+    companyCode: string;
+    unitCode: string;
 }

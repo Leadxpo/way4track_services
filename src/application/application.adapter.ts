@@ -11,6 +11,8 @@ export class ApplicationAdapter {
         entity.image = dto.image;
         entity.name = dto.name;
         entity.desc = dto.desc;
+        entity.companyCode = dto.companyCode
+        entity.unitCode = dto.unitCode
         return entity;
     }
 
@@ -22,6 +24,8 @@ export class ApplicationAdapter {
             image: entity.image,
             name: entity.name,
             desc: entity.desc,
+            companyCode: entity.companyCode,
+            unitCode: entity.unitCode
         };
     }
 

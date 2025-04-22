@@ -29,18 +29,20 @@ export class WebsiteProductService {
         dto: WebsiteProductDto,
         photos: {
             homeBanner?: Express.Multer.File[];
+            footerBanner?: Express.Multer.File[],
             banner1?: Express.Multer.File[];
             banner2?: Express.Multer.File[];
             banner3?: Express.Multer.File[];
             blogImage?: Express.Multer.File[];
         } = {}
     ): Promise<CommonResponse> {
-        const filePaths: Partial<Record<keyof typeof photos, string| undefined>> = {
+        const filePaths: Partial<Record<keyof typeof photos, string | undefined>> = {
             homeBanner: undefined,
-             banner2: undefined,
-             banner3: undefined,
-             banner1: undefined,
-             blogImage: undefined,
+            footerBanner: undefined,
+            banner2: undefined,
+            banner3: undefined,
+            banner1: undefined,
+            blogImage: undefined,
         };
 
         for (const [key, fileArray] of Object.entries(photos)) {
@@ -75,6 +77,7 @@ export class WebsiteProductService {
             const entity = this.adapter.convertDtoToEntity(dto);
             if (filePaths) {
                 entity.homeBanner = filePaths.homeBanner;
+                entity.footerBanner = filePaths.footerBanner;
                 entity.banner1 = filePaths.banner1;
                 entity.banner2 = filePaths.banner2;
                 entity.banner3 = filePaths.banner3;
@@ -91,29 +94,30 @@ export class WebsiteProductService {
     async updateWebsiteProductDetails(
         dto: WebsiteProductDto,
         filePaths: Partial<Record<keyof WebsiteProductDto, string>> = {}
-      ): Promise<CommonResponse> {
+    ): Promise<CommonResponse> {
         try {
-          const existing = await this.websiteProductRepository.findOne({ where: { id: dto.id } });
-          if (!existing) throw new Error('WebsiteProduct not found');
-      
-          // Replace image URLs only if new files were uploaded
-          const updatedEntity = {
-            ...existing,
-            ...dto, // Other fields
-            homeBanner: filePaths.homeBanner ?? existing.homeBanner,
-            banner1: filePaths.banner1 ?? existing.banner1,
-            banner2: filePaths.banner2 ?? existing.banner2,
-            banner3: filePaths.banner3 ?? existing.banner3,
-            blogImage: filePaths.blogImage ?? existing.blogImage,
-          };
-      
-          await this.websiteProductRepository.save(updatedEntity);
-          return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
+            const existing = await this.websiteProductRepository.findOne({ where: { id: dto.id } });
+            if (!existing) throw new Error('WebsiteProduct not found');
+
+            // Replace image URLs only if new files were uploaded
+            const updatedEntity = {
+                ...existing,
+                ...dto, // Other fields
+                homeBanner: filePaths.homeBanner ?? existing.homeBanner,
+                footerBanner: filePaths.footerBanner ?? existing.footerBanner,
+                banner1: filePaths.banner1 ?? existing.banner1,
+                banner2: filePaths.banner2 ?? existing.banner2,
+                banner3: filePaths.banner3 ?? existing.banner3,
+                blogImage: filePaths.blogImage ?? existing.blogImage,
+            };
+
+            await this.websiteProductRepository.save(updatedEntity);
+            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
         } catch (error) {
-          throw new ErrorResponse(500, error.message);
+            throw new ErrorResponse(500, error.message);
         }
-      }
-      
+    }
+
 
     async deleteWebsiteProductDetails(dto: WebsiteProductIdDto): Promise<CommonResponse> {
         try {

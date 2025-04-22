@@ -44,186 +44,6 @@ export class ProductService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-
-
-    // async bulkUploadProducts(file: Express.Multer.File, subDealerId?: number, staffId?: number, branchId?: number): Promise<any[]> {
-    //     console.log(file, "+++++++")
-    //     const getCellValue = (cell: ExcelJS.Cell) => {
-    //         if (cell.value === null || cell.value === undefined) {
-    //             return null;
-    //         }
-    //         if (typeof cell.value === 'object') {
-    //             return (cell.value as any).text || cell.value.toString();
-    //         }
-    //         return cell.value.toString();
-    //     };
-
-    //     const parseDate = (dateString: string) => {
-    //         const parsedDate = new Date(dateString);
-    //         return isNaN(parsedDate.getTime()) ? null : parsedDate;
-    //     };
-
-    //     try {
-    //         const workbook = new ExcelJS.Workbook();
-    //         await workbook.xlsx.load(file.buffer);
-    //         const worksheet = workbook.worksheets[0];
-
-    //         const headerMapping: { [key: string]: string } = {
-    //             "product name": "productName",
-    //             "date of purchase": "inDate",
-    //             "vendor name": "vendorName",
-    //             "vendor email id": "vendorEmailId",
-    //             "vendor address": "vendorAddress",
-    //             "imei number": "imeiNumber",
-    //             "supplier name": "supplierName",
-    //             "serial number": "serialNumber",
-    //             "primary no": "primaryNo",
-    //             "secondary no": "secondaryNo",
-    //             "primary network": "primaryNetwork",
-    //             "secondary network": "secondaryNetwork",
-    //             "category name": "categoryName",
-    //             // "voucher id": "voucherId",
-    //             "cost": "cost",
-    //             "product description": "productDescription",
-    //             "company code": "companyCode",
-    //             "vendor phone number": "vendorPhoneNumber",
-    //             "device model": "deviceModel",
-    //             "unit code": "unitCode",
-    //             "sim status": "simStatus",
-    //             "plan name": "planName",
-    //             "remarks 1": "remarks1",
-    //             "remarks 2": "remarks2",
-    //             "quantity": "quantity",
-    //             "iccid no": "ICCIDNo",
-    //             "hsn code": "hsnCode",
-    //             "remarks 3": "remarks3",
-    //             "basket name": "BASKET_NAME",
-    //             "sim imsi": "SIM_IMSI",
-    //             "sim number": "SIM_Number",
-    //             "mobile number": "MOBILE_NUMBER",
-    //         };
-
-    //         const headers: { [key: string]: number } = {};
-    //         worksheet.getRow(1).eachCell((cell, colNumber) => {
-    //             const headerName = getCellValue(cell)?.toLowerCase();
-    //             if (headerName && headerMapping[headerName]) {
-    //                 headers[headerMapping[headerName]] = colNumber;
-    //             }
-    //         });
-    //         console.log(headers)
-    //         const finalData = [];
-    //         const results = [];
-
-
-    //         for (let rowIndex = 2; rowIndex <= worksheet.rowCount; rowIndex++) {
-    //             const row = worksheet.getRow(rowIndex);
-
-    //             const getCellValueByHeader = (header: string) => {
-    //                 const colNumber = headers[header];
-    //                 return colNumber ? getCellValue(row.getCell(colNumber)) : null;
-    //             };
-
-    //             const imeiNumber = getCellValueByHeader('imeiNumber');
-    //             const simNumber = getCellValueByHeader('SIM_Number');
-    //             console.log(simNumber, "==")
-    //             if (!imeiNumber && !simNumber) continue;
-
-    //             const currentRow = {
-    //                 productName: getCellValueByHeader('productName'),
-    //                 inDate: parseDate(getCellValueByHeader('inDate')),
-    //                 vendorName: getCellValueByHeader('vendorName'),
-    //                 vendorEmailId: getCellValueByHeader('vendorEmailId'),
-    //                 vendorAddress: getCellValueByHeader('vendorAddress'),
-    //                 imeiNumber,
-    //                 supplierName: getCellValueByHeader('supplierName'),
-    //                 serialNumber: getCellValueByHeader('serialNumber'),
-    //                 primaryNo: getCellValueByHeader('primaryNo'),
-    //                 secondaryNo: getCellValueByHeader('secondaryNo'),
-    //                 primaryNetwork: getCellValueByHeader('primaryNetwork'),
-    //                 secondaryNetwork: getCellValueByHeader('secondaryNetwork'),
-    //                 categoryName: getCellValueByHeader('categoryName'),
-    //                 // voucherId: getCellValueByHeader('voucherId'),
-    //                 cost: parseFloat(getCellValueByHeader('cost') || '0'),
-    //                 productDescription: getCellValueByHeader('productDescription'),
-    //                 companyCode: getCellValueByHeader('companyCode'),
-    //                 vendorPhoneNumber: getCellValueByHeader('vendorPhoneNumber'),
-    //                 deviceModel: getCellValueByHeader('deviceModel'),
-    //                 unitCode: getCellValueByHeader('unitCode'),
-    //                 simStatus: getCellValueByHeader('simStatus'),
-    //                 planName: getCellValueByHeader('planName'),
-    //                 remarks1: getCellValueByHeader('remarks1'),
-    //                 remarks2: getCellValueByHeader('remarks2'),
-    //                 quantity: parseInt(getCellValueByHeader('quantity') || '1'),
-    //                 ICCIDNo: getCellValueByHeader('ICCIDNo'),
-    //                 hsnCode: getCellValueByHeader('hsnCode'),
-    //                 remarks3: getCellValueByHeader('remarks3'),
-    //                 simImsi: getCellValueByHeader('SIM_IMSI'),
-    //                 basketName: getCellValueByHeader('BASKET_NAME'),
-    //                 mobileNumber: getCellValueByHeader('MOBILE_NUMBER'),
-    //                 simNumber,
-    //             };
-    //             console.log(currentRow, "::::::::")
-
-    //             let existing = null;
-
-    //             if (imeiNumber && simNumber) {
-    //                 existing = await this.productRepository.findOne({
-    //                     where: [
-    //                         { imeiNumber },
-    //                         { simNumber: simNumber }
-    //                     ],
-    //                 });
-    //             } else if (imeiNumber && branchId || staffId || subDealerId) {
-    //                 existing = await this.productRepository.findOne({
-    //                     where: { imeiNumber, branchId: branchId },
-    //                 });
-    //             } else if (simNumber) {
-    //                 existing = await this.productRepository.findOne({
-    //                     where: { simNumber: simNumber },
-    //                 });
-    //             }
-    //             console.log(existing, "??????????")
-    //             if (existing) {
-    //                 const hasChanged = Object.keys(currentRow).some(key => {
-    //                     return currentRow[key] !== existing[key];
-    //                 });
-
-    //                 if (hasChanged) {
-    //                     await this.productRepository.update(existing.id, currentRow);
-    //                     results.push({
-    //                         row: rowIndex,
-    //                         status: 'updated',
-    //                         message: 'Product updated successfully.',
-    //                         identifier: imeiNumber || simNumber
-    //                     });
-    //                 } else {
-    //                     results.push({
-    //                         row: rowIndex,
-    //                         status: 'exists',
-    //                         message: 'Product already exists with no changes.',
-    //                         identifier: imeiNumber || simNumber
-    //                     });
-    //                 }
-    //             } else {
-    //                 finalData.push(currentRow);
-    //                 results.push({
-    //                     row: rowIndex,
-    //                     status: 'inserted',
-    //                     message: 'New product added.',
-    //                     identifier: imeiNumber || simNumber
-    //                 });
-    //             }
-
-    //         }
-    //         console.log(finalData, ">>>>>>>>>")
-    //         return finalData;
-    //     } catch (error) {
-    //         console.error("Error processing Excel:", error); // <-- log actual error
-    //         throw new ErrorResponse(500, 'Error parsing Excel file');
-    //     }
-
-    // }
-
     async bulkUploadProducts(
         file: Express.Multer.File,
         subDealerId?: number,
@@ -553,7 +373,7 @@ export class ProductService {
 
             productDto.productType = designationEntity.name; // Store name
             productDto.productTypeId = designationEntity;
-            productDto.productName=designationEntity.name // Store relation
+            productDto.productName = designationEntity.name // Store relation
         }
         if (productDto.branchId) {
             designationEntity = await this.branchRepo.findOne({
@@ -614,7 +434,7 @@ export class ProductService {
 
     async getproductDetails(req: ProductIdDto): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.findOne({where: { id: req.id} });
+            const product = await this.productRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
@@ -626,9 +446,9 @@ export class ProductService {
         }
     }
 
-    async getAllproductDetails(): Promise<CommonResponse> {
+    async getAllproductDetails(dto: CommonReq): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.find();
+            const product = await this.productRepository.find({ where: { companyCode: dto.companyCode, unitCode: dto.unitCode } });
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }

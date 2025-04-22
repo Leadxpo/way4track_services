@@ -87,7 +87,7 @@ export class AmenitiesService {
 
     async deleteDeviceDetails(dto: HiringIdDto): Promise<CommonResponse> {
         try {
-            const existing = await this.repo.findOne({ where: { id: dto.id } });
+            const existing = await this.repo.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });
 
             if (!existing) return new CommonResponse(false, 404, 'not found');
 
@@ -101,7 +101,7 @@ export class AmenitiesService {
     async getAmenitiesDetailsById(req: HiringIdDto): Promise<CommonResponse> {
         try {
             const item = await this.repo.findOne({
-                where: { id: req.id },
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
 
@@ -116,6 +116,7 @@ export class AmenitiesService {
     async getAmenitiesDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const items = await this.repo.find({
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
 

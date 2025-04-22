@@ -19,6 +19,12 @@ export class DeviceEntity {
 
     @Column({ name: 'model', type: 'varchar', length: 255, nullable: true })
     model: string;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false, })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false, })
+    unitCode: string;
 }
 
 

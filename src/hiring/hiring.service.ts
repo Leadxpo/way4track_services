@@ -85,9 +85,33 @@ export class HiringService {
 
             return new CommonResponse(true, 65152, internalMessage, { resumePath: resumePath });
         } catch (error) {
-            throw new ErrorResponse(500, error.message);
+            console.error('Error saving hiring details:', error);
+
+            // Handle TypeORM QueryFailedError (e.g., unique constraint, null value, etc.)
+            const code = error.driverError?.code;
+            let errorMessage = 'Database error occurred.';
+            let field = '';
+
+            switch (code) {
+                case '23505': // unique_violation
+                    field = error.driverError.detail?.match(/\(([^)]+)\)/)?.[1] || '';
+                    errorMessage = 'Duplicate entry found.';
+                    break;
+                case '23502': // not_null_violation
+                    field = error.driverError.column || '';
+                    errorMessage = 'A required field is missing.';
+                    break;
+                case '23503': // foreign_key_violation
+                    field = error.driverError.constraint || '';
+                    errorMessage = 'Invalid reference to another table.';
+                    break;
+            }
+
+            throw new ErrorResponse(400, `${errorMessage} ${field ? 'Field: ' + field : ''}`);
         }
+
     }
+
 
     async uploadResume(file: Express.Multer.File): Promise<string> {
         try {

@@ -48,6 +48,9 @@ export class WebsiteProductEntity extends BaseEntity {
     @Column({ name: 'home_banner', type: 'varchar', length: 255, nullable: true })
     homeBanner: string;
 
+    @Column({ name: 'footer_banner', type: 'varchar', length: 255, nullable: true })
+    footerBanner: string;
+
     @Column({ name: 'blog_image', type: 'varchar', length: 255, nullable: true })
     blogImage: string;
 

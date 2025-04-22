@@ -21,6 +21,12 @@ export class AmenitiesEntity {
 
     @Column({ name: 'desc', type: 'varchar', length: 255, nullable: true })
     desc: string;
+
+    @Column('varchar', { name: 'company_code', length: 20, nullable: false, })
+    companyCode: string;
+
+    @Column('varchar', { name: 'unit_code', length: 20, nullable: false, })
+    unitCode: string;
 }
 
 

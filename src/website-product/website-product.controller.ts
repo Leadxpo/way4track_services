@@ -22,6 +22,7 @@ export class WebsiteProductController {
     @UseInterceptors(FileFieldsInterceptor(
         [
             { name: 'homeBanner', maxCount: 1 },
+            { name: 'footerBanner', maxCount: 1 },
             { name: 'banner1', maxCount: 1 },
             { name: 'banner2', maxCount: 1 },
             { name: 'banner3', maxCount: 1 },
@@ -31,6 +32,7 @@ export class WebsiteProductController {
     ))
     async handleWebsiteProductDetails(@Body() dto: WebsiteProductDto, @UploadedFiles() photos: {
         homeBanner?: Express.Multer.File[],
+        footerBanner?: Express.Multer.File[],
         banner1?: Express.Multer.File[],
         banner2?: Express.Multer.File[],
         banner3?: Express.Multer.File[],

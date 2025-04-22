@@ -125,27 +125,6 @@ export class StaffService {
             }
             console.log(qualifications, "qualifications")
 
-            // if (files?.experience) {
-            //     for (let i = 0; i < files.experience.length; i++) {
-            //         const file = files.experience[i];
-            //         const filePath = await this.uploadFile(file, `experience_files/${newStaff.staffId}_${file.originalname}`);
-
-            //         if (experience[i]) {
-            //             experience[i].uploadLetters = filePath;
-            //         } else {
-            //             console.warn(`No matching experience entry found for file: ${file.originalname}. Adding default entry.`);
-            //             experience.push({
-            //                 previousCompany: '',
-            //                 previous_designation: 'Unknown',
-            //                 total_experience: '',
-            //                 previous_salary: '',
-            //                 letter: Letters.OFFER_LETTER, // ✅ Assigning a specific enum value
-            //                 uploadLetters: filePath,
-            //             });
-            //         }
-            //     }
-            // }
-
             if (files?.experience) {
                 for (let i = 0; i < files.experience.length; i++) {
                     const file = files.experience[i];
@@ -187,27 +166,49 @@ export class StaffService {
             await this.service.savePermissionDetails(permissionsDto);
 
             // Upload Letter Documents
-            const lettersDto: LettersDto = {
-                staffId: newStaff.staffId,
-                companyCode: req.companyCode,
-                unitCode: req.unitCode,
-                offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
-                resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
-                terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
-                appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
-                leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
-                relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
-                experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
-            };
-            console.log(lettersDto, "=====<<<<");
+            // const lettersDto: LettersDto = {
+            //     staffId: newStaff.staffId,
+            //     companyCode: req.companyCode,
+            //     unitCode: req.unitCode,
+            //     offerLetter: files?.offerLetter?.[0] ? await this.uploadFile(files.offerLetter[0], `letters/${newStaff.staffId}_offer.pdf`) : null,
+            //     resignationLetter: files?.resignationLetter?.[0] ? await this.uploadFile(files.resignationLetter[0], `letters/${newStaff.staffId}_resignation.pdf`) : null,
+            //     terminationLetter: files?.terminationLetter?.[0] ? await this.uploadFile(files.terminationLetter[0], `letters/${newStaff.staffId}_termination.pdf`) : null,
+            //     appointmentLetter: files?.appointmentLetter?.[0] ? await this.uploadFile(files.appointmentLetter[0], `letters/${newStaff.staffId}_appointment.pdf`) : null,
+            //     leaveFormat: files?.leaveFormat?.[0] ? await this.uploadFile(files.leaveFormat[0], `letters/${newStaff.staffId}_leave.pdf`) : null,
+            //     relievingLetter: files?.relievingLetter?.[0] ? await this.uploadFile(files.relievingLetter[0], `letters/${newStaff.staffId}_relieving.pdf`) : null,
+            //     experienceLetter: files?.experienceLetter?.[0] ? await this.uploadFile(files.experienceLetter[0], `letters/${newStaff.staffId}_experience.pdf`) : null
+            // };
+            // console.log(lettersDto, "=====<<<<");
 
-            await this.lettersService.saveLetterDetails(lettersDto);
+            // await this.lettersService.saveLetterDetails(lettersDto);
 
             return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
         } catch (error) {
-            console.error(`Error creating staff details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to create staff details: ${error.message}`);
+            console.error('Error saving staff details:', error);
+
+            // Handle TypeORM QueryFailedError (e.g., unique constraint, null value, etc.)
+            const code = error.driverError?.code;
+            let errorMessage = 'Database error occurred.';
+            let field = '';
+
+            switch (code) {
+                case '23505': // unique_violation
+                    field = error.driverError.detail?.match(/\(([^)]+)\)/)?.[1] || '';
+                    errorMessage = 'Duplicate entry found.';
+                    break;
+                case '23502': // not_null_violation
+                    field = error.driverError.column || '';
+                    errorMessage = 'A required field is missing.';
+                    break;
+                case '23503': // foreign_key_violation
+                    field = error.driverError.constraint || '';
+                    errorMessage = 'Invalid reference to another table.';
+                    break;
+            }
+
+            throw new ErrorResponse(400, `${errorMessage} ${field ? 'Field: ' + field : ''}`);
         }
+
     }
 
 
@@ -301,21 +302,40 @@ export class StaffService {
             }
 
             await this.staffRepository.update(existingStaff.id, updatedStaff);
-            if (letterUpdates) {
-                if (existingLetters.id) {
-                    await this.letterRepo.update(existingLetters.id, letterUpdates);
-                } else {
-                    await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
-                }
-            }
-
-
-
+            // if (letterUpdates) {
+            //     if (existingLetters.id) {
+            //         await this.letterRepo.update(existingLetters.id, letterUpdates);
+            //     } else {
+            //         await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
+            //     }
+            // }
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
-            console.error('Error:', error.message);
-            throw new ErrorResponse(5416, error.message);
+            console.error('Error saving staff details:', error);
+
+            // Handle TypeORM QueryFailedError (e.g., unique constraint, null value, etc.)
+            const code = error.driverError?.code;
+            let errorMessage = 'Database error occurred.';
+            let field = '';
+
+            switch (code) {
+                case '23505': // unique_violation
+                    field = error.driverError.detail?.match(/\(([^)]+)\)/)?.[1] || '';
+                    errorMessage = 'Duplicate entry found.';
+                    break;
+                case '23502': // not_null_violation
+                    field = error.driverError.column || '';
+                    errorMessage = 'A required field is missing.';
+                    break;
+                case '23503': // foreign_key_violation
+                    field = error.driverError.constraint || '';
+                    errorMessage = 'Invalid reference to another table.';
+                    break;
+            }
+
+            throw new ErrorResponse(400, `${errorMessage} ${field ? 'Field: ' + field : ''}`);
         }
+
     }
 
 

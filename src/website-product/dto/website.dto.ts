@@ -10,6 +10,7 @@ export class WebsiteProductDto {
     banner2?: string;
     banner3?: string;
     homeBanner?: string;
+    footerBanner: string;
     blogImage?: string;
     steps: {
         desc: string;

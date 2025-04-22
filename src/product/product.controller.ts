@@ -55,9 +55,9 @@ export class ProductController {
   }
 
   @Post('getAllproductDetails')
-  async getAllproductDetails(): Promise<CommonResponse> {
+  async getAllproductDetails(@Body() dto: CommonReq): Promise<CommonResponse> {
     try {
-      return await this.productService.getAllproductDetails();
+      return await this.productService.getAllproductDetails(dto);
     } catch (error) {
       console.error('Error in get client details in service:', error);
       return new CommonResponse(false, 500, 'Error fetching client details');
