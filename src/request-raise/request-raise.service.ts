@@ -59,7 +59,16 @@ export class RequestRaiseService {
         try {
             entity = this.requestAdapter.convertDtoToEntity(dto);
             entity.id = null; // Ensure it's treated as a new insert
-            entity.requestId = `RR-${(await this.requestRepository.count() + 1).toString().padStart(5, '0')}`;
+            // entity.requestId = `RR-${(await this.requestRepository.count() + 1).toString().padStart(5, '0')}`;
+
+
+            const lastTicket = await this.requestRepository
+                .createQueryBuilder("ticket")
+                .select("MAX(ticket.request_id)", "max")
+                .getRawOne();
+
+            const nextId = (lastTicket.max ?? 0) + 1;
+            entity.requestId = `RR-${nextId.toString().padStart(5, '0')}`;
 
             console.log("Saving entity:", entity); // Debugging line
 
