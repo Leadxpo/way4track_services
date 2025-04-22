@@ -122,7 +122,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'ticket.ticket_number AS ticketNumber',
                 'ticket.problem AS problem',
                 'ticket.date AS date',
-                'ticket.addressing_department AS addressingDepartment',
+                // 'ticket.addressing_department AS addressingDepartment',
                 'ticket.company_code AS companyCode',
                 'ticket.unit_code AS unitCode',
                 'branch.name AS branchName',

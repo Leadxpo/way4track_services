@@ -45,13 +45,13 @@ export class TicketsEntity {
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
 
-    @Column({
-        name: 'addressing_department',
-        type: 'enum',
-        enum: AddressingDepartment,
-        default: AddressingDepartment.CEO
-    })
-    addressingDepartment: AddressingDepartment;
+    // @Column({
+    //     name: 'addressing_department',
+    //     type: 'enum',
+    //     enum: AddressingDepartment,
+    //     default: AddressingDepartment.CEO
+    // })
+    // addressingDepartment: AddressingDepartment;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

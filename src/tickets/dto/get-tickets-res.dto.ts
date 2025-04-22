@@ -10,14 +10,15 @@ export class GetTicketsResDto {
     branchId: number;
     branchName: string;
     ticketNumber: string;
-    addressingDepartment: AddressingDepartment;
+    // addressingDepartment: AddressingDepartment;
     companyCode: string;
     unitCOde: string;
     workStatus?: WorkStatusEnum;
     description?: string;
     subDealerId?: number
+    subDealerName?: string
     designationRelation?: number
-
+    designation?: string
     constructor(
         staffId: number,
         staffName: string,
@@ -27,13 +28,16 @@ export class GetTicketsResDto {
         branchId: number,
         branchName: string,
         ticketNumber: string,
-        addressingDepartment: AddressingDepartment,
+        // // addressingDepartment: AddressingDepartment,
         companyCode: string,
         unitCOde: string,
         workStatus?: WorkStatusEnum,
         description?: string,
         subDealerId?: number,
-        designationRelation?: number
+        subDealerName?: string,
+        designationRelation?: number,
+        designation?: string
+
 
     ) {
         this.staffId = staffId;
@@ -44,12 +48,14 @@ export class GetTicketsResDto {
         this.branchId = branchId;
         this.branchName = branchName;
         this.ticketNumber = ticketNumber;
-        this.addressingDepartment = addressingDepartment;
+        // this.addressingDepartment = addressingDepartment;
         this.companyCode = companyCode;
         this.unitCOde = unitCOde
         this.workStatus = workStatus
         this.description = description
         this.subDealerId = subDealerId
+        this.subDealerName = subDealerName
         this.designationRelation = designationRelation
+        this.designation = designation
     }
 }

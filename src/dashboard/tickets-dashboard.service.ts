@@ -40,7 +40,7 @@ export class TicketsDashboardService {
                     'ticket.id as ticketId',
                     'ticket.ticket_number as ticketNumber',
                     'staff.name AS staffName',
-                    'ticket.addressing_department as addressingDepartment',
+                    // 'ticket.addressing_department as addressingDepartment',
                     'branch.name AS branchName',
                     'ticket.date as date',
                 ])

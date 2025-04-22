@@ -1,3 +1,3 @@
-export enum AddressingDepartment {
-    HR = "HR"
-}
+// export enum AddressingDepartment {
+//     HR = "HR"
+// }

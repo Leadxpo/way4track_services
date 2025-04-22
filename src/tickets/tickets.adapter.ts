@@ -14,7 +14,7 @@ export class TicketsAdapter {
         const entity = new TicketsEntity();
         entity.problem = dto.problem;
         entity.date = dto.date;
-        entity.addressingDepartment = dto.addressingDepartment
+        // entity.addressingDepartment = dto.addressingDepartment
 
         const staff = new StaffEntity();
         staff.id = dto.staffId;
@@ -55,11 +55,15 @@ export class TicketsAdapter {
                 entity.branch?.id || 0,
                 entity.branch?.branchName || '',
                 entity.ticketNumber,
-                entity.addressingDepartment,
+                // entity.addressingDepartment,
                 entity.companyCode,
                 entity.unitCode,
                 entity.workStatus,
-                entity.description
+                entity.description,
+                entity.subDealerId?.id,
+                entity.subDealerId?.name,
+                entity.designationRelation?.id,
+                entity.designationRelation?.designation
             );
         });
     }

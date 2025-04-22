@@ -7,7 +7,7 @@ export class TicketsDto {
     problem: string;
     date: Date;
     branchId: number;
-    addressingDepartment: AddressingDepartment;
+    // addressingDepartment: AddressingDepartment;
     companyCode: string;
     unitCode: string;
     workStatus: WorkStatusEnum;
