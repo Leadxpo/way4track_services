@@ -34,6 +34,9 @@ import { ClientRepository } from 'src/client/repo/client.repo';
 import { ClientService } from 'src/client/client.service';
 import { ClientDto } from 'src/client/dto/client.dto';
 import { ClientStatus } from 'src/client/enum/client-status.enum';
+import { StaffRepository } from 'src/staff/repo/staff-repo';
+import { NotificationRepository } from 'src/notifications/repo/notification.repo';
+import { NotificationAdapter } from 'src/notifications/notification.adapter';
 
 
 @Injectable()
@@ -48,7 +51,10 @@ export class TechnicianService {
         private serviceRepo: ServiceTypeRepository,
         private notificationService: NotificationService,
         private clientService: ClientService,
-        private clientRepo: ClientRepository
+        private clientRepo: ClientRepository,
+        private staffRepository: StaffRepository,
+        private notificationRepository: NotificationRepository,
+        private notificationAdapter: NotificationAdapter
 
     ) {
         this.storage = new Storage({
@@ -266,7 +272,7 @@ export class TechnicianService {
                 try {
                     await this.clientService.createClientDetails(clientDto);
                 } catch (notificationError) {
-                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                    console.error(`client failed: ${notificationError.message}`, notificationError.stack);
                 }
             }
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
@@ -336,32 +342,11 @@ export class TechnicianService {
                 ]
             });
             req.productId = product?.id;
-            const photoMapping: Record<string, string> = {
-                photo1: 'vehiclePhoto1',
-                photo2: 'vehiclePhoto2',
-                photo3: 'vehiclePhoto3',
-                photo4: 'vehiclePhoto4',
-                photo5: 'vehiclePhoto5',
-                photo6: 'vehiclePhoto6',
-                photo7: 'vehiclePhoto7',
-                photo8: 'vehiclePhoto8',
-                photo9: 'vehiclePhoto9',
-                photo10: 'vehiclePhoto10',
-                screenShot: 'screenShot',
-                image: 'image',
-                videos: 'videos'
-            };
+
 
             // ✅ Ensure filePaths is always a valid object
             filePaths = filePaths ?? {};
             console.log(filePaths, "files")
-
-
-            // for (const [field, entityField] of Object.entries(photoMapping)) {
-            //     if (filePaths[field]) {
-            //         (existingTechnician as any)[entityField] = filePaths[field];
-            //     }
-            // }
 
             console.log("Saving technician with remarks: before", existingTechnician.remark);
             let parsedRemark = req.remark;
@@ -405,6 +390,42 @@ export class TechnicianService {
                     console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
                 }
             }
+
+
+            // New logic: Notify related staff of new remarks
+            if (newRemarks.length > 0) {
+                const relatedStaff = await this.staffRepository.find({
+                    where: {
+                        companyCode: existingTechnician.companyCode,
+                        unitCode: existingTechnician.unitCode,
+                        staffId: existingTechnician.staffId.staffId
+                    },
+                    relations: ['branch'] // Make sure branch is loaded if it's a relation
+                });
+
+                for (const staff of relatedStaff) {
+                    for (const newRemark of newRemarks) {
+                        const message = `New remark added: ${newRemark?.text || 'No message'}`;
+
+                        const notificationEntity = this.notificationAdapter.convertDtoToEntity({
+                            message,
+                            createdAt: new Date(),
+                            isRead: false,
+                            notificationType: NotificationEnum.TechnicianWorks,
+                            userId: staff.id,
+                            branchId: typeof staff.branch === 'object' ? staff.branch.id : staff.branch,
+                            companyCode: staff.companyCode,
+                            unitCode: staff.unitCode,
+                            subDealerId: null, // ✅ Add this line
+                        });
+
+
+                        await this.notificationRepository.insert(notificationEntity);
+                    }
+                }
+            }
+
+
             // ✅ Convert rest of DTO, remove remark
             let convertedData = this.adapter.convertDtoToEntity(req);
             delete convertedData.remark;
