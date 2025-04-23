@@ -157,7 +157,7 @@ export class SubDealerStaffService {
 
     async getSubDealerStaffLogin(req: LoginDto): Promise<CommonResponse> {
         try {
-            const subDealerStaff = await this.repo.find({ where: { staffId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const subDealerStaff = await this.repo.findOne({ where: { staffId: req.staffId, password: req.password, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!subDealerStaff) {
                 return new CommonResponse(false, 404, 'subDealerStaff not found');
             }
