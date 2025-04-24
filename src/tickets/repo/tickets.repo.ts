@@ -169,7 +169,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.staffId) {
-            query.andWhere('wa.staff_id = :staffId', { staffId: req.staffId });
+            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
         }
 
         if (req.subDealerId) {

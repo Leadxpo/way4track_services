@@ -115,6 +115,5 @@ export class NotificationService {
         } else {
             return new CommonResponse(true, 200, "Data retrieved successfully", data)
         }
-
     }
 }
