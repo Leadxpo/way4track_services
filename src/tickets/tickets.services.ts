@@ -99,14 +99,13 @@ export class TicketsService {
 
     async getTicketDetailsById(req: TicketsIdDto): Promise<CommonResponse> {
         try {
-            const ticket = await this.ticketsRepository.find({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['staff', 'branch'] });
+            const ticket = await this.ticketsRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['staff', 'branch'] });
 
             if (!ticket) {
                 return new CommonResponse(false, 404, 'Ticket not found');
             }
 
-            const dto = this.ticketsAdapter.convertEntityToDto(ticket);
-            return new CommonResponse(true, 200, 'Ticket details fetched successfully', dto);
+            return new CommonResponse(true, 200, 'Ticket details fetched successfully', ticket);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }

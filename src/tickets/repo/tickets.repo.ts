@@ -9,6 +9,7 @@ import { WorkStatusEnum } from "src/work-allocation/enum/work-status-enum";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { StaffEntity } from "src/staff/entity/staff.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
+import { DesignationEntity } from "src/designation/entity/designation.entity";
 
 
 
@@ -133,6 +134,7 @@ export class TicketsRepository extends Repository<TicketsEntity> {
             .leftJoin('ticket.branch', 'branch')
             .leftJoin('ticket.staff', 'staff')
             .leftJoin(SubDealerEntity, 'sb', 'ticket.sub_dealer_id = sb.id')
+            .leftJoinAndSelect(DesignationEntity, 'de', 'de.id = ticket.designation_id')
             .where('ticket.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ticket.unit_code = :unitCode', { unitCode: req.unitCode })
 
