@@ -11,6 +11,7 @@ import { ErrorResponse } from 'src/models/error-response';
 import { In } from 'typeorm';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TechinicianWoksRepository } from 'src/technician-works/repo/technician-works.repo';
+import { CommonReq } from 'src/models/common-req';
 
 
 @Injectable()
@@ -116,4 +117,17 @@ export class NotificationService {
             return new CommonResponse(true, 200, "Data retrieved successfully", data)
         }
     }
+
+    async getNotifications(req: CommonReq): Promise<CommonResponse> {
+        try {
+            const request = await this.notificationRepository.find({ relations: ['user', 'request', 'subDealerId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            if (!request) {
+                return new CommonResponse(false, 404, 'notifications not found');
+            }
+            return new CommonResponse(true, 200, 'notifications details fetched successfully', request);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
 }

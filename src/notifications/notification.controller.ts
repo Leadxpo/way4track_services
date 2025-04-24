@@ -2,6 +2,7 @@ import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
 import { UpdateNotificationDto } from './dto/notification.dto';
 import { NotificationService } from './notification.service';
+import { CommonReq } from 'src/models/common-req';
 
 
 @Controller('notifications')
@@ -26,6 +27,16 @@ export class NotificationController {
     }) {
         try {
             return this.notificationService.getAllNotifications(req);
+        } catch (error) {
+            console.error('Error in delete vendor details:', error);
+            return new CommonResponse(false, 500, 'Error deleting vendor details');
+        }
+    }
+
+    @Post('getNotifications')
+    async getNotifications(@Body() req: CommonReq) {
+        try {
+            return this.notificationService.getNotifications(req);
         } catch (error) {
             console.error('Error in delete vendor details:', error);
             return new CommonResponse(false, 500, 'Error deleting vendor details');
