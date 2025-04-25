@@ -51,7 +51,7 @@ export class BranchEntity extends BaseEntity {
   @Column({ name: 'branch_opening', type: 'datetime', nullable: true })
   branchOpening: Date;
 
-  @Column({ name: 'email', type: 'varchar', length: 255, unique: true })
+  @Column({ name: 'email', type: 'varchar', length: 255, nullable: true})
   email: string;
 
   @Column({ name: 'branch_photo', type: 'text', nullable: true })
