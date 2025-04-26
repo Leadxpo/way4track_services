@@ -64,21 +64,33 @@ export class AmenitiesService {
     async updateDeviceDetails(dto: AmenitiesDto, filePath: string | null): Promise<CommonResponse> {
         try {
             const existing = await this.repo.findOne({ where: { id: dto.id } });
-
+            console.log(existing, "?????????");
             if (!existing) throw new Error('amenities not found');
             if (filePath && existing.image) {
-                const existingFilePath = existing.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const existingFilePath = existing.image
+                    .replace(`https://storage.googleapis.com/${this.bucketName}/`, '')
+                    .trim(); // 🧼 Clean extra spaces
+
                 const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
                 try {
-                    await file.delete();
-                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    const [exists] = await file.exists(); // ✅ Check existence
+                    if (exists) {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } else {
+                        console.warn(`File not found in GCS, skipping delete: ${existingFilePath}`);
+                    }
                 } catch (error) {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-            Object.assign(existing, this.adapter.convertDtoToEntity(dto));
-            await this.repo.update(dto.id, dto);
+
+
+            const updated = this.adapter.convertDtoToEntity(dto);
+            if (filePath) updated.image = filePath;
+            Object.assign(existing, updated);
+            await this.repo.save(existing);
             return new CommonResponse(true, 200, 'Device updated successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
@@ -104,7 +116,7 @@ export class AmenitiesService {
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
-
+            console.log(item, "??????????")
             if (!item) return new CommonResponse(false, 404, 'Device not found');
             return new CommonResponse(true, 200, 'Device fetched successfully', item);
         } catch (error) {
@@ -119,6 +131,7 @@ export class AmenitiesService {
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
+            console.log(items, "??????????")
 
             if (!items || !items.length) return new CommonResponse(false, 404, 'Device not found');
 

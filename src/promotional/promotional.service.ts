@@ -70,6 +70,8 @@ export class PromotionService {
                 uploadedImages.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
             }
         }
+        console.log(req, ">")
+        console.log(uploadedImages, "999")
 
         return req.id
             ? await this.updateTechnicianDetails(req, filePaths, uploadedImages)
@@ -88,24 +90,31 @@ export class PromotionService {
             entity.image = filePaths.image;
         }
 
-        // Parse list if it's a string
         if (typeof entity.list === 'string') {
             try {
                 entity.list = JSON.parse(entity.list);
+
+                // Important fix: if it's a single object, wrap it into an array
+                if (!Array.isArray(entity.list)) {
+                    entity.list = [entity.list];
+                }
+
             } catch (e) {
                 console.error('Failed to parse list string', entity.list);
                 entity.list = [];
             }
         }
 
-        // Map list to include uploaded photo URLs
+        console.log(uploadedImages, ">>>>");
+
         if (Array.isArray(entity.list)) {
-            entity.list = entity.list.map((list, index) => ({
-                ...list,
+            entity.list = entity.list.map((listItem, index) => ({
+                ...listItem,
                 photo: uploadedImages[index] || null,
             }));
         }
 
+        console.log(entity.list, "??????")
         const savedEntity = await this.promoRepo.save(entity);
         return new CommonResponse(true, 65152, 'Technician created Successfully', savedEntity);
     }
@@ -127,9 +136,13 @@ export class PromotionService {
 
         let parsedList = dto.list;
 
+        // Step 1: parse the list correctly
         if (typeof parsedList === 'string') {
             try {
                 parsedList = JSON.parse(parsedList);
+                if (!Array.isArray(parsedList)) {
+                    parsedList = [parsedList];
+                }
             } catch (e) {
                 console.error('Failed to parse list string', parsedList);
                 parsedList = [];
@@ -140,27 +153,36 @@ export class PromotionService {
             parsedList = [];
         }
 
-        const newLists = parsedList.map((list, index) => ({
-            ...list,
+        // Step 2: attach uploaded photo to list
+        const newLists = parsedList.map((listItem, index) => ({
+            ...listItem,
             photo: uploadedImages[index] || null,
         }));
 
+        console.log(newLists, "newLists >>>");
+
+        // Step 3: Now safely update fields
         const entity = this.adapter.fromDtoToEntity(dto);
 
-        // Merge existing list with new list
-        existing.list = Array.isArray(existing.list)
-            ? [...existing.list, ...newLists]
-            : newLists;
-
-        Object.assign(existing, entity);
+        // Manually assign fields you want to update
+        existing.name = entity.name;
+        existing.header = entity.header;
+        existing.shortDescription = entity.shortDescription;
+        existing.theme = entity.theme;
 
         if (filePaths.image) {
             existing.image = filePaths.image;
         }
 
-        await this.promoRepo.update(dto.id, existing);
+        // Very important: Set the corrected list
+        existing.list = newLists;
+
+        // Step 4: Save
+        await this.promoRepo.save(existing);
+
         return new CommonResponse(true, 65152, 'Technician Updated Successfully', existing);
     }
+
 
     async findAll(): Promise<CommonResponse> {
         try {

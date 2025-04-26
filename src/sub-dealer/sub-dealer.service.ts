@@ -130,7 +130,7 @@ export class SubDealerService {
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }
-      await this.subDealerRepository.delete(dto.subDealerId);
+      await this.subDealerRepository.delete(subDealer.subDealerId);
       return new CommonResponse(true, 200, 'SubDealer details deleted successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);

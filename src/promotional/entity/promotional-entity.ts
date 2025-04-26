@@ -25,7 +25,7 @@ export class PromotionEntity extends BaseEntity {
     @Column({ name: 'image', type: 'varchar', length: 255, nullable: true })
     image: string;
 
-    @Column('json', { name: 'steps' })
+    @Column('json', { name: 'list', nullable: true })
     list: {
         photo?: string;
         desc: string;

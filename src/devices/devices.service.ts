@@ -66,9 +66,11 @@ export class DeviceService {
 
   async updateDeviceDetails(dto: DeviceDto, filePath: string | null): Promise<CommonResponse> {
     try {
+      console.log(dto);
       const existing = await this.deviceRepository.findOne({ where: { id: dto.id } });
-
+      console.log(existing, "?????????");
       if (!existing) throw new Error('Device not found');
+
       if (filePath && existing.image) {
         const existingFilePath = existing.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
         const file = this.storage.bucket(this.bucketName).file(existingFilePath);
@@ -80,8 +82,13 @@ export class DeviceService {
           console.error(`Error deleting old file from GCS: ${error.message}`);
         }
       }
-      Object.assign(existing, this.adapter.convertDtoToEntity(dto));
-      await this.deviceRepository.update(dto.id, dto);
+
+      const updated = this.adapter.convertDtoToEntity(dto);
+      if (filePath) updated.image = filePath;
+
+      Object.assign(existing, updated);
+      await this.deviceRepository.save(existing); // ✅ Save the merged result
+
       return new CommonResponse(true, 200, 'Device updated successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);

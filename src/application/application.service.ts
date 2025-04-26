@@ -68,18 +68,28 @@ export class ApplicationService {
 
             if (!existing) throw new Error('Application not found');
             if (filePath && existing.image) {
-                const existingFilePath = existing.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const existingFilePath = existing.image
+                    .replace(`https://storage.googleapis.com/${this.bucketName}/`, '')
+                    .trim(); // 🧼 Clean extra spaces
+
                 const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
                 try {
-                    await file.delete();
-                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    const [exists] = await file.exists(); // ✅ Check existence
+                    if (exists) {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } else {
+                        console.warn(`File not found in GCS, skipping delete: ${existingFilePath}`);
+                    }
                 } catch (error) {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-            Object.assign(existing, this.adapter.convertDtoToEntity(dto));
-            await this.repo.update(dto.id, dto);
+            const updated = this.adapter.convertDtoToEntity(dto);
+            if (filePath) updated.image = filePath;
+            Object.assign(existing, updated);
+            await this.repo.save(existing);
             return new CommonResponse(true, 200, 'Application updated successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
