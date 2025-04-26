@@ -6,6 +6,7 @@ import { PermissionEntity } from 'src/permissions/entity/permissions.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
+import { StaffStatus } from 'src/staff/enum/staff-status';
 import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
@@ -98,4 +99,13 @@ export class SubDealerEntity {
 
   @OneToMany(() => ProductEntity, (asserts) => asserts.subDealerId)
   product: ProductEntity[];
+
+  @Column({
+    type: 'enum',
+    name: 'status',
+    enum: StaffStatus,
+    nullable: true,
+    default: StaffStatus.ACTIVE
+  })
+  status: StaffStatus;
 }

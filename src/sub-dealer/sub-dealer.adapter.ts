@@ -22,7 +22,7 @@ export class SubDealerAdapter {
         entity.unitCode = dto.unitCode;
         entity.password = dto.password;
         entity.subDealerPhoto = dto.subDealerPhoto;
-
+        entity.status = dto.status
         // if (dto.voucherId) {
         //     const voucher = new VoucherEntity();
         //     voucher.id = dto.voucherId;

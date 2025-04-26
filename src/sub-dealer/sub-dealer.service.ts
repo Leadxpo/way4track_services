@@ -9,6 +9,7 @@ import { SubDealerDto } from './dto/sub-dealer.dto';
 import { SubDealerRepository } from './repo/sub-dealer.repo';
 import { SubDealerAdapter } from './sub-dealer.adapter';
 import { SubDealerEntity } from './entity/sub-dealer.entity';
+import { StaffStatus } from 'src/staff/enum/staff-status';
 
 @Injectable()
 export class SubDealerService {
@@ -126,16 +127,25 @@ export class SubDealerService {
 
   async deleteSubDealerDetails(dto: SubDealerIdDto): Promise<CommonResponse> {
     try {
-      const subDealer = await this.subDealerRepository.findOne({ where: { subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode } });
+      const subDealer = await this.subDealerRepository.findOne({
+        where: { subDealerId: dto.subDealerId, companyCode: dto.companyCode, unitCode: dto.unitCode }
+      });
+
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }
-      await this.subDealerRepository.delete({ subDealerId: String(dto.subDealerId) });
+
+      await this.subDealerRepository.update(
+        { subDealerId: subDealer.subDealerId },
+        { status: StaffStatus.INACTIVE }
+      );
+
       return new CommonResponse(true, 200, 'SubDealer details deleted successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
   }
+
 
   async getSubDealerDetails(req: CommonReq): Promise<CommonResponse> {
     try {

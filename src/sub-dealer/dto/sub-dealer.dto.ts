@@ -1,3 +1,5 @@
+import { StaffStatus } from "src/staff/enum/staff-status";
+
 export class SubDealerDto {
   id?: number;
   name: string;
@@ -15,4 +17,6 @@ export class SubDealerDto {
   password: string
   subDealerPhoto?: string;
   branchId?: number;
+  status?: StaffStatus;
+
 }
