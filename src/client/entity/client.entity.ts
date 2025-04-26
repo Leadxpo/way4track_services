@@ -85,10 +85,10 @@ export class ClientEntity extends BaseEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @Column({ name: 'hsn_code', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'hsn_code', type: 'varchar', length: 100, nullable: true })
     hsnCode: string;
 
-    @Column({ name: 'sac_code', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'sac_code', type: 'varchar', length: 100, nullable: true })
     SACCode: string;
 
     @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })

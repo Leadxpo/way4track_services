@@ -118,7 +118,7 @@ export class VoucherEntity {
     @Column({ name: 'building_address', type: 'varchar', length: 255, nullable: true, default: null })
     buildingAddress: string;
 
-    @Column({ name: 'hsn_code', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'hsn_code', type: 'varchar', length: 100, nullable: true })
     hsnCode: string;
 
     @Column({ name: 'journal_type', type: 'enum', nullable: true, enum: DebitORCreditEnum })
@@ -222,7 +222,7 @@ export class VoucherEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column('varchar', { name: 'invoice_id', length: 20, nullable: true })
+    @Column('varchar', { name: 'invoice_id', length: 100, nullable: true })
     invoiceId: string;
 
     @ManyToOne(() => EstimateEntity, (Estimate) => Estimate.invoice, { nullable: true })

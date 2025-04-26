@@ -110,7 +110,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'secondary_network', type: 'varchar', length: 50, nullable: true })
   secondaryNetwork: string;
 
-  @Column({ name: 'sim_status', type: 'varchar', length: 20, nullable: true })
+  @Column({ name: 'sim_status', type: 'varchar', length: 100, nullable: true })
   simStatus: string;
 
   @Column({ name: 'plan_name', type: 'varchar', length: 100, nullable: true })

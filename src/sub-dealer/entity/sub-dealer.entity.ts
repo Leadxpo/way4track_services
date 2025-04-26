@@ -23,10 +23,10 @@ export class SubDealerEntity {
   @Column({ name: 'sub_dealer_photo', type: 'text', nullable: true })
   subDealerPhoto: string;
 
-  @Column({ name: 'sub_dealer_id', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'sub_dealer_id', type: 'varchar', length: 100, unique: true })
   subDealerId: string;
 
-  @Column({ name: 'password', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'password', type: 'varchar', length: 100 })
   password: string;
 
   @Column({ name: 'sub_dealer_phone_number', type: 'varchar', length: 15 })
@@ -35,7 +35,7 @@ export class SubDealerEntity {
   @Column({ name: 'alternate_phone_number', type: 'varchar', length: 15, nullable: true })
   alternatePhoneNumber?: string;
 
-  @Column({ name: 'gst_number', type: 'varchar', length: 20, unique: true, nullable: true })
+  @Column({ name: 'gst_number', type: 'varchar', length: 100, unique: true, nullable: true })
   gstNumber: string;
 
   @Column({ name: 'starting_date', type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
@@ -44,7 +44,7 @@ export class SubDealerEntity {
   @Column({ name: 'email', type: 'varchar', length: 150 })
   emailId: string;
 
-  @Column({ name: 'aadhar_number', type: 'varchar', length: 20, unique: true })
+  @Column({ name: 'aadhar_number', type: 'varchar', length: 100, unique: true })
   aadharNumber: string;
 
   @Column({ name: 'address', type: 'text' })

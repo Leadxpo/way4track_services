@@ -71,7 +71,7 @@ export class HiringEntity extends BaseEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
-    @Column({ name: 'driving_licence_number', type: 'varchar', length: 20, nullable: true })
+    @Column({ name: 'driving_licence_number', type: 'varchar', length: 100, nullable: true })
     drivingLicenceNumber: string;
 
     @Column({ name: 'driving_licence', type: 'enum', enum: YesNo, default: YesNo.NO })
