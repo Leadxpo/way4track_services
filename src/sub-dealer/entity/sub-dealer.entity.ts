@@ -26,7 +26,7 @@ export class SubDealerEntity {
   @Column({ name: 'sub_dealer_id', type: 'varchar', length: 100, unique: true })
   subDealerId: string;
 
-  @Column({ name: 'password', type: 'varchar', length: 100, unique: true })
+  @Column({ name: 'password', type: 'varchar', length: 100 })
   password: string;
 
   @Column({ name: 'sub_dealer_phone_number', type: 'varchar', length: 15 })
