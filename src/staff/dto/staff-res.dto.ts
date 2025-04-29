@@ -2,6 +2,7 @@ import { AccountType, Gender, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Qualification } from "../enum/qualifications.enum";
 import { StaffStatus } from "../enum/staff-status";
+import { Experience } from "./staff.dto";
 
 export class GetStaffResDto {
     id: number;
@@ -70,6 +71,7 @@ export class GetStaffResDto {
     staffStatus?: StaffStatus;
     accountBranch?: string;
     uniqueId?: string;
+    experienceDetails?: Experience[]
 
     constructor(
         id: number,
@@ -136,7 +138,9 @@ export class GetStaffResDto {
         carryForwardLeaves?: number,
         staffStatus?: StaffStatus,
         accountBranch?: string | undefined,
-        uniqueId?: string
+        uniqueId?: string,
+        experienceDetails?: Experience[]
+
 
 
 
@@ -208,6 +212,7 @@ export class GetStaffResDto {
         this.staffStatus = staffStatus
         this.branchName = branchName
         this.uniqueId = uniqueId
+        this.experienceDetails = experienceDetails
     }
 }
 

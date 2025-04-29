@@ -24,10 +24,6 @@ export class StaffDto {
     bloodGroup?: string;
     joiningDate: string;
     beforeExperience: number;
-    // previousCompany?: string;
-    // previousDesignation?: string;
-    // totalExperience?: number;
-    // previousSalary?: number;
     bankName?: string;
     accountNumber?: string;
     ifscCode?: string;

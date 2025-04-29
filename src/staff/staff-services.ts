@@ -102,8 +102,32 @@ export class StaffService {
             }
 
             // Handle Qualifications and Qualification Files
-            let qualifications: Qualifications[] = Array.isArray(req.qualifications) ? [...req.qualifications] : [];
-            let experience: Experience[] = Array.isArray(req.experienceDetails) ? [...req.experienceDetails] : [];
+            let qualifications: Qualifications[] = [];
+
+            if (typeof req.qualifications === 'string') {
+                try {
+                    qualifications = JSON.parse(req.qualifications);
+                } catch (e) {
+                    console.error("Invalid JSON in qualifications:", req.qualifications);
+                    qualifications = [];
+                }
+            } else if (Array.isArray(req.qualifications)) {
+                qualifications = [...req.qualifications];
+            }
+
+            let experience: Experience[] = [];
+
+            if (typeof req.experienceDetails === 'string') {
+                try {
+                    experience = JSON.parse(req.experienceDetails);
+                } catch (e) {
+                    console.error("Invalid JSON in experienceDetails:", req.experienceDetails);
+                    experience = [];
+                }
+            } else if (Array.isArray(req.experienceDetails)) {
+                experience = [...req.experienceDetails];
+            }
+
 
 
             if (files?.qualificationFiles) {
