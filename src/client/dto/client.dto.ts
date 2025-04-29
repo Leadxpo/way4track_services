@@ -21,6 +21,6 @@ export class ClientDto {
     billWiseDate: boolean;
     status: ClientStatus
     branchName?: string;
-    password: string;
+    // password: string;
 
 }

@@ -94,6 +94,6 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })
     status: ClientStatus
 
-    @Column({ name: 'password', type: 'varchar' })
-    password: string;
+    // @Column({ name: 'password', type: 'varchar' })
+    // password: string;
 }

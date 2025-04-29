@@ -259,7 +259,7 @@ export class ClientService {
         try {
             console.log(req, "+++++++++++")
 
-            const client = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber, password: req.password } });
+            const client = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
             console.log(client, "+++++++++++")
 
             if (!client) {

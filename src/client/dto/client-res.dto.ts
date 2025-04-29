@@ -15,7 +15,7 @@ export class ClientResDto {
     companyCode: string;
     unitCode: string
     status: ClientStatus
-    password: string;
+    // password: string;
 
     constructor(
         id: number,
@@ -32,7 +32,7 @@ export class ClientResDto {
         companyCode: string,
         unitCode: string,
         status: ClientStatus,
-        password: string
+        // password: string
 
     ) {
         this.id = id;
@@ -49,6 +49,6 @@ export class ClientResDto {
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status
-        this.password=password
+        // this.password=password
     }
 }
