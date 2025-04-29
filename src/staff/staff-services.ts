@@ -265,6 +265,8 @@ export class StaffService {
             }
 
 
+
+
             // Update staff details
             const updatedStaff: Partial<StaffEntity> = {
                 ...existingStaff,
@@ -294,45 +296,80 @@ export class StaffService {
                 }
                 updatedStaff.resume = await this.uploadFile(files.resume[0], `resume/${existingStaff.resume}.jpg`)
             }
+            let newQualifications: Qualifications[] = [];
+            let newExperiences: Experience[] = [];
+            console.log('New Qualifications:', newQualifications);
 
-
-
-            let existingLetters = await this.letterRepo.findOne({ where: { staffId: { staffId: existingStaff.staffId } } });
-
-            if (!existingLetters) {
-                existingLetters = new LettersEntity();
-                existingLetters.staffId = existingStaff;
-                existingLetters.companyCode = req.companyCode;
-                existingLetters.unitCode = req.unitCode;
+            if (typeof req.qualifications === 'string') {
+                try {
+                    newQualifications = JSON.parse(req.qualifications);
+                } catch (e) {
+                    console.error("Invalid qualifications JSON");
+                }
+            } else if (Array.isArray(req.qualifications)) {
+                newQualifications = [...req.qualifications];
             }
 
-            // ✅ Handle letter file updates
-            const letterFiles = [
-                "offerLetter", "resignationLetter", "terminationLetter",
-                "appointmentLetter", "leaveFormat", "relievingLetter", "experienceLetter"
-            ];
+            if (typeof req.experienceDetails === 'string') {
+                try {
+                    newExperiences = JSON.parse(req.experienceDetails);
+                } catch (e) {
+                    console.error("Invalid experienceDetails JSON");
+                }
+            } else if (Array.isArray(req.experienceDetails)) {
+                newExperiences = [...req.experienceDetails];
+            }
+            const mergedQualifications: Qualifications[] = [...(existingStaff.qualifications || [])];
 
-            const letterUpdates: Partial<LettersEntity> = {};
 
-            for (const letterType of letterFiles) {
-                if (files?.[letterType]?.[0]) {
-                    if (existingLetters[letterType]) {
-                        await this.deleteFile(existingLetters[letterType]);
-                    }
-                    letterUpdates[letterType] = await this.uploadFile(files[letterType][0], `letters/${existingStaff.staffId}_${letterType}.pdf`);
+            for (const [index, item] of newQualifications.entries()) {
+                const file = files?.qualificationFiles?.[index];
+                const filePath = file ? await this.uploadFile(file, `qualification_files/${existingStaff.staffId}_${file.originalname}`) : null;
+                const qualificationData = {
+                    qualificationName: item.qualificationName || '',
+                    marksOrCgpa: item.marksOrCgpa !== undefined ? item.marksOrCgpa : null, // Ensure it's properly assigned
+                };
+
+                if (mergedQualifications[index]) {
+                    mergedQualifications[index] = {
+                        ...mergedQualifications[index],
+                        ...qualificationData,
+                        file: filePath || mergedQualifications[index].file
+                    };
                 } else {
-                    letterUpdates[letterType] = existingLetters[letterType];
+                    mergedQualifications.push({
+                        ...qualificationData,
+                        file: filePath
+                    });
+                }
+            }
+            updatedStaff.qualifications = mergedQualifications;
+            console.log('Merged Qualifications:', mergedQualifications);
+
+
+            const mergedExperience: Experience[] = [...(existingStaff.experienceDetails || [])];
+
+            for (const [index, item] of newExperiences.entries()) {
+                const file = files?.experience?.[index];
+                const filePath = file ? await this.uploadFile(file, `experience_files/${existingStaff.staffId}_${file.originalname}`) : null;
+
+                if (mergedExperience[index]) {
+                    mergedExperience[index] = {
+                        ...mergedExperience[index],
+                        ...item,
+                        uploadLetters: filePath || mergedExperience[index].uploadLetters
+                    };
+                } else {
+                    mergedExperience.push({
+                        ...item,
+                        uploadLetters: filePath
+                    });
                 }
             }
 
+
+            updatedStaff.experienceDetails = mergedExperience
             await this.staffRepository.update(existingStaff.id, updatedStaff);
-            // if (letterUpdates) {
-            //     if (existingLetters.id) {
-            //         await this.letterRepo.update(existingLetters.id, letterUpdates);
-            //     } else {
-            //         await this.letterRepo.save({ ...existingLetters, ...letterUpdates });
-            //     }
-            // }
             return new CommonResponse(true, 65152, 'Staff Details Updated Successfully');
         } catch (error) {
             console.error('Error saving staff details:', error);
