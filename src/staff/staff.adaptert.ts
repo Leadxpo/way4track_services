@@ -158,7 +158,8 @@ export class StaffAdapter {
                 staffMember.carryForwardLeaves,
                 staffMember.status,
                 staffMember.accountBranch ? staffMember.accountBranch : "",
-                staffMember.uniqueId
+                staffMember.uniqueId,
+                staffMember.experienceDetails
             );
         });
     }
