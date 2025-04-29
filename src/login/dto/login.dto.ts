@@ -5,6 +5,7 @@ export class LoginDto extends CommonReq {
     password: string;
     designation?: string;
     uniqueId?: string
+    phoneNumber?: string
 
     constructor(
         staffId: string,
@@ -14,7 +15,9 @@ export class LoginDto extends CommonReq {
         userId?: number,
         userName?: string,
         designation?: string,
-        uniqueId?: string
+        uniqueId?: string,
+        phoneNumber?: string
+
 
     ) {
         super(unitCode, companyCode, userId, userName);
@@ -22,5 +25,6 @@ export class LoginDto extends CommonReq {
         this.password = password;
         this.designation = designation;
         this.uniqueId = uniqueId
+        this.phoneNumber = phoneNumber
     }
 }

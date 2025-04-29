@@ -42,9 +42,10 @@ export class ClientAdapter {
         entity.tds = dto.tds
         entity.billWiseDate = dto.billWiseDate
         entity.status = dto.status
+        entity.password = dto.password
         return entity;
     }
-    
+
 
     convertEntityToDto(entity: ClientEntity[]): ClientResDto[] {
         return entity.map((client) => {
@@ -62,7 +63,8 @@ export class ClientAdapter {
                 client.joiningDate,
                 client.companyCode,
                 client.unitCode,
-                client.status
+                client.status,
+                client.password
             );
         });
     }

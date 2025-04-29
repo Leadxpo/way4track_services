@@ -6,6 +6,7 @@ import { ClientDto } from './dto/client.dto';
 import { ClientService } from './client.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CommonReq } from 'src/models/common-req';
+import { LoginDto } from 'src/login/dto/login.dto';
 const multerOptions = {
     storage: multer.memoryStorage(),
     limits: {
@@ -57,6 +58,16 @@ export class ClientController {
     async getClientDetailsById(@Body() req: ClientIdDto): Promise<CommonResponse> {
         try {
             return await this.clientService.getClientDetailsById(req);
+        } catch (error) {
+            console.error('Error in get client details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching client details');
+        }
+    }
+
+    @Post('clientLoginDetails')
+    async clientLoginDetails(@Body() req: LoginDto): Promise<CommonResponse> {
+        try {
+            return await this.clientService.clientLoginDetails(req);
         } catch (error) {
             console.error('Error in get client details in service:', error);
             return new CommonResponse(false, 500, 'Error fetching client details');

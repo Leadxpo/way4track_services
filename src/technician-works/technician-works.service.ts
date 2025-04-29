@@ -266,7 +266,7 @@ export class TechnicianService {
                     tcs: false,
                     billWiseDate: false,
                     status: ClientStatus.Active,
-
+                    password: ""
                 };
 
                 try {

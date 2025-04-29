@@ -223,7 +223,7 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ type: 'json', name: 'qualifications', nullable: true })
   qualifications: {
-    qualificationName: Qualification;
+    qualificationName: string;
     marksOrCgpa: number;
     file?: string;
   }[];

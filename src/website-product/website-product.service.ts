@@ -64,6 +64,7 @@ export class WebsiteProductService {
             if (dto.id) {
                 return await this.updateWebsiteProductDetails(dto, filePaths);
             } else {
+                console.log(filePaths, "+++++++++")
                 return await this.createWebsiteProductDetails(dto, filePaths);
             }
         } catch (error) {
@@ -75,6 +76,7 @@ export class WebsiteProductService {
     async createWebsiteProductDetails(dto: WebsiteProductDto, filePaths?: Record<string, string | null>,): Promise<CommonResponse> {
         try {
             const entity = this.adapter.convertDtoToEntity(dto);
+            console.log(filePaths, "+++++++++")
             if (filePaths) {
                 entity.homeBanner = filePaths.homeBanner;
                 entity.footerBanner = filePaths.footerBanner;
@@ -83,7 +85,7 @@ export class WebsiteProductService {
                 entity.banner3 = filePaths.banner3;
                 entity.blogImage = filePaths.blogImage;
             }
-
+            console.log(entity, "???????")
             await this.websiteProductRepository.insert(entity);
             return new CommonResponse(true, 201, 'WebsiteProduct created successfully');
         } catch (error) {

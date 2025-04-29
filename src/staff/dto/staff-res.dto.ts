@@ -212,11 +212,11 @@ export class GetStaffResDto {
 }
 
 export class Qualifications {
-    qualificationName: Qualification;
+    qualificationName: string;
     marksOrCgpa: number;
     file?: string;
 
-    constructor(qualificationName: Qualification, marksOrCgpa: number, file?: string) {
+    constructor(qualificationName: string, marksOrCgpa: number, file?: string) {
         this.qualificationName = qualificationName;
         this.marksOrCgpa = marksOrCgpa;
         this.file = file;

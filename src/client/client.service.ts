@@ -12,6 +12,7 @@ import { ClientDto } from './dto/client.dto';
 import { ClientRepository } from './repo/client.repo';
 import { ClientEntity } from './entity/client.entity';
 import { Storage } from '@google-cloud/storage';
+import { LoginDto } from 'src/login/dto/login.dto';
 
 @Injectable()
 export class ClientService {
@@ -68,24 +69,14 @@ export class ClientService {
     async createClientDetails(dto: ClientDto, photoPath?: string | null): Promise<CommonResponse> {
         try {
             console.log(dto, "KKKKKKKKKKKKKK")
-            const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
-            if (!branchEntity) {
-                throw new Error('Branch not found');
-            }
             const entity = this.clientAdapter.convertDtoToEntity(dto);
-            entity.clientId = `CLI(${branchEntity.branchName})-${(await this.clientRepository.count() + 1).toString().padStart(5, '0')}`;
+            entity.clientId = `CLI-${(await this.clientRepository.count() + 1).toString().padStart(5, '0')}`;
 
             if (photoPath) {
                 entity.clientPhoto = photoPath;
             }
-
-
-            const branch = new BranchEntity();
-            branch.id = dto.branch;
-            entity.branch = branch;
             console.log(entity, "entity")
             await this.clientRepository.insert(entity);
-
             return new CommonResponse(true, 201, 'Client details created successfully');
         } catch (error) {
             console.error(`Error creating client details: ${error.message}`, error.stack);
@@ -121,16 +112,16 @@ export class ClientService {
             }
             const entity = this.clientAdapter.convertDtoToEntity(dto);
 
-            if (dto.branch) {
-                // Fetch branch by name to get the correct ID
-                const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
+            // if (dto.branch) {
+            //     // Fetch branch by name to get the correct ID
+            //     const branchEntity = await this.branchRepo.findOne({ where: { id: dto.branch } });
 
-                if (!branchEntity) {
-                    throw new Error(`Branch with name '${dto.branch}' not found`);
-                }
+            //     if (!branchEntity) {
+            //         throw new Error(`Branch with name '${dto.branch}' not found`);
+            //     }
 
-                entity.branch = branchEntity; // Assign the entire entity, not just an invalid string
-            }
+            //     entity.branch = branchEntity; // Assign the entire entity, not just an invalid string
+            // }
 
             // Merge existing client details with new data
             const updatedClient = {
@@ -180,7 +171,7 @@ export class ClientService {
         try {
             console.log(req, "+++++++++++")
 
-            const client = await this.clientRepository.findOne({ relations: ['branch'], where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
             console.log(client, "+++++++++++")
 
             if (!client) {
@@ -197,7 +188,7 @@ export class ClientService {
 
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ relations: ['branch', 'voucherId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
@@ -215,7 +206,7 @@ export class ClientService {
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {
-            return new CommonResponse(false, 4579, "There Is No branch names")
+            return new CommonResponse(false, 4579, "There Is No  names")
         }
     }
 
@@ -258,10 +249,30 @@ export class ClientService {
         }
 
         if (data) {
-            return new CommonResponse(false, 75483, "Data already exists",'false');
+            return new CommonResponse(false, 75483, "Data already exists", 'false');
         } else {
-            return new CommonResponse(true, 4579, "No matching data found",'true');
+            return new CommonResponse(true, 4579, "No matching data found", 'true');
         }
     }
+
+    async clientLoginDetails(req: LoginDto) {
+        try {
+            console.log(req, "+++++++++++")
+
+            const client = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber, password: req.password } });
+            console.log(client, "+++++++++++")
+
+            if (!client) {
+                return new CommonResponse(false, 404, 'Client not found');
+            }
+            else {
+                return new CommonResponse(true, 200, 'Client login successfully', client);
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+
+    }
+
 
 }

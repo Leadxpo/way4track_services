@@ -73,7 +73,7 @@ export class StaffDto {
 }
 
 export class Qualifications {
-    qualificationName: Qualification;
+    qualificationName: string;
     marksOrCgpa: number;
     file?: string;
 }

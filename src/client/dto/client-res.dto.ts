@@ -15,6 +15,7 @@ export class ClientResDto {
     companyCode: string;
     unitCode: string
     status: ClientStatus
+    password: string;
 
     constructor(
         id: number,
@@ -30,7 +31,8 @@ export class ClientResDto {
         joiningDate: Date,
         companyCode: string,
         unitCode: string,
-        status: ClientStatus
+        status: ClientStatus,
+        password: string
 
     ) {
         this.id = id;
@@ -47,5 +49,6 @@ export class ClientResDto {
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status
+        this.password=password
     }
 }

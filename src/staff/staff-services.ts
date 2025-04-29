@@ -116,7 +116,7 @@ export class StaffService {
                     } else {
                         console.warn(`No matching qualification found for file: ${file.originalname}. Adding default entry.`);
                         qualifications.push({
-                            qualificationName: Qualification.TENTH,
+                            qualificationName: '',
                             marksOrCgpa: null,
                             file: filePath
                         });
