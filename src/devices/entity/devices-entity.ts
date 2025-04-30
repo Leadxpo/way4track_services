@@ -14,7 +14,7 @@ export class DeviceEntity {
     @Column({ name: 'web_product_name', type: 'varchar', length: 100, nullable: false })
     webProductName: string;
 
-    @Column({ name: 'image', type: 'varchar', length: 100, nullable: true })
+    @Column({ name: 'image', type: 'varchar', length: 200, nullable: true })
     image: string;
 
     @Column({ name: 'model', type: 'varchar', length: 255, nullable: true })

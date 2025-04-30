@@ -13,7 +13,7 @@ export class ApplicationEntity {
     @Column({ name: 'web_product_name', type: 'varchar', length: 100, nullable: true })
     webProductName: string;
 
-    @Column({ name: 'image', type: 'varchar', length: 100, nullable: true })
+    @Column({ name: 'image', type: 'varchar', length: 200, nullable: true })
     image: string;
 
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
