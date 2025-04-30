@@ -18,7 +18,7 @@ export class WebsiteProductEntity extends BaseEntity {
     @Column({ name: 'layout_type', type: 'varchar', length: 100, nullable: true })
     layoutType: string;
 
-    @Column({ name: 'short_description', type: 'varchar', length: 100, nullable: true })
+    @Column({ name: 'short_description', type: 'varchar', length: 225, nullable: true })
     shortDescription: string;
 
     @Column('varchar', { name: 'company_code', length: 200, nullable: false })
