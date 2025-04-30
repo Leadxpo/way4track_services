@@ -182,8 +182,10 @@ export class BranchService {
                 companyCode: branch.companyCode,
                 unitCode: branch.unitCode,
                 staff: branch.staff.map(staff => ({
+                    staffId: staff.staffId,
                     name: staff.name,
                     designation: staff.designation,
+                    phoneNumber: staff.phoneNumber,
                     staffPhoto: staff.staffPhoto,
                 })),
                 asserts: branch.asserts.map(assert => ({
