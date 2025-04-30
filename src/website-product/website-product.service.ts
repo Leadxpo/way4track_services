@@ -87,7 +87,7 @@ export class WebsiteProductService {
             }
             console.log(entity, "???????")
             await this.websiteProductRepository.insert(entity); 
-            return new CommonResponse(true, 201, 'WebsiteProduct created successfully');
+            return new CommonResponse(true, 201, 'WebsiteProduct created successfully',entity);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -114,7 +114,7 @@ export class WebsiteProductService {
             };
 
             await this.websiteProductRepository.save(updatedEntity);
-            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully');
+            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully',updatedEntity);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
