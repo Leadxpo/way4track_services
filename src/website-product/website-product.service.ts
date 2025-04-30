@@ -86,7 +86,7 @@ export class WebsiteProductService {
                 entity.blogImage = filePaths.blogImage;
             }
             console.log(entity, "???????")
-            await this.websiteProductRepository.insert(entity);
+            await this.websiteProductRepository.insert(entity); 
             return new CommonResponse(true, 201, 'WebsiteProduct created successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
