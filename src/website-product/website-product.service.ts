@@ -153,9 +153,20 @@ export class WebsiteProductService {
 
     async getWebsiteProductDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const items = await this.websiteProductRepository.find({
-                where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
-            });
+            const items = await this.websiteProductRepository
+                .createQueryBuilder('product')
+                .leftJoinAndSelect('product.device', 'device')
+                .leftJoinAndSelect('product.amenities', 'amenities')
+                .leftJoinAndSelect('product.application', 'application')
+                .where('product.companyCode = :companyCode AND product.unitCode = :unitCode', {
+                    companyCode: req.companyCode,
+                    unitCode: req.unitCode
+                })
+                .getMany();
+
+            // const items = await this.websiteProductRepository.find({
+            //     where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
+            // });
 
             if (!items || !items.length) return new CommonResponse(false, 404, 'WebsiteProduct not found');
 
