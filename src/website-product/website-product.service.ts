@@ -86,8 +86,8 @@ export class WebsiteProductService {
                 entity.blogImage = filePaths.blogImage;
             }
             console.log(entity, "???????")
-            await this.websiteProductRepository.insert(entity); 
-            return new CommonResponse(true, 201, 'WebsiteProduct created successfully',entity);
+            await this.websiteProductRepository.insert(entity);
+            return new CommonResponse(true, 201, 'WebsiteProduct created successfully', entity);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -114,7 +114,7 @@ export class WebsiteProductService {
             };
 
             await this.websiteProductRepository.save(updatedEntity);
-            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully',updatedEntity);
+            return new CommonResponse(true, 200, 'WebsiteProduct updated successfully', updatedEntity);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -141,7 +141,7 @@ export class WebsiteProductService {
     async getWebsiteProductDetailsById(req: WebsiteProductIdDto): Promise<CommonResponse> {
         try {
             const item = await this.websiteProductRepository.findOne({
-                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device']
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
             });
 
             if (!item) return new CommonResponse(false, 404, 'WebsiteProduct not found');
@@ -154,7 +154,7 @@ export class WebsiteProductService {
     async getWebsiteProductDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const items = await this.websiteProductRepository.find({
-                where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device']
+                where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
             });
 
             if (!items || !items.length) return new CommonResponse(false, 404, 'WebsiteProduct not found');
