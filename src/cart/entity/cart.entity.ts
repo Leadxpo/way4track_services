@@ -16,7 +16,7 @@ export class CartEntity {
   @Column({ name: 'name', type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ name: 'quantity', type: 'number', nullable: true })
+  @Column({ name: 'quantity', type: 'int', nullable: true })
   quantity: number;
 
   @Column({ name: 'is_relay', type: 'boolean', nullable: true })
@@ -32,13 +32,13 @@ export class CartEntity {
   subscription: SubscriptionType;
 
   @Column({ name: 'tolal_amount', type: 'varchar', nullable: true })
-  total_amount: string;
+  totalAmount: string;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.id, { nullable: true })
+  @ManyToOne(() =>ClientEntity, (client) => client.cart, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 
-  @ManyToOne(() =>DeviceEntity, (device) => device.id, { nullable: true })
+  @ManyToOne(() =>DeviceEntity, (device) => device.cart, { nullable: true })
   @JoinColumn({ name: 'device_id' })
   device: DeviceEntity;
 

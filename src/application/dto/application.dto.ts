@@ -8,3 +8,6 @@ export class ApplicationDto {
     companyCode: string;
     unitCode: string;
 }
+export class ApplicationListDto {
+    dtoList: ApplicationDto[]; // this will be parsed from JSON
+}

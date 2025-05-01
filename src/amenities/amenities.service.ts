@@ -25,27 +25,27 @@ export class AmenitiesService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleAmenitiesDetails(dto: AmenitiesDto, photo?: Express.Multer.File): Promise<CommonResponse> {
-        let filePath: string | null = null;
-        if (photo) {
-            const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `amenities_photos/${Date.now()}-${photo.originalname}`;
-            const file = bucket.file(uniqueFileName);
+    // async handleAmenitiesDetails(dto: AmenitiesDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    //     let filePath: string | null = null;
+    //     if (photo) {
+    //         const bucket = this.storage.bucket(this.bucketName);
+    //         const uniqueFileName = `amenities_photos/${Date.now()}-${photo.originalname}`;
+    //         const file = bucket.file(uniqueFileName);
 
-            await file.save(photo.buffer, {
-                contentType: photo.mimetype,
-                resumable: false,
-            });
+    //         await file.save(photo.buffer, {
+    //             contentType: photo.mimetype,
+    //             resumable: false,
+    //         });
 
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-        }
-        if (dto.id) {
-            return this.updateDeviceDetails(dto, filePath);
-        } else {
-            return this.createDeviceDetails(dto, filePath);
-        }
-    }
+    //         console.log(`File uploaded to GCS: ${uniqueFileName}`);
+    //         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+    //     }
+    //     if (dto.id) {
+    //         return this.updateDeviceDetails(dto, filePath);
+    //     } else {
+    //         return this.createDeviceDetails(dto, filePath);
+    //     }
+    // }
 
 
     async createDeviceDetails(dto: AmenitiesDto, filePath: string | null): Promise<CommonResponse> {
@@ -96,6 +96,49 @@ export class AmenitiesService {
             throw new ErrorResponse(500, error.message);
         }
     }
+
+    async handleBulkAmenities(
+        dtoList: AmenitiesDto[],
+        photos?: Express.Multer.File[],
+    ): Promise<CommonResponse> {
+        const results: CommonResponse[] = [];
+
+        for (let i = 0; i < dtoList.length; i++) {
+            const dto = dtoList[i];
+            const photo = photos?.[i];
+            const result = await this.handleSingleAmenity(dto, photo);
+            results.push(result);
+        }
+
+        return new CommonResponse(true, 200, 'All amenities processed', results);
+    }
+
+    private async handleSingleAmenity(
+        dto: AmenitiesDto,
+        photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        let filePath: string | null = null;
+
+        if (photo) {
+            const bucket = this.storage.bucket(this.bucketName);
+            const uniqueFileName = `amenities_photos/${Date.now()}-${photo.originalname}`;
+            const file = bucket.file(uniqueFileName);
+
+            await file.save(photo.buffer, {
+                contentType: photo.mimetype,
+                resumable: false,
+            });
+
+            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
+        if (dto.id) {
+            return this.updateDeviceDetails(dto, filePath);
+        } else {
+            return this.createDeviceDetails(dto, filePath);
+        }
+    }
+
 
     async deleteDeviceDetails(dto: HiringIdDto): Promise<CommonResponse> {
         try {

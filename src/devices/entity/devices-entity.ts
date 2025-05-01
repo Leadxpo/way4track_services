@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { WebsiteProductEntity } from 'src/website-product/entity/website-entity';
+import { CartEntity } from 'src/cart/entity/cart.entity';
 
 @Entity('device')
 export class DeviceEntity {
@@ -25,6 +26,9 @@ export class DeviceEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false, })
     unitCode: string;
+
+    @OneToMany(() => CartEntity, (voucher) => voucher.device)
+    cart: CartEntity[];
 }
 
 

@@ -33,7 +33,7 @@ export class AddressEntity {
   @Column({ name: 'address_line_two', type: 'varchar', nullable: true })
   addressLineTwo: string;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.id, { nullable: true })
+  @ManyToOne(() =>ClientEntity, (client) => client.customerAddress, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 

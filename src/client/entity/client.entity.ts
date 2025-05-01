@@ -9,6 +9,9 @@ import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entit
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { DispatchEntity } from 'src/dispatch/entity/dispatch.entity';
 import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
+import { CartEntity } from 'src/cart/entity/cart.entity';
+import { AddressEntity } from 'src/address/entity/address.entity';
+import { OrderEntity } from 'src/orders/entity/orders.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -57,12 +60,21 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
     dispatch: DispatchEntity[];
 
+    @OneToMany(() => AddressEntity, (AddressEntity) => AddressEntity.client)
+    customerAddress: AddressEntity[];
+
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
     @OneToMany(() => VoucherEntity, (voucher) => voucher.clientId)
     voucherId: VoucherEntity[];
+
+    @OneToMany(() => CartEntity, (voucher) => voucher.client)
+    cart: CartEntity[];
+
+    @OneToMany(() => OrderEntity, (voucher) => voucher.client)
+    order: OrderEntity[];
 
     @OneToMany(() => AppointmentEntity, (asserts) => asserts.clientId)
     appiontment: AppointmentEntity[];

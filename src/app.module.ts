@@ -82,6 +82,12 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { ReviewEntity } from './reviews/entity/reviews-entity';
 import { PromotionalModule } from './promotional/promotional.module';
 import { PromotionEntity } from './promotional/entity/promotional-entity';
+import { AddressModule } from './address/address.module';
+import { AddressEntity } from './address/entity/address.entity';
+import { CartModule } from './cart/cart.module';
+import { CartEntity } from './cart/entity/cart.entity';
+import { OrdersModule } from './orders/orders.module';
+import { OrderEntity } from './orders/entity/orders.entity';
 
 
 @Module({
@@ -93,11 +99,11 @@ import { PromotionEntity } from './promotional/entity/promotional-entity';
       username: 'root',
       password: 'root',
       database: 'localdb',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity],
-      synchronize: true,
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity],
+      synchronize: false,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -138,7 +144,10 @@ import { PromotionEntity } from './promotional/entity/promotional-entity';
     AmenitiesModule,
     ReviewsModule,
     PromotionalModule,
-    DevicesModule
+    DevicesModule,
+    AddressModule,
+    CartModule,
+    OrdersModule
   ],
   controllers: [],
   providers: [WebsiteProductService],

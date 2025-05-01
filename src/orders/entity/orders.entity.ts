@@ -10,7 +10,7 @@ export enum OrderStatus {
     CANCELED= "cancel"
   }
   
-@Entity('cart')
+@Entity('Orders')
 export class OrderEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -18,7 +18,7 @@ export class OrderEntity {
   @Column({ name: 'name', type: 'varchar', length: 255, nullable: true })
   name: string;
 
-  @Column({ name: 'total_amount', type: 'number', nullable: true })
+  @Column({ name: 'total_amount', type: 'int', nullable: true })
   totalAmount: number;
 
   @Column({ name: 'payment_status', type: 'varchar', nullable: true })
@@ -33,7 +33,7 @@ export class OrderEntity {
   @Column({  type: 'enum', enum: OrderStatus,name: 'order_status', nullable: true })
   subscription: OrderStatus;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.id, { nullable: true })
+  @ManyToOne(() =>ClientEntity, (client) => client.order, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 

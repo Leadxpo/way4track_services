@@ -26,8 +26,50 @@ export class ApplicationService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleApplicationDetails(dto: ApplicationDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    // async handleApplicationDetails(dto: ApplicationDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+    //     let filePath: string | null = null;
+    //     if (photo) {
+    //         const bucket = this.storage.bucket(this.bucketName);
+    //         const uniqueFileName = `Application_photos/${Date.now()}-${photo.originalname}`;
+    //         const file = bucket.file(uniqueFileName);
+
+    //         await file.save(photo.buffer, {
+    //             contentType: photo.mimetype,
+    //             resumable: false,
+    //         });
+
+    //         console.log(`File uploaded to GCS: ${uniqueFileName}`);
+    //         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+    //     }
+    //     if (dto.id) {
+    //         return this.updateApplicationDetails(dto, filePath);
+    //     } else {
+    //         return this.createApplicationDetails(dto, filePath);
+    //     }
+    // }
+
+    async handleBulkAmenities(
+        dtoList: ApplicationDto[],
+        photos?: Express.Multer.File[],
+    ): Promise<CommonResponse> {
+        const results: CommonResponse[] = [];
+
+        for (let i = 0; i < dtoList.length; i++) {
+            const dto = dtoList[i];
+            const photo = photos?.[i];
+            const result = await this.handleSingleAmenity(dto, photo);
+            results.push(result);
+        }
+
+        return new CommonResponse(true, 200, 'All amenities processed', results);
+    }
+
+    private async handleSingleAmenity(
+        dto: ApplicationDto,
+        photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
         let filePath: string | null = null;
+
         if (photo) {
             const bucket = this.storage.bucket(this.bucketName);
             const uniqueFileName = `Application_photos/${Date.now()}-${photo.originalname}`;
@@ -38,9 +80,9 @@ export class ApplicationService {
                 resumable: false,
             });
 
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
             filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
+
         if (dto.id) {
             return this.updateApplicationDetails(dto, filePath);
         } else {

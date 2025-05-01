@@ -1,0 +1,66 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CommonResponse } from 'src/models/common-response';
+import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
+import { OrderRepository } from './repo/order-repo';
+import { CreateOrderDto } from './dto/order.dto';
+import { OrderAdapter } from './order.adapter';
+import { OrderEntity } from './entity/orders.entity';
+import { ErrorResponse } from 'src/models/error-response';
+@Injectable()
+export class OrderService {
+    constructor(
+        private readonly repo: OrderRepository,
+        private readonly adapter: OrderAdapter,
+    ) { }
+
+    async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
+        try {
+            let entity: OrderEntity;
+            if (dto.id) {
+                entity = await this.repo.findOne({ where: { id: dto.id } });
+                if (!entity) return new CommonResponse(false, 404, 'cart not found');
+                Object.assign(entity, this.adapter.toEntity(dto));
+                await this.repo.save(entity);
+                return new CommonResponse(true, 200, 'Cart updated');
+            } else {
+                entity = this.adapter.toEntity(dto);
+                await this.repo.save(entity);
+                return new CommonResponse(true, 201, 'Cart created');
+            }
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async deleteOrder(dto: HiringIdDto): Promise<CommonResponse> {
+        try {
+            const existing = await this.repo.findOne({ where: { id: dto.id } });
+            if (!existing) return new CommonResponse(false, 404, 'Cart not found');
+            await this.repo.delete({ id: dto.id });
+            return new CommonResponse(true, 200, 'Cart deleted');
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getOrderList(): Promise<CommonResponse> {
+        try {
+            const data = await this.repo.find({ relations: ['device', 'client'] });
+            return new CommonResponse(true, 200, 'Cart list fetched', data);
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+    async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
+        try {
+            const entity = await this.repo.findOne({ where: { id: dto.id }, relations: ['device', 'client'] });
+            if (!entity) return new CommonResponse(false, 404, 'Cart not found');
+            return new CommonResponse(true, 200, 'Cart fetched', this.adapter.toResponse(entity));
+        } catch (error) {
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+}

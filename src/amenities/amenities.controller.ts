@@ -4,8 +4,9 @@ import {
     Body,
     UseInterceptors,
     UploadedFile,
+    UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { AmenitiesService } from './amenities.service';
 import { AmenitiesDto } from './dto/amenities.dto';
@@ -24,18 +25,28 @@ const multerOptions = {
 export class AmenitiesController {
     constructor(private readonly service: AmenitiesService) { }
 
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    // @UseInterceptors(FileInterceptor('photo', multerOptions))
+    // @Post('handleAmenitiesDetails')
+    // async handleAmenitiesDetails(
+    //     @Body() dto: AmenitiesDto,
+    //     @UploadedFile() photo?: Express.Multer.File,
+    // ): Promise<CommonResponse> {
+    //     try {
+    //         if (dto.id) dto.id = Number(dto.id);
+    //         return await this.service.handleAmenitiesDetails(dto, photo);
+    //     } catch (error) {
+    //         return new CommonResponse(false, 500, 'Error saving Amenities details');
+    //     }
+    // }
+
     @Post('handleAmenitiesDetails')
+    @UseInterceptors(FilesInterceptor('photos'))
     async handleAmenitiesDetails(
-        @Body() dto: AmenitiesDto,
-        @UploadedFile() photo?: Express.Multer.File,
+        @Body('dtoList') dtoListString: string,
+        @UploadedFiles() photos: Express.Multer.File[],
     ): Promise<CommonResponse> {
-        try {
-            if (dto.id) dto.id = Number(dto.id);
-            return await this.service.handleAmenitiesDetails(dto, photo);
-        } catch (error) {
-            return new CommonResponse(false, 500, 'Error saving Amenities details');
-        }
+        const dtoList = JSON.parse(dtoListString); // Parse incoming string to array
+        return this.service.handleBulkAmenities(dtoList, photos);
     }
 
     @Post('deleteAmenitiesDetails')
