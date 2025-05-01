@@ -141,7 +141,7 @@ export class WebsiteProductService {
     async getWebsiteProductDetailsById(req: WebsiteProductIdDto): Promise<CommonResponse> {
         try {
             const item = await this.websiteProductRepository.findOne({
-                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
+                where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application', 'productApp']
             });
 
             if (!item) return new CommonResponse(false, 404, 'WebsiteProduct not found');
@@ -158,6 +158,7 @@ export class WebsiteProductService {
                 .leftJoinAndSelect('product.device', 'device')
                 .leftJoinAndSelect('product.amenities', 'amenities')
                 .leftJoinAndSelect('product.application', 'application')
+                .leftJoinAndSelect('product.productApp', 'productApp')
                 .where('product.companyCode = :companyCode AND product.unitCode = :unitCode', {
                     companyCode: req.companyCode,
                     unitCode: req.unitCode
