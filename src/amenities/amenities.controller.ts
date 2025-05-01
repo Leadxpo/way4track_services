@@ -25,19 +25,19 @@ const multerOptions = {
 export class AmenitiesController {
     constructor(private readonly service: AmenitiesService) { }
 
-    // @UseInterceptors(FileInterceptor('photo', multerOptions))
-    // @Post('handleAmenitiesDetails')
-    // async handleAmenitiesDetails(
-    //     @Body() dto: AmenitiesDto,
-    //     @UploadedFile() photo?: Express.Multer.File,
-    // ): Promise<CommonResponse> {
-    //     try {
-    //         if (dto.id) dto.id = Number(dto.id);
-    //         return await this.service.handleAmenitiesDetails(dto, photo);
-    //     } catch (error) {
-    //         return new CommonResponse(false, 500, 'Error saving Amenities details');
-    //     }
-    // }
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @Post('handleUpdateAmenitiesDetails')
+    async handleUpdateAmenitiesDetails(
+        @Body() dto: AmenitiesDto,
+        @UploadedFile() photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        try {
+            if (dto.id) dto.id = Number(dto.id);
+            return await this.service.handleUpdateAmenitiesDetails(dto, photo);
+        } catch (error) {
+            return new CommonResponse(false, 500, 'Error saving Amenities details');
+        }
+    }
 
     @Post('handleAmenitiesDetails')
     @UseInterceptors(FilesInterceptor('photos'))

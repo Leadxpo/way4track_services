@@ -25,27 +25,25 @@ export class AmenitiesService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    // async handleAmenitiesDetails(dto: AmenitiesDto, photo?: Express.Multer.File): Promise<CommonResponse> {
-    //     let filePath: string | null = null;
-    //     if (photo) {
-    //         const bucket = this.storage.bucket(this.bucketName);
-    //         const uniqueFileName = `amenities_photos/${Date.now()}-${photo.originalname}`;
-    //         const file = bucket.file(uniqueFileName);
+    async handleUpdateAmenitiesDetails(dto: AmenitiesDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+        let filePath: string | null = null;
+        if (photo) {
+            const bucket = this.storage.bucket(this.bucketName);
+            const uniqueFileName = `amenities_photos/${Date.now()}-${photo.originalname}`;
+            const file = bucket.file(uniqueFileName);
 
-    //         await file.save(photo.buffer, {
-    //             contentType: photo.mimetype,
-    //             resumable: false,
-    //         });
+            await file.save(photo.buffer, {
+                contentType: photo.mimetype,
+                resumable: false,
+            });
 
-    //         console.log(`File uploaded to GCS: ${uniqueFileName}`);
-    //         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-    //     }
-    //     if (dto.id) {
-    //         return this.updateDeviceDetails(dto, filePath);
-    //     } else {
-    //         return this.createDeviceDetails(dto, filePath);
-    //     }
-    // }
+            console.log(`File uploaded to GCS: ${uniqueFileName}`);
+            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
+        return this.updateDeviceDetails(dto, filePath);
+
+    }
 
 
     async createDeviceDetails(dto: AmenitiesDto, filePath: string | null): Promise<CommonResponse> {

@@ -25,19 +25,19 @@ const multerOptions = {
 export class ApplicationController {
     constructor(private readonly service: ApplicationService) { }
 
-    // @UseInterceptors(FileInterceptor('photo', multerOptions))
-    // @Post('handleApplicationDetails')
-    // async handleApplicationDetails(
-    //     @Body() dto: ApplicationDto,
-    //     @UploadedFile() photo?: Express.Multer.File,
-    // ): Promise<CommonResponse> {
-    //     try {
-    //         if (dto.id) dto.id = Number(dto.id);
-    //         return await this.service.handleApplicationDetails(dto, photo);
-    //     } catch (error) {
-    //         return new CommonResponse(false, 500, 'Error saving Application details');
-    //     }
-    // }
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @Post('updateApplicationDetails')
+    async updateApplicationDetails(
+        @Body() dto: ApplicationDto,
+        @UploadedFile() photo?: Express.Multer.File,
+    ): Promise<CommonResponse> {
+        try {
+            if (dto.id) dto.id = Number(dto.id);
+            return await this.service.handleUpdateApplicationDetails(dto, photo);
+        } catch (error) {
+            return new CommonResponse(false, 500, 'Error saving Application details');
+        }
+    }
 
     @Post('handleApplicationDetails')
     @UseInterceptors(FilesInterceptor('photos'))
