@@ -3,14 +3,14 @@ import { WebsiteProductEntity } from 'src/website-product/entity/website-entity'
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 
 export enum OrderStatus {
-    PENDING = 'pending',
-    ORDERSUCESS = 'success',
-    ABORTED= "aborted",
-    CANCELED= "cancel"
-  }
-  
-@Entity('cart')
-export class transactionEntity {
+  PENDING = 'pending',
+  ORDERSUCESS = 'success',
+  ABORTED = "aborted",
+  CANCELED = "cancel"
+}
+
+@Entity('product_app')
+export class ProductAppEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
@@ -23,7 +23,7 @@ export class transactionEntity {
   @Column({ name: 'short_description', type: 'varchar', nullable: true })
   shortDescription: string;
 
-  @ManyToOne(() =>WebsiteProductEntity, (webProduct) => webProduct.id, { nullable: true })
+  @ManyToOne(() => WebsiteProductEntity, (webProduct) => webProduct.productApp, { nullable: true })
   @JoinColumn({ name: 'webProduct_id' })
   webProduct: WebsiteProductEntity;
 
@@ -41,6 +41,6 @@ export class transactionEntity {
 
   @Column('json', { name: 'points' })
   orderItems: {
-      title: string; desc: string;
+    title: string; desc: string;
   }[];
 }

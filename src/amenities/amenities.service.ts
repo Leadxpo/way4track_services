@@ -130,11 +130,9 @@ export class AmenitiesService {
             filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
 
-        if (dto.id) {
-            return this.updateDeviceDetails(dto, filePath);
-        } else {
-            return this.createDeviceDetails(dto, filePath);
-        }
+
+        return this.createDeviceDetails(dto, filePath);
+
     }
 
 

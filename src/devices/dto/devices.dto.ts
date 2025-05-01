@@ -6,4 +6,13 @@ export class DeviceDto {
   model?: string;
   companyCode: string;
   unitCode: string
+  name?: string;
+  isRelay?: boolean;
+  relayAmt?: number;
+  isSubscription?: boolean;
+  subscriptionMonthlyAmt?: number;
+  subscriptionYearlyAmt?: number;
+  isNetwork?: boolean;
+  discount?: number;
+  description?: string;
 }

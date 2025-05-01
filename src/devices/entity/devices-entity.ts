@@ -29,6 +29,33 @@ export class DeviceEntity {
 
     @OneToMany(() => CartEntity, (voucher) => voucher.device)
     cart: CartEntity[];
+
+    @Column({ name: 'device_name', type: 'varchar', nullable: true })
+    name: string;
+
+    @Column({ name: 'is_relay', type: 'boolean', default: false })
+    isRelay: boolean;
+
+    @Column({ name: 'relay_amt', type: 'float', nullable: true })
+    relayAmt: number;
+
+    @Column({ name: 'is_subscription', type: 'boolean', default: false })
+    isSubscription: boolean;
+
+    @Column({ name: 'subscription_monthly_amt', type: 'float', nullable: true })
+    subscriptionMonthlyAmt: number;
+
+    @Column({ name: 'subscription_yearly_amt', type: 'float', nullable: true })
+    subscriptionYearlyAmt: number;
+
+    @Column({ name: 'is_network', type: 'boolean', default: false })
+    isNetwork: boolean;
+
+    @Column({ name: 'discount', type: 'float', nullable: true })
+    discount: number;
+
+    @Column({ name: 'description', type: 'text', nullable: true })
+    description: string;
 }
 
 
