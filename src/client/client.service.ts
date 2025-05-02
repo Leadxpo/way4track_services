@@ -171,7 +171,7 @@ export class ClientService {
         try {
             console.log(req, "+++++++++++")
 
-            const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
             console.log(client, "+++++++++++")
 
             if (!client) {
@@ -188,7 +188,7 @@ export class ClientService {
 
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const client = await this.clientRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
