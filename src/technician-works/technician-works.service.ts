@@ -346,7 +346,6 @@ export class TechnicianService {
 
             // ✅ Ensure filePaths is always a valid object
             filePaths = filePaths ?? {};
-            console.log(filePaths, "files")
 
             console.log("Saving technician with remarks: before", existingTechnician.remark);
             let parsedRemark = req.remark;
@@ -380,7 +379,7 @@ export class TechnicianService {
                 ? [...existingTechnician.remark, ...newRemarks]
                 : newRemarks;
 
-            console.log("Saving technician with remarks:", existingTechnician.screenShot);
+            console.log("Saving technician with remarks:", existingTechnician.remark);
 
 
             if (existingTechnician.workStatus === WorkStatusEnum.ACTIVATE && existingTechnician.paymentStatus === PaymentStatus.PENDING && existingTechnician.subDealerId) {
@@ -394,14 +393,20 @@ export class TechnicianService {
 
             // New logic: Notify related staff of new remarks
             if (newRemarks.length > 0) {
+                const staffIdValue =
+                    typeof existingTechnician.staffId === 'object'
+                        ? existingTechnician.staffId.staffId
+                        : existingTechnician.staffId;
+
                 const relatedStaff = await this.staffRepository.find({
                     where: {
                         companyCode: existingTechnician.companyCode,
                         unitCode: existingTechnician.unitCode,
-                        staffId: existingTechnician.staffId.staffId
+                        staffId: staffIdValue,
                     },
-                    relations: ['branch'] // Make sure branch is loaded if it's a relation
+                    relations: ['branch'],
                 });
+
 
                 for (const staff of relatedStaff) {
                     for (const newRemark of newRemarks) {
@@ -413,7 +418,7 @@ export class TechnicianService {
                             isRead: false,
                             notificationType: NotificationEnum.TechnicianWorks,
                             userId: staff.id,
-                            branchId: typeof staff.branch === 'object' ? staff.branch.id : staff.branch,
+                            branchId: null,
                             companyCode: staff.companyCode,
                             unitCode: staff.unitCode,
                             subDealerId: null, // ✅ Add this line
@@ -445,9 +450,7 @@ export class TechnicianService {
                 existingTechnician.screenShot = filePaths.screenShot;
 
             }
-            console.log(existingTechnician.screenShot, ":::::::::::")
 
-            console.log("Final remarks to save:", existingTechnician.screenShot);
 
             await this.repo.save(existingTechnician);
 

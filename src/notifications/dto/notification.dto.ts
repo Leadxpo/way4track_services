@@ -3,13 +3,13 @@ import { NotificationEnum } from "../entity/notification.entity";
 export class CreateNotificationDto {
     userId: number;
     message: string;
-    branchId: number;
+    branchId?: number;
     notificationType: NotificationEnum;
     unitCode: string;
     companyCode: string;
     createdAt: Date;
     isRead: boolean
-    subDealerId:number
+    subDealerId: number
 }
 
 
@@ -25,7 +25,7 @@ export class GetNotificationDto {
     notificationType: NotificationEnum;
     unitCode: string;
     companyCode: string;
-    subDealerId:number
+    subDealerId: number
 
     // Constructor to initialize the DTO properties
     constructor(
@@ -40,7 +40,7 @@ export class GetNotificationDto {
         notificationType: NotificationEnum,
         unitCode: string,
         companyCode: string,
-    subDealerId:number
+        subDealerId: number
 
 
     ) {
@@ -55,7 +55,7 @@ export class GetNotificationDto {
         this.notificationType = notificationType;
         this.unitCode = unitCode;
         this.companyCode = companyCode;
-        this.subDealerId=subDealerId
+        this.subDealerId = subDealerId
     }
 }
 

@@ -37,7 +37,7 @@ export class NotificationEntity {
     })
     notificationType: NotificationEnum;
 
-    @ManyToOne(() => BranchEntity, (branch) => branch.notifications, { eager: true })
+    @ManyToOne(() => BranchEntity, (branch) => branch.notifications, { eager: true ,nullable:true})
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
