@@ -596,6 +596,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
+                'wa.subDealerStaffId as subDealerStaffId',
                 'wa.remark as remark',
                 'wa.paid_amount as paidAmount'
             ])
