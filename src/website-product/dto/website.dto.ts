@@ -14,6 +14,7 @@ export class WebsiteProductDto {
     blogImage?: string;
     steps: {
         desc: string;
+        title: string;
     }[];
 
     productType: string;

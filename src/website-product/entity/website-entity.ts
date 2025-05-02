@@ -61,6 +61,7 @@ export class WebsiteProductEntity extends BaseEntity {
     @Column('json', { name: 'steps' })
     steps: {
         desc: string;
+        title: string
     }[];
 
     @OneToMany(() => DeviceEntity, (staff) => staff.webProduct)
