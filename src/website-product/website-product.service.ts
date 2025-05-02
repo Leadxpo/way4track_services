@@ -34,6 +34,7 @@ export class WebsiteProductService {
             banner2?: Express.Multer.File[];
             banner3?: Express.Multer.File[];
             blogImage?: Express.Multer.File[];
+            productIcon?: Express.Multer.File[];
         } = {}
     ): Promise<CommonResponse> {
         const filePaths: Partial<Record<keyof typeof photos, string | undefined>> = {
@@ -43,6 +44,7 @@ export class WebsiteProductService {
             banner3: undefined,
             banner1: undefined,
             blogImage: undefined,
+            productIcon: undefined
         };
 
         for (const [key, fileArray] of Object.entries(photos)) {
@@ -84,6 +86,7 @@ export class WebsiteProductService {
                 entity.banner2 = filePaths.banner2;
                 entity.banner3 = filePaths.banner3;
                 entity.blogImage = filePaths.blogImage;
+                entity.productIcon = filePaths.productIcon
             }
             console.log(entity, "???????")
             await this.websiteProductRepository.insert(entity);
@@ -111,6 +114,7 @@ export class WebsiteProductService {
                 banner2: filePaths.banner2 ?? existing.banner2,
                 banner3: filePaths.banner3 ?? existing.banner3,
                 blogImage: filePaths.blogImage ?? existing.blogImage,
+                productIcon: filePaths.productIcon ?? existing.productIcon
             };
 
             await this.websiteProductRepository.save(updatedEntity);

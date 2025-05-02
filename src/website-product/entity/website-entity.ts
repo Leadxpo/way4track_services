@@ -49,6 +49,9 @@ export class WebsiteProductEntity extends BaseEntity {
     @Column({ name: 'home_banner', type: 'varchar', length: 255, nullable: true })
     homeBanner: string;
 
+    @Column({ name: 'product_icon', type: 'varchar', length: 255, nullable: true })
+    productIcon: string;
+
     @Column({ name: 'footer_banner', type: 'varchar', length: 255, nullable: true })
     footerBanner: string;
 
@@ -71,4 +74,26 @@ export class WebsiteProductEntity extends BaseEntity {
 
     @OneToMany(() => ProductAppEntity, (staff) => staff.webProduct)
     productApp: ProductAppEntity[];
+
+    @Column({ name: 'product_type', type: 'varchar', length: 100, nullable: true })
+    productType: string;
+
+    @Column({ name: 'blog_title', type: 'varchar', length: 255, nullable: true })
+    blogTitle: string;
+
+    @Column({ name: 'choose_title', type: 'varchar', length: 255, nullable: true })
+    chooseTitle: string;
+
+    @Column({ name: 'choose_image', type: 'varchar', length: 255, nullable: true })
+    chooseImage: string;
+
+    @Column({ name: 'choose_description', type: 'text', nullable: true })
+    chooseDescription: string;
+
+    @Column('json', { name: 'points', nullable: true })
+    points: {
+        title: string;
+        description: string;
+    }[];
+
 }

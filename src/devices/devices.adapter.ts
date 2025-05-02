@@ -14,7 +14,7 @@ export class DeviceAdapter {
         entity.model = dto.model;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-
+        entity.amount = dto.amount
         // ✅ New fields
         entity.name = dto.name;
         entity.isRelay = dto.isRelay;
@@ -49,6 +49,7 @@ export class DeviceAdapter {
             isNetwork: entity.isNetwork,
             discount: entity.discount,
             description: entity.description,
+            amount: entity.amount
         }));
     }
 }

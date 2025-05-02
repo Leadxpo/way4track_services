@@ -39,6 +39,9 @@ export class DeviceEntity {
     @Column({ name: 'relay_amt', type: 'float', nullable: true })
     relayAmt: number;
 
+    @Column({ name: 'amount', type: 'float', nullable: true })
+    amount: number;
+
     @Column({ name: 'is_subscription', type: 'boolean', default: false })
     isSubscription: boolean;
 

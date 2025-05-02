@@ -1,16 +1,17 @@
 
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { DeviceEntity } from 'src/devices/entity/devices-entity';
+import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 
 export enum OrderStatus {
-    PENDING = 'pending',
-    ORDERSUCESS = 'success',
-    ABORTED= "aborted",
-    CANCELED= "cancel"
-  }
-  
-@Entity('Order')
+  PENDING = 'pending',
+  ORDERSUCESS = 'success',
+  ABORTED = "aborted",
+  CANCELED = "cancel"
+}
+
+@Entity('orders')
 export class OrderEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -30,10 +31,10 @@ export class OrderEntity {
   @Column({ name: 'delivery_address', type: 'varchar', nullable: true })
   deliveryAddress: string;
 
-  @Column({  type: 'enum', enum: OrderStatus,name: 'order_status', nullable: true })
+  @Column({ type: 'enum', enum: OrderStatus, name: 'order_status', nullable: true })
   subscription: OrderStatus;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.order, { nullable: true })
+  @ManyToOne(() => ClientEntity, (client) => client.order, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 
@@ -46,19 +47,22 @@ export class OrderEntity {
   @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @OneToMany(() => TransactionEntity, (TransactionEntity) => TransactionEntity.order)
+  transactions: TransactionEntity[];
+
   @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
 
   @Column('json', { name: 'order_items' })
   orderItems: {
-      name: string;
-      qty:number;
-      amount:number;
-      deviceId:string;
-      is_relay:boolean;
-      network:string;
-      subscriptionType:string;
-      desc: string;
+    name: string;
+    qty: number;
+    amount: number;
+    deviceId: string;
+    is_relay: boolean;
+    network: string;
+    subscriptionType: string;
+    desc: string;
   }[];
 }
 

@@ -27,6 +27,8 @@ export class WebsiteProductController {
             { name: 'banner2', maxCount: 1 },
             { name: 'banner3', maxCount: 1 },
             { name: 'blogImage', maxCount: 1 },
+            { name: 'productIcon', maxCount: 1 },
+
         ],
         multerOptions
     ))
@@ -37,6 +39,7 @@ export class WebsiteProductController {
         banner2?: Express.Multer.File[],
         banner3?: Express.Multer.File[],
         blogImage?: Express.Multer.File[],
+        productIcon?: Express.Multer.File[],
     }
     ): Promise<CommonResponse> {
         try {

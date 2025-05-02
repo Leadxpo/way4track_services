@@ -12,6 +12,7 @@ import { LedgerEntity } from 'src/ledger/entity/ledger.entity';
 import { CartEntity } from 'src/cart/entity/cart.entity';
 import { AddressEntity } from 'src/address/entity/address.entity';
 import { OrderEntity } from 'src/orders/entity/orders.entity';
+import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -59,6 +60,9 @@ export class ClientEntity extends BaseEntity {
 
     @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
     dispatch: DispatchEntity[];
+
+    @OneToMany(() => TransactionEntity, (TransactionEntity) => TransactionEntity.client)
+    transactions: TransactionEntity[];
 
     @OneToMany(() => AddressEntity, (AddressEntity) => AddressEntity.client)
     customerAddress: AddressEntity[];

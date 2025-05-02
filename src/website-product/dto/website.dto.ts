@@ -15,4 +15,16 @@ export class WebsiteProductDto {
     steps: {
         desc: string;
     }[];
+
+    productType: string;
+    blogTitle: string;
+    chooseTitle: string;
+    chooseImage: string;
+    chooseDescription: string;
+    points: {
+        title: string;
+        description: string;
+    }[];
+    productIcon: string;
+
 }

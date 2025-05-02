@@ -15,4 +15,5 @@ export class DeviceDto {
   isNetwork?: boolean;
   discount?: number;
   description?: string;
+  amount: number;
 }

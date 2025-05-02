@@ -10,15 +10,15 @@ export enum OrderStatus {
     CANCELED= "cancel"
   }
   
-@Entity('transaction')
-export class transactionEntity {
+@Entity('transactions_table')
+export class TransactionEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @Column({ name: 'transaction_id', type: 'number', nullable: true })
+  @Column({ name: 'transaction_id', type: 'int', nullable: true })
   transactionId: number;
 
-  @Column({ name: 'total_amount', type: 'number', nullable: true })
+  @Column({ name: 'total_amount', type: 'int', nullable: true })
   totalAmount: number;
 
   @Column({ name: 'payment_method', type: 'varchar', nullable: true })
@@ -30,11 +30,11 @@ export class transactionEntity {
   @Column({ name: 'delivery_address', type: 'varchar', nullable: true })
   deliveryAddress: string;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.id, { nullable: true })
+  @ManyToOne(() =>ClientEntity, (client) => client.transactions, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 
-  @ManyToOne(() =>OrderEntity, (order) => order.id, { nullable: true })
+  @ManyToOne(() =>OrderEntity, (order) => order.transactions, { nullable: true })
   @JoinColumn({ name: 'order_id' })
   order: OrderEntity;
 
