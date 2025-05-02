@@ -61,6 +61,7 @@ export class TechnicianWorksResponseDto {
     userName?: string;
     applicationId?: number
     paidAmount?: number
+    subDealerStaffId?: number
 
     constructor(
         id: number,
@@ -116,7 +117,9 @@ export class TechnicianWorksResponseDto {
         subDealerId?: number,
         userName?: string,
         applicationId?: number,
-        paidAmount?: number
+        paidAmount?: number,
+        subDealerStaffId?: number
+
 
     ) {
         this.id = id;
@@ -173,5 +176,7 @@ export class TechnicianWorksResponseDto {
         this.userName = userName
         this.applicationId = applicationId
         this.paidAmount = paidAmount
+        this.subDealerStaffId = subDealerStaffId
+
     }
 }

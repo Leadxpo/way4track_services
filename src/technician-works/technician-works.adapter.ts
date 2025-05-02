@@ -12,6 +12,7 @@ import { VehicleTypeEntity } from 'src/vehicle-type/entity/vehicle-type.entity';
 import { ServiceTypeEntity } from 'src/service-type/entity/service.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
+import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 
 export class TechnicianWorksAdapter {
     // Convert DTO to Entity
@@ -42,6 +43,11 @@ export class TechnicianWorksAdapter {
             const staff = new StaffEntity();
             staff.id = dto.staffId;
             entity.staffId = staff;
+        }
+        if (dto.subDealerStaffId) {
+            const sub = new SubDelaerStaffEntity();
+            sub.id = dto.subDealerStaffId;
+            entity.subDealerStaffId = sub;
         }
 
         if (dto.backEndStaffRelation) {
@@ -192,7 +198,9 @@ export class TechnicianWorksAdapter {
             entity.subDealerId ? entity.subDealerId.id : null,
             entity.userName ? entity.userName : "",
             entity.applicationId ? entity.applicationId.id : null,
-            entity.paidAmount ? entity.paidAmount : null
+            entity.paidAmount ? entity.paidAmount : null,
+            entity.subDealerStaffId?.id
+
             // entity.requirementDetails ? entity.requirementDetails : []
 
         );

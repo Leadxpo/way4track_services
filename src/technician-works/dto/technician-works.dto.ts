@@ -54,6 +54,7 @@ export class TechnicianWorksDto {
     userName?: string;
     applicationId?: number
     paidAmount?: number;
+    subDealerStaffId?: number
 
 }
 export class Requirements {

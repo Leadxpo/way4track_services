@@ -6,6 +6,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { GetTicketsResDto } from './dto/get-tickets-res.dto';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
+import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 
 
 @Injectable()
@@ -25,7 +26,11 @@ export class TicketsAdapter {
             sub.id = dto.subDealerId;
             entity.subDealerId = sub;
         }
-
+        if (dto.subDealerStaffId) {
+            const sub = new SubDelaerStaffEntity();
+            sub.id = dto.subDealerStaffId;
+            entity.subDealerStaffId = sub;
+        }
 
         const branch = new BranchEntity();
         branch.id = dto.branchId;
@@ -63,7 +68,8 @@ export class TicketsAdapter {
                 entity.subDealerId?.id,
                 entity.subDealerId?.name,
                 entity.designationRelation?.id,
-                entity.designationRelation?.designation
+                entity.designationRelation?.designation,
+                entity.subDealerStaffId?.id
             );
         });
     }

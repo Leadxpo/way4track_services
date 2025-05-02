@@ -18,7 +18,9 @@ export class GetTicketsResDto {
     subDealerId?: number
     subDealerName?: string
     designationRelation?: number
-    designation?: string
+    designation?: string;
+    subDealerStaffId?: number
+
     constructor(
         staffId: number,
         staffName: string,
@@ -36,7 +38,9 @@ export class GetTicketsResDto {
         subDealerId?: number,
         subDealerName?: string,
         designationRelation?: number,
-        designation?: string
+        designation?: string,
+        subDealerStaffId?: number
+
 
 
     ) {
@@ -57,5 +61,6 @@ export class GetTicketsResDto {
         this.subDealerName = subDealerName
         this.designationRelation = designationRelation
         this.designation = designation
+        this.subDealerStaffId = subDealerStaffId
     }
 }

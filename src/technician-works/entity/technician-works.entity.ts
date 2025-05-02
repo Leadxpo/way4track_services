@@ -13,6 +13,7 @@ import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColu
 import { Remarks } from '../dto/technician-works.dto';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
+import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 
 @Entity('technician_works')
 export class TechnicianWorksEntity extends BaseEntity {
@@ -195,4 +196,8 @@ export class TechnicianWorksEntity extends BaseEntity {
 
     @Column('decimal', { name: 'paid_amount', nullable: true })
     paidAmount: number;
+
+    @ManyToOne(() => SubDelaerStaffEntity, (SubDelaerStaffEntity) => SubDelaerStaffEntity.technician, { nullable: true })
+    @JoinColumn({ name: 'sub_dealer_staff_id' })
+    subDealerStaffId: SubDelaerStaffEntity;
 }

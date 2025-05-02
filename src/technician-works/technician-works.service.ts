@@ -520,7 +520,7 @@ export class TechnicianService {
 
     async getTechnicianDetails(req: CommonReq): Promise<CommonResponse> {
         const branch = await this.repo.find({
-            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'voucherId', 'staffId', 'productId', 'clientId', 'workId']
+            where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'voucherId', 'staffId', 'productId', 'clientId', 'workId', 'subDealerStaffId']
         });
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");
@@ -533,7 +533,7 @@ export class TechnicianService {
         try {
             console.log(req, "+++++++++++")
 
-            const Technician = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'backEndStaffRelation', 'applicationId', 'clientId', 'vehicleId', 'serviceId', 'subDealerId'] });
+            const Technician = await this.repo.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branchId', 'backEndStaffRelation', 'applicationId', 'clientId', 'vehicleId', 'serviceId', 'subDealerId', 'subDealerStaffId'] });
 
             if (!Technician) {
                 return new CommonResponse(false, 404, 'Technician not found');

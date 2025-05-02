@@ -2,6 +2,7 @@ import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.en
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
+import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 export enum Gender {
     MALE = 'MALE',
@@ -66,5 +67,11 @@ export class SubDelaerStaffEntity extends BaseEntity {
     @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.subDealerStaff, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
+
+    @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.subDealerStaffId)
+    technician: TechnicianWorksEntity[];
+
+    @OneToMany(() => TicketsEntity, (TicketsEntity) => TicketsEntity.subDealerStaffId)
+    subTickets: TicketsEntity[];
 }
 

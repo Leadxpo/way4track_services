@@ -14,4 +14,5 @@ export class TicketsDto {
     description: string;
     subDealerId?:number
     designationRelation?:number
+    subDealerStaffId?:number
 }

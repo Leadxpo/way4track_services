@@ -7,11 +7,13 @@ import { TicketsService } from './tickets.services';
 import { TicketsRepository } from './repo/tickets.repo';
 import { NotificationModule } from 'src/notifications/notification.module';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
+import { SubDealerStaffModule } from 'src/sub-dealer-staff/sub-dealer-staff.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([TicketsEntity]),
   forwardRef(() => NotificationModule),
   forwardRef(() => DesignationEntity),
+  forwardRef(() => SubDealerStaffModule),
 
   ],
   controllers: [TicketsController],

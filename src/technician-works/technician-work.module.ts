@@ -14,8 +14,9 @@ import { WorkAllocationModule } from 'src/work-allocation/work-allocation.module
 import { ServiceTypeModule } from 'src/service-type/service.module';
 import { ProductTypeModule } from 'src/product-type/product-type.module';
 import { VehicleTypeModule } from 'src/vehicle-type/vehicle-type.module';
-import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { NotificationModule } from 'src/notifications/notification.module';
+import { SubDealerModule } from 'src/sub-dealer/sub-dealer.module';
+import { SubDealerStaffModule } from 'src/sub-dealer-staff/sub-dealer-staff.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([TechnicianWorksEntity]),
@@ -27,7 +28,10 @@ import { NotificationModule } from 'src/notifications/notification.module';
     forwardRef(() => ServiceTypeModule),
     forwardRef(() => VehicleTypeModule),
     forwardRef(() => ProductTypeModule),
-    forwardRef(() => SubDealerEntity),
+    forwardRef(() => SubDealerModule),
+    forwardRef(() => SubDealerStaffModule),
+
+    forwardRef(() => NotificationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => ProductModule)],
 
