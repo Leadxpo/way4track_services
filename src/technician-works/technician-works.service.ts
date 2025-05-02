@@ -574,12 +574,15 @@ export class TechnicianService {
     }
 
     async getBackendSupportWorkAllocation(req: {
-        staffId: string;
+        staffId?: string;
+        subDealerId?: string;
+        supporterId?: string;
         companyCode?: string;
         unitCode?: string;
         fromDate?: string;
         toDate?: string;
         branchName?: string;
+        status?: string;
     }): Promise<CommonResponse> {
         const VoucherData = await this.repo.getBackendSupportWorkAllocation(req)
         if (!VoucherData) {

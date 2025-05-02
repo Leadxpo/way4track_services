@@ -104,12 +104,15 @@ export class TechnicianController {
 
     @Post('getBackendSupportWorkAllocation')
     async getBackendSupportWorkAllocation(@Body() req: {
-        staffId: string;
+        staffId?: string;
+        subDealerId?: string;
+        supporterId?: string;
         companyCode?: string;
         unitCode?: string;
         fromDate?: string;
         toDate?: string;
         branchName?: string;
+        status?: string;
     }) {
         try {
             return this.techService.getBackendSupportWorkAllocation(req);
