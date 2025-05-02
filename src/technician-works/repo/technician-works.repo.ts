@@ -13,6 +13,7 @@ import { BranchEntity } from "src/branch/entity/branch.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 import { ServiceTypeEntity } from "src/service-type/entity/service.entity";
 import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
+import { SubDelaerStaffEntity } from "src/sub-dealer-staff/entity/sub-dealer-staff.entity";
 
 
 
@@ -596,13 +597,14 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
-                'wa.subDealerStaffId as subDealerStaffId',
+                'subst.staff_id as subDealerStaffId',
                 'wa.remark as remark',
                 'wa.paid_amount as paidAmount'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
+            .leftJoin(SubDelaerStaffEntity, 'subst', 'subst.id = wa.sub_dealer_staff_id')
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
