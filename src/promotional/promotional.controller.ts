@@ -28,11 +28,12 @@ export class PromotionController {
     @Post('handlePromotionDetails')
     @UseInterceptors(FileFieldsInterceptor(
         [
-            { name: 'photo', maxCount: 1 },
+            { name: 'photo', maxCount: 10 },
             { name: 'image', maxCount: 1 },
         ],
         multerOptions
     ))
+
     async handlePromotionDetails(
         @Body() dto: CreatePromotionDto,
         @UploadedFiles()

@@ -113,7 +113,7 @@ export class PromotionService {
                 photo: uploadedImages[index] || null,
             }));
         }
-
+        console.log(uploadedImages, "+++++++")
         console.log(entity.list, "??????")
         const savedEntity = await this.promoRepo.save(entity);
         return new CommonResponse(true, 65152, 'Technician created Successfully', savedEntity);
