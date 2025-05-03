@@ -397,7 +397,7 @@ export class StaffRepository extends Repository<StaffEntity> {
         if (req.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: req.branchName });
         }
-        query.orderBy('staff.staff_id', 'ASC')
+        query.orderBy('branch.name', 'ASC');
         const result = await query.groupBy('branch.name').getRawMany();
 
         // Fetching individual staff details and associating with the branch manager
