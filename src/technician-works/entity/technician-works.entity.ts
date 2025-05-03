@@ -154,7 +154,7 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'phone_number', type: 'varchar', length: 15, nullable: true })
     phoneNumber: string;
 
-    @Column({ name: 'sim_number', type: 'varchar', length: 15, nullable: true })
+    @Column({ name: 'sim_number', type: 'varchar', length: 50, nullable: true })
     simNumber: string;
 
     @Column({ name: 'address', type: 'text', nullable: true })
