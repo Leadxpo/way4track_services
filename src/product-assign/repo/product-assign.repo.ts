@@ -32,8 +32,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
                 // 'COUNT(pa.id) AS totalpas',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = pa.branch_id')
-            .where('pa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pa.unit_code = :unitCode', { unitCode: req.unitCode });
+            .where('br.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('br.unit_code = :unitCode', { unitCode: req.unitCode });
 
         // If a branch name is provided, filter by that branch
         if (req.branchName) {
@@ -63,8 +63,8 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
             .leftJoin(ProductEntity, 'pr', 'pr.id = pa.product_id')
             .leftJoin(StaffEntity, 'sa', 'sa.id = pa.staff_id')
             .leftJoin(RequestRaiseEntity, 're', 're.id = pa.request_id')
-            .where('pa.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('pa.unit_code = :unitCode', { unitCode: req.unitCode });
+            .where('sa.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('sa.unit_code = :unitCode', { unitCode: req.unitCode });
 
         // If a branch name is provided, filter the detailed assignment by that branch
         if (req.branchName) {
@@ -759,7 +759,7 @@ export class ProductAssignRepository extends Repository<ProductAssignEntity> {
 
             // Grouping fields
             groupedProductQuery.groupBy('pt.name, sb.name, sb.sub_dealer_id');
-            
+
 
             // Execute query
             const productDetails = await groupedProductQuery.getRawMany();
