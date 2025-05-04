@@ -125,7 +125,7 @@ export class RequestRaiseService {
 
     async getRequestDetails(req: RequestRaiseIdDto): Promise<CommonResponse> {
         try {
-            const request = await this.requestRepository.findOne({ relations: ['staffId', 'branchId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
+            const request = await this.requestRepository.findOne({ relations: ['staffId', 'branchId', 'requestFrom', 'requestTo', 'subDealerId'], where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!request) {
                 return new CommonResponse(false, 404, 'Request not found');
             }
@@ -137,7 +137,7 @@ export class RequestRaiseService {
 
     async getAllRequestDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId', 'requestFrom', 'requestTo', 'subDealerId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
             if (!request) {
                 return new CommonResponse(false, 404, 'Request not found');
             }
@@ -171,6 +171,7 @@ export class RequestRaiseService {
     }) {
         const query = this.requestRepository.createQueryBuilder('req')
             .select([
+                'req',
                 'req.request_id AS requestNumber',
                 'req.id AS requestId',
                 'branch.name AS branchName',
