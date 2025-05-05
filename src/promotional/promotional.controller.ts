@@ -30,6 +30,8 @@ export class PromotionController {
         [
             { name: 'photo', maxCount: 10 },
             { name: 'image', maxCount: 1 },
+            { name: 'themeBgimage', maxCount: 6 },
+
         ],
         multerOptions
     ))
@@ -40,6 +42,8 @@ export class PromotionController {
         files: {
             photo?: Express.Multer.File[],
             image?: Express.Multer.File[],
+            themeBgimage?: Express.Multer.File[],
+
         }
     ): Promise<CommonResponse> {
         try {

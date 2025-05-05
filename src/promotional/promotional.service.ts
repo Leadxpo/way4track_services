@@ -30,11 +30,13 @@ export class PromotionService {
         photos: {
             photo?: Express.Multer.File[];
             image?: Express.Multer.File[];
+            themeBgimage?: Express.Multer.File[]
         } = {}
     ): Promise<CommonResponse> {
-        const filePaths: Record<'photo' | 'image', string | undefined> = {
+        const filePaths: Record<'photo' | 'image' | 'themeBgimage', string | undefined> = {
             photo: undefined,
             image: undefined,
+            themeBgimage: undefined
         };
 
         const uploadedImages: string[] = [];
@@ -88,6 +90,7 @@ export class PromotionService {
         // Assign image if available
         if (filePaths.image) {
             entity.image = filePaths.image;
+            entity.themeBgimage = filePaths.themeBgimage
         }
 
         if (typeof entity.list === 'string') {
@@ -172,6 +175,7 @@ export class PromotionService {
 
         if (filePaths.image) {
             existing.image = filePaths.image;
+            existing.themeBgimage = filePaths.themeBgimage
         }
 
         // Very important: Set the corrected list
