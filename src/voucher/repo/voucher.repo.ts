@@ -1251,22 +1251,18 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             throw new Error('Invalid year provided');
         }
 
-        const query = await this.createQueryBuilder('br') // start from BranchEntity
+        const query = await this.createQueryBuilder('br') // start from branches
         .select([
             `YEAR(ve.generation_date) AS year`,
             `MONTH(ve.generation_date) AS month`,
             `br.name AS branchName`,
-            `COALESCE(SUM(CASE WHEN ve.voucher_type = :salesType THEN ve.amount ELSE 0 END), 0) AS TotalSalesAmount`
+            `SUM(CASE WHEN ve.voucher_type = :salesType THEN ve.amount ELSE 0 END) AS TotalSalesAmount`
         ])
-        .leftJoin('voucher_entity', 've', `
-            ve.branch_id = br.id
-            AND ve.voucher_type = :salesType
-            AND YEAR(ve.generation_date) = :year
-            AND ve.company_code = :companyCode
-            AND ve.unit_code = :unitCode
-        `)
-        .where('br.company_code = :companyCode', { companyCode: req.companyCode })
-        .andWhere('br.unit_code = :unitCode', { unitCode: req.unitCode })
+        .leftJoin(
+            VoucherEntity,
+            've',
+            `ve.branch_id = br.id AND ve.company_code = :companyCode AND ve.unit_code = :unitCode AND YEAR(ve.generation_date) = :year`,
+        )
         .groupBy('br.name, YEAR(ve.generation_date), MONTH(ve.generation_date)')
         .orderBy('YEAR(ve.generation_date)', 'ASC')
         .addOrderBy('MONTH(ve.generation_date)', 'ASC')
@@ -1274,10 +1270,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             salesType: VoucherTypeEnum.SALES,
             companyCode: req.companyCode,
             unitCode: req.unitCode,
-            year,
+            year: year
         })
         .getRawMany();
-            // const query = await this.createQueryBuilder('ve')
+                // const query = await this.createQueryBuilder('ve')
             // .select([
             //     `YEAR(ve.generation_date) AS year`,
             //     `MONTH(ve.generation_date) AS month`,
