@@ -19,7 +19,7 @@ export class ClientEntity extends BaseEntity {
     @PrimaryGeneratedColumn({ name: 'id' })
     id: number;
 
-    @Column({ name: 'name', type: 'varchar', length: 100 })
+    @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
     @Column({ name: 'phone_number', type: 'varchar', length: 15, unique: true })
