@@ -508,6 +508,8 @@ export class TechnicianService {
         return `${formattedYear}-${paddedSequentialNumber}`;
     }
 
+    
+
     async deleteTechnicianDetails(dto: TechIdDto): Promise<CommonResponse> {
         try {
             const TechnicianExists = await this.repo.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });

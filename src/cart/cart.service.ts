@@ -1,13 +1,14 @@
 // service/cart.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CartRepository } from './repo/cart-repo';
-import { CreateCartDto } from './dto/cart.dto';
+import { CreateCartDto, DeleteDto } from './dto/cart.dto';
 import { CartAdapter } from './adapter/cart-.adapter';
 import { CommonResponse } from 'src/models/common-response';
 import { CartEntity } from './entity/cart.entity';
 import { ErrorResponse } from 'src/models/error-response';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class CartService {
@@ -35,16 +36,56 @@ export class CartService {
         }
     }
 
-    async deleteCartDetails(dto: HiringIdDto): Promise<CommonResponse> {
-        try {
-            const existing = await this.cartRepository.findOne({ where: { id: dto.id } });
-            if (!existing) return new CommonResponse(false, 404, 'Cart not found');
-            await this.cartRepository.delete({ id: dto.id });
-            return new CommonResponse(true, 200, 'Cart deleted');
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
+    async deleteCartDetails(dto: DeleteDto): Promise<CommonResponse> {
+        const ids = dto.ids ?? (dto.id ? [dto.id] : []);
+
+        if (!ids.length) {
+            throw new BadRequestException('No valid Cart IDs provided');
         }
+
+        // Find all existing IDs from the database
+        const existingOrders = await this.cartRepository.find({
+            where: { id: In(ids) },
+            select: ['id'], // Only select the ID for efficiency
+        });
+
+        const foundIds = existingOrders.map(order => order.id);
+        const notFoundIds = ids.filter(id => !foundIds.includes(id));
+
+        // Delete only the found IDs
+        if (foundIds.length > 0) {
+            await this.cartRepository.delete({ id: In(foundIds) });
+        }
+
+        // Construct response message
+        const deletedCount = foundIds.length;
+        const message = `${deletedCount} Cart(s) deleted.` +
+            (notFoundIds.length > 0 ? ` Some Cart(s) not found: [${notFoundIds.join(', ')}]` : '');
+
+        return new CommonResponse(true, 200, message);
     }
+
+
+    // async deleteCartDetails(dto: DeleteDto): Promise<CommonResponse> {
+    //     const ids = dto.ids ?? (dto.id ? [dto.id] : []);
+
+    //     if (!ids.length) {
+    //         throw new BadRequestException('No valid Cart IDs provided');
+    //     }
+
+    //     const existing = await this.cartRepository.findOne({ where: { id: In(ids) } });
+    //     if (!existing) return new CommonResponse(false, 404, 'Cart not found');
+
+    //     const result = await this.cartRepository.delete(
+    //         { id: In(ids) },
+    //     );
+
+    //     if (result.affected === 0) {
+    //         throw new NotFoundException('Carts not found');
+    //     }
+    //     return new CommonResponse(true, 200, 'cart(s) deleted successfully');
+
+    // }
 
     async getCartsByCompanyAndUnit(): Promise<CommonResponse> {
         try {

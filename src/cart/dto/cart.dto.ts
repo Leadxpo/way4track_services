@@ -33,3 +33,9 @@ export class CartResponseDto {
     clientId?: number;
     deviceId?: number;
 }
+export class DeleteDto {
+    unitCode: string;
+    companyCode: string;
+    id?: number;        // For marking a single notification as read
+    ids?: number[];     // For marking multiple notifications as read
+}

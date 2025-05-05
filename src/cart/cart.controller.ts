@@ -3,7 +3,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { CartService } from './cart.service';
-import { CreateCartDto } from './dto/cart.dto';
+import { CreateCartDto, DeleteDto } from './dto/cart.dto';
 
 @Controller('cart')
 export class CartController {
@@ -23,7 +23,7 @@ export class CartController {
     }
 
     @Post('deleteCartDetails')
-    async deleteCartDetails(@Body() dto: HiringIdDto): Promise<CommonResponse> {
+    async deleteCartDetails(@Body() dto: DeleteDto): Promise<CommonResponse> {
         try {
             return await this.service.deleteCartDetails(dto);
         } catch (error) {
