@@ -6,5 +6,6 @@ export class CreatePromotionDto {
     shortDescription?: string;
     theme?: string;
     image?: string;
-    list: { photo?: string; desc: string }[];
+    themeBgimage?: string;
+    list: { name: string, photo?: string; desc: string }[];
 }

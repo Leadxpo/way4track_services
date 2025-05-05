@@ -25,8 +25,12 @@ export class PromotionEntity extends BaseEntity {
     @Column({ name: 'image', type: 'varchar', length: 255, nullable: true })
     image: string;
 
+    @Column({ name: 'theme_bgimage', type: 'varchar', length: 255, nullable: true })
+    themeBgimage: string;
+
     @Column('json', { name: 'list', nullable: true })
     list: {
+        name: string
         photo?: string;
         desc: string;
     }[];
