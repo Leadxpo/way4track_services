@@ -1270,8 +1270,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
               ON ve.branch_id = br.id
               AND ve.company_code = :companyCode
               AND ve.unit_code = :unitCode
-              AND YEAR(ve.generation_date) = :year
-              AND MONTH(ve.generation_date) = m.month
+              AND YEAR(ve.generation_date)', 'ASC'
+              AND MONTH(ve.generation_date)', 'ASC'
             GROUP BY br.name, m.month
             ORDER BY br.name, m.month;
           `, [
