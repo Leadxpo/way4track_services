@@ -2,13 +2,6 @@
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { OrderEntity } from 'src/orders/entity/orders.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-
-export enum OrderStatus {
-    PENDING = 'pending',
-    ORDERSUCESS = 'success',
-    ABORTED= "aborted",
-    CANCELED= "cancel"
-  }
   
 @Entity('transactions_table')
 export class TransactionEntity {

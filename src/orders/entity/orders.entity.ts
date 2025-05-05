@@ -28,7 +28,7 @@ export class OrderEntity {
   @Column({ name: 'order_date', type: 'varchar', nullable: true })
   orderDate: string;
 
-  @Column({ name: 'delivery_address', type: 'varchar', nullable: true })
+  @Column({ name: 'delivery_address', type: 'text', nullable: true })
   deliveryAddress: string;
 
   @Column({ type: 'enum', enum: OrderStatus, name: 'order_status', nullable: true })

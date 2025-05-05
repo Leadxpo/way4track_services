@@ -6,11 +6,13 @@ import { OTPGenerationService } from './otp-generation.services';
 import { OTPRepository } from './repo/otp-generation.repo';
 import { StaffModule } from 'src/staff/staff.module';
 import { NotificationModule } from 'src/notifications/notification.module';
+import { ClientModule } from 'src/client/client.module';
 
 
 @Module({
     imports: [TypeOrmModule.forFeature([OtpEntity]),
     forwardRef(() => StaffModule),
+    forwardRef(() => ClientModule),
     ],
     controllers: [OTPGenerationController],
     providers: [OTPGenerationService, OTPRepository],

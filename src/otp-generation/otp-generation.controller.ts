@@ -11,6 +11,19 @@ export class OTPGenerationController {
         return this.otpService.sendOtp(req);
     }
 
+    @Post('verifyClientOtp')
+    verifyClientOtp(
+        @Body() req: OTPDto
+    ) {
+        return this.otpService.verifyClientOtp(req);
+    }
+
+
+    @Post('sendClientOtp')
+    sendClientOtp(@Body() req: OTPDto) {
+        return this.otpService.sendClientOtp(req);
+    }
+
     @Post('verify-otp')
     verifyOtp(
         @Body() req: OTPDto
@@ -28,5 +41,11 @@ export class OTPGenerationController {
     @Post('re-send-otp')
     resendOtp(@Body() req: OTPDto) {
         return this.otpService.reSendOtp(req);
+    }
+
+
+    @Post('reSendClientOtp')
+    reSendClientOtp(@Body() req: OTPDto) {
+        return this.otpService.reSendClientOtp(req);
     }
 }

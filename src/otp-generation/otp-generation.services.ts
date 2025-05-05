@@ -6,12 +6,14 @@ import { CommonResponse } from 'src/models/common-response';
 import { NotificationRepository } from 'src/notifications/repo/notification.repo';
 import axios from 'axios';
 import { StaffStatus } from 'src/staff/enum/staff-status';
+import { ClientRepository } from 'src/client/repo/client.repo';
 
 @Injectable()
 export class OTPGenerationService {
     constructor(
         private readonly otpRepository: OTPRepository,
         private readonly staffRepo: StaffRepository,
+        private readonly clientRepo: ClientRepository
 
     ) { }
 
@@ -72,7 +74,56 @@ export class OTPGenerationService {
         }
     }
 
+    private async handleClientOtpSend(req: OTPDto): Promise<CommonResponse> {
+        const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } });
+
+        const isExistingClient = !!client;
+        const actionType = req.isResend ? 'resend OTP' : (isExistingClient ? 'login' : 'register');
+
+        const otp = this.generateOtp();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 ghante ke liye valid
+
+        const smsParams = {
+            username: "sharontelematics.trans",
+            password: "bisrm",
+            unicode: false,
+            from: "SHARTE",
+            to: req.phoneNumber,
+            text: `This is a message from Sharlon Telematrice.\nAn OTP is requested to ${actionType} for Client ${req.phoneNumber}:\n ${otp}`,
+            dltContentId: "170717376366764870"
+        };
+
+        let smsResponse;
+        try {
+            smsResponse = await axios.get("https://pgapi.smartping.ai/fe/api/v1/send", { params: smsParams });
+        } catch (error) {
+            console.error("SMS sending failed, bhai!", error);
+            return new CommonResponse(false, 500, "SMS sending failed", { error: error.message });
+        }
+
+        const otpRecord = this.otpRepository.create({
+            staffId: req.phoneNumber,
+            otp,
+            expiresAt,
+        });
+        await this.otpRepository.save(otpRecord);
+
+        return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} successfully for ${isExistingClient ? 'login' : 'registration'}`, {
+            otp, // testing ke liye bhej rahe hain, production mein hata dena warna naya tamasha ho jayega
+            sms: smsResponse.data,
+            clientExists: isExistingClient,
+        });
+    }
+
     // Main exposed functions
+    async sendClientOtp(req: OTPDto): Promise<CommonResponse> {
+        return this.handleClientOtpSend(req);
+    }
+
+    async reSendClientOtp(req: OTPDto): Promise<CommonResponse> {
+        return this.handleClientOtpSend(req);
+    }
+
     async sendOtp(req: OTPDto): Promise<CommonResponse> {
         return this.handleOtpSend(req);
     }
@@ -144,6 +195,26 @@ export class OTPGenerationService {
     async verifyOtp(req: VerifyOtpDto): Promise<CommonResponse> {
         const otpRecord = await this.otpRepository.findOne({
             where: { staffId: req.staffId, otp: req.otp },
+        });
+
+        if (!otpRecord) {
+            return new CommonResponse(false, 400, "Invalid OTP");
+        }
+
+        const now = new Date();
+
+        if (otpRecord.expiresAt < now) {
+            await this.otpRepository.remove(otpRecord);
+            return new CommonResponse(false, 400, "OTP expired");
+        }
+
+        return new CommonResponse(true, 200, "OTP verified. Proceed with password change.");
+    }
+
+
+    async verifyClientOtp(req: VerifyOtpDto): Promise<CommonResponse> {
+        const otpRecord = await this.otpRepository.findOne({
+            where: { staffId: req.phoneNumber, otp: req.otp },
         });
 
         if (!otpRecord) {

@@ -13,6 +13,7 @@ export class OTPDto {
 
 export class VerifyOtpDto {
   staffId: string;
+  phoneNumber: string;
   otp: string;
 }
 
