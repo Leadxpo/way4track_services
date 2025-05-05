@@ -94,47 +94,14 @@ export class ProductTypeService {
             if (!existingProductType) {
                 throw new Error('ProductType not found');
             }
-            // const photoMapping: Record<string, string> = {
-            //     photo: 'productPhoto',
-            //     image: 'blogImage'
-            // };
-            // Object.keys(photoMapping).forEach(field => {
-            //     const entityField = photoMapping[field];
-            //     if (filePaths[field]) {
-            //         (existingProductType as any)[entityField] = filePaths[field];
-            //     }
-            // });
-            // for (const field in photoMapping) {
-            //     const entityField = photoMapping[field];
-            //     const newFilePath = filePaths[field];
-            //     const existingFilePath = existingProductType[entityField as keyof ProductTypeEntity];
-            //     if (typeof existingFilePath === 'string' && newFilePath) {
-            //         const existingFileName = existingFilePath.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-            //         const file = this.storage.bucket(this.bucketName).file(existingFileName);
-            //         try {
-            //             await file.delete();
-            //             console.log(`Deleted old file from GCS: ${existingFileName}`);
-            //         } catch (error) {
-            //             console.error(`Error deleting old file from GCS: ${error.message}`);
-            //         }
-            //     }
-            // }
+
 
             const entity = this.productTypeAdapter.convertDtoToEntity(dto);
             entity.id = existingProductType.id
             Object.assign(existingProductType, entity);
-            // Merge existing ProductType details with new data
-            // Object.keys(photoMapping).forEach(field => {
-            //     const entityField = photoMapping[field];
-            //     if (filePaths[field]) {
-            //         (existingProductType as any)[entityField] = filePaths[field];
-            //     }
-            // });
-            // console.log("Final data before saving:", existingProductType);
+
             await this.productTypeRepository.update(existingProductType.id, {
-                ...dto, // Ensure DTO values are applied
-                // productPhoto: filePaths.photo || existingProductType.productPhoto,
-                // blogImage: filePaths.image || existingProductType.blogImage
+                ...dto,
             });
             return new CommonResponse(true, 200, 'ProductType details updated successfully');
         } catch (error) {

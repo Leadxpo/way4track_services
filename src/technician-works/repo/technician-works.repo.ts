@@ -498,6 +498,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
+                've',
                 've.name AS clientName',
                 've.phone_number AS phoneNumber',
                 've.address AS address',
