@@ -1251,28 +1251,36 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             throw new Error('Invalid year provided');
         }
 
-        const query = await this.createQueryBuilder('br') // start from branches
-        .select([
-            `YEAR(ve.generation_date) AS year`,
-            `MONTH(ve.generation_date) AS month`,
-            `br.name AS branchName`,
-            `SUM(CASE WHEN ve.voucher_type = :salesType THEN ve.amount ELSE 0 END) AS TotalSalesAmount`
-        ])
-        .leftJoin(
-            VoucherEntity,
-            've',
-            `ve.branch_id = br.id AND ve.company_code = :companyCode AND ve.unit_code = :unitCode AND YEAR(ve.generation_date) = :year`,
-        )
-        .groupBy('br.name, YEAR(ve.generation_date), MONTH(ve.generation_date)')
-        .orderBy('YEAR(ve.generation_date)', 'ASC')
-        .addOrderBy('MONTH(ve.generation_date)', 'ASC')
-        .setParameters({
-            salesType: VoucherTypeEnum.SALES,
-            companyCode: req.companyCode,
-            unitCode: req.unitCode,
-            year: year
-        })
-        .getRawMany();
+        const rawResult = await this.manager.query(`
+            WITH months AS (
+              SELECT 1 AS month UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+              UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8
+              UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12
+            )
+            SELECT
+              :year AS year,
+              m.month,
+              br.name AS branchName,
+              COALESCE(SUM(CASE 
+                WHEN ve.voucher_type = :salesType THEN ve.amount 
+                ELSE 0 END), 0) AS TotalSalesAmount
+            FROM months m
+            CROSS JOIN branch br
+            LEFT JOIN voucher ve
+              ON ve.branch_id = br.id
+              AND ve.company_code = :companyCode
+              AND ve.unit_code = :unitCode
+              AND YEAR(ve.generation_date) = :year
+              AND MONTH(ve.generation_date) = m.month
+            GROUP BY br.name, m.month
+            ORDER BY br.name, m.month;
+          `, [
+            year,
+            VoucherTypeEnum.SALES,
+            req.companyCode,
+            req.unitCode,
+          ]);
+                    
                 // const query = await this.createQueryBuilder('ve')
             // .select([
             //     `YEAR(ve.generation_date) AS year`,
@@ -1295,7 +1303,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             // })
             // .getRawMany();
 
-        return query;
+        return rawResult;
     }
 
     async getOverAllYearlySales(req: BranchChartDto): Promise<any> {
