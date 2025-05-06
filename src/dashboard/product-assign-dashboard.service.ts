@@ -109,17 +109,7 @@ export class ProductAssignDashboardService {
     }
 
 
-    async getProductDetailsByBranch(req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
-        const productData = await this.productAssignRepo.getProductDetailsByBranch(req);
-
-        if (!productData) {
-            return new CommonResponse(false, 56416, "Data Not Found With Given Input", []);
-        } else {
-            // Flatten the response to remove nested "data of data"
-            return new CommonResponse(true, 200, "Data retrieved successfully", productData);
-        }
-    }
-
+   
 
     async getProductWareHouseDetails(req: { unitCode: string; companyCode: string; }): Promise<CommonResponse> {
         const productData = await this.productAssignRepo.getProductWareHouseDetails(req)

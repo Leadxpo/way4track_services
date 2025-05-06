@@ -362,16 +362,7 @@ export class DashboardController {
         }
     }
 
-    @Post('getProductDetailsByBranch')
-    async getProductDetailsByBranch(@Body() req: { unitCode: string; companyCode: string; branch?: string }): Promise<CommonResponse> {
-        try {
-            return await this.productAssignDashboardService.getProductDetailsByBranch(req)
-        }
-        catch (error) {
-            console.log("Error in details in service..", error);
-            //         return new CommonResponse(false, 500, 'Error details');
-        }
-    }
+   
 
     @Post('getProductWareHouseDetails')
     async getProductWareHouseDetails(@Body() req: { unitCode: string; companyCode: string; }): Promise<CommonResponse> {
