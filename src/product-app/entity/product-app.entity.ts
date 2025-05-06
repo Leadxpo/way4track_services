@@ -40,7 +40,7 @@ export class ProductAppEntity {
   updatedAt: Date;
 
   @Column('json', { name: 'points' })
-  orderItems: {
+  points: {
     title: string; desc: string;
   }[];
 }

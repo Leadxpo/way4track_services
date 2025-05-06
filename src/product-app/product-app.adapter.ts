@@ -3,7 +3,7 @@ import { WebsiteProductEntity } from 'src/website-product/entity/website-entity'
 import { ProductAppEntity } from './entity/product-app.entity';
 
 export class ProductAppAdapter {
-     toEntity(dto: ProductAppDto): ProductAppEntity {
+    toEntity(dto: ProductAppDto): ProductAppEntity {
         const entity = new ProductAppEntity();
         entity.id = dto.id;
         entity.name = dto.name;
@@ -11,7 +11,7 @@ export class ProductAppAdapter {
         entity.shortDescription = dto.shortDescription;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        entity.orderItems = dto.orderItems;
+        entity.points = dto.points;
 
         if (dto.webProductId) {
             const product = new WebsiteProductEntity();
@@ -22,7 +22,7 @@ export class ProductAppAdapter {
         return entity;
     }
 
-     toDto(entity: ProductAppEntity): ProductAppDto {
+    toDto(entity: ProductAppEntity): ProductAppDto {
         return {
             id: entity.id,
             name: entity.name,
@@ -31,7 +31,7 @@ export class ProductAppAdapter {
             webProductId: entity.webProduct?.id,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
-            orderItems: entity.orderItems,
+            points: entity.points,
         };
     }
 }
