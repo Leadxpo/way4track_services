@@ -333,9 +333,12 @@ export class PermissionsService {
             }
 
             const currentPermission = await this.repo.findOne({
-                where: { staffId: staff, staffStatus: StaffStatus.ACTIVE }
+                where: {
+                    staffId: { staffId: staff.staffId }, // filter by the scalar ID inside the related entity
+                    staffStatus: StaffStatus.ACTIVE
+                }
             });
-
+            
             if (currentPermission) {
                 // Mark previous permissions as inactive
                 currentPermission.staffStatus = StaffStatus.INACTIVE;
