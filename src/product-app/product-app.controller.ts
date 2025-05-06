@@ -45,4 +45,16 @@ export class ProductAppController {
         const dtoList = JSON.parse(dtoListJson)
         return await this.service.handleBulkProductApp(dtoList, photos);
     }
+
+
+    @Post('getAll')
+    async getAll(): Promise<CommonResponse> {
+        try {
+            return await this.service.findAll();
+
+        } catch (error) {
+            console.error('Error in get request details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching request details');
+        }
+    }
 }

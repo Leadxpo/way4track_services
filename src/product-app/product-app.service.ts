@@ -134,8 +134,16 @@ export class ProductAppService {
         }
     }
 
-    async findAll(): Promise<ProductAppDto[]> {
-        const entities = await this.repo.find({ relations: ['webProduct'] });
-        return entities.map(this.adapter.toDto);
+    async findAll(): Promise<CommonResponse> {
+        const branch = await this.repo.find({ relations: ['webProduct'] });
+
+        // Convert each entity in the array to DTO
+        const staffDtos = branch.map(entity => this.adapter.toDto(entity));
+
+        if (staffDtos.length === 0) {
+            return new CommonResponse(false, 35416, "There Is No List");
+        }
+
+        return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", staffDtos);
     }
 }
