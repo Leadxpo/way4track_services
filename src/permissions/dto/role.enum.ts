@@ -16,5 +16,12 @@ export enum Roles {
     Estimate = 'estimate',
     Attendance = 'attendance',
     RequestRaise = 'requests',
-    
+    Product_type = 'Product Type',
+    Invoice = 'Invoice',
+    Backend = 'Backend',
+    Services = 'Services',
+    Vehicle = 'Vehicle',
+    Sales = 'Sales',
+    Dispatch = 'Dispatch'
+
 }
