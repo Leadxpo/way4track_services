@@ -33,9 +33,7 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
             query.andWhere('br.name = :branch', { branch: req.branch });
         }
 
-      
 
-        query.groupBy('br.name, re.products'); 
 
         const result = await query.getRawMany();
 
@@ -73,8 +71,10 @@ export class RequestRaiseRepository extends Repository<RequestRaiseEntity> {
                     })),
                 });
             }
-        });
+            console.log(productList, "productList")
 
+        });
+        console.log(transformedResult, "transformedResult")
         return transformedResult;
     }
 
