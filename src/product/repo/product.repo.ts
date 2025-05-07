@@ -54,12 +54,12 @@ export class ProductRepository extends Repository<ProductEntity> {
             // Query for grouped product details
             const groupedProductQuery = this.createQueryBuilder('productAssign')
                 .select([
-                    'productAssign.id AS productId',
+                    'ANY_VALUE(productAssign.id) AS productId',
                     'productAssign.product_name AS productName',
                     'pt.name AS productType',
                     'br.name AS branchName',
                     'SUM(productAssign.quantity) AS totalProducts',
-                    'SUM(CASE WHEN productAssign.in_hands = true THEN productAssign.quantity ELSE 0 END) AS totalInHandsQty',
+                    `SUM(CASE WHEN productAssign.status = 'inHand' THEN COALESCE(productAssign.quantity, 0) ELSE 0 END) AS inHandStock`,
                     'productAssign.status AS status'
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
@@ -72,7 +72,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                 groupedProductQuery.andWhere('br.name = :branchName', { branchName: req.branch });
             }
 
-            groupedProductQuery.groupBy(' productAssign.product_name, br.name, pt.name, productAssign.status');
+            groupedProductQuery.groupBy('productAssign.id, productAssign.product_name, br.name, pt.name, productAssign.status')
+
 
             // Execute query for grouped product details
             const productDetails = await groupedProductQuery.getRawMany();
@@ -81,7 +82,6 @@ export class ProductRepository extends Repository<ProductEntity> {
             const photoQuery = this.createQueryBuilder('productAssign')
                 .select([
                     'pt.id AS productTypeId',
-                    'pt.product_photo AS productAssignPhoto'
                 ])
                 .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
                 .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
