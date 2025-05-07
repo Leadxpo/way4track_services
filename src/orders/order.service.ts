@@ -87,6 +87,9 @@ export class OrderService {
 
     async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
         try {
+            if (!dto.id) {
+                return new CommonResponse(false, 400, 'Client ID is required');
+            }
             const entity = await this.repo.findOne({ where: { id: dto.id }, relations: ['device', 'client'] });
             if (!entity) return new CommonResponse(false, 404, 'order not found');
             return new CommonResponse(true, 200, 'order fetched', this.adapter.toResponse(entity));

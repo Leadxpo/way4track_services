@@ -144,6 +144,9 @@ export class ClientService {
 
     async deleteClientDetails(dto: ClientIdDto): Promise<CommonResponse> {
         try {
+            if (!dto.clientId) {
+                return new CommonResponse(false, 400, 'Client ID is required');
+            }
             // Find the client by client_id, companyCode, and unitCode
             const client = await this.clientRepository.findOne({
                 where: {
@@ -170,6 +173,9 @@ export class ClientService {
     async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
         try {
             console.log(req, "+++++++++++")
+            if (!req.clientId) {
+                return new CommonResponse(false, 400, 'Client ID is required');
+            }
 
             const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
             console.log(client, "+++++++++++")

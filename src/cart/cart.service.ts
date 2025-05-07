@@ -98,6 +98,9 @@ export class CartService {
 
     async getCartDetailsById(dto: HiringIdDto): Promise<CommonResponse> {
         try {
+            if (!dto.id) {
+                return new CommonResponse(false, 400, 'Client ID is required');
+            }
             const entity = await this.cartRepository.findOne({ where: { id: dto.id }, relations: ['device', 'client'] });
             if (!entity) return new CommonResponse(false, 404, 'Cart not found');
             return new CommonResponse(true, 200, 'Cart fetched', this.cartAdapter.toResponse(entity));
