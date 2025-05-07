@@ -1337,52 +1337,95 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query.getRawMany();
     }
 
-    async getSalesBreakdown(req: BranchChartDto) {
-        const query = await this.createQueryBuilder('ve')
-            .select([
-                `YEAR(ve.generation_date) AS year`, // Selecting Year
-                `branch.id AS branchId`,
-                `branch.name AS branchName`,
-                `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS totalSalesAmount`, // Changed to sum extractedAmount
-                `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS extractedAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Rectifications')
-                ) AS rectificationsAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Renewables')
-                ) AS renewablesAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Replacements')
-                ) AS replacementsAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ProductSales')
-                ) AS productSalesAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ServiceSales')
-                ) AS serviceSalesAmount`,
-                `SUM(
-                    JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-                    * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'others')
-                ) AS otherSalesAmount`
-            ])
-            .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .where(`YEAR(ve.generation_date) = :year`, { year: req.date }) // Filtering by selected year
-            .andWhere(`ve.voucher_type = 'Sales'`)
-            .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-            .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-            // .andWhere(`ve.payment_status = :pendingStatus`, { pendingStatus: PaymentStatus.PENDING })
-            .groupBy('YEAR(ve.generation_date), branch.id, branch.name') // Grouping by Year & Branch
-            .orderBy('YEAR(ve.generation_date)', 'ASC')
-            .addOrderBy('branch.name', 'ASC')
-            .getRawMany();
+    // async getSalesBreakdown(req: BranchChartDto) {
+    //     const query = await this.createQueryBuilder('ve')
+    //         .select([
+    //             `YEAR(ve.generation_date) AS year`, // Selecting Year
+    //             `branch.id AS branchId`,
+    //             `branch.name AS branchName`,
+    //             `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS totalSalesAmount`, // Changed to sum extractedAmount
+    //             `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS extractedAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Rectifications')
+    //             ) AS rectificationsAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Renewables')
+    //             ) AS renewablesAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Replacements')
+    //             ) AS replacementsAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ProductSales')
+    //             ) AS productSalesAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ServiceSales')
+    //             ) AS serviceSalesAmount`,
+    //             `SUM(
+    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
+    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'others')
+    //             ) AS otherSalesAmount`
+    //         ])
+    //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+    //         .where(`YEAR(ve.generation_date) = :year`, { year: req.date }) // Filtering by selected year
+    //         .andWhere('ve.voucher_type = :voucherType', { voucherType: VoucherTypeEnum.SALES })
+    //         .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
+    //         .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
+    //         // .andWhere(`ve.payment_status = :pendingStatus`, { pendingStatus: PaymentStatus.PENDING })
+    //         .groupBy('YEAR(ve.generation_date), branch.id, branch.name') // Grouping by Year & Branch
+    //         .orderBy('YEAR(ve.generation_date)', 'ASC')
+    //         .addOrderBy('branch.name', 'ASC')
+    //         .getRawMany();
+    //     console.log(query, "?>>>>>>>>>")
+    //     return query;
+    // }
 
-        return query;
+    async getSalesBreakdown(req: BranchChartDto) {
+        const entityManager = this.dataSource.manager;
+
+        const rawQuery = `
+          SELECT 
+            YEAR(ve.generation_date) AS year,
+            branch.id AS branchId,
+            branch.name AS branchName,
+            SUM(j.totalCost) AS totalSalesAmount,
+            SUM(CASE WHEN j.type = 'Rectifications' THEN j.totalCost ELSE 0 END) AS rectificationsAmount,
+            SUM(CASE WHEN j.type = 'Renewables' THEN j.totalCost ELSE 0 END) AS renewablesAmount,
+            SUM(CASE WHEN j.type = 'Replacements' THEN j.totalCost ELSE 0 END) AS replacementsAmount,
+            SUM(CASE WHEN j.type = 'ProductSales' THEN j.totalCost ELSE 0 END) AS productSalesAmount,
+            SUM(CASE WHEN j.type = 'ServiceSales' THEN j.totalCost ELSE 0 END) AS serviceSalesAmount,
+            SUM(CASE WHEN j.type = 'others' THEN j.totalCost ELSE 0 END) AS otherSalesAmount
+          FROM voucher ve
+          JOIN JSON_TABLE(
+            ve.product_details,
+            '$[*]' COLUMNS (
+              type VARCHAR(50) PATH '$.type',
+              totalCost DECIMAL(10,2) PATH '$.totalCost'
+            )
+          ) AS j
+          LEFT JOIN branches branch ON branch.id = ve.branch_id
+          WHERE YEAR(ve.generation_date) = ?
+            AND ve.voucher_type = ?
+            AND ve.company_code = ?
+            AND ve.unit_code = ?
+          GROUP BY YEAR(ve.generation_date), branch.id, branch.name
+          ORDER BY YEAR(ve.generation_date), branch.name;
+        `;
+
+        const result = await entityManager.query(rawQuery, [
+            req.date,
+            VoucherTypeEnum.SALES,
+            req.companyCode,
+            req.unitCode,
+        ]);
+        console.log(result, "????????")
+        return result;
     }
+
 
     async getSalesForTable(req: {
         fromDate?: string;
