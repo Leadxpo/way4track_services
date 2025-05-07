@@ -172,7 +172,7 @@ export class RequestRaiseService {
                 'req.request_id AS requestNumber',
                 'req.id AS requestId',
                 'branch.name AS branchName',
-                'req.created_date AS paymentDate',
+                'req.created_date AS requestDate',
                 'req.request_type AS requestType',
                 'req.status AS status',
                 'sf.name AS RequestTo'
