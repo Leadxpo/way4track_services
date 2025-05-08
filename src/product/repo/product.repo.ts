@@ -55,7 +55,7 @@ export class ProductRepository extends Repository<ProductEntity> {
             const groupedProductQuery = this.createQueryBuilder('productAssign')
                 .select([
                     'ANY_VALUE(productAssign.id) AS productId',
-                    'productAssign.product_name AS productName',
+                    'productAssign.product_type AS productName',
                     'pt.name AS productType',
                     'br.name AS branchName',
                     'SUM(productAssign.quantity) AS totalProducts',
@@ -312,7 +312,7 @@ export class ProductRepository extends Repository<ProductEntity> {
         const detailedBranchAssignQuery = this.createQueryBuilder('pa')
             .select([
                 'br.name AS branchName',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
@@ -356,7 +356,7 @@ export class ProductRepository extends Repository<ProductEntity> {
             .select([
                 'sb.name AS subDealerName',
                 'sb.sub_dealer_id AS subDealerId',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'pa.product_status AS productStatus',
                 'MAX(pa.assign_time) AS assignTime'
@@ -396,7 +396,7 @@ export class ProductRepository extends Repository<ProductEntity> {
         const detailedStaffQuery = this.createQueryBuilder('pa')
             .select([
                 'sf.name AS staffName',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
                 'MAX(pa.assign_time) AS assignTime'
