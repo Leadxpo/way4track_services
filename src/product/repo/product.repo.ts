@@ -64,8 +64,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
-                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+                .where('br.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('br.unit_code = :unitCode', { unitCode: req.unitCode });
 
             // If a specific branch is selected, filter for that branch
             if (req.branch) {
@@ -84,8 +84,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                     'pt.id AS productTypeId',
                 ])
                 .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
-                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+                .where('br.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('br.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branch) {
                 photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branch WHERE name = :branchName)', { branchName: req.branch });
