@@ -68,11 +68,12 @@ export class ClientRepository extends Repository<ClientEntity> {
     async getSearchDetailClient(req: ClientSearchDto) {
         const query = this.createQueryBuilder('cl')
             .select([
+                'cl.id AS id',
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                'cl.joining_date AS joiningDate',
-                'cl.GST_number AS gstNumber',
+                // 'cl.joining_date AS joiningDate',
+                // 'cl.GST_number AS gstNumber',
                 // 'vr.payment_status AS paymentStatus',
                 // 'vr.amount AS amount',
                 // 'vr.quantity as quantity',
