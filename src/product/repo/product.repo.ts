@@ -328,10 +328,11 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawBranchResults = await detailedBranchAssignQuery
             .groupBy('br.name')
-            .addGroupBy('pa.product_name')
+            .addGroupBy('pa.product_type')
             .addGroupBy('pa.product_status')
             .orderBy('br.name', 'ASC')
             .getRawMany();
+
 
         response.branchDetails = rawBranchResults.filter(item => item.branchName !== null);
 
@@ -371,8 +372,8 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawSubDealerResults = await detailedSubDealerAssignQuery
             .groupBy('sb.name')
+            .addGroupBy('pa.product_type') // was incorrectly pa.product_name
             .addGroupBy('sb.sub_dealer_id')
-            .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .orderBy('sb.sub_dealer_id')
             .getRawMany();
@@ -411,6 +412,7 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawStaffResults = await detailedStaffQuery
             .groupBy('sf.name')
+            .addGroupBy('pa.product_type') // again fix name
             .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .getRawMany();
