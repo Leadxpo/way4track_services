@@ -11,11 +11,12 @@ export class ClientResDto {
     // dob: string;
     email: string;
     address: string;
-    joiningDate: Date;
+    // joiningDate: Date;
     companyCode: string;
     unitCode: string
     status: ClientStatus
     // password: string;
+    // GSTNumber: string;
 
     constructor(
         id: number,
@@ -28,11 +29,12 @@ export class ClientResDto {
         // dob: string,
         email: string,
         address: string,
-        joiningDate: Date,
+        // joiningDate: Date,
         companyCode: string,
         unitCode: string,
         status: ClientStatus,
         // password: string
+        // GSTNumber: string
 
     ) {
         this.id = id;
@@ -45,10 +47,11 @@ export class ClientResDto {
         // this.dob = dob;
         this.email = email;
         this.address = address;
-        this.joiningDate = joiningDate;
+        // this.joiningDate = joiningDate;
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status
+        // this.GSTNumber = GSTNumber
         // this.password=password
     }
 }

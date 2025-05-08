@@ -46,14 +46,14 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'email', type: 'varchar', length: 150, unique: true, nullable: true })
     email: string;
 
-    @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
-    GSTNumber: string;
+    // @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
+    // GSTNumber: string;
 
     @Column({ name: 'address', type: 'text', nullable: true })
     address: string;
 
-    @Column({ name: 'joining_date', type: 'date', nullable: true })
-    joiningDate: Date;
+    // @Column({ name: 'joining_date', type: 'date', nullable: true })
+    // joiningDate: Date;
 
     @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.clientId)
     technician: TechnicianWorksEntity[];
