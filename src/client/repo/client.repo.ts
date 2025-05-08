@@ -21,7 +21,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                'cl.joining_date AS joiningDate',
                 'vr.payment_status AS paymentStatus',
                 'vr.amount AS amount',
                 'vr.voucher_id as voucherId',
@@ -41,7 +40,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                'cl.joining_date AS joiningDate',
                 'vr.payment_status AS paymentStatus',
                 'vr.amount AS amount',
                 'vr.voucher_id AS voucherId',
@@ -72,7 +70,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                // 'cl.joining_date AS joiningDate',
                 // 'cl.GST_number AS gstNumber',
                 // 'vr.payment_status AS paymentStatus',
                 // 'vr.amount AS amount',
@@ -100,7 +97,7 @@ export class ClientRepository extends Repository<ClientEntity> {
             query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
         const result = await query
-            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name, cl.joining_date, vr.payment_status, vr.amount, br.name, cl.email,cl.address, vr.name, vr.generation_date, vr.product_type`)
+            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name,  vr.payment_status, vr.amount, br.name, cl.email,cl.address, vr.name, vr.generation_date, vr.product_type`)
             .getRawMany();
 
         return result;
