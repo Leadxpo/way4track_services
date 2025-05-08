@@ -76,6 +76,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 // 'vr.quantity as quantity',
                 // 'vr.voucher_id AS voucherId',
                 'br.name AS branch',
+                'br.id AS branchId',
                 'cl.email AS email',
                 'cl.address AS address',
                 // 'vr.name AS voucherName',
