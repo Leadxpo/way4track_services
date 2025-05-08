@@ -257,7 +257,7 @@ export class TechnicianService {
                     dob: "",
                     email: newTechnician.email || "",
                     address: newTechnician.address || "",
-                    joiningDate: newTechnician.startDate || null,
+                    // joiningDate: newTechnician.startDate || null,
                     companyCode: req.companyCode ?? "",
                     unitCode: req.unitCode ?? "",
                     hsnCode: "",
@@ -508,7 +508,7 @@ export class TechnicianService {
         return `${formattedYear}-${paddedSequentialNumber}`;
     }
 
-    
+
 
     async deleteTechnicianDetails(dto: TechIdDto): Promise<CommonResponse> {
         try {
