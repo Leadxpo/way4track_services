@@ -55,7 +55,11 @@ export class TechnicianWorksAdapter {
             support.id = dto.backEndStaffRelation;
             entity.backEndStaffRelation = support;
         }
-
+        if (dto.fromStaffId) {
+            const from = new StaffEntity();
+            from.id = dto.fromStaffId;
+            entity.fromStaffId = from;
+        }
         if (dto.branchId) {
             const branch = new BranchEntity();
             branch.id = dto.branchId;

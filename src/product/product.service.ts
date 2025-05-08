@@ -413,6 +413,7 @@ export class ProductService {
             ...excelRow,
             productTypeId: productDto.productTypeId,
             productType: productDto.productType,
+            productName: productDto.productName
         }));
         console.log(finalProductData, "/////")
         await this.productRepository.save(finalProductData);

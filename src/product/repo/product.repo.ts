@@ -55,7 +55,7 @@ export class ProductRepository extends Repository<ProductEntity> {
             const groupedProductQuery = this.createQueryBuilder('productAssign')
                 .select([
                     'ANY_VALUE(productAssign.id) AS productId',
-                    'productAssign.product_name AS productName',
+                    'productAssign.product_type AS productName',
                     'pt.name AS productType',
                     'br.name AS branchName',
                     'SUM(productAssign.quantity) AS totalProducts',
@@ -64,8 +64,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                 ])
                 .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
                 .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
-                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+                .where('pt.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
 
             // If a specific branch is selected, filter for that branch
             if (req.branch) {
@@ -84,8 +84,8 @@ export class ProductRepository extends Repository<ProductEntity> {
                     'pt.id AS productTypeId',
                 ])
                 .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
-                .where('productAssign.company_code = :companyCode', { companyCode: req.companyCode })
-                .andWhere('productAssign.unit_code = :unitCode', { unitCode: req.unitCode });
+                .where('pt.company_code = :companyCode', { companyCode: req.companyCode })
+                .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branch) {
                 photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branch WHERE name = :branchName)', { branchName: req.branch });
@@ -312,7 +312,7 @@ export class ProductRepository extends Repository<ProductEntity> {
         const detailedBranchAssignQuery = this.createQueryBuilder('pa')
             .select([
                 'br.name AS branchName',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
@@ -328,10 +328,11 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawBranchResults = await detailedBranchAssignQuery
             .groupBy('br.name')
-            .addGroupBy('pa.product_name')
+            .addGroupBy('pa.product_type')
             .addGroupBy('pa.product_status')
             .orderBy('br.name', 'ASC')
             .getRawMany();
+
 
         response.branchDetails = rawBranchResults.filter(item => item.branchName !== null);
 
@@ -356,7 +357,7 @@ export class ProductRepository extends Repository<ProductEntity> {
             .select([
                 'sb.name AS subDealerName',
                 'sb.sub_dealer_id AS subDealerId',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'assigned\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS presentStock',
                 'pa.product_status AS productStatus',
                 'MAX(pa.assign_time) AS assignTime'
@@ -371,8 +372,8 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawSubDealerResults = await detailedSubDealerAssignQuery
             .groupBy('sb.name')
+            .addGroupBy('pa.product_type') // was incorrectly pa.product_name
             .addGroupBy('sb.sub_dealer_id')
-            .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .orderBy('sb.sub_dealer_id')
             .getRawMany();
@@ -396,7 +397,7 @@ export class ProductRepository extends Repository<ProductEntity> {
         const detailedStaffQuery = this.createQueryBuilder('pa')
             .select([
                 'sf.name AS staffName',
-                'pa.product_name AS productName',
+                'pa.product_type AS productName',
                 'SUM(CASE WHEN pa.status = \'inHand\' THEN COALESCE(pa.quantity, 0) ELSE 0 END) AS handStock',
                 'pa.product_status AS productStatus',
                 'MAX(pa.assign_time) AS assignTime'
@@ -411,6 +412,7 @@ export class ProductRepository extends Repository<ProductEntity> {
 
         const rawStaffResults = await detailedStaffQuery
             .groupBy('sf.name')
+            .addGroupBy('pa.product_type') // again fix name
             .addGroupBy('pa.product_name')
             .addGroupBy('pa.product_status')
             .getRawMany();

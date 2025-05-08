@@ -95,7 +95,7 @@ export class RequestRaiseService {
 
 
     async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
-        if (dto.id && dto.id !== null || (dto.requestId && dto.requestId.trim() !== '')) {
+        if (dto.id) {
             // Update if id or requestId is present
             return await this.updateRequestDetails(dto);
         } else {
@@ -172,7 +172,7 @@ export class RequestRaiseService {
                 'req.request_id AS requestNumber',
                 'req.id AS requestId',
                 'branch.name AS branchName',
-                'req.created_date AS paymentDate',
+                'req.created_date AS requestDate',
                 'req.request_type AS requestType',
                 'req.status AS status',
                 'sf.name AS RequestTo'
