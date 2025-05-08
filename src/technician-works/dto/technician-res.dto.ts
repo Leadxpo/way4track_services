@@ -62,6 +62,7 @@ export class TechnicianWorksResponseDto {
     applicationId?: number
     paidAmount?: number
     subDealerStaffId?: number
+    fromStaffId?: number
 
     constructor(
         id: number,
@@ -118,7 +119,8 @@ export class TechnicianWorksResponseDto {
         userName?: string,
         applicationId?: number,
         paidAmount?: number,
-        subDealerStaffId?: number
+        subDealerStaffId?: number,
+        fromStaffId?: number
 
 
     ) {
@@ -177,6 +179,6 @@ export class TechnicianWorksResponseDto {
         this.applicationId = applicationId
         this.paidAmount = paidAmount
         this.subDealerStaffId = subDealerStaffId
-
+        this.fromStaffId = fromStaffId
     }
 }

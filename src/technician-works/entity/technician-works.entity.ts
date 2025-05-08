@@ -99,6 +99,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.technician, { nullable: true })
+    @JoinColumn({ name: 'from_staff_id' })
+    fromStaffId: StaffEntity;
+
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.technician, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
