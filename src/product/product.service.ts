@@ -528,4 +528,15 @@ export class ProductService {
         }
     }
 
+    async getStockSummary(req:
+        ProductIdDto
+    ): Promise<CommonResponse> {
+        const productData = await this.productRepository.getStockSummary(req)
+        if (!productData) {
+            return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
+        } else {
+            return new CommonResponse(true, 200, "Data retrieved successfully", productData)
+        }
+    }
+
 }

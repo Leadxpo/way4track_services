@@ -23,10 +23,10 @@ export class ClientAdapter {
         entity.unitCode = dto.unitCode
         // if (entity.dob) {
         //     entity.dob = new Date(entity.dob).toISOString().split('T')[0];
+        // // }
+        // if (entity.joiningDate) {
+        //     entity.joiningDate = dto.joiningDate;
         // }
-        if (entity.joiningDate) {
-            entity.joiningDate = dto.joiningDate;
-        }
 
         // entity.status = dto.status
         if (dto.id) {
@@ -42,6 +42,7 @@ export class ClientAdapter {
         entity.tds = dto.tds
         entity.billWiseDate = dto.billWiseDate
         entity.status = dto.status
+        // entity.GSTNumber = dto.GSTNumber
         // entity.password = dto.password
         return entity;
     }
@@ -60,10 +61,11 @@ export class ClientAdapter {
                 // client.dob,
                 client.email,
                 client.address,
-                client.joiningDate,
+                // client.joiningDate,
                 client.companyCode,
                 client.unitCode,
                 client.status,
+                // client.
                 // client.password
             );
         });

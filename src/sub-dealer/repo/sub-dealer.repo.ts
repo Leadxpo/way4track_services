@@ -25,6 +25,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'sb.sub_dealer_id AS SubDealerId',
                 'sb.sub_dealer_phone_number AS phoneNumber',
                 'sb.name AS name',
+                'sb.gst_number AS gstNumber',
                 'sb.starting_date AS joiningDate',
                 'vr.payment_status AS paymentStatus',
                 'vr.amount AS amount',

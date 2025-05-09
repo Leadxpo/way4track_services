@@ -8,7 +8,7 @@ export class ClientDto {
     dob: string;
     email: string;
     address: string;
-    joiningDate: Date;
+    // joiningDate: Date;
     clientPhoto?: string;
     clientId?: string;
     voucherId?: number
@@ -21,6 +21,8 @@ export class ClientDto {
     billWiseDate: boolean;
     status: ClientStatus
     branchName?: string;
+    // GSTNumber: string;
+
     // password: string;
 
 }
