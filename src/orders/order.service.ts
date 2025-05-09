@@ -84,7 +84,7 @@ export class OrderService {
 
   async getOrderList(): Promise<CommonResponse> {
     try {
-      const data = await this.repo.find({ relations: [ "client"] });
+      const data = await this.repo.find({ relations: ["client"] });
       console.log(data, "{{{{{{{{{");
       return new CommonResponse(true, 200, "order list fetched", data);
     } catch (error) {
@@ -94,12 +94,13 @@ export class OrderService {
 
   async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
     try {
+      console.log(dto);
       if (!dto.id) {
         return new CommonResponse(false, 400, "Client ID is required");
       }
       const entity = await this.repo.findOne({
         where: { id: dto.id },
-        relations: ["device", "client"],
+        relations: ["client"],
       });
       if (!entity) return new CommonResponse(false, 404, "order not found");
       return new CommonResponse(
