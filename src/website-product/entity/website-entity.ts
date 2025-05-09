@@ -1,5 +1,6 @@
 import { AmenitiesEntity } from 'src/amenities/entity/amenities-entity';
 import { ApplicationEntity } from 'src/application/entity/application-entity';
+import { BlogEntity } from 'src/blogs/entity/blog.entity';
 import { DeviceEntity } from 'src/devices/entity/devices-entity';
 import { ProductAppEntity } from 'src/product-app/entity/product-app.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
@@ -66,6 +67,9 @@ export class WebsiteProductEntity extends BaseEntity {
 
     @OneToMany(() => DeviceEntity, (staff) => staff.webProduct)
     device: DeviceEntity[];
+
+    @OneToMany(() => BlogEntity, (staff) => staff.webProduct)
+    Blog: BlogEntity[];
 
     @OneToMany(() => AmenitiesEntity, (staff) => staff.webProduct)
     amenities: AmenitiesEntity[];

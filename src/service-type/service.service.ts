@@ -130,7 +130,7 @@ export class ServiceTypeService {
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {
-            return new CommonResponse(false, 4579, "There Is No branch names")
+            return new CommonResponse(false, 4579, "There Is No servicies names")
         }
     }
 
