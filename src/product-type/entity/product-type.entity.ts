@@ -3,6 +3,7 @@ import { ProductEntity } from 'src/product/entity/product.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from 'typeorm';
 import { ProductORApplicationType } from '../dto/product-type.dto';
+import { ClientStatus } from 'src/client/enum/client-status.enum';
 
 
 @Entity('product_type')
@@ -16,7 +17,7 @@ export class ProductTypeEntity extends BaseEntity {
     // @Column({ name: 'product_photo', type: 'varchar', length: 100, nullable: true })
     // productPhoto: string;
 
-    
+
 
     @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;
@@ -50,5 +51,8 @@ export class ProductTypeEntity extends BaseEntity {
         default: ProductORApplicationType.PRODUCT, // optional
     })
     type: ProductORApplicationType;
+
+    @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })
+    status: ClientStatus
 
 }

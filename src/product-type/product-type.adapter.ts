@@ -14,7 +14,8 @@ export class ProductTypeAdapter {
                         item.name,
                         item.companyCode,
                         item.unitCode,
-                        item.type
+                        item.type,
+                        item.status
                         // item.productPhoto,
                         // item.blogImage,
                         // item.description
@@ -27,7 +28,8 @@ export class ProductTypeAdapter {
             entity.name,
             entity.companyCode,
             entity.unitCode,
-            entity.type
+            entity.type,
+            entity.status
 
             // entity.productPhoto,
             // entity.productPhoto,

@@ -1,3 +1,4 @@
+import { ClientStatus } from "src/client/enum/client-status.enum";
 
 export class ProductTypeDto {
     id?: number;
@@ -8,6 +9,7 @@ export class ProductTypeDto {
     // blogImage: string;
     // description: string
     type: ProductORApplicationType;
+    status: ClientStatus
 
 }
 export enum ProductORApplicationType {

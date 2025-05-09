@@ -1,3 +1,4 @@
+import { ClientStatus } from "src/client/enum/client-status.enum";
 import { ProductORApplicationType } from "./product-type.dto";
 
 export class ProductTypeResponseDto {
@@ -6,6 +7,7 @@ export class ProductTypeResponseDto {
     companyCode: string;
     unitCode: string;
     type: ProductORApplicationType;
+    status: ClientStatus
 
     // productPhoto: string
     // blogImage: string;
@@ -15,7 +17,9 @@ export class ProductTypeResponseDto {
         name: string,
         companyCode: string,
         unitCode: string,
-        type: ProductORApplicationType
+        type: ProductORApplicationType,
+        status: ClientStatus
+
         // productPhoto: string,
         // blogImage: string,
         // description: string
@@ -25,6 +29,7 @@ export class ProductTypeResponseDto {
         this.companyCode = companyCode;
         this.unitCode = unitCode;
         this.type = type
+        this.status = status
         // this.productPhoto = productPhoto;
         // this.blogImage = blogImage
         // this.description = description

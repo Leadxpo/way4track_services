@@ -8,6 +8,7 @@ import { ProductTypeDto } from './dto/product-type.dto';
 import { ProductTypeEntity } from './entity/product-type.entity';
 import { ProductTypeAdapter } from './product-type.adapter';
 import { ProductTypeRepository } from './repo/product-type.repo';
+import { ClientStatus } from 'src/client/enum/client-status.enum';
 
 @Injectable()
 export class ProductTypeService {
@@ -112,7 +113,7 @@ export class ProductTypeService {
 
     async deleteProductTypeDetails(dto: HiringIdDto): Promise<CommonResponse> {
         try {
-            const ProductType = await this.productTypeRepository.findOne({
+            const productType = await this.productTypeRepository.findOne({
                 where: {
                     id: dto.id,
                     companyCode: dto.companyCode,
@@ -120,17 +121,22 @@ export class ProductTypeService {
                 }
             });
 
-            if (!ProductType) {
+            if (!productType) {
                 return new CommonResponse(false, 404, 'ProductType not found');
             }
 
-            await this.productTypeRepository.delete({ id: ProductType.id }); // Correct 
+            // Fix: Pass the criteria and update fields separately
+            await this.productTypeRepository.update(
+                { id: productType.id },
+                { status: ClientStatus.InActive }
+            );
 
             return new CommonResponse(true, 200, 'ProductType details deleted successfully');
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
     }
+
 
 
     async getProductTypeDetailsById(req: HiringIdDto): Promise<CommonResponse> {
