@@ -20,7 +20,7 @@ export class OrderService {
     private readonly repo: OrderRepository,
     private readonly adapter: OrderAdapter,
     private readonly deviceRepository: DeviceRepository
-  ) { }
+  ) {}
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
     try {
@@ -119,31 +119,34 @@ export class OrderService {
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
     const order = await this.repo.findOne({ where: { id: dto.id } });
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new NotFoundException("Order not found");
     }
-    console.log(order, "?????")
+    console.log(order, "?????");
     const enrichedItems = await Promise.all(
       order.orderItems.map(async (item) => {
         const device = await this.deviceRepository.findOne({
           where: { id: Number(item.deviceId) },
-          relations: ['webProduct'],
+          relations: ["webProduct"],
         });
 
         return {
           ...item,
-          productName: device?.webProduct?.name || null,
-          productImage: device?.webProduct?.productIcon || null,
+          productName: device?.webProductName || null,
+          deviceImage: device?.image || null,
         };
       })
     );
-
+    console.log(enrichedItems, "{{{{{{{{{{{{{{");
     const enrichedOrder = {
       ...order,
       orderItems: enrichedItems,
     };
 
-    return new CommonResponse(true, 200, "Order details fetched", enrichedOrder);
+    return new CommonResponse(
+      true,
+      200,
+      "Order details fetched",
+      enrichedOrder
+    );
   }
-
-
 }
