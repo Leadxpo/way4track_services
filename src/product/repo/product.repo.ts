@@ -422,5 +422,56 @@ export class ProductRepository extends Repository<ProductEntity> {
         return response;
     }
 
+    async getStockSummary(req: ProductIdDto) {
+        const query = this.createQueryBuilder('productAssign')
+            .select([
+                'productAssign.product_name AS productName',
+                'productAssign.product_description AS productDescription',
+                'productAssign.location AS location',
+                'pt.name AS productType',
+                'br.name as branchName',
+                `SUM(CASE WHEN productAssign.status = 'assigned' THEN COALESCE(productAssign.quantity, 0) ELSE 0 END) AS inAssignStock`,
+                `SUM(CASE WHEN productAssign.status = 'install' THEN COALESCE(productAssign.quantity, 0) ELSE 0 END) AS installStock`,
+                `SUM(CASE WHEN productAssign.status = 'inHand' THEN COALESCE(productAssign.quantity, 0) ELSE 0 END) AS inHandStock`
+            ])
+            .leftJoin(BranchEntity, 'br', 'br.id = productAssign.branch_id')
+            .leftJoin(ProductTypeEntity, 'pt', 'pt.id = productAssign.product_type_id')
+            .where('pt.company_code = :companyCode', { companyCode: req.companyCode })
+            .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
+        if (req.branchName) {
+            query.andWhere('br.name = :branchName', { branchName: req.branchName });
+        }
+        // Apply filters conditionally
+        if (req.fromDate) {
+            query.andWhere('DATE(productAssign.assign_time) >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('DATE(productAssign.assign_time) <= :toDate', { toDate: req.toDate });
+        }
+        if (req.productType) {
+            query.andWhere('pt.name LIKE :productType', { productType: `%${req.productType}%` });
+        }
+        if (req.status) {
+            query.andWhere('productAssign.status = :status', { status: req.status });
+        }
+
+        // Grouping by all selected fields
+        query.groupBy(`
+            productAssign.product_name,
+            productAssign.product_description,
+            productAssign.location,
+            pt.name,
+            br.name
+        `)
+
+        // Execute and return results
+        const result = await query.getRawMany();
+
+        // Debugging log
+        console.log(result);
+
+        return result;
+    }
+
 
 }

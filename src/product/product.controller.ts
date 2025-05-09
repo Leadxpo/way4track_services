@@ -118,4 +118,15 @@ export class ProductController {
       //         return new CommonResponse(false, 500, 'Error details');
     }
   }
+
+  @Post('getStockSummary')
+  async getStockSummary(@Body() req: ProductIdDto): Promise<CommonResponse> {
+    try {
+      return await this.productService.getStockSummary(req)
+    }
+    catch (error) {
+      console.log("Error in details in service..", error);
+      //         return new CommonResponse(false, 500, 'Error details');
+    }
+  }
 }
