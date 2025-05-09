@@ -61,8 +61,7 @@ export class OrderEntity {
 
   @Column({
     name: "delivary_date",
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
+    type: "timestamp"
   })
   delivaryDate: Date;
 
