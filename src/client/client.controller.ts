@@ -100,4 +100,13 @@ export class ClientController {
         }
     }
 
+    @Post('getClientByPhoneNumber')
+    async getClientByPhoneNumber(@Body() req: ClientDto): Promise<CommonResponse> {
+        try {
+            return this.clientService.getClientByPhoneNumber(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
 }

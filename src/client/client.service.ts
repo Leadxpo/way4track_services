@@ -261,6 +261,18 @@ export class ClientService {
         }
     }
 
+    async getClientByPhoneNumber(req: ClientDto): Promise<CommonResponse> {
+        let data = null;
+
+            data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+        
+        if (data) {
+            return new CommonResponse(false, 75483, "client exists", data);
+        } else {
+            return new CommonResponse(true, 4579, "No matching data found", data);
+        }
+    }
+
     async clientLoginDetails(req: LoginDto) {
         try {
             console.log(req, "+++++++++++")
