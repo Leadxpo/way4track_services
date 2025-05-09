@@ -48,4 +48,14 @@ export class OrderController {
       return new CommonResponse(false, 500, 'Error fetching order by ID');
     }
   }
+
+  @Post('getOrderWithProductDetails')
+  async getOrderWithProductDetails(@Body() dto: HiringIdDto): Promise<CommonResponse> {
+    try {
+      return await this.service.getOrderWithProductDetails(dto);
+    } catch (error) {
+      console.error('Error fetching order by ID:', error);
+      return new CommonResponse(false, 500, 'Error fetching order by ID');
+    }
+  }
 }

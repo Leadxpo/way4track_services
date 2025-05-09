@@ -3,7 +3,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { WebsiteProductEntity } from 'src/website-product/entity/website-entity';
 import { CartEntity } from 'src/cart/entity/cart.entity';
 
-@Entity('Blog')
+@Entity('images_table')
 export class BlogEntity {
     @PrimaryGeneratedColumn()
     id: number;

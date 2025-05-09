@@ -13,12 +13,14 @@ import { OrderAdapter } from "./order.adapter";
 import { OrderEntity } from "./entity/orders.entity";
 import { ErrorResponse } from "src/models/error-response";
 import { DeleteDto } from "src/cart/dto/cart.dto";
+import { DeviceRepository } from "src/devices/repo/devices.repo";
 @Injectable()
 export class OrderService {
   constructor(
     private readonly repo: OrderRepository,
-    private readonly adapter: OrderAdapter
-  ) {}
+    private readonly adapter: OrderAdapter,
+    private readonly deviceRepository: DeviceRepository
+  ) { }
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
     try {
@@ -113,4 +115,35 @@ export class OrderService {
       throw new ErrorResponse(500, error.message);
     }
   }
+
+  async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
+    const order = await this.repo.findOne({ where: { id: dto.id } });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+    console.log(order, "?????")
+    const enrichedItems = await Promise.all(
+      order.orderItems.map(async (item) => {
+        const device = await this.deviceRepository.findOne({
+          where: { id: Number(item.deviceId) },
+          relations: ['webProduct'],
+        });
+
+        return {
+          ...item,
+          productName: device?.webProduct?.name || null,
+          productImage: device?.webProduct?.productIcon || null,
+        };
+      })
+    );
+
+    const enrichedOrder = {
+      ...order,
+      orderItems: enrichedItems,
+    };
+
+    return new CommonResponse(true, 200, "Order details fetched", enrichedOrder);
+  }
+
+
 }
