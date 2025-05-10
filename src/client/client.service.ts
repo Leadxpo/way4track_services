@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
@@ -13,6 +13,8 @@ import { ClientRepository } from './repo/client.repo';
 import { ClientEntity } from './entity/client.entity';
 import { Storage } from '@google-cloud/storage';
 import { LoginDto } from 'src/login/dto/login.dto';
+import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
+import { DeviceRepository } from 'src/devices/repo/devices.repo';
 
 @Injectable()
 export class ClientService {
@@ -21,7 +23,8 @@ export class ClientService {
     constructor(
         private readonly clientAdapter: ClientAdapter,
         private readonly clientRepository: ClientRepository,
-        private readonly branchRepo: BranchRepository
+        private readonly branchRepo: BranchRepository,
+        private readonly deviceRepository: DeviceRepository
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -170,27 +173,27 @@ export class ClientService {
     }
 
 
-    async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
-        try {
-            console.log(req, "+++++++++++")
-            if (!req.clientId) {
-                return new CommonResponse(false, 400, 'Client ID is required');
-            }
+    // async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
+    //     try {
+    //         console.log(req, "+++++++++++")
+    //         if (!req.clientId) {
+    //             return new CommonResponse(false, 400, 'Client ID is required');
+    //         }
 
-            const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
-            console.log(client, "+++++++++++")
+    //         const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
+    //         console.log(client, "+++++++++++")
 
-            if (!client) {
-                return new CommonResponse(false, 404, 'Client not found');
-            }
-            else {
-                // const data = this.clientAdapter.convertEntityToDto([client])
-                return new CommonResponse(true, 200, 'Client details fetched successfully', client);
-            }
-        } catch (error) {
-            throw new ErrorResponse(500, error.message);
-        }
-    }
+    //         if (!client) {
+    //             return new CommonResponse(false, 404, 'Client not found');
+    //         }
+    //         else {
+    //             // const data = this.clientAdapter.convertEntityToDto([client])
+    //             return new CommonResponse(true, 200, 'Client details fetched successfully', client);
+    //         }
+    //     } catch (error) {
+    //         throw new ErrorResponse(500, error.message);
+    //     }
+    // }
 
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
@@ -264,8 +267,8 @@ export class ClientService {
     async getClientByPhoneNumber(req: ClientDto): Promise<CommonResponse> {
         let data = null;
 
-            data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
-        
+        data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+
         if (data) {
             return new CommonResponse(false, 75483, "client exists", data);
         } else {
@@ -291,6 +294,56 @@ export class ClientService {
         }
 
     }
+
+    async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
+        if (!req.clientId) {
+            return new CommonResponse(false, 400, 'Client ID is required');
+        }
+
+        const client = await this.clientRepository.findOne({
+            where: {
+                clientId: req.clientId,
+                companyCode: req.companyCode,
+                unitCode: req.unitCode,
+            },
+            relations: ['order', 'customerAddress', 'cart',],
+        });
+
+        if (!client) {
+            throw new NotFoundException('Client not found');
+        }
+
+        const enrichedOrders = await Promise.all(
+            client.order.map(async (order) => {
+                const devices = await Promise.all(
+                    (order.orderItems || []).map(async (item) => {
+                        const device = await this.deviceRepository.findOne({
+                            where: { id: Number(item.deviceId) },
+                        });
+
+                        return {
+                            deviceId: item.deviceId,
+                            name: device?.webProductName || null,
+                            image: device?.image || null,
+                            quantity: item.qty,
+                            amount: item.amount,
+                        };
+                    })
+                );
+
+                return {
+                    ...order,
+                    deviceDetails: devices,
+                };
+            })
+        );
+
+        return new CommonResponse(true, 200, "Order details fetched successfully", {
+            ...client,
+            orders: enrichedOrders,
+        });
+    }
+
 
 
 }
