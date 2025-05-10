@@ -14,7 +14,7 @@ export class OrderAdapter {
     entity.companyCode = dto.companyCode;
     entity.unitCode = dto.unitCode;
     entity.orderItems = dto.orderItems;
-
+    entity.description = dto.description
     entity.client = dto.clientId ? ({ id: dto.clientId } as any) : null;
     entity.buildingAddressId = dto.buildingAddressId ? ({ id: dto.buildingAddressId } as any) : null;
     entity.deliveryAddressId = dto.deliveryAddressId ? ({ id: dto.deliveryAddressId } as any) : null;
@@ -35,7 +35,8 @@ export class OrderAdapter {
       clientId: entity.client?.id,
       delivaryDate: entity.delivaryDate,
       buildingAddressId: entity.buildingAddressId?.id,
-      deliveryAddressId: entity.deliveryAddressId?.id
+      deliveryAddressId: entity.deliveryAddressId?.id,
+      description: entity.description
     };
   }
 }

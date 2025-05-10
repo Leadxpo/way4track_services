@@ -11,8 +11,9 @@ export class CreateOrderDto {
     clientId?: number;
     companyCode: string;
     unitCode: string;
-    deliveryAddressId?:number
-    buildingAddressId?:number
+    deliveryAddressId?: number
+    buildingAddressId?: number
+    description: string;
     orderItems: {
         name: string;
         qty: number;

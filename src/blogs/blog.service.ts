@@ -119,7 +119,6 @@ export class BlogService {
                 where: { id: req.id },
                 relations: ['webProduct'],
             });
-
             if (!item) return new CommonResponse(false, 404, 'Blog not found');
             return new CommonResponse(true, 200, 'Blog fetched successfully', item);
         } catch (error) {
