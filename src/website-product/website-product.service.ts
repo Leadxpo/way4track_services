@@ -167,7 +167,7 @@ export class WebsiteProductService {
                 .leftJoinAndSelect('product.amenities', 'amenities')
                 .leftJoinAndSelect('product.application', 'application')
                 .leftJoinAndSelect('product.productApp', 'productApp')
-                .leftJoinAndSelect('product.Blog', 'Blog')
+                // .leftJoinAndSelect('product.Blog', 'Blog')
                 .where('product.companyCode = :companyCode AND product.unitCode = :unitCode', {
                     companyCode: req.companyCode,
                     unitCode: req.unitCode
