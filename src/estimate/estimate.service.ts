@@ -292,8 +292,6 @@ export class EstimateService {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
 
-            console.log(estimate, "<<< Raw Estimate Data");
-
             const data = this.estimateAdapter.convertEntityToResDto([estimate]);
 
             console.log(data, "<<< Converted DTO Data");
@@ -315,8 +313,6 @@ export class EstimateService {
             if (!estimate) {
                 return new CommonResponse(false, 404, 'Estimate not found');
             }
-
-            console.log(estimate, "<<< Raw Estimate Data");
 
             const data = this.estimateAdapter.convertEntityToResDto(estimate);
 

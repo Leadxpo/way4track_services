@@ -20,7 +20,7 @@ export class OrderService {
     private readonly repo: OrderRepository,
     private readonly adapter: OrderAdapter,
     private readonly deviceRepository: DeviceRepository
-  ) { }
+  ) {}
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
     try {
@@ -87,12 +87,21 @@ export class OrderService {
   async getOrderList(): Promise<CommonResponse> {
     try {
       const data = await this.repo.find({ relations: ["client"] });
-      console.log(data, "{{{{{{{{{");
-      return new CommonResponse(true, 200, "order list fetched", data);
+  
+      const enrichedOrders = await Promise.all(
+        data.map(async (order) => {
+          const dto = { id: order.id ,companyCode:order.companyCode,unitCode:order.unitCode};
+          const response = await this.getOrderWithProductDetails(dto);
+          return response.data;
+        })
+      );
+  
+      return new CommonResponse(true, 200, "Order list with product details fetched", enrichedOrders);
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
   }
+  
 
   async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
     try {
@@ -117,33 +126,35 @@ export class OrderService {
   }
 
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
-    const order = await this.repo.findOne({ where: { id: dto.id } });
+    const order = await this.repo.findOne({ where: { id: dto.id } ,relations:['client']});
     if (!order) {
-      throw new NotFoundException('Order not found');
+      throw new NotFoundException("Order not found");
     }
-    console.log(order, "?????")
+    console.log(order, "?????");
     const enrichedItems = await Promise.all(
       order.orderItems.map(async (item) => {
         const device = await this.deviceRepository.findOne({
           where: { id: Number(item.deviceId) },
-          relations: ['webProduct'],
+          relations: ["webProduct"],
         });
 
         return {
           ...item,
-          productName: device?.webProduct?.name || null,
-          productImage: device?.webProduct?.productIcon || null,
+          productName: device?.webProductName || null,
+          deviceImage: device?.image || null,
         };
       })
     );
-
     const enrichedOrder = {
       ...order,
       orderItems: enrichedItems,
     };
 
-    return new CommonResponse(true, 200, "Order details fetched", enrichedOrder);
+    return new CommonResponse(
+      true,
+      200,
+      "Order details fetched",
+      enrichedOrder
+    );
   }
-
-
 }
