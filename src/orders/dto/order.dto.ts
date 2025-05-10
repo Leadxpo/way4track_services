@@ -7,11 +7,12 @@ export class CreateOrderDto {
     paymentStatus?: string;
     orderDate?: string;
     delivaryDate: Date;
-    deliveryAddress?: string;
     orderStatus?: OrderStatus;
     clientId?: number;
     companyCode: string;
     unitCode: string;
+    deliveryAddressId?:number
+    buildingAddressId?:number
     orderItems: {
         name: string;
         qty: number;

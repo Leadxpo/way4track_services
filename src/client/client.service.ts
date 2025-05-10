@@ -173,28 +173,6 @@ export class ClientService {
     }
 
 
-    // async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
-    //     try {
-    //         console.log(req, "+++++++++++")
-    //         if (!req.clientId) {
-    //             return new CommonResponse(false, 400, 'Client ID is required');
-    //         }
-
-    //         const client = await this.clientRepository.findOne({ where: { clientId: req.clientId, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
-    //         console.log(client, "+++++++++++")
-
-    //         if (!client) {
-    //             return new CommonResponse(false, 404, 'Client not found');
-    //         }
-    //         else {
-    //             // const data = this.clientAdapter.convertEntityToDto([client])
-    //             return new CommonResponse(true, 200, 'Client details fetched successfully', client);
-    //         }
-    //     } catch (error) {
-    //         throw new ErrorResponse(500, error.message);
-    //     }
-    // }
-
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order'] });
@@ -306,8 +284,15 @@ export class ClientService {
                 companyCode: req.companyCode,
                 unitCode: req.unitCode,
             },
-            relations: ['order', 'customerAddress', 'cart',],
+            relations: [
+                'order',
+                'order.deliveryAddressId',
+                'order.buildingAddressId',
+                'customerAddress',
+                'cart',
+            ],
         });
+
 
         if (!client) {
             throw new NotFoundException('Client not found');
@@ -333,8 +318,11 @@ export class ClientService {
 
                 return {
                     ...order,
+                    deliveryAddress: order.deliveryAddressId,
+                    buildingAddress: order.buildingAddressId,
                     deviceDetails: devices,
                 };
+
             })
         );
 
@@ -343,7 +331,4 @@ export class ClientService {
             orders: enrichedOrders,
         });
     }
-
-
-
 }

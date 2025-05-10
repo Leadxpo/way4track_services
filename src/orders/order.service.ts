@@ -20,7 +20,7 @@ export class OrderService {
     private readonly repo: OrderRepository,
     private readonly adapter: OrderAdapter,
     private readonly deviceRepository: DeviceRepository
-  ) {}
+  ) { }
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
     try {
@@ -86,22 +86,22 @@ export class OrderService {
 
   async getOrderList(): Promise<CommonResponse> {
     try {
-      const data = await this.repo.find({ relations: ["client"] });
-  
+      const data = await this.repo.find({ relations: ["client", "deliveryAddressId", "buildingAddressId"] });
+
       const enrichedOrders = await Promise.all(
         data.map(async (order) => {
-          const dto = { id: order.id ,companyCode:order.companyCode,unitCode:order.unitCode};
+          const dto = { id: order.id, companyCode: order.companyCode, unitCode: order.unitCode };
           const response = await this.getOrderWithProductDetails(dto);
           return response.data;
         })
       );
-  
+
       return new CommonResponse(true, 200, "Order list with product details fetched", enrichedOrders);
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
   }
-  
+
 
   async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
     try {
@@ -111,7 +111,7 @@ export class OrderService {
       }
       const entity = await this.repo.findOne({
         where: { id: dto.id },
-        relations: ["client"],
+        relations: ["client", "deliveryAddressId", "buildingAddressId"],
       });
       if (!entity) return new CommonResponse(false, 404, "order not found");
       return new CommonResponse(
@@ -126,7 +126,7 @@ export class OrderService {
   }
 
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
-    const order = await this.repo.findOne({ where: { id: dto.id } ,relations:['client']});
+    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId"] });
     if (!order) {
       throw new NotFoundException("Order not found");
     }

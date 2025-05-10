@@ -1,5 +1,6 @@
 
 import { ClientEntity } from 'src/client/entity/client.entity';
+import { OrderEntity } from 'src/orders/entity/orders.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 
 
@@ -33,7 +34,7 @@ export class AddressEntity {
   @Column({ name: 'address_line_two', type: 'varchar', nullable: true })
   addressLineTwo: string;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.customerAddress, { nullable: true })
+  @ManyToOne(() => ClientEntity, (client) => client.customerAddress, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 
@@ -48,4 +49,10 @@ export class AddressEntity {
 
   @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(() => OrderEntity, (staff) => staff.deliveryAddressId)
+  order: OrderEntity[];
+
+  @OneToMany(() => OrderEntity, (staff) => staff.buildingAddressId)
+  orders: OrderEntity[];
 }

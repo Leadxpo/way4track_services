@@ -1,3 +1,4 @@
+import { AddressEntity } from "src/address/entity/address.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { DeviceEntity } from "src/devices/entity/devices-entity";
 import { TransactionEntity } from "src/transactions/entity/transactions.entity";
@@ -37,8 +38,13 @@ export class OrderEntity {
   @Column({ name: "order_date", type: "varchar", nullable: true })
   orderDate: string;
 
-  @Column({ name: "delivery_address", type: "text", nullable: true })
-  deliveryAddress: string;
+  @ManyToOne(() => AddressEntity, (client) => client.order, { nullable: true })
+  @JoinColumn({ name: "delivery_address_id" })
+  deliveryAddressId: AddressEntity;
+
+  @ManyToOne(() => AddressEntity, (client) => client.orders, { nullable: true })
+  @JoinColumn({ name: "building_address_id" })
+  buildingAddressId: AddressEntity;
 
   @Column({
     type: "enum",
