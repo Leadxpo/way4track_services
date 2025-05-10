@@ -163,10 +163,10 @@ export class WebsiteProductService {
         try {
             const items = await this.websiteProductRepository
                 .createQueryBuilder('product')
-                .leftJoinAndSelect('product.device', 'device')
-                .leftJoinAndSelect('product.amenities', 'amenities')
-                .leftJoinAndSelect('product.application', 'application')
-                .leftJoinAndSelect('product.productApp', 'productApp')
+                // .leftJoinAndSelect('product.device', 'device')
+                // .leftJoinAndSelect('product.amenities', 'amenities')
+                // .leftJoinAndSelect('product.application', 'application')
+                // .leftJoinAndSelect('product.productApp', 'productApp')
                 // .leftJoinAndSelect('product.Blog', 'Blog')
                 .where('product.companyCode = :companyCode AND product.unitCode = :unitCode', {
                     companyCode: req.companyCode,
