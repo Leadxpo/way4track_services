@@ -14,11 +14,14 @@ import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonReq } from 'src/models/common-req';
 import { StaffRepository } from 'src/staff/repo/staff-repo';
 import { ClientRepository } from 'src/client/repo/client.repo';
+import { Storage } from '@google-cloud/storage';
 import { SubDealerRepository } from 'src/sub-dealer/repo/sub-dealer.repo';
 import { ProductAssignRepository } from 'src/product-assign/repo/product-assign.repo';
 
 @Injectable()
 export class DispatchService {
+    private storage: Storage;
+    private bucketName: string;
     constructor(
 
         private readonly repo: DispatchRepository,
@@ -27,9 +30,41 @@ export class DispatchService {
         private readonly clientRepository: ClientRepository,
         private readonly subDealerRepository: SubDealerRepository,
         private readonly productAssignRepo: ProductAssignRepository,
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
 
-    async updateDispatchDetails(dto: DispatchDto): Promise<CommonResponse> {
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
+
+    async handleDispatchDetails(dto: DispatchDto, dispatchBoximage?: Express.Multer.File): Promise<CommonResponse> {
+        let photoPath: string | null = null
+        if (dispatchBoximage) {
+            const bucket = this.storage.bucket(this.bucketName);
+            const uniqueFileName = `dispatch_photos/${Date.now()}-${dispatchBoximage.originalname}`;
+            const file = bucket.file(uniqueFileName);
+
+            await file.save(dispatchBoximage.buffer, {
+                contentType: dispatchBoximage.mimetype,
+                resumable: false,
+            });
+
+            console.log(`File uploaded to GCS: ${uniqueFileName}`);
+            photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
+        if (dto.id && dto.id !== null) {
+            return await this.updateDispatchDetails(dto, photoPath);
+        } else {
+            return await this.createDispatchDetails(dto, photoPath);
+        }
+    }
+
+
+    async updateDispatchDetails(dto: DispatchDto, photoPath?: string | null): Promise<CommonResponse> {
         try {
             const Dispatch = await this.repo.findOne({
                 where: { id: dto.id }
@@ -39,7 +74,24 @@ export class DispatchService {
                 throw new Error('Work Allocation not found');
             }
 
-            const updatedDispatch = this.adapter.convertDtoToEntity(dto);
+            if (photoPath && Dispatch.dispatchBoximage) {
+                const existingFilePath = Dispatch.dispatchBoximage.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                try {
+                    await file.delete();
+                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                } catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
+
+            const entity = this.adapter.convertDtoToEntity(dto);
+            const updatedDispatch = {
+                ...Dispatch,
+                ...entity,
+                dispatchBoximage: photoPath ?? Dispatch.dispatchBoximage,
+            };
 
             Object.assign(Dispatch, updatedDispatch);
 
@@ -53,7 +105,7 @@ export class DispatchService {
         }
     }
 
-    async createDispatchDetails(dto: DispatchDto): Promise<CommonResponse> {
+    async createDispatchDetails(dto: DispatchDto, photoPath?: string | null): Promise<CommonResponse> {
         try {
             const newDispatch = await this.adapter.convertDtoToEntity(dto);
 
@@ -80,6 +132,9 @@ export class DispatchService {
                 if (!subDealer) throw new Error(`Sub-dealer with ID ${dto.subDealerId} not found`);
                 newDispatch.subDealerId = subDealer;
             }
+            if (photoPath) {
+                newDispatch.dispatchBoximage = photoPath;
+            }
 
             await this.repo.insert(newDispatch);
             return new CommonResponse(true, 200, 'Work allocation and technician details created successfully');
@@ -90,14 +145,6 @@ export class DispatchService {
     }
 
 
-    async handleDispatchDetails(dto: DispatchDto): Promise<CommonResponse> {
-
-        if (dto.id && dto.id !== null) {
-            return await this.updateDispatchDetails(dto);
-        } else {
-            return await this.createDispatchDetails(dto);
-        }
-    }
 
     async deleteDispatch(req: HiringIdDto): Promise<CommonResponse> {
         try {

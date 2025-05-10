@@ -19,4 +19,6 @@ export class DispatchDto {
     staffId?: string;
     clientId?: string;
     subDealerId?: string;
+    dispatchBoximage: string;
+
 }

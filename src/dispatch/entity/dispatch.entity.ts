@@ -64,6 +64,9 @@ export class DispatchEntity {
     @Column('varchar', { name: 'tracking_url', length: 255, nullable: true })
     trackingURL: string;
 
+    @Column('varchar', { name: 'dispatch_box_image', length: 255, nullable: true })
+    dispatchBoximage: string;
+
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.dispatch, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;

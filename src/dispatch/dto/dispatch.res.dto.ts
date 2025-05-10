@@ -24,6 +24,7 @@ export class DispatchResponseDto {
 
     subDealerId?: string;
     subDealerName?: string;
+    dispatchBoximage?: string;
 
     constructor(
         id: number,
@@ -46,7 +47,8 @@ export class DispatchResponseDto {
         clientId?: string,
         clientName?: string,
         subDealerId?: string,
-        subDealerName?: string
+        subDealerName?: string,
+        dispatchBoximage?: string
     ) {
         this.id = id;
         this.companyCode = companyCode;
@@ -69,5 +71,6 @@ export class DispatchResponseDto {
         this.clientName = clientName
         this.subDealerId = subDealerId;
         this.subDealerName = subDealerName
+        this.dispatchBoximage = dispatchBoximage
     }
 }

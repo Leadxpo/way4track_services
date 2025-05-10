@@ -35,7 +35,8 @@ export class DispatchAdapter {
             clientId: entity.clientId?.clientId || null,
             clientName: entity.clientId?.name || null,
             subDealerId: entity.subDealerId?.subDealerId || null,
-            subDealerName: entity.subDealerId?.name || null
+            subDealerName: entity.subDealerId?.name || null,
+            dispatchBoximage: entity.dispatchBoximage || ""
         };
     }
 
@@ -74,6 +75,8 @@ export class DispatchAdapter {
             product.id = dto.assignedProductsId
             entity.assignedProductsId = product
         }
+
+        entity.dispatchBoximage = dto.dispatchBoximage
 
         return entity;
     }
