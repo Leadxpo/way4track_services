@@ -19,7 +19,11 @@ export enum OrderStatus {
   CANCELED = "cancelled",
   Received = "received",
   Dispatched = "dispatched",
-  Delivered = "delivered"
+  Delivered = "delivered",
+  request_raised = "request_raised",
+  request_approved = "request_approved",
+  request_reject = "request_reject",
+  request_sucess = "request_sucess"
 }
 
 @Entity("orders")

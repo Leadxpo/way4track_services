@@ -3,7 +3,7 @@ import { RefundEntity } from "./entity/refund.entity";
 
 
 export class RefundAdapter {
-     toEntity(dto: CreateRefundDto): RefundEntity {
+    toEntity(dto: CreateRefundDto): RefundEntity {
         const entity = new RefundEntity();
         entity.name = dto.name;
         entity.productName = dto.productName;
@@ -20,11 +20,15 @@ export class RefundAdapter {
         if (dto.orderId) {
             entity.order = { id: dto.orderId } as any;
         }
-
+        if (dto.deviceId) {
+            entity.deviceId = { id: dto.deviceId } as any;
+        } if (dto.transactionId) {
+            entity.transactionId = { id: dto.transactionId } as any;
+        }
         return entity;
     }
 
-     toResponseDto(entity: RefundEntity): CreateRefundDto {
+    toResponseDto(entity: RefundEntity): CreateRefundDto {
         return {
             id: entity.id,
             name: entity.name,
@@ -37,6 +41,9 @@ export class RefundAdapter {
             description: entity.description,
             clientId: entity.clientId?.id,
             orderId: entity.order?.id,
+            deviceId: entity.deviceId?.id,
+            transactionId: entity.transactionId?.id,
+
         };
     }
 }

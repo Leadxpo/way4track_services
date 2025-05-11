@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMan
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { WebsiteProductEntity } from 'src/website-product/entity/website-entity';
 import { CartEntity } from 'src/cart/entity/cart.entity';
+import { RefundEntity } from 'src/refund/entity/refund.entity';
 
 @Entity('device')
 export class DeviceEntity {
@@ -29,6 +30,9 @@ export class DeviceEntity {
 
     @OneToMany(() => CartEntity, (voucher) => voucher.device)
     cart: CartEntity[];
+
+    @OneToMany(() => RefundEntity, (voucher) => voucher.deviceId)
+    refund: RefundEntity[];
 
     @Column({ name: 'device_name', type: 'varchar', nullable: true })
     name: string;

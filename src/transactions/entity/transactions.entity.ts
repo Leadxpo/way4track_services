@@ -1,8 +1,9 @@
 
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { OrderEntity } from 'src/orders/entity/orders.entity';
+import { RefundEntity } from 'src/refund/entity/refund.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-  
+
 @Entity('transactions_table')
 export class TransactionEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
@@ -23,11 +24,11 @@ export class TransactionEntity {
   @Column({ name: 'delivery_address', type: 'varchar', nullable: true })
   deliveryAddress: string;
 
-  @ManyToOne(() =>ClientEntity, (client) => client.transactions, { nullable: true })
+  @ManyToOne(() => ClientEntity, (client) => client.transactions, { nullable: true })
   @JoinColumn({ name: 'client_id' })
   client: ClientEntity;
 
-  @ManyToOne(() =>OrderEntity, (order) => order.transactions, { nullable: true })
+  @ManyToOne(() => OrderEntity, (order) => order.transactions, { nullable: true })
   @JoinColumn({ name: 'order_id' })
   order: OrderEntity;
 
@@ -42,4 +43,10 @@ export class TransactionEntity {
 
   @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @OneToMany(
+    () => RefundEntity,
+    (RefundEntity) => RefundEntity.transactionId
+  )
+  refund: RefundEntity[];
 }

@@ -13,4 +13,6 @@ export class CreateRefundDto {
     description?: string;
     clientId?: number;
     orderId?: number;
+    transactionId?: number;
+    deviceId?: number;
 }

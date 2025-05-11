@@ -112,7 +112,7 @@ export class RefundService {
         try {
             const item = await this.repo.findOne({
                 where: { id: req.id },
-                relations: ['order', 'clientId'],
+                relations: ['order', 'clientId', 'transactionId', 'deviceId'],
             });
 
             if (!item) return new CommonResponse(false, 404, 'Refund not found');
@@ -124,7 +124,7 @@ export class RefundService {
 
     async getRefundDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const items = await this.repo.find({ relations: ['order', 'clientId'] });
+            const items = await this.repo.find({ relations: ['order', 'clientId', 'transactionId', 'deviceId'] });
 
             if (!items || !items.length) {
                 return new CommonResponse(false, 404, 'Refund not found');

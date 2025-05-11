@@ -80,7 +80,7 @@ export class ClientService {
             }
             console.log(entity, "entity")
             await this.clientRepository.insert(entity);
-            return new CommonResponse(true, 201, 'Client details created successfully');
+            return new CommonResponse(true, 201, 'Client details created successfully', entity);
         } catch (error) {
             console.error(`Error creating client details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create client details: ${error.message}`);
@@ -138,7 +138,7 @@ export class ClientService {
             await this.clientRepository.save(updatedClient);
 
 
-            return new CommonResponse(true, 200, 'Client details updated successfully');
+            return new CommonResponse(true, 200, 'Client details updated successfully', updatedClient);
         } catch (error) {
             console.error(`Error updating client details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update client details: ${error.message}`);

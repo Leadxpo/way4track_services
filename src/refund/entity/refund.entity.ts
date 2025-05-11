@@ -13,9 +13,13 @@ import {
 
 export enum RefundStatus {
     PENDING = "pending",
-    accept = "accept",
-    reject = "reject",
-    replaced = "replaced",
+    request_recived = 'request_recived',
+    request_accept = "request_accept",
+    request_reject = "request_reject",
+    pick_scheduled = "pick_scheduled",
+    item_picked_up = "item_picked_up",
+    new_item_dispatched = "new_item_dispatched",
+    replaced_sucess = "replaced_sucess",
     returning = "returning" // or use "return_in_transit"
 }
 
@@ -55,6 +59,13 @@ export class RefundEntity {
     @JoinColumn({ name: "client_id" })
     clientId: ClientEntity;
 
+    @ManyToOne(() => TransactionEntity, (client) => client.refund, { nullable: true })
+    @JoinColumn({ name: "transaction_id" })
+    transactionId: TransactionEntity;
+
+    @ManyToOne(() => DeviceEntity, (client) => client.refund, { nullable: true })
+    @JoinColumn({ name: "device_id" })
+    deviceId: DeviceEntity;
     @Column({
         name: "created_at",
         type: "timestamp",
