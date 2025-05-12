@@ -97,10 +97,10 @@ export class VoucherEntity {
     @Column({ name: 'voucher_type', type: 'enum', enum: VoucherTypeEnum })
     voucherType: VoucherTypeEnum;
 
-    @Column({ name: 'generation_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    @Column({ name: 'generation_date', type: 'timestamp', nullable: true })
     generationDate: Date;
 
-    @Column({ name: 'due_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    @Column({ name: 'due_date', type: 'timestamp',nullable: true })
     dueDate: Date;
 
     // @Column({ name: 'last_paid_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
