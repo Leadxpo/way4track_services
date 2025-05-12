@@ -63,6 +63,7 @@ export class TechnicianWorksResponseDto {
     paidAmount?: number
     subDealerStaffId?: number
     fromStaffId?: number
+    convertToInvoice?: boolean;
 
     constructor(
         id: number,
@@ -120,7 +121,8 @@ export class TechnicianWorksResponseDto {
         applicationId?: number,
         paidAmount?: number,
         subDealerStaffId?: number,
-        fromStaffId?: number
+        fromStaffId?: number,
+        convertToInvoice?: boolean
 
 
     ) {
@@ -180,5 +182,6 @@ export class TechnicianWorksResponseDto {
         this.paidAmount = paidAmount
         this.subDealerStaffId = subDealerStaffId
         this.fromStaffId = fromStaffId
+        this.convertToInvoice = convertToInvoice
     }
 }
