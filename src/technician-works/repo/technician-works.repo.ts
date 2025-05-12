@@ -157,6 +157,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         const query = this.createQueryBuilder('wa')
             .select([
                 'wa.id as id',
+                'wa.convert_to_invoice as convertToInvoice',
                 'wa.service AS service',
                 'wa.payment_status AS paymentStatus',
                 'wa.start_date AS startDate',
@@ -560,6 +561,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         const query = this.createQueryBuilder('wa')
             .select([
                 'wa.id as id',
+                'wa.convert_to_invoice as convertToInvoice',
                 'wa.service AS service',
                 'wa.payment_status AS paymentStatus',
                 'wa.start_date AS startDate',

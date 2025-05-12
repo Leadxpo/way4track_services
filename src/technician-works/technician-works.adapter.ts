@@ -38,6 +38,7 @@ export class TechnicianWorksAdapter {
         entity.vehiclePhoto4 = dto.vehiclePhoto4;
         entity.startDate = dto.startDate
         entity.endDate = dto.endDate;
+        entity.convertToInvoice = dto.convertToInvoice
         // Assign related entities by their IDs
         if (dto.staffId) {
             const staff = new StaffEntity();

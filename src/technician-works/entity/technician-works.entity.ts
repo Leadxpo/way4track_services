@@ -38,6 +38,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     @Column({ name: 'vehicle_number', type: 'varchar', length: 200, nullable: true })
     vehicleNumber: string;
 
+    @Column({ name: 'convert_to_invoice', type: 'boolean', nullable: true, default: false })
+    convertToInvoice: boolean;
+
+
     @Column({ name: 'chassis_number', type: 'varchar', length: 200, nullable: true })
     chassisNumber: string;
 

@@ -56,6 +56,7 @@ export class TechnicianWorksDto {
     paidAmount?: number;
     subDealerStaffId?: number
     fromStaffId?: number
+    convertToInvoice: boolean;
 }
 export class Requirements {
     productName: string;
