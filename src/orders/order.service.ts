@@ -111,7 +111,7 @@ export class OrderService {
       }
       const entity = await this.repo.findOne({
         where: { id: dto.id },
-        relations: ["client", "deliveryAddressId", "buildingAddressId"],
+        relations: ["client", "deliveryAddressId", "buildingAddressId", "refund"],
       });
       if (!entity) return new CommonResponse(false, 404, "order not found");
       return new CommonResponse(
