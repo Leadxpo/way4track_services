@@ -13,6 +13,7 @@ import { CartEntity } from 'src/cart/entity/cart.entity';
 import { AddressEntity } from 'src/address/entity/address.entity';
 import { OrderEntity } from 'src/orders/entity/orders.entity';
 import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
+import { RefundEntity } from 'src/refund/entity/refund.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -30,6 +31,9 @@ export class ClientEntity extends BaseEntity {
 
     @OneToMany(() => RequestRaiseEntity, (requestRaiseEntity) => requestRaiseEntity.staffId)
     request: RequestRaiseEntity[];
+
+    @OneToMany(() => RefundEntity, (requestRaiseEntity) => requestRaiseEntity.clientId)
+    refund: RefundEntity[];
 
     // @Column({ name: 'dob', type: 'date', nullable: true })
     // dob: string;

@@ -86,7 +86,7 @@ export class OrderService {
 
   async getOrderList(): Promise<CommonResponse> {
     try {
-      const data = await this.repo.find({ relations: ["client", "deliveryAddressId", "buildingAddressId"] });
+      const data = await this.repo.find({ relations: ["client", "deliveryAddressId", "buildingAddressId", 'refund'] });
 
       const enrichedOrders = await Promise.all(
         data.map(async (order) => {
@@ -107,7 +107,7 @@ export class OrderService {
     try {
       console.log(dto);
       if (!dto.id) {
-        return new CommonResponse(false, 400, "Client ID is required");
+        return new CommonResponse(false, 400, "order ID is required");
       }
       const entity = await this.repo.findOne({
         where: { id: dto.id },
@@ -126,7 +126,7 @@ export class OrderService {
   }
 
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
-    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId"] });
+    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId", "refund"] });
     if (!order) {
       throw new NotFoundException("Order not found");
     }

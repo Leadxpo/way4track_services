@@ -55,7 +55,7 @@ export class RefundEntity {
     })
     refundStatus: RefundStatus;
 
-    @ManyToOne(() => ClientEntity, (client) => client.order, { nullable: true })
+    @ManyToOne(() => ClientEntity, (client) => client.refund, { nullable: true })
     @JoinColumn({ name: "client_id" })
     clientId: ClientEntity;
 
