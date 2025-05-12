@@ -580,6 +580,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.engine_number as engineNumber',
                 'wa.description as description',
                 'wa.name as clientName',
+                'wa.client_id as clientId', 
                 'wa.phone_number as phoneNumber',
                 'wa.sim_number as simNumber',
                 'wa.end_date AS endDate',
