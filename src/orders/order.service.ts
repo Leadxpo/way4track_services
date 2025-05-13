@@ -106,19 +106,17 @@ export class OrderService {
   async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
     try {
       console.log(dto);
-      if (!dto.id) {
-        return new CommonResponse(false, 400, "order ID is required");
-      }
+     
       const entity = await this.repo.findOne({
         where: { id: dto.id },
-        relations: ["client", "deliveryAddressId", "buildingAddressId", "refund"],
+        relations: ["client", "deliveryAddressId", "buildingAddressId", "refund",'refund.deviceId'],
       });
       if (!entity) return new CommonResponse(false, 404, "order not found");
       return new CommonResponse(
         true,
         200,
         "order fetched",
-        this.adapter.toResponse(entity)
+        entity
       );
     } catch (error) {
       throw new ErrorResponse(500, error.message);
@@ -126,7 +124,7 @@ export class OrderService {
   }
 
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
-    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId", "refund"] });
+    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId", "refund",'refund.deviceId'] });
     if (!order) {
       throw new NotFoundException("Order not found");
     }

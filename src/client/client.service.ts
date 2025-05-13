@@ -274,9 +274,9 @@ export class ClientService {
     }
 
     async getClientDetailsById(req: ClientIdDto): Promise<CommonResponse> {
-        if (!req.clientId) {
-            return new CommonResponse(false, 400, 'Client ID is required');
-        }
+        // if (!req.clientId) {
+        //     return new CommonResponse(false, 400, 'Client ID is required');
+        // }
 
         const client = await this.clientRepository.findOne({
             where: {
@@ -290,6 +290,8 @@ export class ClientService {
                 'order.buildingAddressId',
                 'customerAddress',
                 'cart',
+                'refund',
+                'refund.deviceId'
             ],
         });
 
