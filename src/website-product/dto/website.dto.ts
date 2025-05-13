@@ -28,7 +28,7 @@ export class WebsiteProductDto {
     }[];
     productIcon: string;
     workTitle:string;
-    woworkFor:string;
+    workFor:string;
     workDescription:string;
     productModal:string;
     solutionTitle:string;
