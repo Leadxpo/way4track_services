@@ -42,7 +42,7 @@ export enum AccountType {
   SAVINGS = 'savings',
   CURRENT = 'current',
 }
-@Entity({ name: 'st' })
+@Entity({ name: 'staff' })
 export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
@@ -89,7 +89,7 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'aadhar_number', type: 'varchar', length: 200, unique: true, nullable: true })
   aadharNumber: string;
 
-  @Column({ name: 'pan_card_number', type: 'varchar', length: 200, unique: true, nullable: true })
+  @Column({ name: 'pan_card_number', type: 'varchar', length: 200, unique: false, nullable: true })
   panCardNumber: string;
 
   @Column({ name: 'driving_licence', type: 'enum', enum: YesNo, nullable: true })

@@ -27,5 +27,11 @@ export class WebsiteProductDto {
         description: string;
     }[];
     productIcon: string;
-
+    workTitle:string;
+    workFor:string;
+    workDescription:string;
+    productModal:string;
+    solutionTitle:string;
+    solutionImage:string;
+    solutionDescription:string;
 }

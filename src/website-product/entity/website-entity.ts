@@ -95,6 +95,27 @@ export class WebsiteProductEntity extends BaseEntity {
     @Column({ name: 'choose_description', type: 'text', nullable: true })
     chooseDescription: string;
 
+    @Column({ name: 'work_title', type: 'varchar', nullable: true })
+    workTitle: string;
+
+    @Column({ name: 'work_for', type: 'varchar', nullable: true })
+    workFor: string;
+
+    @Column({ name: 'work_description', type: 'text', nullable: true })
+    workDescription: string;
+
+    @Column({ name: 'product_modal', type: 'varchar', nullable: true })
+    productModal: string;
+
+    @Column({ name: 'solution_title', type: 'varchar', nullable: true })
+    solutionTitle: string;
+
+    @Column({ name: 'solution_image', type: 'varchar', nullable: true })
+    solutionImage: string;
+
+    @Column({ name: 'solution_description', type: 'text', nullable: true })
+    solutionDescription: string;
+
     @Column('json', { name: 'points', nullable: true })
     points: {
         title: string;
