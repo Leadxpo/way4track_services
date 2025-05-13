@@ -42,7 +42,7 @@ export enum AccountType {
   SAVINGS = 'savings',
   CURRENT = 'current',
 }
-@Entity({ name: 'st' })
+@Entity({ name: 'staff' })
 export class StaffEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
