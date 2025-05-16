@@ -2,6 +2,7 @@ import { AddressEntity } from "src/address/entity/address.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { DeviceEntity } from "src/devices/entity/devices-entity";
 import { RefundEntity } from "src/refund/entity/refund.entity";
+import { ReviewEntity } from "src/reviews/entity/reviews-entity";
 import { TransactionEntity } from "src/transactions/entity/transactions.entity";
 import {
   Entity,
@@ -115,4 +116,7 @@ export class OrderEntity {
 
   @OneToMany(() => RefundEntity, (requestRaiseEntity) => requestRaiseEntity.order)
   refund: RefundEntity[];
+
+  @OneToMany(() => ReviewEntity, (requestRaiseEntity) => requestRaiseEntity.orderId)
+  review: ReviewEntity[];
 }

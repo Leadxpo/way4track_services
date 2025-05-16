@@ -14,6 +14,7 @@ import { AddressEntity } from 'src/address/entity/address.entity';
 import { OrderEntity } from 'src/orders/entity/orders.entity';
 import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
 import { RefundEntity } from 'src/refund/entity/refund.entity';
+import { ReviewEntity } from 'src/reviews/entity/reviews-entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -34,6 +35,9 @@ export class ClientEntity extends BaseEntity {
 
     @OneToMany(() => RefundEntity, (requestRaiseEntity) => requestRaiseEntity.clientId)
     refund: RefundEntity[];
+
+    @OneToMany(() => ReviewEntity, (requestRaiseEntity) => requestRaiseEntity.clientId)
+    review: ReviewEntity[];
 
     // @Column({ name: 'dob', type: 'date', nullable: true })
     // dob: string;

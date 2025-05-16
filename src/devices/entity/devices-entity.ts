@@ -3,6 +3,7 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { WebsiteProductEntity } from 'src/website-product/entity/website-entity';
 import { CartEntity } from 'src/cart/entity/cart.entity';
 import { RefundEntity } from 'src/refund/entity/refund.entity';
+import { ReviewEntity } from 'src/reviews/entity/reviews-entity';
 
 @Entity('device')
 export class DeviceEntity {
@@ -33,6 +34,9 @@ export class DeviceEntity {
 
     @OneToMany(() => RefundEntity, (voucher) => voucher.deviceId)
     refund: RefundEntity[];
+
+    @OneToMany(() => ReviewEntity, (voucher) => voucher.deviceId)
+    review: ReviewEntity[];
 
     @Column({ name: 'device_name', type: 'varchar', nullable: true })
     name: string;
