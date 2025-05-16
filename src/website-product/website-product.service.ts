@@ -27,61 +27,6 @@ export class WebsiteProductService {
     this.bucketName = process.env.GCLOUD_BUCKET_NAME || "way4track-application";
   }
 
-  async handleWebsiteProductDetails(
-    dto: WebsiteProductDto,
-    photos: {
-      homeBanner?: Express.Multer.File[];
-      footerBanner?: Express.Multer.File[];
-      banner1?: Express.Multer.File[];
-      banner2?: Express.Multer.File[];
-      banner3?: Express.Multer.File[];
-      blogImage?: Express.Multer.File[];
-      productIcon?: Express.Multer.File[];
-      chooseImage?: Express.Multer.File[];
-    } = {}
-  ): Promise<CommonResponse> {
-    const filePaths: Partial<Record<keyof typeof photos, string | undefined>> =
-      {
-        homeBanner: undefined,
-        footerBanner: undefined,
-        banner2: undefined,
-        banner3: undefined,
-        banner1: undefined,
-        blogImage: undefined,
-        productIcon: undefined,
-        chooseImage: undefined,
-      };
-
-    for (const [key, fileArray] of Object.entries(photos)) {
-      if (!fileArray || fileArray.length === 0) continue;
-
-      const file = fileArray[0];
-      const uniqueFileName = `web_product_photos/${Date.now()}-${file.originalname}`;
-      const storageFile = this.storage
-        .bucket(this.bucketName)
-        .file(uniqueFileName);
-
-      await storageFile.save(file.buffer, {
-        contentType: file.mimetype,
-        resumable: false,
-      });
-
-      filePaths[key as keyof typeof photos] =
-        `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
-    }
-
-<<<<<<< HEAD
-    try {
-      if (dto.id) {
-        console.log(filePaths, "111111++++");
-        return await this.updateWebsiteProductDetails(dto, filePaths);
-      } else {
-        console.log(filePaths, "+++++++++");
-        return await this.createWebsiteProductDetails(dto, filePaths);
-      }
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-=======
     async handleWebsiteProductDetails(
         dto: WebsiteProductDto,
         photos: {
@@ -133,39 +78,7 @@ export class WebsiteProductService {
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
->>>>>>> 1afe984004b005c2ec7b6a37d6428a0cc509e73a
     }
-  }
-
-<<<<<<< HEAD
-  async createWebsiteProductDetails(
-    dto: WebsiteProductDto,
-    filePaths?: Record<string, string | null>
-  ): Promise<CommonResponse> {
-    try {
-      const entity = this.adapter.convertDtoToEntity(dto);
-      console.log(filePaths, "+++++++++");
-      if (filePaths) {
-        entity.homeBanner = filePaths.homeBanner;
-        entity.footerBanner = filePaths.footerBanner;
-        entity.banner1 = filePaths.banner1;
-        entity.banner2 = filePaths.banner2;
-        entity.banner3 = filePaths.banner3;
-        entity.blogImage = filePaths.blogImage;
-        entity.productIcon = filePaths.productIcon;
-        entity.chooseImage = filePaths.chooseImage;
-      }
-      console.log(entity, "???????");
-      await this.websiteProductRepository.insert(entity);
-      return new CommonResponse(
-        true,
-        201,
-        "WebsiteProduct created successfully",
-        entity
-      );
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-=======
 
     async createWebsiteProductDetails(dto: WebsiteProductDto, filePaths?: Record<string, string | null>,): Promise<CommonResponse> {
         try {
@@ -188,9 +101,7 @@ export class WebsiteProductService {
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
->>>>>>> 1afe984004b005c2ec7b6a37d6428a0cc509e73a
     }
-  }
 
   async updateWebsiteProductDetails(
     dto: WebsiteProductDto,
@@ -202,31 +113,6 @@ export class WebsiteProductService {
       });
       if (!existing) throw new Error("WebsiteProduct not found");
 
-<<<<<<< HEAD
-      // Replace image URLs only if new files were uploaded
-      const updatedEntity = {
-        ...existing,
-        ...dto, // Other fields
-        homeBanner: filePaths.homeBanner ?? existing.homeBanner,
-        footerBanner: filePaths.footerBanner ?? existing.footerBanner,
-        banner1: filePaths.banner1 ?? existing.banner1,
-        banner2: filePaths.banner2 ?? existing.banner2,
-        banner3: filePaths.banner3 ?? existing.banner3,
-        blogImage: filePaths.blogImage ?? existing.blogImage,
-        productIcon: filePaths.productIcon ?? existing.productIcon,
-        chooseImage: filePaths.chooseImage ?? existing.chooseImage,
-      };
-      console.log(updatedEntity, "kkkkkkkk");
-      await this.websiteProductRepository.save(updatedEntity);
-      return new CommonResponse(
-        true,
-        200,
-        "WebsiteProduct updated successfully",
-        updatedEntity
-      );
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-=======
             // Replace image URLs only if new files were uploaded
             const updatedEntity = {
                 ...existing,
@@ -247,9 +133,7 @@ export class WebsiteProductService {
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
->>>>>>> 1afe984004b005c2ec7b6a37d6428a0cc509e73a
     }
-  }
 
   async deleteWebsiteProductDetails(
     dto: WebsiteProductIdDto
