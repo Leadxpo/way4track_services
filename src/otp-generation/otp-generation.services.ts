@@ -53,7 +53,7 @@ export class OTPGenerationService {
             dltContentId: "170717376366764870"
         };
 
-        const smsResponse = await axios.get("https://pgapi.smartping.ai/fe/api/v1/send", { params: smsParams });
+        const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${ceo.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20var.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`, { params: smsParams });
 
         const otpRecord = this.otpRepository.create({
             staffId: staff.staffId,
@@ -95,7 +95,7 @@ export class OTPGenerationService {
 
         let smsResponse;
         try {
-            smsResponse = await axios.get("https://pgapi.smartping.ai/fe/api/v1/send", { params: smsParams });
+            smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${req.phoneNumber}&text=Your%20login%20OTP%20is%20%7Bvar%7D.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174737408612325`, { params: smsParams });
         } catch (error) {
             console.error("SMS sending failed, bhai!", error);
             return new CommonResponse(false, 500, "SMS sending failed", { error: error.message });

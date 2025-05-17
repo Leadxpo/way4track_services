@@ -26,6 +26,7 @@ export class AttendanceService {
         const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
         console.log(data, "data")
         const attendanceRecords: AttendanceEntity[] = [];
+        const updatedRecords: AttendanceEntity[] = [];
         const missingStaffIds: number[] = [];
 
         for (const row of data) {
@@ -78,8 +79,8 @@ export class AttendanceService {
                         existingRecord.outTimeRemark = outTimeRemark || existingRecord.outTimeRemark;
                         existingRecord.status = status || existingRecord.status;
                         existingRecord.remark = remarks || existingRecord.remark;
-
-                        await this.attendanceRepo.save(existingRecord);
+                        updatedRecords.push(existingRecord)
+                        // await this.attendanceRepo.save(existingRecord);
                     } else {
                         // **Insert new record**
                         const attendance = new AttendanceEntity();
@@ -98,15 +99,19 @@ export class AttendanceService {
                 }
             }
         }
+        if (updatedRecords.length > 0) {
+            await this.attendanceRepo.save(updatedRecords);
+        }
 
         if (attendanceRecords.length > 0) {
             await this.attendanceRepo.save(attendanceRecords);
         }
-        console.log(attendanceRecords, "attendanceRecords")
+        // console.log(updatedRecords, "updatedRecords")
         return {
             message: 'Attendance data uploaded successfully',
             inserted: attendanceRecords.length,
-            missingStaffIds: missingStaffIds.length > 0 ? missingStaffIds : 'None'
+            missingStaffIds: missingStaffIds.length > 0 ? missingStaffIds : 'None',
+            updatedRecords: updatedRecords.length
         };
     }
 
