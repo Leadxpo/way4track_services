@@ -39,6 +39,7 @@ export class WebsiteProductController {
         { name: "blogImage", maxCount: 1 },
         { name: "productIcon", maxCount: 1 },
         { name: "chooseImage", maxCount: 1 },
+        { name: "solutionImage", maxCount: 1 },
       ],
       multerOptions
     )
@@ -55,6 +56,8 @@ export class WebsiteProductController {
       blogImage?: Express.Multer.File[];
       productIcon?: Express.Multer.File[];
       chooseImage?: Express.Multer.File[];
+      solutionImage?: Express.Multer.File[];
+
     }
   ): Promise<CommonResponse> {
     console.log(dto, "//////");
