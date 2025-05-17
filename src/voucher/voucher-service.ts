@@ -316,7 +316,7 @@ export class VoucherService {
                 ledgerId: ledger, // Use the full entity instead of ledger.id
                 paymentStatus: PaymentStatus.PENDING,
             },
-            select: ['invoiceId', 'voucherType', 'branchId', 'amount', 'paidAmount', 'reminigAmount'], // Return only invoiceId and amount
+            select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount','branchId'], // Return only invoiceId and amount
         });
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
