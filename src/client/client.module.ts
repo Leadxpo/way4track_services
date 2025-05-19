@@ -8,11 +8,13 @@ import { ClientAdapter } from './client.adapter';
 import { BranchModule } from 'src/branch/branch.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DevicesModule } from 'src/devices/devices.module';
+import { ReviewsModule } from 'src/reviews/reviews.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([ClientEntity]),
     forwardRef(() => BranchModule),
     forwardRef(() => DevicesModule),
+    forwardRef(() => ReviewsModule),
     MulterModule.register({
         dest: './uploads',
     }),],

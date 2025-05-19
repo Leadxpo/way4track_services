@@ -333,4 +333,23 @@ export class ClientService {
             orders: enrichedOrders,
         });
     }
+
+    async getClientReviewsById(req: ClientIdDto): Promise<CommonResponse> {
+        const client = await this.clientRepository.findOne({
+            where: {
+                clientId: req.clientId,
+                companyCode: req.companyCode,
+                unitCode: req.unitCode,
+            },
+            relations: [
+                'review',
+                'review.deviceId',
+                'review.orderId'
+            ],
+        });
+        if (!client) {
+            throw new NotFoundException('Client not found');
+        }
+        return new CommonResponse(true, 200, "Order details fetched successfully", client);
+    }
 }

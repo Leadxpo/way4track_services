@@ -64,6 +64,16 @@ export class ClientController {
         }
     }
 
+    @Post('getClientReviewsById')
+    async getClientReviewsById(@Body() req: ClientIdDto): Promise<CommonResponse> {
+        try {
+            return await this.clientService.getClientReviewsById(req);
+        } catch (error) {
+            console.error('Error in get client details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching client details');
+        }
+    }
+
     @Post('clientLoginDetails')
     async clientLoginDetails(@Body() req: LoginDto): Promise<CommonResponse> {
         try {
