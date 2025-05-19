@@ -317,7 +317,7 @@ export class VoucherService {
                 paymentStatus: PaymentStatus.PENDING,
             },
             select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount'], 
-            relations:['branchId']// Return only invoiceId and amount
+            relations:['branch_id']// Return only invoiceId and amount
         });
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
@@ -349,11 +349,6 @@ export class VoucherService {
             internalMessage: ""
         };
     }
-
-
-
-
-
 
     // private calculateNextDueDate(lastPaidDate: Date): Date {
     //     const nextDueDate = new Date(lastPaidDate);
