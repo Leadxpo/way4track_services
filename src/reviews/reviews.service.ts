@@ -48,8 +48,9 @@ export class ReviewService {
 
     async getReviewDetails(): Promise<CommonResponse> {
         try {
-            const data = await this.repo.find();
-            return new CommonResponse(true, 200, 'Review list fetched', this.adapter.toDtoList(data));
+            const data = await this.repo.find({relations:['clientId','deviceId','orderId']});
+            console.log(data,"::::::::::::::::")
+            return new CommonResponse(true, 200, 'Review list fetched', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
         }
@@ -57,7 +58,7 @@ export class ReviewService {
 
     async getReviewDetailsById(dto: HiringIdDto): Promise<CommonResponse> {
         try {
-            const entity = await this.repo.findOne({ where: { id: dto.id } });
+            const entity = await this.repo.findOne({ where: { id: dto.id },relations:['clientId','deviceId','orderId'] });
             if (!entity) return new CommonResponse(false, 404, 'Review not found');
             return new CommonResponse(true, 200, 'Review fetched', this.adapter.toDto(entity));
         } catch (error) {
