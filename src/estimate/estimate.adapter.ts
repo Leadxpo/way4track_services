@@ -80,6 +80,7 @@ export class EstimateAdapter {
             entity.branchId ? entity.branchId.branchAddress : '',
             entity.branchId ? entity.branchId.email : '',
             entity.branchId ? entity.branchId.branchNumber : '',
+            entity.branchId ? entity.branchId.GST : '',
             entity.buildingAddress,
             entity.shippingAddress,
             entity.estimateDate,
