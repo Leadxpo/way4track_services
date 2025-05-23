@@ -4,6 +4,7 @@ import { EstimateResDto } from './dto/estimate-res.dto';
 import { EstimateDto } from './dto/estimate.dto';
 import { EstimateEntity } from './entity/estimate.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
+import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 
 @Injectable()
@@ -12,6 +13,7 @@ export class EstimateAdapter {
         const entity = new EstimateEntity();
         entity.id = dto.id;
         entity.buildingAddress = dto.buildingAddress;
+        entity.shippingAddress = dto.shippingAddress;
         entity.estimateDate = dto.estimateDate;
         entity.expireDate = dto.expireDate;
         entity.productOrService = dto.productOrService;
@@ -19,11 +21,15 @@ export class EstimateAdapter {
         entity.amount = dto.totalAmount;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
+        entity.quantity = dto.quantity
 
         const clientEntity = new ClientEntity();
         clientEntity.clientId = dto.clientId;
         entity.clientId = clientEntity;
-        entity.quantity = dto.quantity
+
+        const branchEntity = new BranchEntity();
+        branchEntity.id = dto.branchId;
+        entity.branchId = branchEntity;
 
         const vendorEntity = new VendorEntity();
         vendorEntity.id = dto.vendorId;
@@ -31,9 +37,9 @@ export class EstimateAdapter {
 
         entity.quantity = dto.quantity;
         // if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
+        // entity.hsnCode = dto.hsnCode;
         if (dto.SCST) entity.SCST = dto.SCST;
         if (dto.CGST) entity.CGST = dto.CGST;
-        // entity.hsnCode = dto.hsnCode;
 
         entity.estimatePdfUrl = dto.estimatePdfUrl
         entity.invoicePdfUrl = dto.invoicePdfUrl
@@ -69,7 +75,13 @@ export class EstimateAdapter {
             entity.clientId ? entity.clientId.address : '',
             entity.clientId ? entity.clientId.email : '',
             entity.clientId ? entity.clientId.phoneNumber : '',
+            entity.branchId ? entity.branchId.id : null,  // ✅ Null check added
+            entity.branchId ? entity.branchId.branchName : '',  // ✅ Null check added
+            entity.branchId ? entity.branchId.branchAddress : '',
+            entity.branchId ? entity.branchId.email : '',
+            entity.branchId ? entity.branchId.branchNumber : '',
             entity.buildingAddress,
+            entity.shippingAddress,
             entity.estimateDate,
             entity.expireDate,
             entity.productOrService,
@@ -89,9 +101,9 @@ export class EstimateAdapter {
             entity.estimateId,
             entity.invoiceId,
             // entity.GSTORTDS,
+            // entity.hsnCode,
             entity.SCST,
             entity.CGST,
-            // entity.hsnCode,
             entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
             entity.vendorId ? entity.vendorId.name : null,  // ✅ Null check added
             entity.vendorId ? entity.vendorId.vendorPhoneNumber : null,

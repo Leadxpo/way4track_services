@@ -1,3 +1,4 @@
+import { BranchEntity } from "src/branch/entity/branch.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
@@ -22,8 +23,15 @@ export class EstimateEntity extends BaseEntity {
     @JoinColumn({ name: 'vendor_id' })
     vendorId: VendorEntity;
 
+    @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.estimate, { nullable: true })
+    @JoinColumn({ name: 'branch_id' })
+    branchId: BranchEntity;
+
     @Column({ type: 'varchar', length: 255, name: 'building_address', nullable: true })
     buildingAddress: string;
+    
+    @Column({ type: 'varchar', length: 255, name: 'shipping_address', nullable: true })
+    shippingAddress: string;
 
     @Column({ name: 'estimate_date', type: 'timestamp', nullable: true })
     estimateDate: Date;

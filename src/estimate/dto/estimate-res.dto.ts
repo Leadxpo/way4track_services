@@ -6,7 +6,13 @@ export class EstimateResDto {
     clientAddress: string;
     clientEmail: string;
     clientPhoneNumber: string;
+    branchId: number;
+    branchName: string;
+    branchAddress: string;
+    branchEmail: string;
+    branchPhoneNumber: string;
     buildingAddress: string;
+    shippingAddress: string;
     estimateDate: Date;
     expireDate: string;
     productOrService: string;
@@ -37,7 +43,13 @@ export class EstimateResDto {
         clientAddress: string,
         clientEmail: string,
         clientPhoneNumber: string,
+        branchId:number,
+        branchName: string,
+        branchAddress: string,
+        branchEmail: string,
+        branchPhoneNumber: string,
         buildingAddress: string,
+        shippingAddress: string,
         estimateDate: Date,
         expireDate: string,
         productOrService: string,
@@ -69,7 +81,13 @@ export class EstimateResDto {
         this.clientAddress = clientAddress;
         this.clientEmail = clientEmail;
         this.clientPhoneNumber = clientPhoneNumber;
+        this.branchId = branchId;
+        this.branchName = branchName;
+        this.branchAddress = branchAddress;
+        this.branchEmail = branchEmail;
+        this.branchPhoneNumber = branchPhoneNumber;
         this.buildingAddress = buildingAddress;
+        this.shippingAddress = shippingAddress;
         this.estimateDate = estimateDate;
         this.expireDate = expireDate;
         this.productOrService = productOrService;

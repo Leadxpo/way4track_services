@@ -284,7 +284,7 @@ export class EstimateService {
     async getEstimateDetails(req: EstimateIdDto): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.findOne({
-                relations: ['clientId', 'products', 'vendorId'],  // ✅ Add 'vendorId' if needed
+                relations: ['clientId', 'products', 'vendorId','branchId'],  // ✅ Add 'vendorId' if needed
                 where: { estimateId: req.estimateId, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
@@ -306,7 +306,7 @@ export class EstimateService {
     async getAllEstimateDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.find({
-                relations: ['clientId', 'products', 'vendorId'],  // ✅ Add 'vendorId' if needed
+                relations: ['clientId', 'products', 'vendorId','branchId'],  // ✅ Add 'vendorId' if needed
                 where: { companyCode: req.companyCode, unitCode: req.unitCode }
             });
 

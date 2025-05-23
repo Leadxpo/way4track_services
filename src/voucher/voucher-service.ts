@@ -97,29 +97,176 @@ export class VoucherService {
     async updateVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
         try {
             const existingVoucher = await this.voucherRepository.findOne({
-                where: {
-                    voucherId: voucherDto.voucherId,
-                    companyCode: voucherDto.companyCode,
-                    unitCode: voucherDto.unitCode
-                },
+                where: { id: voucherDto.id },
+                relations: ['estimate'],
             });
-
+    
             if (!existingVoucher) {
-                return new CommonResponse(false, 4002, 'Voucher not found for the provided id.');
+                throw new Error(`Voucher with ID ${voucherDto.id} not found.`);
             }
-            Object.assign(existingVoucher, this.voucherAdapter.dtoToEntity(voucherDto));
-            await this.voucherRepository.save(existingVoucher);
-
-            return new CommonResponse(true, 65152, 'Voucher Updated Successfully');
+    
+            const oldAmount = Number(existingVoucher.amount);
+            const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
+            voucherEntity.id = existingVoucher.id;
+            voucherEntity.voucherId = existingVoucher.voucherId;
+    
+            // =========================
+            // 1. Product Details Update
+            // =========================
+            let productDetails: ProductDetailDto[] = [];
+            let totalCost = 0;
+    
+            if (voucherDto.productDetails) {
+                const parsedDetails = typeof voucherDto.productDetails === 'string'
+                    ? JSON.parse(voucherDto.productDetails)
+                    : voucherDto.productDetails;
+    
+                if (!Array.isArray(parsedDetails)) {
+                    throw new Error('Invalid productDetails format. Expected an array.');
+                }
+    
+                productDetails = parsedDetails.map(detail => {
+                    const quantity = parseInt(detail.quantity?.toString() || '0', 10);
+                    const rate = parseFloat(detail.rate?.toString() || '0');
+                    const total = quantity * rate;
+                    totalCost += total;
+    
+                    return {
+                        type: detail.type || TypeEnum.Product_Sales,
+                        productName: detail.productName,
+                        quantity,
+                        rate,
+                        totalCost: total,
+                        description: detail.description,
+                    };
+                });
+    
+                voucherEntity.productDetails = productDetails;
+            }
+    
+            // ============================
+            // 2. Payment Processing Logic
+            // ============================
+            let fromAccount: AccountEntity | null = null;
+            let toAccount: AccountEntity | null = null;
+    
+            if (voucherDto.paymentType) {
+                if (voucherDto.fromAccount) {
+                    fromAccount = await this.accountRepository.findOne({ where: { id: voucherDto.fromAccount } });
+                    if (!fromAccount) throw new Error("From account not found.");
+                }
+    
+                if (voucherDto.toAccount) {
+                    toAccount = await this.accountRepository.findOne({ where: { id: voucherDto.toAccount } });
+                    if (!toAccount) throw new Error("To account not found.");
+                }
+    
+                let totalPaidAmount = 0;
+    
+                if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.RECEIPT].includes(voucherEntity.voucherType)) {
+                    if (voucherDto.pendingInvoices?.length > 0) {
+                        const invoiceIds = voucherDto.pendingInvoices.map(i => i.invoiceId);
+                        const pendingVouchers = await this.voucherRepository.find({ where: { invoiceId: In(invoiceIds) } });
+    
+                        const voucherMap = new Map(pendingVouchers.map(v => [v.invoiceId, v]));
+    
+                        for (const invoice of voucherDto.pendingInvoices) {
+                            const matchedVoucher = voucherMap.get(invoice.invoiceId);
+                            if (matchedVoucher) {
+                                matchedVoucher.amount = invoice.amount;
+                                matchedVoucher.paidAmount = invoice.paidAmount;
+                                matchedVoucher.reminigAmount = invoice.reminigAmount;
+                                matchedVoucher.paymentStatus =
+                                    matchedVoucher.reminigAmount === 0
+                                        ? PaymentStatus.COMPLETED
+                                        : PaymentStatus.PENDING;
+                                await this.voucherRepository.save(matchedVoucher);
+                            }
+    
+                            const paidAmount = parseFloat(invoice.paidAmount?.toString() || '0');
+                            totalPaidAmount += paidAmount;
+                        }
+    
+                        voucherEntity.amount = totalPaidAmount;
+                    }
+                }
+    
+                const newAmount = Number(voucherEntity.amount);
+    
+                // ========================
+                // 3. Reverse Old Balances
+                // ========================
+                switch (existingVoucher.voucherType) {
+                    case VoucherTypeEnum.RECEIPT:
+                    case VoucherTypeEnum.DEBITNOTE:
+                        if (fromAccount) fromAccount.totalAmount -= oldAmount;
+                        break;
+                    case VoucherTypeEnum.PAYMENT:
+                    case VoucherTypeEnum.CREDITNOTE:
+                        if (fromAccount) fromAccount.totalAmount += oldAmount;
+                        break;
+                    case VoucherTypeEnum.CONTRA:
+                        if (fromAccount) fromAccount.totalAmount += oldAmount;
+                        if (toAccount) toAccount.totalAmount -= oldAmount;
+                        break;
+                    case VoucherTypeEnum.JOURNAL:
+                        if (voucherDto.journalType === DebitORCreditEnum.Credit && fromAccount)
+                            fromAccount.totalAmount += oldAmount;
+                        else if (toAccount)
+                            toAccount.totalAmount -= oldAmount;
+                        break;
+                }
+    
+                // ========================
+                // 4. Apply New Balances
+                // ========================
+                switch (voucherEntity.voucherType) {
+                    case VoucherTypeEnum.RECEIPT:
+                    case VoucherTypeEnum.DEBITNOTE:
+                        if (fromAccount) fromAccount.totalAmount += newAmount;
+                        break;
+                    case VoucherTypeEnum.PAYMENT:
+                    case VoucherTypeEnum.CREDITNOTE:
+                        if (fromAccount) fromAccount.totalAmount -= newAmount;
+                        break;
+                    case VoucherTypeEnum.CONTRA:
+                        if (fromAccount) fromAccount.totalAmount -= newAmount;
+                        if (toAccount) toAccount.totalAmount += newAmount;
+                        break;
+                    case VoucherTypeEnum.JOURNAL:
+                        if (voucherDto.journalType === DebitORCreditEnum.Credit && fromAccount)
+                            fromAccount.totalAmount -= newAmount;
+                        else if (toAccount)
+                            toAccount.totalAmount += newAmount;
+                        break;
+                }
+    
+                const accountsToSave = [fromAccount, toAccount].filter(Boolean) as AccountEntity[];
+                await this.accountRepository.save(accountsToSave);
+            }
+    
+            // ========================
+            // 5. Estimate Association
+            // ========================
+            if (voucherDto.invoiceId && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
+                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoiceId } });
+                if (estimate) {
+                    voucherEntity.estimate = estimate;
+                }
+            }
+    
+            voucherEntity.invoiceId = voucherDto.invoiceId;
+            await this.voucherRepository.save(voucherEntity);
+    
+            return new CommonResponse(true, 65153, `Voucher Updated Successfully for ID: ${voucherDto.id}`);
         } catch (error) {
-            console.error(`Error updating voucher details: ${error.message}`, error.stack);
-            throw new ErrorResponse(5416, `Failed to update voucher details: ${error.message}`);
+            console.error('Error updating voucher:', error.message, error.stack);
+            throw new ErrorResponse(error?.code || 5417, `Failed to update voucher: ${error.message}`);
         }
     }
-
-    async createVoucher(voucherDto: VoucherDto, receiptPdf?: string | null): Promise<CommonResponse> {
+    
+    async createVoucher(voucherDto: VoucherDto): Promise<CommonResponse> {
         try {
-            console.log(voucherDto, "?????????????????");
 
             const generatedVoucherId = await this.generateVoucherNumber(voucherDto.voucherType);
             const voucherEntity = this.voucherAdapter.dtoToEntity(voucherDto);
@@ -134,8 +281,6 @@ export class VoucherService {
                     typeof voucherDto.productDetails === "string"
                         ? JSON.parse(voucherDto.productDetails)
                         : voucherDto.productDetails;
-
-                console.log(productDetailsArray, "+++++++++++++++++")
 
                 if (!Array.isArray(productDetailsArray)) {
                     throw new Error("Invalid productDetails format. Expected an array.");
@@ -285,11 +430,11 @@ export class VoucherService {
 
                 if (estimate) {
                     voucherEntity.estimate = estimate;
-                    if (receiptPdf) {
-                        console.log("Updating receiptPdfUrl with:", receiptPdf);
-                        estimate.receiptPdfUrl = receiptPdf;
-                        await this.estimateRepo.save(estimate);
-                    }
+                    // if (receiptPdf) {
+                    //     console.log("Updating receiptPdfUrl with:", receiptPdf);
+                    //     estimate.receiptPdfUrl = receiptPdf;
+                    //     await this.estimateRepo.save(estimate);
+                    // }
                 }
             }
 
@@ -303,8 +448,6 @@ export class VoucherService {
         }
     }
 
-
-
     async getPendingVouchers(req: { ledgerId: number }) {
         const ledger = await this.ledgerRepo.findOne({ where: { id: req.ledgerId } });
 
@@ -316,8 +459,8 @@ export class VoucherService {
                 ledgerId: ledger, // Use the full entity instead of ledger.id
                 paymentStatus: PaymentStatus.PENDING,
             },
-            select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount'], 
-            relations:['branch_id']// Return only invoiceId and amount
+            select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount'],
+            relations: ['branch_id']// Return only invoiceId and amount
         });
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
@@ -520,7 +663,7 @@ export class VoucherService {
             // }
 
             console.log(`🆕 Creating new voucher with ID: ${voucherDto.voucherId}`);
-            return await this.createVoucher(voucherDto, filePath);
+            return await this.createVoucher(voucherDto);
 
         } catch (error) {
             console.error(`❌ Error in handleVoucher: ${error.message}`, error.stack);
@@ -552,7 +695,6 @@ export class VoucherService {
             return new CommonResponse(false, 500, error.message);
         }
     }
-
 
     async getVoucherNamesDropDown(): Promise<CommonResponse> {
         const data = await this.voucherRepository.find({

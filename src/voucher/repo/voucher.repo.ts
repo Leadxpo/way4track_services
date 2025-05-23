@@ -32,7 +32,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     async getInVoiceData(req: InvoiceDto) {
         const query = this.createQueryBuilder('ve')
             .select([
-                've.voucher_id AS ReciptId',
+                've.voucher_id AS ReceiptId',
                 'es.invoice_id as InvoiceId',
                 've.name AS name',
                 'cl.name AS clientName',

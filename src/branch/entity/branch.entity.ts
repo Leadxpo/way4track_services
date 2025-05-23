@@ -3,6 +3,7 @@ import { AppointmentEntity } from 'src/appointment/entity/appointement.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { AttendanceEntity } from 'src/attendence/entity/attendence.entity';
 import { ClientEntity } from 'src/client/entity/client.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
@@ -108,6 +109,10 @@ export class BranchEntity extends BaseEntity {
 
   @OneToMany(() => TicketsEntity, (ticketsEntity) => ticketsEntity.branch)
   tickets: TicketsEntity[];
+
+  @OneToMany(() => EstimateEntity, (estimateEntity) => estimateEntity.branchId, { nullable: true })
+  estimate: EstimateEntity[];
+
 
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;

@@ -2,10 +2,12 @@
 export class EstimateDto {
     id?: number;
     clientId: string;
+    branchId: number;
     vendorId?: number;
     buildingAddress: string;
+    shippingAddress: string;
     estimateDate: Date;
-    expireDate: string;
+    expireDate: string;ß
     productOrService?: string;
     description: string;
     totalAmount: number;
