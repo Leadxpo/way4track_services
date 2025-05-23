@@ -38,9 +38,10 @@ export class DeviceService {
           resumable: false,
         });
 
-        console.log(`File uploaded to GCS: ${uniqueFileName}`);
+        // console.log(`File uploaded to GCS: ${uniqueFileName}`);
         filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
       }
+      console.log(dto,"testing dto")
       if (dto.id) {
         return this.updateDeviceDetails(dto, filePath);
       } else {
