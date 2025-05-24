@@ -4,6 +4,7 @@ import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { DataSource, Repository } from "typeorm";
 import { EstimateEntity } from "../entity/estimate.entity";
 import { VendorEntity } from "src/vendor/entity/vendor.entity";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 @Injectable()
 
 export class EstimateRepository extends Repository<EstimateEntity> {
@@ -30,10 +31,12 @@ export class EstimateRepository extends Repository<EstimateEntity> {
                 'estimate.estimate_date AS estimateDate',
                 'estimate.expire_date AS expiryDate',
                 'estimate.amount AS estimateAmount',
+                'estimate.shipping_address AS shippingAddress',
                 'estimate.product_details as productDetails'
             ])
             .leftJoin(ClientEntity, 'client', 'client.id = estimate.client_id')
             .leftJoin(VendorEntity, 'vendor', 'vendor.id = estimate.vendor_id')
+            .leftJoin(BranchEntity, 'branch', 'branch.id = estimate.branch_id')
             .leftJoin('estimate.products', 'pa')
             .where('estimate.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('estimate.unit_code = :unitCode', { unitCode: req.unitCode });
