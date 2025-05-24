@@ -105,7 +105,7 @@ import { RefundEntity } from './refund/entity/refund.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'root',
+      password: 'ravikumar',
       database: 'localdb',
       entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity],
       synchronize: true,
