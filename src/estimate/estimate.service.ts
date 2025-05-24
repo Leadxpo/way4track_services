@@ -208,7 +208,6 @@ export class EstimateService {
                 );
                 dto.estimatePdfUrl = newEstimate.estimatePdfUrl
             }
-            console.log(newEstimate, "___________");
 
             await this.estimateRepository.insert(newEstimate);
 
@@ -218,7 +217,6 @@ export class EstimateService {
             throw new ErrorResponse(500, `Failed to create estimate details: ${error.message}`);
         }
     }
-
 
     async uploadAndHandleEstimateDetails(
         dto: EstimateDto,
@@ -243,8 +241,6 @@ export class EstimateService {
             return new CommonResponse(false, 500, 'Error processing estimate details');
         }
     }
-
-
 
     private async getInvoiceCount(id: number): Promise<number> {
         return this.estimateRepository.count({ where: { id: id, invoiceId: Not(IsNull()) } });
@@ -280,7 +276,6 @@ export class EstimateService {
         }
     }
 
-
     async getEstimateDetails(req: EstimateIdDto): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.findOne({
@@ -293,8 +288,6 @@ export class EstimateService {
             }
 
             const data = this.estimateAdapter.convertEntityToResDto([estimate]);
-
-            console.log(data, "<<< Converted DTO Data");
 
             return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
         } catch (error) {
@@ -315,8 +308,6 @@ export class EstimateService {
             }
 
             const data = this.estimateAdapter.convertEntityToResDto(estimate);
-
-            console.log(data, "<<< Converted DTO Data");
 
             return new CommonResponse(true, 200, 'Estimate details fetched successfully', data);
         } catch (error) {

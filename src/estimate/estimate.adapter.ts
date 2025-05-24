@@ -101,8 +101,6 @@ export class EstimateAdapter {
             })) ?? [],  // ✅ Default empty array
             entity.estimateId,
             entity.invoiceId,
-            // entity.GSTORTDS,
-            // entity.hsnCode,
             entity.SCST,
             entity.CGST,
             entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
