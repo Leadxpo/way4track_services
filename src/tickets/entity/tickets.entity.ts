@@ -6,18 +6,18 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
-export enum AddressingDepartment {
-    CEO = 'CEO',
-    HR = 'HR',
-    Accountant = 'Accountant',
-    Operator = 'Operator',
-    WarehouseManager = 'Warehouse Manager',
-    BranchManager = 'Branch Manager',
-    SubDealer = 'Sub Dealer',
-    Technician = 'Technician',
-    SalesMan = 'Sales Man',
-    CallCenter = 'Call Center',
-}
+// export enum AddressingDepartment {
+//     CEO = 'CEO',
+//     HR = 'HR',
+//     Accountant = 'Accountant',
+//     Operator = 'Operator',
+//     WarehouseManager = 'Warehouse Manager',
+//     BranchManager = 'Branch Manager',
+//     SubDealer = 'Sub Dealer',
+//     Technician = 'Technician',
+//     SalesMan = 'Sales Man',
+//     CallCenter = 'Call Center',
+// }
 @Entity('tickets')
 export class TicketsEntity {
     @PrimaryGeneratedColumn()
