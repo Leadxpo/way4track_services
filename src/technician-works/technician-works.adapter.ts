@@ -204,7 +204,8 @@ export class TechnicianWorksAdapter {
             entity.userName ? entity.userName : "",
             entity.applicationId ? entity.applicationId.id : null,
             entity.paidAmount ? entity.paidAmount : null,
-            entity.subDealerStaffId?.id
+            entity.subDealerStaffId?.id,
+            // entity.convertToInvoice? entity.convertToInvoice
 
             // entity.requirementDetails ? entity.requirementDetails : []
 
