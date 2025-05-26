@@ -1,7 +1,7 @@
 import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 import { ProductAssignEntity } from 'src/product-assign/entity/product-assign.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
-import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
+// import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
 import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
@@ -73,8 +73,8 @@ export class ProductEntity extends BaseEntity {
   @OneToMany(() => VoucherEntity, (product) => product.product)
   voucherId: VoucherEntity[];
 
-  @OneToMany(() => SalesWorksEntity, (product) => product.productId)
-  sales: SalesWorksEntity[];
+  // @OneToMany(() => SalesWorksEntity, (product) => product.productId)
+  // sales: SalesWorksEntity[];
 
   @OneToMany(() => ProductAssignEntity, (product) => product.productId)
   productAssign: ProductAssignEntity[];
