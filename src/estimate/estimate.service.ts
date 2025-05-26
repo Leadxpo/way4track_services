@@ -71,7 +71,7 @@ export class EstimateService {
                 ? dto.productDetails
                 : dto.productDetails ? JSON.parse(dto.productDetails) : [];
 
-            let updatedProductDetails = existingEstimate.productDetails || [];
+            let updatedProductDetails = productDetails;
 
             // if (productDetails.length > 0) {
             //     const productIds = productDetails
