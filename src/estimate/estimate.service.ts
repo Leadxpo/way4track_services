@@ -50,7 +50,20 @@ export class EstimateService {
             if (!existingEstimate) {
                 return new CommonResponse(false, 404, `Estimate with ID ${dto.id || dto.estimateId} not found`);
             }
+            // Fields you want to ignore for safety (e.g., IDs, file URLs)
+            const ignoreFields = ['id', 'estimateId', 'clientId', 'estimatePdfUrl', 'invoicePdfUrl'];
 
+            // Dynamically copy valid fields from dto
+            for (const key in dto) {
+                if (
+                    dto.hasOwnProperty(key) &&
+                    !ignoreFields.includes(key) &&
+                    dto[key] !== undefined &&
+                    dto[key] !== null
+                ) {
+                    existingEstimate[key] = dto[key];
+                }
+            }
             const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
@@ -107,7 +120,7 @@ export class EstimateService {
 
             existingEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100;
             existingEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100;
-
+            console.log(existingEstimate)
             await this.estimateRepository.save(existingEstimate);
 
             return new CommonResponse(true, 200, 'Estimate details updated successfully');
@@ -279,7 +292,7 @@ export class EstimateService {
     async getEstimateDetails(req: EstimateIdDto): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.findOne({
-                relations: ['clientId', 'products', 'vendorId','branchId'],  // ✅ Add 'vendorId' if needed
+                relations: ['clientId', 'products', 'vendorId', 'branchId'],  // ✅ Add 'vendorId' if needed
                 where: { estimateId: req.estimateId, companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
@@ -299,7 +312,7 @@ export class EstimateService {
     async getAllEstimateDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.find({
-                relations: ['clientId', 'products', 'vendorId','branchId'],  // ✅ Add 'vendorId' if needed
+                relations: ['clientId', 'products', 'vendorId', 'branchId'],  // ✅ Add 'vendorId' if needed
                 where: { companyCode: req.companyCode, unitCode: req.unitCode }
             });
 
