@@ -63,13 +63,12 @@ export class SalesWorksEntity extends BaseEntity {
         description: string;
     }[];
 
-    @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.sales, { nullable: true })
-    @JoinColumn({ name: 'product_id' })
-    productId: ProductEntity;
+    // @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.sales, { nullable: true })
+    // @JoinColumn({ name: 'product_id' })
+    // productId: ProductEntity;
 
     @Column({ name: 'visiting_number', type: 'varchar', unique: true })
     visitingNumber: string;
-
 
     // @OneToMany(() => WorkAllocationEntity, (WorkAllocationEntity) => WorkAllocationEntity.salesRelation)
     // sales: WorkAllocationEntity[];

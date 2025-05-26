@@ -217,6 +217,8 @@ export class VoucherService {
                             existingVoucher.toAccount.totalAmount -= oldAmount;
                         break;
                 }
+                const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
+                await this.accountRepository.save(oldAccountsToSave);
 
                 // ========================
                 // 4. Apply New Balances
