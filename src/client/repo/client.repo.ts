@@ -70,7 +70,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                // 'cl.GST_number AS gstNumber',
+                'cl.GST_number AS gstNumber',
                 // 'vr.payment_status AS paymentStatus',
                 // 'vr.amount AS amount',
                 // 'vr.quantity as quantity',

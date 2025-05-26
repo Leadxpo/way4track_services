@@ -42,7 +42,7 @@ export class ClientAdapter {
         entity.tds = dto.tds
         entity.billWiseDate = dto.billWiseDate
         entity.status = dto.status
-        // entity.GSTNumber = dto.GSTNumber
+        entity.GSTNumber = dto.GSTNumber
         // entity.password = dto.password
         return entity;
     }
@@ -65,7 +65,7 @@ export class ClientAdapter {
                 client.companyCode,
                 client.unitCode,
                 client.status,
-                // client.
+                client.GSTNumber
                 // client.password
             );
         });

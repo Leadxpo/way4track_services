@@ -35,9 +35,9 @@ export class EstimateAdapter {
         vendorEntity.id = dto.vendorId;
         entity.vendorId = vendorEntity;
 
-        entity.quantity = dto.quantity;
-        // if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
         // entity.hsnCode = dto.hsnCode;
+        entity.quantity = dto.quantity;
+        if (dto.GSTORTDS) entity.GSTORTDS = dto.GSTORTDS;
         if (dto.SCST) entity.SCST = dto.SCST;
         if (dto.CGST) entity.CGST = dto.CGST;
 
@@ -59,9 +59,6 @@ export class EstimateAdapter {
                 }))
                 : [];
         }
-
-
-
         return entity;
     }
 
@@ -75,6 +72,7 @@ export class EstimateAdapter {
             entity.clientId ? entity.clientId.address : '',
             entity.clientId ? entity.clientId.email : '',
             entity.clientId ? entity.clientId.phoneNumber : '',
+            entity.clientId ? entity.clientId.GSTNumber : '',
             entity.branchId ? entity.branchId.id : null,  // ✅ Null check added
             entity.branchId ? entity.branchId.branchName : '',  // ✅ Null check added
             entity.branchId ? entity.branchId.branchAddress : '',
@@ -101,6 +99,7 @@ export class EstimateAdapter {
             })) ?? [],  // ✅ Default empty array
             entity.estimateId,
             entity.invoiceId,
+            entity.GSTORTDS,
             entity.SCST,
             entity.CGST,
             entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added

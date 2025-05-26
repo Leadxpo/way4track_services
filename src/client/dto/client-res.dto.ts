@@ -16,7 +16,7 @@ export class ClientResDto {
     unitCode: string
     status: ClientStatus
     // password: string;
-    // GSTNumber: string;
+    GSTNumber: string;
 
     constructor(
         id: number,
@@ -34,7 +34,7 @@ export class ClientResDto {
         unitCode: string,
         status: ClientStatus,
         // password: string
-        // GSTNumber: string
+        GSTNumber: string
 
     ) {
         this.id = id;
@@ -51,7 +51,7 @@ export class ClientResDto {
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status
-        // this.GSTNumber = GSTNumber
+        this.GSTNumber = GSTNumber
         // this.password=password
     }
 }

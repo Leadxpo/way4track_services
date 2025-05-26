@@ -1,3 +1,4 @@
+import { GSTORTDSEnum } from "../entity/estimate.entity";
 
 export class EstimateResDto {
     id: number;
@@ -6,6 +7,7 @@ export class EstimateResDto {
     clientAddress: string;
     clientEmail: string;
     clientPhoneNumber: string;
+    clientGST: string;
     branchId: number;
     branchName: string;
     branchAddress: string;
@@ -29,7 +31,7 @@ export class EstimateResDto {
     }[];  // Modified to include name, quantity, and amount
     estimateId?: string;
     invoiceId?: string;
-    // GSTORTDS?: GSTORTDSEnum;
+    GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
     vendorId?: number;
@@ -44,6 +46,7 @@ export class EstimateResDto {
         clientAddress: string,
         clientEmail: string,
         clientPhoneNumber: string,
+        clientGST: string,
         branchId:number,
         branchName: string,
         branchAddress: string,
@@ -66,7 +69,7 @@ export class EstimateResDto {
         }[],  // Modified to match the structure
         estimateId?: string,
         invoiceId?: string,
-        // GSTORTDS?: GSTORTDSEnum,
+        GSTORTDS?: GSTORTDSEnum,
         SCST?: number,
         CGST?: number,
         // hsnCode?: string,
@@ -83,6 +86,7 @@ export class EstimateResDto {
         this.clientAddress = clientAddress;
         this.clientEmail = clientEmail;
         this.clientPhoneNumber = clientPhoneNumber;
+        this.clientGST = clientGST;
         this.branchId = branchId;
         this.branchName = branchName;
         this.branchAddress = branchAddress;
@@ -101,7 +105,7 @@ export class EstimateResDto {
         this.unitCode = unitCode;
         this.estimateId = estimateId;
         this.invoiceId = invoiceId;
-        // this.GSTORTDS = GSTORTDS;
+        this.GSTORTDS = GSTORTDS;
         this.SCST = SCST;
         this.CGST = CGST;
         // this.hsnCode = hsnCode;
