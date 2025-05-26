@@ -54,17 +54,15 @@ export class EstimateService {
             const ignoreFields = ['id', 'estimateId', 'clientId', 'estimatePdfUrl', 'invoicePdfUrl'];
 
             // Dynamically copy valid fields from dto
-            for (const key in dto) {
+            Object.keys(dto).forEach((key) => {
                 if (
-                    dto.hasOwnProperty(key) &&
                     !ignoreFields.includes(key) &&
                     dto[key] !== undefined &&
                     dto[key] !== null
                 ) {
-                    existingEstimate[key] = dto[key];
+                    (existingEstimate as any)[key] = dto[key];
                 }
-            }
-            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
+            });            const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
             if (!client) {
                 return new CommonResponse(false, 400, `Client with ID ${dto.clientId} not found`);
             }
