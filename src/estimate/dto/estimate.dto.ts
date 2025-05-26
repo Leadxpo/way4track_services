@@ -1,3 +1,4 @@
+import { GSTORTDSEnum } from "../entity/estimate.entity";
 
 export class EstimateDto {
     id?: number;
@@ -7,7 +8,7 @@ export class EstimateDto {
     buildingAddress: string;
     shippingAddress: string;
     estimateDate: Date;
-    expireDate: string;ß
+    expireDate: string;
     productOrService?: string;
     description: string;
     totalAmount: number;
@@ -15,7 +16,7 @@ export class EstimateDto {
     unitCode: string;
     estimateId?: string;
     invoiceId?: string;
-    // GSTORTDS?: GSTORTDSEnum;
+    GSTORTDS?: GSTORTDSEnum;
     SCST?: number;
     CGST?: number;
     quantity: number;  // The total quantity for all products

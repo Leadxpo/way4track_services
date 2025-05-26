@@ -6,6 +6,7 @@ import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
 export enum GSTORTDSEnum {
     GST = "GST",
     TDS = "TDS"
