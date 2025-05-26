@@ -65,6 +65,8 @@ import { GroupsModule } from './groups/groups.module';
 import { GroupsEntity } from './groups/entity/groups.entity';
 import { VehicleTypeEntity } from './vehicle-type/entity/vehicle-type.entity';
 import { VehicleTypeModule } from './vehicle-type/vehicle-type.module';
+import { PromoEntity } from './promocode/entity/promo.entity';
+import { PromocodesModule } from './promocode/promo.module';
 import { ServiceTypeEntity } from './service-type/entity/service.entity';
 import { ServiceTypeModule } from './service-type/service.module';
 import { SubDealerStaffModule } from './sub-dealer-staff/sub-dealer-staff.module';
@@ -107,11 +109,11 @@ import { RefundEntity } from './refund/entity/refund.entity';
       username: 'root',
       password: 'ravikumar',
       database: 'localdb',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity],
+      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity,PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity,PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity]),
     BranchModule,
     AssertModule,
     ClientModule,
@@ -145,6 +147,7 @@ import { RefundEntity } from './refund/entity/refund.entity';
     LedgerModule,
     GroupsModule,
     VehicleTypeModule,
+    PromocodesModule,
     ServiceTypeModule,
     SubDealerStaffModule,
     WebsiteProductModule,
