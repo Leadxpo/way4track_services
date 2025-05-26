@@ -21,7 +21,7 @@ export class ClientDto {
     billWiseDate: boolean;
     status: ClientStatus
     branchName?: string;
-    GSTNumber: string;
+    GSTNumber?: string;
 
     // password: string;
 
