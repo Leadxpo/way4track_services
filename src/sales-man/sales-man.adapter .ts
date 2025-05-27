@@ -11,7 +11,7 @@ export class SalesWorksAdapter {
             clientPhoto: entity.clientPhoto,
             date: entity.date,
             estimateDate: entity.estimateDate,
-            staffId: entity.staffId.staffId,
+            staffId: entity.staffId.id,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
             createdAt: entity.createdAt,
@@ -27,20 +27,19 @@ export class SalesWorksAdapter {
 
     convertDtoToEntity(dto: SalesWorksDto): SalesWorksEntity {
         const entity = new SalesWorksEntity();
-        if (entity.id) {
-            entity.id = dto.id;
-        }
+    
         entity.id = dto.id;
         entity.visitingCard = dto.visitingCard;
         entity.clientPhoto = dto.clientPhoto;
         entity.date = dto.date;
         entity.estimateDate = dto.estimateDate;
-
+    
         if (dto.staffId) {
             entity.staffId = new StaffEntity();
-            entity.staffId.staffId = dto.staffId;
+            // ✅ Correctly assign primary key (assumed to be `id`, not `staffId`)
+            entity.staffId.id = dto.staffId; // convert to number if necessary
         }
-
+    
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.createdAt = dto.createdAt;
@@ -49,8 +48,8 @@ export class SalesWorksAdapter {
         entity.phoneNumber = dto.phoneNumber;
         entity.address = dto.address;
         entity.requirementDetails = dto.requirementDetails;
-        entity.service = dto.service
-        entity.visitingNumber = dto.visitingNumber
+        entity.service = dto.service;
+        entity.visitingNumber = dto.visitingNumber;
+    
         return entity;
-    }
-}
+    }}

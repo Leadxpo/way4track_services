@@ -16,7 +16,7 @@ export class SalesWorksDto {
     clientPhoto?: string;
     date?: Date;
     estimateDate?: Date;
-    staffId?: string; // Can be changed to `number` if it's an ID reference
+    staffId?: number; // Can be changed to `number` if it's an ID reference
     companyCode: string;
     unitCode: string;
     createdAt?: Date;
