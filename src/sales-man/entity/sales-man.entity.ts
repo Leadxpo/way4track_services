@@ -6,8 +6,17 @@ import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
-import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+
+export enum LeadStatusEnum {
+    PENDING = 'pending',
+    ALLOCATED = 'allocated',
+    INCOMPLETE = 'incomplete',
+    PAYMENT_PENDING = "paymentPending",
+    PARTIALLY_PAID = "partiallyPaid",
+    COMPLETED = 'completed',
+}
 
 @Entity('sales')
 export class SalesWorksEntity extends BaseEntity {
@@ -63,13 +72,10 @@ export class SalesWorksEntity extends BaseEntity {
         description: string;
     }[];
 
-    // @ManyToOne(() => ProductEntity, (ProductEntity) => ProductEntity.sales, { nullable: true })
-    // @JoinColumn({ name: 'product_id' })
-    // productId: ProductEntity;
-
     @Column({ name: 'visiting_number', type: 'varchar', unique: true })
     visitingNumber: string;
 
-    // @OneToMany(() => WorkAllocationEntity, (WorkAllocationEntity) => WorkAllocationEntity.salesRelation)
-    // sales: WorkAllocationEntity[];
+    @Column({ type: 'enum', enum: LeadStatusEnum, name: 'lead_status', default: LeadStatusEnum.PENDING, nullable: true })
+    leadStatus: LeadStatusEnum;
+
 }

@@ -28,6 +28,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.address as address',
                 'sa.service as service',
                 'sa.visiting_number as visitingNumber',
+                'sa.leadStatus as leadStatus',
                 'branch.name AS branchName',
                 'staff.staff_id AS staffId',
                 'staff.name AS staffName',

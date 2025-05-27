@@ -74,9 +74,9 @@ export class SalesWorksService {
         // Convert each entity in the array to DTO
         const staffDtos = branch.map(entity => this.adapter.convertEntityToDto(entity));
 
-        if (staffDtos.length === 0) {
-            return new CommonResponse(false, 35416, "There Is No List");
-        }
+        // if (staffDtos.length === 0) {
+        //     return new CommonResponse(false, 35416, "There Is No List");
+        // }
 
         return new CommonResponse(true, 35416, "Branch List Retrieved Successfully", staffDtos);
     }

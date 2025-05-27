@@ -22,6 +22,7 @@ export class EstimateAdapter {
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.quantity = dto.quantity
+        entity.accountId = dto.accountId
 
         const clientEntity = new ClientEntity();
         clientEntity.clientId = dto.clientId;
@@ -65,51 +66,70 @@ export class EstimateAdapter {
 
 
     convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
-        return entities.map(entity => new EstimateResDto(
-            entity.id,
-            entity.clientId ? entity.clientId.clientId : null,  // ✅ Null check added
-            entity.clientId ? entity.clientId.name : '',  // ✅ Null check added
-            entity.clientId ? entity.clientId.address : '',
-            entity.clientId ? entity.clientId.email : '',
-            entity.clientId ? entity.clientId.phoneNumber : '',
-            entity.clientId ? entity.clientId.GSTNumber : '',
-            entity.branchId ? entity.branchId.id : null,  // ✅ Null check added
-            entity.branchId ? entity.branchId.branchName : '',  // ✅ Null check added
-            entity.branchId ? entity.branchId.branchAddress : '',
-            entity.branchId ? entity.branchId.email : '',
-            entity.branchId ? entity.branchId.branchNumber : '',
-            entity.branchId ? entity.branchId.GST : '',
-            entity.buildingAddress,
-            entity.shippingAddress,
-            entity.estimateDate,
-            entity.expireDate,
-            entity.productOrService,
-            entity.description,
-            entity.amount,
-            entity.companyCode,
-            entity.unitCode,
-            entity.productDetails?.map(product => ({
-                type: product.type,
-                productId: product.productId,
-                name: product.productName,
-                quantity: product.quantity,
-                costPerUnit: product.costPerUnit,
-                totalCost: product.totalCost,
-                hsnCode: product.hsnCode
-            })) ?? [],  // ✅ Default empty array
-            entity.estimateId,
-            entity.invoiceId,
-            entity.GSTORTDS,
-            entity.SCST,
-            entity.CGST,
-            entity.vendorId ? entity.vendorId.id : null,  // ✅ Null check added
-            entity.vendorId ? entity.vendorId.name : null,  // ✅ Null check added
-            entity.vendorId ? entity.vendorId.vendorPhoneNumber : null,
-            entity.estimatePdfUrl,
-            entity.invoicePdfUrl // ✅ Null check added
-        ));
+        return entities.map(entity => {
+            const accountEntity = entity.branchId
+                ? entity.branchId.accounts.find(item => String(item.id) === entity.accountId) || null
+                : null;
+    
+                const account = accountEntity
+                ? {
+                    id: accountEntity.id,
+                    name: accountEntity.name,
+                    accountNumber: accountEntity.accountNumber,
+                    ifscCode: accountEntity.ifscCode,
+                    bankName: accountEntity.accountName
+                  }
+                : null;
+              
+    
+            return new EstimateResDto(
+                entity.id,
+                entity.clientId?.clientId ?? null,
+                entity.clientId?.name ?? '',
+                entity.clientId?.address ?? '',
+                entity.clientId?.email ?? '',
+                entity.clientId?.phoneNumber ?? '',
+                entity.clientId?.GSTNumber ?? '',
+                entity.branchId?.id ?? null,
+                entity.branchId?.branchName ?? '',
+                entity.branchId?.branchAddress ?? '',
+                entity.branchId?.email ?? '',
+                entity.branchId?.branchNumber ?? '',
+                entity.branchId?.GST ?? '',
+                account, // ✅ Plain object or null
+                entity.accountId,
+                entity.buildingAddress,
+                entity.shippingAddress,
+                entity.estimateDate,
+                entity.expireDate,
+                entity.productOrService,
+                entity.description,
+                entity.amount,
+                entity.companyCode,
+                entity.unitCode,
+                entity.productDetails?.map(product => ({
+                    type: product.type,
+                    productId: product.productId,
+                    name: product.productName,
+                    quantity: product.quantity,
+                    costPerUnit: product.costPerUnit,
+                    totalCost: product.totalCost,
+                    hsnCode: product.hsnCode
+                })) ?? [],
+                entity.estimateId,
+                entity.invoiceId,
+                entity.GSTORTDS,
+                entity.SCST,
+                entity.CGST,
+                entity.vendorId?.id ?? null,
+                entity.vendorId?.name ?? null,
+                entity.vendorId?.vendorPhoneNumber ?? null,
+                entity.estimatePdfUrl,
+                entity.invoicePdfUrl
+            );
+        });
     }
-
+    
 
 }
 

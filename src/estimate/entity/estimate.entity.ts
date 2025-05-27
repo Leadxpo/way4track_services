@@ -40,6 +40,9 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'varchar', name: 'estimate_id', nullable: true })
     estimateId: string;
 
+    @Column({ type: 'varchar', name: 'account_id', nullable: true })
+    accountId: string;
+
     @Column({ type: 'varchar', name: 'invoice_id', nullable: true })
     invoiceId: string;
 

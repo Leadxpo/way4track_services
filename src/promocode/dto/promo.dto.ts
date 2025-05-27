@@ -9,7 +9,7 @@ export class PromocodeDto {
     discountType: DiscountTypeEnum;
     companyCode: string;
     unitCode: string;
-    promoUsers: WorkStatusEnum;
+    promoUsers: string;
     minSaleAmount: number;
     maxDiscountAmount?:number
     promoStatus?:promoStatusEnum
