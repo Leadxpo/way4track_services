@@ -1,3 +1,4 @@
+import { LeadStatusEnum } from "../entity/sales-man.entity";
 
 
 class RequirementDetailDto {
@@ -18,6 +19,7 @@ export class SalesWorksDto {
     estimateDate?: Date;
     staffId?: number; // Can be changed to `number` if it's an ID reference
     companyCode: string;
+    leadStatus:LeadStatusEnum
     unitCode: string;
     createdAt?: Date;
     updatedAt?: Date;

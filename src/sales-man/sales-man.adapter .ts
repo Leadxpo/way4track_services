@@ -1,6 +1,6 @@
 
 import { StaffEntity } from 'src/staff/entity/staff.entity';
-import { SalesWorksEntity } from './entity/sales-man.entity';
+import { LeadStatusEnum, SalesWorksEntity } from './entity/sales-man.entity';
 import { SalesWorksDto } from './dto/sales-man.dto';
 
 export class SalesWorksAdapter {
@@ -21,6 +21,7 @@ export class SalesWorksAdapter {
             address: entity.address,
             requirementDetails: entity.requirementDetails,
             service: entity.service,
+            leadStatus:entity.leadStatus,
             visitingNumber: entity.visitingNumber
         };
     }
@@ -49,6 +50,7 @@ export class SalesWorksAdapter {
         entity.address = dto.address;
         entity.requirementDetails = dto.requirementDetails;
         entity.service = dto.service;
+        entity.leadStatus=dto.leadStatus
         entity.visitingNumber = dto.visitingNumber;
     
         return entity;
