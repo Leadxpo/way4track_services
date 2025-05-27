@@ -135,7 +135,8 @@ export class BranchService {
 
     async getBranchDetails(req: CommonReq): Promise<CommonResponse> {
         const branch = await this.branchRepo.find({
-            where: { companyCode: req.companyCode, unitCode: req.unitCode }
+            where: { companyCode: req.companyCode, unitCode: req.unitCode },
+            relations: ['accounts'],
         });
         console.log(branch, ">>>>>")
         if (!branch.length) {
