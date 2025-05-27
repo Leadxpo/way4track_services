@@ -18,6 +18,7 @@ import { StaffStatus } from '../enum/staff-status';
 import { Letters } from '../enum/qualifications.enum';
 import { Experience } from '../dto/staff.dto';
 import { ProductEntity } from 'src/product/entity/product.entity';
+import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
 
 
 export enum Gender {
@@ -240,6 +241,9 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.staffId)
   technician: TechnicianWorksEntity[];
+
+  @OneToMany(() => SalesWorksEntity, (SalesWorksEntity) => SalesWorksEntity.staffId)
+  salesWork: SalesWorksEntity[];
 
   @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.staffId)
   permissions: PermissionEntity[];
