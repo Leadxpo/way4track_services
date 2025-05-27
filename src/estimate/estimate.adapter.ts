@@ -67,10 +67,10 @@ export class EstimateAdapter {
 
     convertEntityToResDto(entities: EstimateEntity[]): EstimateResDto[] {
         return entities.map(entity => {
-            const accountEntity = entity.branchId
-                ? entity.branchId.accounts.find(item => String(item.id) === entity.accountId) || null
-                : null;
-    
+            const accountEntity = entity.branchId && Array.isArray(entity.branchId.accounts)
+            ? entity.branchId?.accounts?.find(item => String(item.id) === entity.accountId) || null
+            : null;
+            console.log("rrr:",accountEntity)
                 const account = accountEntity
                 ? {
                     id: accountEntity.id,
