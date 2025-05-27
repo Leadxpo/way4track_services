@@ -54,7 +54,7 @@ export class SalesWorksEntity extends BaseEntity {
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
-    @Column({ name: 'phone_number', type: 'varchar', length: 15, unique: true, nullable: true })
+    @Column({ name: 'phone_number', type: 'varchar', length: 30, nullable: true })
     phoneNumber: string;
 
     @Column({ name: 'address', type: 'text', nullable: true })
