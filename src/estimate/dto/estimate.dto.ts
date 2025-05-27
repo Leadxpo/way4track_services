@@ -8,6 +8,7 @@ export class EstimateDto {
     buildingAddress: string;
     shippingAddress: string;
     estimateDate: Date;
+    accountId:string;
     expireDate: string;
     productOrService?: string;
     description: string;
