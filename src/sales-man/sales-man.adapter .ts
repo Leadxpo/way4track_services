@@ -11,7 +11,7 @@ export class SalesWorksAdapter {
             clientPhoto: entity.clientPhoto,
             date: entity.date,
             estimateDate: entity.estimateDate,
-            staffId: entity.staffId?.staffId?.toString(),
+            staffId: entity.staffId.staffId,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
             createdAt: entity.createdAt,
