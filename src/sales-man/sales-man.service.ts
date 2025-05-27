@@ -112,20 +112,21 @@ export class SalesWorksService {
         }
 
         // Fetch product names and remove duplicates
-        if (dto.requirementDetails) {
-            const productNames = dto.requirementDetails.map((item) => item.productName);
-            const uniqueProductNames = [...new Set(productNames)];
+        // if (dto.requirementDetails) {
 
-            const products = await this.productRepository.find({
-                where: { productName: In(uniqueProductNames) }
-                ,
-            });
+        //     const productNames = dto.requirementDetails.map((item) => item.productName);
+        //     const uniqueProductNames = [...new Set(productNames)];
 
-            entity.requirementDetails = products.map((product) => ({
-                productName: product.productName,
-                quantity: dto.requirementDetails.find((item) => item.productName === product.productName)?.quantity || 0,
-            }));
-        }
+        //     const products = await this.productRepository.find({
+        //         where: { productName: In(uniqueProductNames) }
+        //         ,
+        //     });
+
+        //     entity.requirementDetails = products.map((product) => ({
+        //         productName: product.productName,
+        //         quantity: dto.requirementDetails.find((item) => item.productName === product.productName)?.quantity || 0,
+        //     }));
+        // }
         console.log(entity, ">>>>>>>>")
         await this.salesWorksRepository.insert(entity);
         //    await this.adapter.convertEntityToDto(savedEntity);
