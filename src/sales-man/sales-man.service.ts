@@ -79,70 +79,79 @@ export class SalesWorksService {
 
     async create(dto: SalesWorksDto, files: any): Promise<CommonResponse> {
         try {
-          // Convert DTO to entity
-          const entity = this.adapter.convertDtoToEntity(dto);
-      
-          // Set unique visiting number
-          const count = await this.salesWorksRepository.count();
-          entity.visitingNumber = `#VI-${(count + 1).toString().padStart(5, '0')}`;
-      
-          // Timestamp to avoid overwriting files
-          const timestamp = Date.now();
-      
-          // Upload visiting card photo if available
-          if (files?.visitingCard?.[0]) {
-            entity.visitingCard = await this.uploadFile(
-              files.visitingCard[0],
-              `visiting_card_photos/vcp_${timestamp}.jpg`
-            );
-          }
-      
-          // Upload client photo if available
-          if (files?.clientPhoto?.[0]) {
-            entity.clientPhoto = await this.uploadFile(
-              files.clientPhoto[0],
-              `client_photos/cp_${timestamp}.jpg`
-            );
-          }
-      
-          // Parse requirementDetails
-console.log("requirementDetails",dto.requirementDetails)
-          if (typeof dto.requirementDetails === "string") {
-            try {
-              dto.requirementDetails = JSON.parse(dto.requirementDetails);
-            } catch (err) {
-              throw new Error("Invalid JSON in requirementDetails: " + err.message);
-            }
-          }
-          
-          if (!Array.isArray(dto.requirementDetails)) {
-            throw new Error("Invalid requirementDetails format. Expected an array.");
-          }
+            // Convert DTO to entity
+            const entity = this.adapter.convertDtoToEntity(dto);
 
-          console.log("service",dto.service)
-          // Parse service array
-          if (typeof dto.service === "string") {
-            try {
-              dto.service = JSON.parse(dto.service);
-            } catch (err) {
-              throw new Error("Invalid JSON in service: " + err.message);
+            // Set unique visiting number
+            const count = await this.salesWorksRepository.count();
+            entity.visitingNumber = `#VI-${(count + 1).toString().padStart(5, '0')}`;
+
+            // Timestamp to avoid overwriting files
+            const timestamp = Date.now();
+
+            // Upload visiting card photo if available
+            if (files?.visitingCard?.[0]) {
+                entity.visitingCard = await this.uploadFile(
+                    files.visitingCard[0],
+                    `visiting_card_photos/vcp_${timestamp}.jpg`
+                );
             }
-          }
-          
-          if (!Array.isArray(dto.service)) {
-            throw new Error("Invalid services format. Expected an array.");
-          }
-                
-          // Save the entity
-          await this.salesWorksRepository.insert(entity);
-      
-          return new CommonResponse(true, 65152, 'Staff Details and Letters created Successfully');
+
+            // Upload client photo if available
+            if (files?.clientPhoto?.[0]) {
+                entity.clientPhoto = await this.uploadFile(
+                    files.clientPhoto[0],
+                    `client_photos/cp_${timestamp}.jpg`
+                );
+            }
+
+            // Parse requirementDetails
+            console.log("requirementDetails", dto.requirementDetails);
+
+            if (typeof dto.requirementDetails === "string") {
+                try {
+                    dto.requirementDetails = JSON.parse(dto.requirementDetails);
+                } catch (err) {
+                    throw new Error("Invalid JSON in requirementDetails: " + err.message);
+                }
+            }
+
+            // Ensure it's an array after parsing or direct assignment
+            if (!Array.isArray(dto.requirementDetails)) {
+                throw new Error("Invalid requirementDetails format. Expected an array.");
+            }
+
+            // Normalize each item (optional step: filter or sanitize data here)
+            dto.requirementDetails = dto.requirementDetails.map((requirementDetail) => ({
+                productName: requirementDetail.productName,
+                quantity: requirementDetail.quantity,
+            }));
+
+
+            console.log("service", dto.service)
+            // Parse service array
+            if (typeof dto.service === "string") {
+                try {
+                    dto.service = JSON.parse(dto.service);
+                } catch (err) {
+                    throw new Error("Invalid JSON in service: " + err.message);
+                }
+            }
+
+            if (!Array.isArray(dto.service)) {
+                throw new Error("Invalid services format. Expected an array.");
+            }
+
+            // Save the entity
+            await this.salesWorksRepository.insert(entity);
+
+            return new CommonResponse(true, 65152, 'Staff Details and Letters created Successfully');
         } catch (error) {
-          console.error('Error in create():', error);
-          throw new Error('Failed to create sales work entry: ' + error.message);
+            console.error('Error in create():', error);
+            throw new Error('Failed to create sales work entry: ' + error.message);
         }
-      }
-      
+    }
+
     private async uploadFile(file: Express.Multer.File, fileName: string): Promise<string> {
         const bucket = this.storage.bucket(this.bucketName);
         const fileRef = bucket.file(fileName);
@@ -192,33 +201,33 @@ console.log("requirementDetails",dto.requirementDetails)
         }
 
         // Fetch product names and remove duplicates
-          // Parse requirementDetails
-          if (dto.requirementDetails) {
-            const requirementDetailsArray: RequirementDetailDto[] = 
-              typeof dto.requirementDetails === 'string'
-                ? JSON.parse(dto.requirementDetails)
-                : dto.requirementDetails;
-      
+        // Parse requirementDetails
+        if (dto.requirementDetails) {
+            const requirementDetailsArray: RequirementDetailDto[] =
+                typeof dto.requirementDetails === 'string'
+                    ? JSON.parse(dto.requirementDetails)
+                    : dto.requirementDetails;
+
             if (!Array.isArray(requirementDetailsArray)) {
-              throw new Error("Invalid requirementDetails format. Expected an array.");
+                throw new Error("Invalid requirementDetails format. Expected an array.");
             }
-      
+
             dto.requirementDetails = requirementDetailsArray;
-          }
-      
-          // Parse service array
-          if (dto.service) {
-            const servicesArray: ServiceDto[] = 
-              typeof dto.service === 'string'
-                ? JSON.parse(dto.service)
-                : dto.service;
-      
+        }
+
+        // Parse service array
+        if (dto.service) {
+            const servicesArray: ServiceDto[] =
+                typeof dto.service === 'string'
+                    ? JSON.parse(dto.service)
+                    : dto.service;
+
             if (!Array.isArray(servicesArray)) {
-              throw new Error("Invalid services format. Expected an array.");
+                throw new Error("Invalid services format. Expected an array.");
             }
-      
+
             dto.service = servicesArray;
-          }
+        }
         updatedStaff.id = dto.id;
         await this.salesWorksRepository.save(updatedStaff);
 
