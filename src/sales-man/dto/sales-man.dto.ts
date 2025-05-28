@@ -18,6 +18,7 @@ export class SalesWorksDto {
     date?: Date;
     estimateDate?: Date;
     staffId?: number; // Can be changed to `number` if it's an ID reference
+    allocateStaffId?: number; // Can be changed to `number` if it's an ID reference
     companyCode: string;
     leadStatus:LeadStatusEnum
     unitCode: string;

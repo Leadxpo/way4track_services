@@ -38,7 +38,11 @@ export class SalesWorksEntity extends BaseEntity {
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.salesWork, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
-
+    
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.salesWork, { nullable: true })
+    @JoinColumn({ name: 'allocate_staff_id' })
+    allocateStaffId: StaffEntity;
+    
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;
 

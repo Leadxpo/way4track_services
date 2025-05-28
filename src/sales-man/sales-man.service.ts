@@ -112,21 +112,12 @@ export class SalesWorksService {
         }
 
         // Fetch product names and remove duplicates
-        // if (dto.requirementDetails) {
-
-        //     const productNames = dto.requirementDetails.map((item) => item.productName);
-        //     const uniqueProductNames = [...new Set(productNames)];
-
-        //     const products = await this.productRepository.find({
-        //         where: { productName: In(uniqueProductNames) }
-        //         ,
-        //     });
-
-        //     entity.requirementDetails = products.map((product) => ({
-        //         productName: product.productName,
-        //         quantity: dto.requirementDetails.find((item) => item.productName === product.productName)?.quantity || 0,
-        //     }));
-        // }
+        if (Array.isArray(dto.requirementDetails)) {
+            entity.requirementDetails = dto.requirementDetails.map(r => ({
+                productName: r.productName,
+                quantity: r.quantity
+            }));
+        }
         console.log(entity, ">>>>>>>>")
         await this.salesWorksRepository.insert(entity);
         //    await this.adapter.convertEntityToDto(savedEntity);
@@ -182,23 +173,13 @@ export class SalesWorksService {
             updatedStaff.clientPhoto = await this.uploadFile(files.clientPhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
         }
 
-
         // Fetch product names and remove duplicates
-        // if (dto.requirementDetails) {
-        //     const productNames = dto.requirementDetails.map((item) => item.productName);
-        //     const uniqueProductNames = [...new Set(productNames)];
-
-        //     const products = await this.productRepository.find({
-        //         where: { productName: In(uniqueProductNames) }
-        //         ,
-        //     });
-
-        //     updatedStaff.requirementDetails = products.map((product) => ({
-        //         productName: product.productName,
-        //         quantity: dto.requirementDetails.find((item) => item.productName === product.productName)?.quantity || 0,
-        //     }));
-        // }
-
+        if (Array.isArray(dto.requirementDetails)) {
+            entity.requirementDetails = dto.requirementDetails.map(r => ({
+                productName: r.productName,
+                quantity: r.quantity
+            }));
+        }
         updatedStaff.id = dto.id;
         await this.salesWorksRepository.save(updatedStaff);
 

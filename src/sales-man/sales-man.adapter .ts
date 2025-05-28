@@ -12,6 +12,7 @@ export class SalesWorksAdapter {
             date: entity.date,
             estimateDate: entity.estimateDate,
             staffId: entity.staffId.id,
+            allocateStaffId: entity.allocateStaffId.id,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
             createdAt: entity.createdAt,
@@ -39,6 +40,12 @@ export class SalesWorksAdapter {
             entity.staffId = new StaffEntity();
             // ✅ Correctly assign primary key (assumed to be `id`, not `staffId`)
             entity.staffId.id = dto.staffId; // convert to number if necessary
+        }
+    
+        if (dto.allocateStaffId) {
+            entity.allocateStaffId = new StaffEntity();
+            // ✅ Correctly assign primary key (assumed to be `id`, not `staffId`)
+            entity.allocateStaffId.id = dto.allocateStaffId; // convert to number if necessary
         }
     
         entity.companyCode = dto.companyCode;
