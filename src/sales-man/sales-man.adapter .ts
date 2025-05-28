@@ -61,16 +61,17 @@ export class SalesWorksAdapter {
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         entity.address = dto.address;
-        if (!dto.requirementDetails || dto.requirementDetails.length === 0) {
-            entity.requirementDetails = [];
-        } else {
-            entity.requirementDetails = Array.isArray(dto.requirementDetails)
-                ? dto.requirementDetails.map((requirementDetail) => ({
-                    productName: requirementDetail.productName,
-                    quantity: requirementDetail.quantity,
-                }))
-                : [];
-        }
+        entity.requirementDetails = dto.requirementDetails;
+        // if (!dto.requirementDetails || dto.requirementDetails.length === 0) {
+        //     entity.requirementDetails = [];
+        // } else {
+        //     entity.requirementDetails = Array.isArray(dto.requirementDetails)
+        //         ? dto.requirementDetails.map((requirementDetail) => ({
+        //             productName: requirementDetail.productName,
+        //             quantity: requirementDetail.quantity,
+        //         }))
+        //         : [];
+        // }
 
         if (!dto.service || dto.service.length === 0) {
             entity.service = [];
