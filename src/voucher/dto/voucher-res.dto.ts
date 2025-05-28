@@ -12,12 +12,14 @@ export class VoucherResDto {
     quantity?: number;
     branchId: number;
     branchName: string;
-    // role: RoleEnum;
+    supplierLocation:string;
     purpose: string;
     creditAmount: number;
     paymentType: PaymentType;
     clientId: string;
     clientName: string;
+    ledgerId: number;
+    ledgerName: string;
     staffId: string;
     staffName: string;
     toAccountId: string
@@ -66,12 +68,14 @@ export class VoucherResDto {
         name: string,
         branchId: number,
         branchName: string,
-        // role: RoleEnum,
+        supplierLocation:string,
         purpose: string,
         creditAmount: number,
         paymentType: PaymentType,
         clientId: string,
         clientName: string,
+        ledgerId: number,
+        ledgerName: string,
         staffId: string,
         staffName: string,
         toAccount: string,
@@ -122,12 +126,14 @@ export class VoucherResDto {
         this.name = name;
         this.branchId = branchId;
         this.branchName = branchName;
-        // this.role = role;
+        this.supplierLocation = supplierLocation;
         this.purpose = purpose;
         this.creditAmount = creditAmount;
         this.paymentType = paymentType;
         this.clientId = clientId;
         this.clientName = clientName;
+        this.ledgerId = ledgerId;
+        this.ledgerName = ledgerName;
         this.staffId = staffId;
         this.staffName = staffName;
         this.toAccount = toAccount;

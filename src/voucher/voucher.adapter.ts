@@ -23,8 +23,6 @@ export class VoucherAdapter {
     branch.id = dto.branchId;
     entity.branchId = branch;
 
-    entity.invoiceId = dto.invoiceId
-
     // Accounts
     if (dto.toAccount) {
       const toAccount = new AccountEntity();
@@ -134,12 +132,14 @@ export class VoucherAdapter {
           voucher.name,
           voucher.branchId?.id || 0,
           voucher.branchId?.branchName || "Unknown",
-          // voucher.role,
+          voucher.supplierLocation,
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
           voucher.clientId?.clientId || "",
           voucher.clientId?.name || "Unknown",
+          voucher.ledgerId?.id || 0,
+          voucher.ledgerId?.name || "Unknown",
           voucher.staffId?.staffId || "",
           voucher.staffId?.name || "",
           voucher.toAccount?.accountName || "",
@@ -177,7 +177,7 @@ export class VoucherAdapter {
           voucher.product?.id || null,
           voucher.product?.productName || "",
           voucher.estimate?.id || null,
-          voucher.estimate?.invoiceId,
+          voucher.invoiceId,
           voucher.staffId?.name || "",
           voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
           voucher?.dueDate ? voucher.dueDate : null,
@@ -192,12 +192,14 @@ export class VoucherAdapter {
           voucher.name,
           voucher.branchId?.id || 0,
           voucher.branchId?.branchName || "Unknown",
-          // voucher.role,
+          voucher.supplierLocation,
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
           voucher.clientId?.clientId || "",
           voucher.clientId?.name || "Unknown",
+          voucher.ledgerId?.id || 0,
+          voucher.ledgerId?.name || "Unknown",
           voucher.staffId?.staffId || "",
           voucher.staffId?.name || "",
           voucher.toAccount?.accountName || "",
@@ -240,8 +242,6 @@ export class VoucherAdapter {
           voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
           voucher?.dueDate ? voucher.dueDate : null,
           voucher?.productDetails ? voucher.productDetails : [],
-
-
         )
       ];
     }
