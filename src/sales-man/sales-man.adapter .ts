@@ -62,28 +62,7 @@ export class SalesWorksAdapter {
         entity.phoneNumber = dto.phoneNumber;
         entity.address = dto.address;
         entity.requirementDetails = dto.requirementDetails;
-        // if (!dto.requirementDetails || dto.requirementDetails.length === 0) {
-        //     entity.requirementDetails = [];
-        // } else {
-        //     entity.requirementDetails = Array.isArray(dto.requirementDetails)
-        //         ? dto.requirementDetails.map((requirementDetail) => ({
-        //             productName: requirementDetail.productName,
-        //             quantity: requirementDetail.quantity,
-        //         }))
-        //         : [];
-        // }
-
-        if (!dto.service || dto.service.length === 0) {
-            entity.service = [];
-        } else {
-            entity.service = Array.isArray(dto.service)
-                ? dto.service.map((services) => ({
-                    services: services.services,
-                    description: services.description,
-                }))
-                : [];
-        }
-
+        entity.service = dto.service;
         entity.leadStatus=dto.leadStatus
         entity.visitingNumber = dto.visitingNumber;
     
