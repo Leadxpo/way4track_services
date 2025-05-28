@@ -35,6 +35,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.voucher_id AS ReceiptId',
                 'es.invoice_id as InvoiceId',
                 've.name AS name',
+                'branch.id AS branchId',
                 've.ledgerId AS ledgerId',
                 'cl.name AS clientName',
                 've.generation_date AS generationDate',
