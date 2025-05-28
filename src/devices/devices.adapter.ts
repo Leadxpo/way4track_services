@@ -17,6 +17,8 @@ export class DeviceAdapter {
         entity.amount = dto.amount
         // ✅ New fields
         entity.name = dto.name;
+        entity.state = dto.state;
+        entity.city = dto.city;
         entity.isRelay = dto.isRelay;
         entity.relayAmt = dto.relayAmt;
         entity.isSubscription = dto.isSubscription;
@@ -41,6 +43,8 @@ export class DeviceAdapter {
 
             // ✅ New fields
             name: entity.name,
+            state: entity.state,
+            city: entity.city,
             isRelay: entity.isRelay,
             relayAmt: entity.relayAmt,
             isSubscription: entity.isSubscription,

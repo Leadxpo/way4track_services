@@ -7,6 +7,8 @@ export class DeviceDto {
   companyCode: string;
   unitCode: string
   name?: string;
+  state?: string;
+  city?: string;
   isRelay?: boolean;
   relayAmt?: number;
   isSubscription?: boolean;

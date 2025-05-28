@@ -41,6 +41,12 @@ export class DeviceEntity {
     @Column({ name: 'device_name', type: 'varchar', nullable: true })
     name: string;
 
+    @Column({ name: 'state', type: 'text', nullable: true })
+    state: string;
+
+    @Column({ name: 'city', type: 'text', nullable: true })
+    city: string;
+
     @Column({ name: 'is_relay', type: 'boolean', default: false })
     isRelay: boolean;
 
