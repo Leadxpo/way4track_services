@@ -177,63 +177,83 @@ export class SalesWorksService {
     }
 
     async update(dto: SalesWorksDto, files: any): Promise<CommonResponse> {
-
-        let existingStaff: SalesWorksEntity | null = null;
-        const entity = await this.salesWorksRepository.findOne({ where: { id: dto.id } });
-        if (!entity) {
+        const existingStaff = await this.salesWorksRepository.findOne({ where: { id: dto.id } });
+        const timestamp = Date.now();
+        if (!existingStaff) {
             throw new Error('Sales Work not found');
         }
 
         const updatedStaff = this.adapter.convertDtoToEntity(dto);
+        updatedStaff.id = dto.id; // Ensure ID is set
 
+        // Handle visitingCard upload
         if (files?.visitingCard?.[0]) {
             if (existingStaff.visitingCard) {
                 await this.deleteFile(existingStaff.visitingCard);
             }
-            updatedStaff.visitingCard = await this.uploadFile(files.photo[0], `staff_photos/visitingCard_${Date.now()}.jpg`);
+            updatedStaff.visitingCard = await this.uploadFile(
+                files.visitingCard[0],
+                `visiting_card_photos/vcp_${timestamp}.jpg`
+            );
         }
 
+        // Handle clientPhoto upload
         if (files?.clientPhoto?.[0]) {
             if (existingStaff.clientPhoto) {
                 await this.deleteFile(existingStaff.clientPhoto);
             }
-            updatedStaff.clientPhoto = await this.uploadFile(files.clientPhoto[0], `vehicle_photos/clientPhoto_${Date.now()}.jpg`);
+            updatedStaff.clientPhoto = await this.uploadFile(
+                files.clientPhoto[0],
+                `client_photos/cp_${timestamp}.jpg`
+            );
         }
 
-        // Fetch product names and remove duplicates
-        // Parse requirementDetails
+        // Parse and normalize requirementDetails
         if (dto.requirementDetails) {
-            const requirementDetailsArray: RequirementDetailDto[] =
-                typeof dto.requirementDetails === 'string'
-                    ? JSON.parse(dto.requirementDetails)
-                    : dto.requirementDetails;
+            try {
+                if (typeof dto.requirementDetails === "string") {
+                    dto.requirementDetails = JSON.parse(dto.requirementDetails);
+                }
+                if (!Array.isArray(dto.requirementDetails)) {
+                    throw new Error("Invalid requirementDetails format");
+                }
 
-            if (!Array.isArray(requirementDetailsArray)) {
-                throw new Error("Invalid requirementDetails format. Expected an array.");
+                updatedStaff.requirementDetails = dto.requirementDetails.map(r => ({
+                    productName: r.productName,
+                    quantity: r.quantity,
+                }));
+            } catch (err) {
+                throw new Error("Invalid JSON in requirementDetails: " + err.message);
             }
-
-            dto.requirementDetails = requirementDetailsArray;
         }
 
-        // Parse service array
+        // Parse and normalize service data
         if (dto.service) {
-            const servicesArray: ServiceDto[] =
-                typeof dto.service === 'string'
-                    ? JSON.parse(dto.service)
-                    : dto.service;
+            try {
+                if (typeof dto.service === "string") {
+                    dto.service = JSON.parse(dto.service);
+                }
+                if (!Array.isArray(dto.service)) {
+                    throw new Error("Invalid service format");
+                }
 
-            if (!Array.isArray(servicesArray)) {
-                throw new Error("Invalid services format. Expected an array.");
+                updatedStaff.service = dto.service;
+            } catch (err) {
+                throw new Error("Invalid JSON in service: " + err.message);
             }
-
-            dto.service = servicesArray;
         }
-        updatedStaff.id = dto.id;
-        await this.salesWorksRepository.save(updatedStaff);
 
-        await this.adapter.convertEntityToDto(updatedStaff);
+        // Save to DB
+        const savedStaff = await this.salesWorksRepository.save(updatedStaff);
 
-        return new CommonResponse(true, 65152, 'Staff Details and Permissions Created Successfully');
+        // Make sure savedStaff is valid before converting
+        if (!savedStaff || !savedStaff.id) {
+            throw new Error("Failed to save updated staff");
+        }
+
+        await this.adapter.convertEntityToDto(savedStaff);
+
+        return new CommonResponse(true, 65152, 'Staff Details and Permissions Updated Successfully');
     }
 
 
