@@ -1,12 +1,12 @@
 import { LeadStatusEnum } from "../entity/sales-man.entity";
 
 
-class RequirementDetailDto {
+export class RequirementDetailDto {
     productName: string;
     quantity: number;
 }
 
-class ServiceDto {
+export class ServiceDto {
     services: string;
     description: string;
 }
