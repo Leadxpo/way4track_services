@@ -106,33 +106,33 @@ export class SalesWorksService {
           }
       
           // Parse requirementDetails
-          if (dto.requirementDetails) {
-            const requirementDetailsArray: RequirementDetailDto[] = 
-              typeof dto.requirementDetails === 'string'
-                ? JSON.parse(dto.requirementDetails)
-                : dto.requirementDetails;
-      
-            if (!Array.isArray(requirementDetailsArray)) {
-              throw new Error("Invalid requirementDetails format. Expected an array.");
+
+          if (typeof dto.requirementDetails === "string") {
+            try {
+              dto.requirementDetails = JSON.parse(dto.requirementDetails);
+            } catch (err) {
+              throw new Error("Invalid JSON in requirementDetails: " + err.message);
             }
-      
-            dto.requirementDetails = requirementDetailsArray;
           }
+          
+          if (!Array.isArray(dto.requirementDetails)) {
+            throw new Error("Invalid requirementDetails format. Expected an array.");
+          }
+
       
           // Parse service array
-          if (dto.service) {
-            const servicesArray: ServiceDto[] = 
-              typeof dto.service === 'string'
-                ? JSON.parse(dto.service)
-                : dto.service;
-      
-            if (!Array.isArray(servicesArray)) {
-              throw new Error("Invalid services format. Expected an array.");
+          if (typeof dto.service === "string") {
+            try {
+              dto.service = JSON.parse(dto.service);
+            } catch (err) {
+              throw new Error("Invalid JSON in service: " + err.message);
             }
-      
-            dto.service = servicesArray;
           }
-      
+          
+          if (!Array.isArray(dto.service)) {
+            throw new Error("Invalid services format. Expected an array.");
+          }
+                
           // Save the entity
           await this.salesWorksRepository.insert(entity);
       
