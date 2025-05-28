@@ -22,7 +22,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.id as id',
                 'sa.date as date',
                 'sa.estimate_date as estimateDate',
-                'sa.name as name',
+                'sa.name as name', 
                 'sa.phone_number as phoneNumber',  // Sales phone number
                 'sa.requirement_details as requirementDetails',
                 'sa.address as address',

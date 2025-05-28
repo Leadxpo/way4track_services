@@ -43,7 +43,7 @@ export class EstimateAdapter {
         if (dto.CGST) entity.CGST = dto.CGST;
 
         entity.estimatePdfUrl = dto.estimatePdfUrl
-        entity.invoicePdfUrl = dto.invoicePdfUrl
+        entity.invoicePdfUrl = dto.invoicePdfUrl 
 
         if (!dto.productDetails || dto.productDetails.length === 0) {
             entity.productDetails = [];

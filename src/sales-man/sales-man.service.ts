@@ -163,14 +163,14 @@ export class SalesWorksService {
             if (existingStaff.visitingCard) {
                 await this.deleteFile(existingStaff.visitingCard);
             }
-            updatedStaff.visitingCard = await this.uploadFile(files.photo[0], `staff_photos/${existingStaff.staffId}.jpg`);
+            updatedStaff.visitingCard = await this.uploadFile(files.photo[0], `staff_photos/visitingCard_${Date.now()}.jpg`);
         }
 
         if (files?.clientPhoto?.[0]) {
             if (existingStaff.clientPhoto) {
                 await this.deleteFile(existingStaff.clientPhoto);
             }
-            updatedStaff.clientPhoto = await this.uploadFile(files.clientPhoto[0], `vehicle_photos/${existingStaff.staffId}.jpg`);
+            updatedStaff.clientPhoto = await this.uploadFile(files.clientPhoto[0], `vehicle_photos/clientPhoto_${Date.now()}.jpg`);
         }
 
         // Fetch product names and remove duplicates

@@ -20,8 +20,14 @@ export class SalesWorksAdapter {
             name: entity.name,
             phoneNumber: entity.phoneNumber,
             address: entity.address,
-            requirementDetails: entity.requirementDetails,
-            service: entity.service,
+            requirementDetails:entity.requirementDetails?.map(requirementDetail => ({
+                productName: requirementDetail.productName,
+                quantity: requirementDetail.quantity,
+            })) ?? [],
+            service: entity.service?.map(services => ({
+                services: services.services,
+                description: services.description,
+            })) ?? [],
             leadStatus:entity.leadStatus,
             visitingNumber: entity.visitingNumber
         };
@@ -55,8 +61,28 @@ export class SalesWorksAdapter {
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         entity.address = dto.address;
-        entity.requirementDetails = dto.requirementDetails;
-        entity.service = dto.service;
+        if (!dto.requirementDetails || dto.requirementDetails.length === 0) {
+            entity.requirementDetails = [];
+        } else {
+            entity.requirementDetails = Array.isArray(dto.requirementDetails)
+                ? dto.requirementDetails.map((requirementDetail) => ({
+                    productName: requirementDetail.productName,
+                    quantity: requirementDetail.quantity,
+                }))
+                : [];
+        }
+
+        if (!dto.service || dto.service.length === 0) {
+            entity.service = [];
+        } else {
+            entity.service = Array.isArray(dto.service)
+                ? dto.service.map((services) => ({
+                    services: services.services,
+                    description: services.description,
+                }))
+                : [];
+        }
+
         entity.leadStatus=dto.leadStatus
         entity.visitingNumber = dto.visitingNumber;
     
