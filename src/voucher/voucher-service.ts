@@ -463,7 +463,7 @@ export class VoucherService {
                 paymentStatus: PaymentStatus.PENDING,
             },
             select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount'],
-            relations: ['branch_id']// Return only invoiceId and amount
+            relations: ['branchId']// Return only invoiceId and amount
         });
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
