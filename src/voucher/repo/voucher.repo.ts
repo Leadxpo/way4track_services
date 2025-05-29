@@ -189,7 +189,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.voucher_id AS paymentId',
                 'cl.name AS clientName',
                 've.generation_date AS generationDate',
-                'ac.account_name AS paymentTo',
+                'ac.account_name AS accountTo',
                 'ac.account_number AS accountNumber',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
