@@ -88,13 +88,6 @@ export class VoucherAdapter {
     } else {
       entity.reminigAmount = dto.reminigAmount;
     }
-
-    // EMI-related fields
-    // entity.initialPayment = dto.initialPayment;
-    // entity.numberOfEmi = dto.numberOfEmi;
-    // entity.emiNumber = dto.emiNumber;
-    // entity.emiAmount = dto.emiAmount;
-
     // Company and unit info
     entity.upiId = dto.upiId;
     entity.checkNumber = dto.checkNumber;
@@ -168,12 +161,8 @@ export class VoucherAdapter {
           voucher.upiId,
           voucher.checkNumber,
           voucher.cardNumber,
-          // voucher.initialPayment,
-          // voucher.numberOfEmi,
-          // voucher.emiNumber,
-          // voucher.emiAmount,
-          voucher.fromAccount?.accountNumber || "",
-          voucher.toAccount?.accountNumber || "",
+          voucher.fromAccount?.id || 0,
+          voucher.toAccount?.id || 0,
           voucher.product?.id || null,
           voucher.product?.productName || "",
           voucher.estimate?.id || null,
@@ -232,8 +221,8 @@ export class VoucherAdapter {
           // voucher.numberOfEmi,
           // voucher.emiNumber,
           // voucher.emiAmount,
-          voucher.fromAccount?.accountNumber || "",
-          voucher.toAccount?.accountNumber || "",
+          voucher.fromAccount?.id || 0,
+          voucher.toAccount?.id || 0,
           voucher.product?.id || null,
           voucher.product?.productName || "",
           voucher.estimate?.id || null,

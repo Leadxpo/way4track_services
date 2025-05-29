@@ -47,6 +47,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(AccountEntity, 'from_a/c', 'from_a/c.id = ve.from_account_id')
+            .leftJoinAndSelect(AccountEntity, 'to_a/c', 'to_a/c.id = ve.to_account_id')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
         if (req.fromDate && req.toDate) {

@@ -22,9 +22,9 @@ export class VoucherResDto {
     ledgerName: string;
     staffId: string;
     staffName: string;
-    toAccountId: string
+    toAccountId: number
     toAccount: string;
-    fromAccountId: string;
+    fromAccountId: number;
     fromAccount: string;
     voucherType: VoucherTypeEnum;
     generationDate?: Date;
@@ -107,8 +107,8 @@ export class VoucherResDto {
         // initialPayment?: number,
         // emiCount?: number,
         // emiNumber?: number,
-        fromAccountId?: string,
-        toAccountId?: string,
+        fromAccountId?: number,
+        toAccountId?: number,
         product?: number,
         productName?: string,
         invoice?: number,
