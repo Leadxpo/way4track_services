@@ -677,7 +677,7 @@ export class VoucherService {
 
     async getAllVouchers(): Promise<VoucherResDto[]> {
         const vouchers = await this.voucherRepository.find({
-            relations: ['branchId','ledgerId','from_account_id','to_account_id'], // make sure this is included
+            relations: ['branchId','ledgerId'], // make sure this is included
           });
         return this.voucherAdapter.entityToDto(vouchers);
     }
