@@ -685,13 +685,42 @@ export class VoucherService {
     async deleteVoucherDetails(dto: { voucherId: string }): Promise<CommonResponse> {
         try {
             // Find voucher by voucherId as a string
-            const voucher = await this.voucherRepository.findOne({
+            const existingVoucher = await this.voucherRepository.findOne({
                 where: { voucherId: String(dto.voucherId) }
             });
 
-            if (!voucher) {
+            if (!existingVoucher) {
                 return new CommonResponse(false, 404, 'Voucher not found');
             }
+
+            const oldAmount = Number(existingVoucher.amount);
+
+                // ========================
+                // 3. Reverse Old Balances
+                // ========================
+                switch (existingVoucher.voucherType) {
+                    case VoucherTypeEnum.RECEIPT:
+                    case VoucherTypeEnum.DEBITNOTE:
+
+                        if (oldAmount) existingVoucher.fromAccount.totalAmount -= oldAmount;
+                        break;
+                    case VoucherTypeEnum.PAYMENT:
+                    case VoucherTypeEnum.CREDITNOTE:
+                        if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
+                        break;
+                    case VoucherTypeEnum.CONTRA:
+                        if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
+                        if (oldAmount) existingVoucher.toAccount.totalAmount -= oldAmount;
+                        break;
+                    case VoucherTypeEnum.JOURNAL:
+                        if (existingVoucher.journalType === DebitORCreditEnum.Credit && oldAmount)
+                            existingVoucher.fromAccount.totalAmount += oldAmount;
+                        else 
+                            existingVoucher.toAccount.totalAmount -= oldAmount;
+                        break;
+                }
+                const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
+                await this.accountRepository.save(oldAccountsToSave);
 
             // Delete voucher by voucherId as string
             await this.voucherRepository.delete({ voucherId: String(dto.voucherId) });
