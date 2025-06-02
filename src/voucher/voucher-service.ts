@@ -325,7 +325,6 @@ export class VoucherService {
             }
             // ✅ Final Amount Calculation
             voucherEntity.productDetails = productDetails;
-
             // Handle Account Transactions
             if (voucherDto.paymentType) {
                 if (voucherDto.fromAccount) {
@@ -333,7 +332,6 @@ export class VoucherService {
                     if (!fromAccount) {
                         throw new Error('From account not found.');
                     }
-
                     const voucherAmount = Number(voucherEntity.amount);
                     const accountBalance = Number(fromAccount.totalAmount);
 
@@ -341,7 +339,6 @@ export class VoucherService {
                         throw new Error('Insufficient funds in the from account.');
                     }
                 }
-
                 if ([VoucherTypeEnum.PAYMENT, VoucherTypeEnum.RECEIPT].includes(voucherEntity.voucherType)) {
                     let totalPaidAmount = 0;
 
@@ -383,8 +380,12 @@ export class VoucherService {
                     }
                 }
 
+                if (voucherDto.paymentType && !voucherDto.fromAccount) {
+                    throw new Error("Missing 'fromAccount' for a voucher that requires payment.");
+                }
+                
                 const voucherAmount = Number(voucherEntity.amount);
-                let accountBalance = Number(fromAccount?.totalAmount || 0);
+                let accountBalance = fromAccount ? Number(fromAccount.totalAmount || 0) : 0;
 
                 switch (voucherEntity.voucherType) {
                     case VoucherTypeEnum.RECEIPT:
@@ -665,7 +666,7 @@ export class VoucherService {
             //     return await this.createOrPayEmi(voucherDto);
             // }
 
-            console.log(`🆕 Creating new voucher with ID: ${voucherDto.voucherId}`);
+            console.log(`🆕 Creating new voucher withhhh ID: ${voucherDto.fromAccount}`);
             return await this.createVoucher(voucherDto);
 
         } catch (error) {
@@ -677,8 +678,8 @@ export class VoucherService {
 
     async getAllVouchers(): Promise<VoucherResDto[]> {
         const vouchers = await this.voucherRepository.find({
-            relations: ['branchId','ledgerId','fromAccount','toAccount'], // make sure this is included
-          });
+            relations: ['branchId', 'ledgerId', 'fromAccount', 'toAccount'], // make sure this is included
+        });
         return this.voucherAdapter.entityToDto(vouchers);
     }
 
@@ -695,32 +696,32 @@ export class VoucherService {
 
             const oldAmount = Number(existingVoucher.amount);
 
-                // ========================
-                // 3. Reverse Old Balances
-                // ========================
-                switch (existingVoucher.voucherType) {
-                    case VoucherTypeEnum.RECEIPT:
-                    case VoucherTypeEnum.DEBITNOTE:
+            // ========================
+            // 3. Reverse Old Balances
+            // ========================
+            switch (existingVoucher.voucherType) {
+                case VoucherTypeEnum.RECEIPT:
+                case VoucherTypeEnum.DEBITNOTE:
 
-                        if (oldAmount) existingVoucher.fromAccount.totalAmount -= oldAmount;
-                        break;
-                    case VoucherTypeEnum.PAYMENT:
-                    case VoucherTypeEnum.CREDITNOTE:
-                        if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
-                        break;
-                    case VoucherTypeEnum.CONTRA:
-                        if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
-                        if (oldAmount) existingVoucher.toAccount.totalAmount -= oldAmount;
-                        break;
-                    case VoucherTypeEnum.JOURNAL:
-                        if (existingVoucher.journalType === DebitORCreditEnum.Credit && oldAmount)
-                            existingVoucher.fromAccount.totalAmount += oldAmount;
-                        else 
-                            existingVoucher.toAccount.totalAmount -= oldAmount;
-                        break;
-                }
-                const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
-                await this.accountRepository.save(oldAccountsToSave);
+                    if (oldAmount) existingVoucher.fromAccount.totalAmount -= oldAmount;
+                    break;
+                case VoucherTypeEnum.PAYMENT:
+                case VoucherTypeEnum.CREDITNOTE:
+                    if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
+                    break;
+                case VoucherTypeEnum.CONTRA:
+                    if (oldAmount) existingVoucher.fromAccount.totalAmount += oldAmount;
+                    if (oldAmount) existingVoucher.toAccount.totalAmount -= oldAmount;
+                    break;
+                case VoucherTypeEnum.JOURNAL:
+                    if (existingVoucher.journalType === DebitORCreditEnum.Credit && oldAmount)
+                        existingVoucher.fromAccount.totalAmount += oldAmount;
+                    else
+                        existingVoucher.toAccount.totalAmount -= oldAmount;
+                    break;
+            }
+            const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
+            await this.accountRepository.save(oldAccountsToSave);
 
             // Delete voucher by voucherId as string
             await this.voucherRepository.delete({ voucherId: String(dto.voucherId) });
