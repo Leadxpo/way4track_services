@@ -17,6 +17,8 @@ export class BranchRepository extends Repository<BranchEntity> {
                 'br.name AS branchName', 
                 'br.longitude AS longitude', 
                 'br.latitude AS latitude', 
+                'br.CIN AS CIN', 
+                'br.GST AS GST', 
                 'st.staff_photo AS staffPhoto',
                 'as.asserts_name AS assertsName',
                 'as.asserts_photo AS assertsPhoto',
