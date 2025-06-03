@@ -33,9 +33,9 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'staff.phone_number AS staffPhoneNumber',  // Renamed to avoid duplicate alias
-                'allocate_st.staff_id AS staffId',
-                'allocate_st.name AS staffName',
-                'allocate_st.phone_number AS staffPhoneNumber'  // Renamed to avoid duplicate alias
+                'allocate_st.staff_id AS allocatedStaffId',
+                'allocate_st.name AS allocatedStaffName',
+                'allocate_st.phone_number AS allocatedStaffPhoneNumber'  // Renamed to avoid duplicate alias
             ])
             .leftJoin(StaffEntity, 'staff', 'sa.staff_id = staff.id')  // Use leftJoin instead of leftJoinAndSelect
             .leftJoin(StaffEntity, 'allocate_st', 'sa.allocate_staff_id= staff.id')  // Use leftJoin instead of leftJoinAndSelect
