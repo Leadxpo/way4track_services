@@ -14,7 +14,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
         super(SalesWorksEntity, dataSource.createEntityManager());
     }
     async getSalesSearchDetails(req: {
-        companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string
+        companyCode: string; unitCode: string; staffId?: number; name?: string, branch?: string
 
     }) {
         const query = this.createQueryBuilder('sa')
@@ -30,7 +30,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.visiting_number as visitingNumber',
                 'sa.leadStatus as leadStatus',
                 'branch.name AS branchName',
-                'staff.staff_id AS staffId',
+                'sa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'staff.phone_number AS staffPhoneNumber',  // Renamed to avoid duplicate alias
                 'allocate_st.staff_id AS staffId',
@@ -44,7 +44,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
             .andWhere('sa.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.staffId) {
-            query.andWhere('staff.staff_id = :staffId', { staffId: req.staffId });
+            query.andWhere('staff.id = :staffId', { staffId: req.staffId });
         }
 
         if (req.branch) {

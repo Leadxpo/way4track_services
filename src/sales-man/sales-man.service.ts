@@ -45,7 +45,7 @@ export class SalesWorksService {
         }
     }
 
-    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string }) {
+    async getSalesSearchDetails(req: { companyCode: string; unitCode: string; staffId?: number; name?: string, branch?: string }) {
         const staffData = await this.salesWorksRepository.getSalesSearchDetails(req)
         if (!staffData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
@@ -56,7 +56,8 @@ export class SalesWorksService {
 
 
     async findAll(): Promise<CommonResponse> {
-        const branch: SalesWorksEntity[] = await this.salesWorksRepository.find();
+        const branch: SalesWorksEntity[] = await this.salesWorksRepository.find({relations: ['staffId,','allocateStaffId']
+        });
 
         // Convert each entity in the array to DTO
         const staffDtos = branch.map(entity => this.adapter.convertEntityToDto(entity));

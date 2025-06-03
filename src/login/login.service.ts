@@ -35,7 +35,6 @@ export class LoginService {
         }
         else {
             login = await this.staffService.getStaffProfileDetails(req);
-            console.log(login, "{{{")
         }
         if (!login) {
             return new CommonResponse(false, 401, "Data does not match the credentials.", []);

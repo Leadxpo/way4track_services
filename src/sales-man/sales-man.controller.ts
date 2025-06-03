@@ -68,7 +68,7 @@ export class SalesWorksController {
 
 
     @Post('getSalesSearchDetails')
-    async getSalesSearchDetails(@Body() req: { companyCode: string; unitCode: string; staffId?: string; name?: string, branch?: string }): Promise<CommonResponse> {
+    async getSalesSearchDetails(@Body() req: { companyCode: string; unitCode: string; staffId?: number; name?: string, branch?: string }): Promise<CommonResponse> {
         try {
             return await this.salesWorksService.getSalesSearchDetails(req)
         }
