@@ -8,14 +8,11 @@ export class ClientResDto {
     clientPhoto: string;
     branchId: number;
     branchName: string;
-    // dob: string;
     email: string;
     address: string;
-    // joiningDate: Date;
     companyCode: string;
     unitCode: string
     status: ClientStatus
-    // password: string;
     GSTNumber: string;
 
     constructor(
@@ -26,14 +23,11 @@ export class ClientResDto {
         clientPhoto: string,
         branchId: number,
         branchName: string,
-        // dob: string,
         email: string,
         address: string,
-        // joiningDate: Date,
         companyCode: string,
         unitCode: string,
         status: ClientStatus,
-        // password: string
         GSTNumber: string
 
     ) {
@@ -44,14 +38,11 @@ export class ClientResDto {
         this.clientPhoto = clientPhoto
         this.branchId = branchId;
         this.branchName = branchName;
-        // this.dob = dob;
         this.email = email;
         this.address = address;
-        // this.joiningDate = joiningDate;
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status
         this.GSTNumber = GSTNumber
-        // this.password=password
     }
 }

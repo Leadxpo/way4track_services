@@ -22,6 +22,7 @@ export class EstimateResDto {
   branchEmail: string;
   branchPhoneNumber: string;
   branchGST: string;
+  branchCIN: string;
   branchAccount: AccountDto | null;
   accountId: string;
   buildingAddress: string;
@@ -67,6 +68,7 @@ export class EstimateResDto {
     branchEmail: string,
     branchPhoneNumber: string,
     branchGST: string,
+    branchCIN: string,
     branchAccount: AccountDto | null,
     accountId: string,
     buildingAddress: string,
@@ -111,6 +113,7 @@ export class EstimateResDto {
     this.branchEmail = branchEmail;
     this.branchPhoneNumber = branchPhoneNumber;
     this.branchGST = branchGST;
+    this.branchCIN = branchCIN;
     this.branchAccount = branchAccount;
     this.accountId = accountId;
     this.buildingAddress = buildingAddress;

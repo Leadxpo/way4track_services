@@ -48,9 +48,6 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'tcs', type: 'boolean', default: false, nullable: true })
     tcs: boolean;
 
-    @Column({ name: 'bill_wise_date', type: 'boolean', default: false, nullable: true })
-    billWiseDate: boolean;
-
     @Column({ name: 'email', type: 'varchar', length: 150, unique: true, nullable: true })
     email: string;
 

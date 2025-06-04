@@ -257,14 +257,12 @@ export class TechnicianService {
                     dob: "",
                     email: newTechnician.email || "",
                     address: newTechnician.address || "",
-                    // joiningDate: newTechnician.startDate || null,
                     companyCode: req.companyCode ?? "",
                     unitCode: req.unitCode ?? "",
                     hsnCode: "",
                     SACCode: "",
                     tds: false,
                     tcs: false,
-                    billWiseDate: false,
                     status: ClientStatus.Active,
                     // password: ""
                 };

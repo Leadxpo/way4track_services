@@ -40,7 +40,6 @@ export class ClientAdapter {
         }
         entity.tcs = dto.tcs
         entity.tds = dto.tds
-        entity.billWiseDate = dto.billWiseDate
         entity.status = dto.status
         entity.GSTNumber = dto.GSTNumber
         // entity.password = dto.password

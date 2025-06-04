@@ -42,18 +42,20 @@ export class OTPGenerationService {
 
         const otp = this.generateOtp();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        // const smsParams = {
+        //     username: "sharontelematics.trans",
+        //     password: "bisrm",
+        //     unicode: false,
+        //     from: "SHARTE",
+        //     to: ceo.phoneNumber,
+        //     text: `This is a message from Sharlon Telematrice.\n An OTP is requested to ${req.isResend ? 'resend OTP' : 'reset a password'} for staff ${staff.staffId}:\n ${otp}`,
+        //     dltContentId: "170717376366764870"
+        // };
+        // https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=9494130830&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20var.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991
+        console.log("aaa :",ceo.phoneNumber)
+        console.log("OTP :",otp)
 
-        const smsParams = {
-            username: "sharontelematics.trans",
-            password: "bisrm",
-            unicode: false,
-            from: "SHARTE",
-            to: ceo.phoneNumber,
-            text: `This is a message from Sharlon Telematrice.\n An OTP is requested to ${req.isResend ? 'resend OTP' : 'reset a password'} for staff ${staff.staffId}:\n ${otp}`,
-            dltContentId: "170717376366764870"
-        };
-
-        const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${ceo.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20var.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`, { params: smsParams });
+        const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${ceo.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20${otp}.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`);
 
         const otpRecord = this.otpRepository.create({
             staffId: staff.staffId,

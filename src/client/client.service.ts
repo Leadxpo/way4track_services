@@ -214,9 +214,6 @@ export class ClientService {
         if (req.hasOwnProperty('tcs')) {
             updatedFields.tcs = !client.tcs;
         }
-        if (req.hasOwnProperty('billWiseDate')) {
-            updatedFields.billWiseDate = !client.billWiseDate;
-        }
 
         // Only update if there are changes
         if (Object.keys(updatedFields).length > 0) {
