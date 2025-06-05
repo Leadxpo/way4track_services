@@ -70,9 +70,6 @@ export class EstimateAdapter {
             const accountEntity = entity.branchId && Array.isArray(entity.branchId.accounts)
             ? entity.branchId?.accounts?.find(item => String(item.id) === entity.accountId) || null
             : null;
-            console.log("¸rrr:",Array.isArray(entity.branchId.accounts))
-            console.log("¸rrr:",entity.branchId)
-            console.log("¸rrr:",accountEntity)
                 const account = accountEntity
                 ? {
                     id: accountEntity.id,
