@@ -106,6 +106,9 @@ export class ClientEntity extends BaseEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
+    @Column({ name: 'state', type: 'varchar', length: 200, nullable: true })
+    state: string;
+
     @Column({ name: 'hsn_code', type: 'varchar', length: 100, nullable: true })
     hsnCode: string;
 
@@ -114,7 +117,4 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })
     status: ClientStatus
-
-    // @Column({ name: 'password', type: 'varchar' })
-    // password: string;
 }

@@ -8,6 +8,7 @@ export class ClientDto {
     dob: string;
     email: string;
     address: string;
+    state: string;
     clientPhoto?: string;
     clientId?: string;
     voucherId?: number

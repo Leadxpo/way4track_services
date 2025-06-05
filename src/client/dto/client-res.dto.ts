@@ -10,6 +10,7 @@ export class ClientResDto {
     branchName: string;
     email: string;
     address: string;
+    state: string;
     companyCode: string;
     unitCode: string
     status: ClientStatus
@@ -25,6 +26,7 @@ export class ClientResDto {
         branchName: string,
         email: string,
         address: string,
+        state: string,
         companyCode: string,
         unitCode: string,
         status: ClientStatus,
@@ -40,6 +42,7 @@ export class ClientResDto {
         this.branchName = branchName;
         this.email = email;
         this.address = address;
+        this.state = state;
         this.companyCode = companyCode
         this.unitCode = unitCode
         this.status = status

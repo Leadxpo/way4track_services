@@ -257,6 +257,7 @@ export class TechnicianService {
                     dob: "",
                     email: newTechnician.email || "",
                     address: newTechnician.address || "",
+                    state: "",
                     companyCode: req.companyCode ?? "",
                     unitCode: req.unitCode ?? "",
                     hsnCode: "",

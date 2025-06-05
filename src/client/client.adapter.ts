@@ -15,20 +15,11 @@ export class ClientAdapter {
         branchEntity.id = dto.branch;
         entity.branch = branchEntity;
         entity.clientPhoto = dto.clientPhoto
-        // entity.dob = dto.dob;
         entity.email = dto.email;
         entity.address = dto.address;
-        // entity.joiningDate = dto.joiningDate;
+        entity.state = dto.state;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
-        // if (entity.dob) {
-        //     entity.dob = new Date(entity.dob).toISOString().split('T')[0];
-        // // }
-        // if (entity.joiningDate) {
-        //     entity.joiningDate = dto.joiningDate;
-        // }
-
-        // entity.status = dto.status
         if (dto.id) {
             entity.id = dto.id;
         }
@@ -42,7 +33,6 @@ export class ClientAdapter {
         entity.tds = dto.tds
         entity.status = dto.status
         entity.GSTNumber = dto.GSTNumber
-        // entity.password = dto.password
         return entity;
     }
 
@@ -57,15 +47,13 @@ export class ClientAdapter {
                 client.clientPhoto,
                 client?.branch?.id,
                 client?.branch?.branchName,
-                // client.dob,
                 client.email,
                 client.address,
-                // client.joiningDate,
+                client.state,
                 client.companyCode,
                 client.unitCode,
                 client.status,
                 client.GSTNumber
-                // client.password
             );
         });
     }
