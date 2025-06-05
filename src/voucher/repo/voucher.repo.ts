@@ -8,7 +8,7 @@ import { PaymentStatus } from "src/product/dto/payment-status.enum";
 import { ProductType } from "src/product/dto/product-type.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
-import { VendorEntity } from "src/vendor/entity/vendor.entity";
+// import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { Brackets, DataSource, Repository } from "typeorm";
 import { BranchChartDto } from "../dto/balance-chart.dto";
 import { InvoiceDto } from "../dto/invoice.dto";
@@ -233,12 +233,12 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'br.name AS branchName',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
-                'vn.name AS vendorName',
+                // 'vn.name AS vendorName',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
-            .leftJoin(VendorEntity, 'vn', 've.vendor_id=vn.id')
+            // .leftJoin(VendorEntity, 'vn', 've.vendor_id=vn.id')
             .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
@@ -960,7 +960,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
     async getProductsPhotos(req: {
         subDealerId?: string;
-        vendorId?: string;
+        // vendorId?: string;
         companyCode: string;
         unitCode: string;
     }) {
@@ -970,17 +970,18 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'pr.product_photo as productPhoto'
             ])
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = ve.sub_dealer_id')
-            .leftJoin(VendorEntity, 'vn', 'vn.id = ve.vendor_id')
+            // .leftJoin(VendorEntity, 'vn', 'vn.id = ve.vendor_id')
             .leftJoin(ProductEntity, 'pr', 'pr.id = ve.product_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
 
-        if (req.vendorId) {
-            query.andWhere('ve.vendor_id = :vendorId', { vendorId: req.vendorId });
-        } else if (req.subDealerId) {
+        // if (req.vendorId) {
+        //     query.andWhere('ve.vendor_id = :vendorId', { vendorId: req.vendorId });
+        // } else 
+        if (req.subDealerId) {
             query.andWhere('ve.sub_dealer_id = :subDealerId', { subDealerId: req.subDealerId });
         } else {
-            throw new Error('Either vendorId or subDealerId must be provided.');
+            throw new Error('Either subDealerId must be provided.');
         }
 
         const results = await query.getRawMany();

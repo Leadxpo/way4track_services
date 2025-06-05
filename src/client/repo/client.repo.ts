@@ -73,18 +73,11 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
                 'cl.GST_number AS gstNumber',
-                // 'vr.payment_status AS paymentStatus',
-                // 'vr.amount AS amount',
-                // 'vr.quantity as quantity',
-                // 'vr.voucher_id AS voucherId',
                 'br.name AS branch',
                 'br.id AS branchId',
                 'cl.email AS email',
                 'cl.address AS address',
                 'cl.state AS state',
-                // 'vr.name AS voucherName',
-                // 'vr.generation_date AS generationDate',
-                // 'vr.product_type AS productType',
                 'cl.status as status'
             ])
             .leftJoin('cl.voucherId', 'vr')

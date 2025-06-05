@@ -34,7 +34,7 @@ export class VoucherDto {
     IGST?: number;
 
     subDealerId?: number;
-    vendorId?: number;
+    // vendorId?: number;
     // initialPayment?: number;
     // numberOfEmi?: number;
     // emiNumber?: number;

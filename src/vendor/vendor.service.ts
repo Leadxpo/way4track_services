@@ -140,7 +140,7 @@ export class VendorService {
     try {
       const vendor = await this.vendorRepository.findOne({
         where: { vendorId: req.vendorId, companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['branch', 'voucherId'],
+        relations: ['branch'],
       });
 
       if (!vendor) {
@@ -159,7 +159,7 @@ export class VendorService {
     try {
       const vendor = await this.vendorRepository.find({
         where: { companyCode: req.companyCode, unitCode: req.unitCode },
-        relations: ['branch', 'voucherId'],
+        relations: ['branch'],
       });
 
       if (!vendor) {

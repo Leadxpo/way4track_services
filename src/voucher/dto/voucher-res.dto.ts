@@ -39,8 +39,6 @@ export class VoucherResDto {
     amount?: number;
     subDealerId?: number;
     subDealerName?: string;
-    vendorId?: number;
-    vendorName?: string;
     voucherId: string;
     companyCode: string;
     unitCode: string;
@@ -86,8 +84,6 @@ export class VoucherResDto {
         unitCode: string,
         paymentStatus: PaymentStatus,
         productType: ProductType,
-        vendorId: number,
-        vendorName: string,
         quantity?: number,
         generationDate?: Date,
         expireDate?: Date,
@@ -141,8 +137,6 @@ export class VoucherResDto {
         this.unitCode = unitCode;
         this.paymentStatus = paymentStatus;
         this.productType = productType;
-        this.vendorId = vendorId;
-        this.vendorName = vendorName;
         this.quantity = quantity ?? 0;
         this.generationDate = generationDate ?? null;
         this.expireDate = expireDate ?? null;

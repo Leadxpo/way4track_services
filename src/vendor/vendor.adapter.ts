@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { VendorDto } from './dto/vendor.dto';
 import { VendorEntity } from './entity/vendor.entity';
 import { VendorResDto } from './dto/vendor-res.dto';
-import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
+// import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 
 
@@ -14,17 +14,14 @@ export class VendorAdapter {
         entity.name = dto.name;
         entity.vendorPhoneNumber = dto.vendorPhoneNumber;
         entity.alternatePhoneNumber = dto.alternatePhoneNumber;
-        entity.productType = dto.productType;
-        entity.startingDate = dto.startingDate;
         entity.emailId = dto.emailId;
-        entity.aadharNumber = dto.aadharNumber;
+        entity.state = dto.state;
+        entity.GSTNumber = dto.GSTNumber;
+        entity.bankDetails = dto.bankDetails;
         entity.address = dto.address;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         entity.vendorPhoto = dto.vendorPhoto
-        // const voucher = new VoucherEntity()
-        // voucher.id = dto.voucherId
-        // entity.voucherId = voucher;
         const branch = new BranchEntity()
         branch.id = dto.branchId
         entity.branch = branch;
@@ -38,12 +35,11 @@ export class VendorAdapter {
                 name,
                 vendorPhoneNumber,
                 alternatePhoneNumber,
-                productType,
-                startingDate,
                 emailId,
-                aadharNumber,
+                state,
+                bankDetails,
+                GSTNumber,
                 address,
-                voucherId,
                 companyCode,
                 unitCode,
                 vendorPhoto,
@@ -54,13 +50,11 @@ export class VendorAdapter {
                 name,
                 vendorPhoneNumber,
                 alternatePhoneNumber,
-                productType,
-                startingDate,
                 emailId,
-                aadharNumber,
+                state,
+                bankDetails,
+                GSTNumber,
                 address,
-                // voucherId?.id,
-                // voucherId?.name ?? '',
                 companyCode,
                 unitCode,
                 vendorPhoto,

@@ -3,13 +3,14 @@ export class VendorResDto {
     name: string;
     vendorPhoneNumber: string;
     alternatePhoneNumber?: string;
-    productType: string;
-    startingDate: Date;
+    // productType: string;
+    // startingDate: Date;
+    // aadharNumber: string;
     emailId: string;
-    aadharNumber: string;
+    state: string;
     address: string;
-    // voucherId: number;
-    // voucherNames: string;
+    GSTNumber:string;
+    bankDetails:string;
     companyCode?: string;
     unitCode?: string
     vendorPhoto?: string
@@ -20,13 +21,14 @@ export class VendorResDto {
         name: string,
         vendorPhoneNumber: string,
         alternatePhoneNumber: string | undefined,
-        productType: string,
-        startingDate: Date,
+        // productType: string,
+        // startingDate: Date,
+        // aadharNumber: string,
         emailId: string,
-        aadharNumber: string,
+        state: string,
         address: string,
-        // voucherId: number,
-        // voucherNames: string,
+        GSTNumber: string,
+        bankDetails: string,
         companyCode?: string,
         unitCode?: string,
         vendorPhoto?: string,
@@ -37,13 +39,14 @@ export class VendorResDto {
         this.name = name;
         this.vendorPhoneNumber = vendorPhoneNumber;
         this.alternatePhoneNumber = alternatePhoneNumber;
-        this.productType = productType;
-        this.startingDate = startingDate;
+        // this.productType = productType;
+        // this.startingDate = startingDate;
+        // this.aadharNumber = aadharNumber;
         this.emailId = emailId;
-        this.aadharNumber = aadharNumber;
+        this.state = state;
         this.address = address;
-        // this.voucherId = voucherId;
-        // this.voucherNames = voucherNames;
+        this.GSTNumber = GSTNumber;
+        this.bankDetails = bankDetails;
         this.companyCode = companyCode
         this.unitCode = unitCode;
         this.vendorPhoto = vendorPhoto;

@@ -4,7 +4,7 @@ import { VoucherEntity } from "./entity/voucher.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
-import { VendorEntity } from "src/vendor/entity/vendor.entity";
+// import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { AccountEntity } from "src/account/entity/account.entity";
 import { VoucherResDto } from "./dto/voucher-res.dto";
 import { StaffEntity } from "src/staff/entity/staff.entity";
@@ -55,11 +55,6 @@ export class VoucherAdapter {
     const subDealer = new SubDealerEntity();
     subDealer.id = dto.subDealerId
     entity.subDealer = subDealer
-
-
-    const vendor = new VendorEntity();
-    vendor.id = dto.vendorId
-    entity.vendorId = vendor
 
     const estimatePayment = new EstimateEntity()
     estimatePayment.id = dto.estimate
@@ -143,8 +138,6 @@ export class VoucherAdapter {
           voucher.unitCode,
           voucher.paymentStatus,
           voucher.productType,
-          voucher.vendorId ? voucher.vendorId.id : null,
-          voucher.vendorId ? voucher.vendorId.name : "",
           voucher.quantity,
           voucher.generationDate,
           voucher.expireDate,
@@ -199,8 +192,6 @@ export class VoucherAdapter {
           voucher.unitCode,
           voucher.paymentStatus,
           voucher.productType,
-          voucher.vendorId ? voucher.vendorId.id : null,
-          voucher.vendorId ? voucher.vendorId.name : "",
           voucher.quantity,
           voucher.generationDate,
           voucher.expireDate,

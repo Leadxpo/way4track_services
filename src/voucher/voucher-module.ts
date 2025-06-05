@@ -20,7 +20,7 @@ import { LedgerModule } from 'src/ledger/ledger.module';
     imports: [
         TypeOrmModule.forFeature([VoucherEntity, VoucherRepository]),
         forwardRef(() => BranchModule),
-        forwardRef(() => VendorModule),
+        // forwardRef(() => VendorModule),
         forwardRef(() => SubDealerModule),
         forwardRef(() => ClientModule),
         forwardRef(() => AccountModule),
