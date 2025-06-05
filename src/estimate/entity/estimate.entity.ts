@@ -52,7 +52,7 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'varchar', length: 100, name: 'product_or_service', nullable: true })
     productOrService: string;
 
-    @Column({ type: 'varchar', length: 255, name: 'description', nullable: true })
+    @Column({ type: 'text',  name: 'description', nullable: true })
     description: string;
 
     @Column({ type: 'float', name: 'amount', nullable: true })

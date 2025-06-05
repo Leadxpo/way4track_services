@@ -3,9 +3,6 @@ export class VendorResDto {
     name: string;
     vendorPhoneNumber: string;
     alternatePhoneNumber?: string;
-    // productType: string;
-    // startingDate: Date;
-    // aadharNumber: string;
     emailId: string;
     state: string;
     address: string;
@@ -21,9 +18,6 @@ export class VendorResDto {
         name: string,
         vendorPhoneNumber: string,
         alternatePhoneNumber: string | undefined,
-        // productType: string,
-        // startingDate: Date,
-        // aadharNumber: string,
         emailId: string,
         state: string,
         address: string,
@@ -39,9 +33,6 @@ export class VendorResDto {
         this.name = name;
         this.vendorPhoneNumber = vendorPhoneNumber;
         this.alternatePhoneNumber = alternatePhoneNumber;
-        // this.productType = productType;
-        // this.startingDate = startingDate;
-        // this.aadharNumber = aadharNumber;
         this.emailId = emailId;
         this.state = state;
         this.address = address;

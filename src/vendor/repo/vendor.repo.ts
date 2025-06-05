@@ -21,8 +21,9 @@ export class VendorRepository extends Repository<VendorEntity> {
                 've.vendor_id AS vendorId',
                 've.vendor_phone_number AS phoneNumber',
                 've.name AS name',
-                've.name AS GSTNumber',
+                've.GST_number AS GSTNumber',
                 've.state AS state',
+                've.bank_details AS bankDetails',
             ])
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -40,7 +41,7 @@ export class VendorRepository extends Repository<VendorEntity> {
                 've.name AS name',
                 've.email AS email',
                 've.address AS address',
-                've.name AS GSTNumber',
+                've.GST_number AS GSTNumber',
                 've.state AS state',
                 've.bank_details AS bankDetails',
             ])
