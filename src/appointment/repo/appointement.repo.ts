@@ -52,7 +52,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
                 'appointment.time AS slot',
                 'appointment.description AS description',
                 'appointment.status AS status',
-                'staff.staff_id AS staffId',
+                'staff.id AS staffId',
                 'staff.name AS assignedTo',
             ])
             .leftJoin(ClientEntity, 'client', 'appointment.client_id = client.id')

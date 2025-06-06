@@ -56,7 +56,7 @@ export class AppointmentEntity {
     @Column({ name: 'time', type: 'time' })
     slot: string;
 
-    @Column({ name: 'period', type: 'enum', enum: TimePeriodEnum })
+    @Column({ name: 'period', type: 'enum', enum: TimePeriodEnum,nullable:true })
     period: TimePeriodEnum;
 
 
