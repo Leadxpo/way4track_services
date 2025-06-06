@@ -365,9 +365,9 @@ export class StaffRepository extends Repository<StaffEntity> {
         const query = this.createQueryBuilder('staff')
             .select([
                 'COUNT(staff.staff_id) AS totalStaff',
-                `SUM(CASE WHEN LOWER(staff.designation) = 'technician' THEN 1 ELSE 0 END) AS totalTechnicians`,
-                `SUM(CASE WHEN LOWER(staff.designation) = 'salesman' THEN 1 ELSE 0 END) AS totalSales`,
-                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'salesman') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) IN ('technician', 'sr. technician') THEN 1 ELSE 0 END) AS totalTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) = 'sales executive' THEN 1 ELSE 0 END) AS totalSales`,
+                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician','sr. technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
@@ -388,7 +388,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'COUNT(staff.staff_id) AS totalStaff',
                 `SUM(CASE WHEN LOWER(staff.designation) IN ('technician', 'sr. technician') THEN 1 ELSE 0 END) AS totalTechnicians`,
                 `SUM(CASE WHEN LOWER(staff.designation) = 'sales executive' THEN 1 ELSE 0 END) AS totalSales`,
-                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician','sr. technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
@@ -440,10 +440,10 @@ export class StaffRepository extends Repository<StaffEntity> {
                     'branchManager.phone_number AS branchManagerPhoneNumber',
                     'branchManager.monthly_salary AS branchManagerSalary',
                     'COUNT(staff.staff_id) AS totalStaff',
-                    `SUM(CASE WHEN LOWER(staff.designation) = 'technician' THEN 1 ELSE 0 END) AS totalTechnicians`,
-                    `SUM(CASE WHEN LOWER(staff.designation) = 'salesman' THEN 1 ELSE 0 END) AS totalSales`,
-                    `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'salesman') THEN 1 ELSE 0 END) AS totalNonTechnicians`
-                ])
+                    `SUM(CASE WHEN LOWER(staff.designation) IN ('technician', 'sr. technician') THEN 1 ELSE 0 END) AS totalTechnicians`,
+                    `SUM(CASE WHEN LOWER(staff.designation) = 'sales executive' THEN 1 ELSE 0 END) AS totalSales`,
+                    `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician','sr. technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+                    ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .leftJoinAndSelect(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(staff.designation) = :managerDesignation', { managerDesignation: 'branch manager' })
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
