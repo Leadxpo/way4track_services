@@ -386,9 +386,9 @@ export class StaffRepository extends Repository<StaffEntity> {
             .select([
                 'branch.name AS branchName',
                 'COUNT(staff.staff_id) AS totalStaff',
-                `SUM(CASE WHEN LOWER(staff.designation) = 'technician' THEN 1 ELSE 0 END) AS totalTechnicians`,
-                `SUM(CASE WHEN LOWER(staff.designation) = 'salesman' THEN 1 ELSE 0 END) AS totalSales`,
-                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'salesman') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) IN ('technician', 'sr. technician') THEN 1 ELSE 0 END) AS totalTechnicians`,
+                `SUM(CASE WHEN LOWER(staff.designation) = 'sales executive' THEN 1 ELSE 0 END) AS totalSales`,
+                `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })

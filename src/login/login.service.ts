@@ -29,7 +29,7 @@ export class LoginService {
 
         if (designation === 'sub dealer') {
             login = await this.subDealerService.getSubDealerProfileDetails(req);
-            console.log(login, ">>")
+
         } else if (designation === 'sub dealer staff') {
             login = await this.subDealerStaff.getSubDealerStaffLogin(req);
         }

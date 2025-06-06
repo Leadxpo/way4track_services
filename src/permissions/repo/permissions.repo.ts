@@ -37,6 +37,8 @@ export class PermissionRepository extends Repository<PermissionEntity> {
                 'sb.aadhar_number AS subDealerAadharNumber',
                 'permission.role AS role',
                 'permission.permissions AS permissions',
+                'permission.start_at AS startAt',
+                'permission.end_at AS endAt',
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = permission.staff_id')
             .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
