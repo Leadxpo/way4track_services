@@ -51,6 +51,7 @@ export class PermissionRepository extends Repository<PermissionEntity> {
         if (req.subDealerId) {
             query.andWhere('sb.id = :subDealerId', { subDealerId: req.subDealerId });
         }
+        query.orderBy('permission.start_at', 'DESC').limit(1);
 
         const staffDetails = await query.getRawMany();
         return staffDetails;
