@@ -15,15 +15,13 @@ const razorpayInstance = new Razorpay({
 
 @Controller('order')
 export class OrderController {
-  constructor(private readonly service: OrderService) {}
+  constructor(private readonly service: OrderService) { }
 
   @Post('CreateOrder')
   async CreateOrder(@Body() dto: CreateOrderDto): Promise<CommonResponse> {
     try {
       if (dto.id) dto.id = Number(dto.id);
       const amount = dto.totalAmount;
-      console.log(crypto.randomBytes(10).toString('hex'));
-
       const options = {
         amount: amount * 100,
         currency: 'INR',
@@ -42,20 +40,28 @@ export class OrderController {
   @Post('OrderVerify')
   async OrderVerify(@Body() dto: any): Promise<CommonResponse> {
     try {
+      let payload = dto;
+
+      // If body is a string, parse it
+      if (typeof dto.body === 'string') {
+        payload = JSON.parse(dto.body);
+      }
+
       const {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
         orderDetails,
-      } = dto;
-      console.log("dto :",dto)
+      } = payload;
+
+      console.log("payload :", payload)
       const sign = razorpay_order_id + "|" + razorpay_payment_id;
-  console.log("sign :",sign)
+      console.log("sign :", sign)
       const expectedSign = crypto
         .createHmac("sha256", process.env.KEY_SECRET || 'V2S1KzGsJpfsVp6YsPlbdrOy')
         .update(sign)
         .digest("hex");
-  
+
       if (expectedSign === razorpay_signature) {
         console.log("Signature Verified ✅");
         return await this.service.handleCreateOrder(orderDetails);
