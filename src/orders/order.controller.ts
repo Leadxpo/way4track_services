@@ -3,10 +3,70 @@ import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/order.dto';
+const Razorpay = require('razorpay');
+import * as crypto from 'crypto';
+import orders from 'razorpay/dist/types/orders';
+import { error } from 'console';
+
+const razorpayInstance = new Razorpay({
+  key_id: process.env.KEY_ID || 'rzp_test_NPT4UOaHTgxvZj',
+  key_secret: process.env.KEY_SECRET || 'V2S1KzGsJpfsVp6YsPlbdrOy',
+});
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly service: OrderService) {}
+
+  @Post('CreateOrder')
+  async CreateOrder(@Body() dto: CreateOrderDto): Promise<CommonResponse> {
+    try {
+      if (dto.id) dto.id = Number(dto.id);
+      const amount = dto.totalAmount;
+      console.log(crypto.randomBytes(10).toString('hex'));
+
+      const options = {
+        amount: amount * 100,
+        currency: 'INR',
+        receipt: crypto.randomBytes(10).toString('hex'), // ✅ will now work
+      };
+
+      const order = await razorpayInstance.orders.create(options);
+
+      return new CommonResponse(true, 200, 'Payment order created successfully', order);
+    } catch (error) {
+      console.error('Error creating Razorpay order:', error);
+      return new CommonResponse(false, 500, 'Error creating payment order');
+    }
+  }
+
+  @Post('OrderVerify')
+  async OrderVerify(@Body() dto: any): Promise<CommonResponse> {
+    try {
+      const {
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        orderDetails,
+      } = dto;
+      console.log("dto :",dto)
+      const sign = razorpay_order_id + "|" + razorpay_payment_id;
+  console.log("sign :",sign)
+      const expectedSign = crypto
+        .createHmac("sha256", process.env.KEY_SECRET || 'V2S1KzGsJpfsVp6YsPlbdrOy')
+        .update(sign)
+        .digest("hex");
+  
+      if (expectedSign === razorpay_signature) {
+        console.log("Signature Verified ✅");
+        return await this.service.handleCreateOrder(orderDetails);
+      } else {
+        return new CommonResponse(false, 400, 'Signature mismatch ❌');
+      }
+    } catch (error) {
+      console.error('Error verifying order:', error);
+      return new CommonResponse(false, 500, 'Error verifying order');
+    }
+  }
 
   @Post('handleCreateOrder')
   async handleCreateOrder(@Body() dto: CreateOrderDto): Promise<CommonResponse> {

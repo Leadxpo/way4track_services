@@ -8,9 +8,12 @@ export class CreateOrderDto {
     orderDate?: string;
     delivaryDate: Date;
     orderStatus?: OrderStatus;
-    clientId?: number;
     companyCode: string;
     unitCode: string;
+    razorpay_order_id?:string;
+    razorpay_payment_id?:string;
+    razorpay_signature?:string
+    clientId?: number;
     deliveryAddressId?: number
     buildingAddressId?: number
     description: string;

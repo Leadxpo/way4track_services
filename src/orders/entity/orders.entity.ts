@@ -44,6 +44,15 @@ export class OrderEntity {
   @Column({ name: "order_date", type: "varchar", nullable: true })
   orderDate: string;
 
+  @Column({ name: "razorpay_order_id", type: "varchar", nullable: true })
+  razorpay_order_id: string;
+
+  @Column({ name: "razorpay_payment_id", type: "varchar", nullable: true })
+  razorpay_payment_id: string;
+
+  @Column({ name: "razorpay_signature", type: "varchar", nullable: true })
+  razorpay_signature: string;
+
   @ManyToOne(() => AddressEntity, (client) => client.order, { nullable: true })
   @JoinColumn({ name: "delivery_address_id" })
   deliveryAddressId: AddressEntity;

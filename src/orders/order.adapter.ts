@@ -15,6 +15,9 @@ export class OrderAdapter {
     entity.unitCode = dto.unitCode;
     entity.orderItems = dto.orderItems;
     entity.description = dto.description
+    entity.razorpay_signature = dto.razorpay_signature
+    entity.razorpay_payment_id = dto.razorpay_payment_id
+    entity.razorpay_order_id = dto.razorpay_order_id
     entity.client = dto.clientId ? ({ id: dto.clientId } as any) : null;
     entity.buildingAddressId = dto.buildingAddressId ? ({ id: dto.buildingAddressId } as any) : null;
     entity.deliveryAddressId = dto.deliveryAddressId ? ({ id: dto.deliveryAddressId } as any) : null;
@@ -32,6 +35,9 @@ export class OrderAdapter {
       orderItems: entity.orderItems,
       companyCode: entity.companyCode,
       unitCode: entity.unitCode,
+      razorpay_signature : entity.razorpay_signature,
+      razorpay_payment_id : entity.razorpay_payment_id,
+      razorpay_order_id : entity.razorpay_order_id,
       clientId: entity.client?.id,
       delivaryDate: entity.delivaryDate,
       buildingAddressId: entity.buildingAddressId?.id,

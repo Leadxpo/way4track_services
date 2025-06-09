@@ -23,6 +23,7 @@ export class OrderService {
   ) { }
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
+    
     try {
       let entity: OrderEntity;
       if (dto.id) {
@@ -34,7 +35,7 @@ export class OrderService {
       } else {
         entity = this.adapter.toEntity(dto);
         await this.repo.save(entity);
-        return new CommonResponse(true, 201, "order created");
+        return new CommonResponse(true, 201, "Payment Successfully and Order Created");
       }
     } catch (error) {
       throw new ErrorResponse(500, error.message);
