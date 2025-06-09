@@ -51,10 +51,8 @@ export class OrderController {
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
-        orderDetails,
       } = payload;
 
-      console.log("payload :", payload)
       const sign = razorpay_order_id + "|" + razorpay_payment_id;
       console.log("sign :", sign)
       const expectedSign = crypto
@@ -64,7 +62,7 @@ export class OrderController {
 
       if (expectedSign === razorpay_signature) {
         console.log("Signature Verified ✅");
-        return await this.service.handleCreateOrder(orderDetails);
+        return await this.service.handleCreateOrder(payload);
       } else {
         return new CommonResponse(false, 400, 'Signature mismatch ❌');
       }

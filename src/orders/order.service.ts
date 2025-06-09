@@ -23,7 +23,7 @@ export class OrderService {
   ) { }
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
-    
+    console.log("payload :", dto)
     try {
       let entity: OrderEntity;
       if (dto.id) {
