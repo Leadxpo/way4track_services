@@ -20,7 +20,7 @@ export class OTPGenerationService {
     private generateOtp(): string {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
-
+    // send change password OTP
     private async handleOtpSend(req: OTPDto): Promise<CommonResponse> {
         const staff = await this.staffRepo.findOne({ where: { staffId: req.staffId } });
 
@@ -39,22 +39,9 @@ export class OTPGenerationService {
         if (!ceo || !ceo.phoneNumber) {
             return new CommonResponse(false, 404, "CEO not found for this staff");
         }
-
+        console.log("rrr :", ceo.phoneNumber)
         const otp = this.generateOtp();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-        // const smsParams = {
-        //     username: "sharontelematics.trans",
-        //     password: "bisrm",
-        //     unicode: false,
-        //     from: "SHARTE",
-        //     to: ceo.phoneNumber,
-        //     text: `This is a message from Sharlon Telematrice.\n An OTP is requested to ${req.isResend ? 'resend OTP' : 'reset a password'} for staff ${staff.staffId}:\n ${otp}`,
-        //     dltContentId: "170717376366764870"
-        // };
-        // https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=9494130830&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20var.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991
-        console.log("aaa :",ceo.phoneNumber)
-        console.log("OTP :",otp)
-
         const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${ceo.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20${otp}.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`);
 
         const otpRecord = this.otpRepository.create({
@@ -75,7 +62,7 @@ export class OTPGenerationService {
             });
         }
     }
-
+    // eccommerse user login OTP
     private async handleClientOtpSend(req: OTPDto): Promise<CommonResponse> {
         const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } });
 
@@ -85,19 +72,8 @@ export class OTPGenerationService {
         const otp = this.generateOtp();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 ghante ke liye valid
 
-        const smsParams = {
-            username: "sharontelematics.trans",
-            password: "bisrm",
-            unicode: false,
-            from: "SHARTE",
-            to: req.phoneNumber,
-            text: `This is a message from Sharlon Telematrice.\nAn OTP is requested to ${actionType} for Client ${req.phoneNumber}:\n ${otp}`,
-            dltContentId: "170717376366764870"
-        };
-
-        let smsResponse;
         try {
-            smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${req.phoneNumber}&text=Your%20login%20OTP%20is%20%7Bvar%7D.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174737408612325`, { params: smsParams });
+            var smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${req.phoneNumber}&text=Your%20login%20OTP%20is%20${otp}.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174737408612325`);
         } catch (error) {
             console.error("SMS sending failed, bhai!", error);
             return new CommonResponse(false, 500, "SMS sending failed", { error: error.message });
@@ -112,7 +88,7 @@ export class OTPGenerationService {
 
         return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} successfully for ${isExistingClient ? 'login' : 'registration'}`, {
             otp, // testing ke liye bhej rahe hain, production mein hata dena warna naya tamasha ho jayega
-            sms: smsResponse.data,
+            sms: smsResponse,
             clientExists: isExistingClient,
         });
     }
@@ -232,7 +208,7 @@ export class OTPGenerationService {
 
         return new CommonResponse(true, 200, "OTP verified. Proceed with password change.");
     }
-
+    // changing staff password
     async changePassword(req: ChangePasswordDto): Promise<CommonResponse> {
         const staff = await this.staffRepo.findOne({
             where: { staffId: req.staffId },
