@@ -237,8 +237,8 @@ export class OTPGenerationService {
                 status: ClientStatus.Active,
             };
             try {
-                await this.clientService.createClientDetails(clientDto);
-                return new CommonResponse(true, 200, "OTP verified. client generated.", clientDto);
+               const rrr= await this.clientService.createClientDetails(clientDto);
+                return new CommonResponse(true, 200, "OTP verified. client generated.", rrr);
             } catch (notificationError) {
                 console.error(`client failed: ${notificationError.message}`, notificationError.stack);
             }
