@@ -104,7 +104,7 @@ export class ProductRepository extends Repository<ProductEntity> {
 
             productDetails.forEach((product) => {
                 const { productName, productType, branchName, totalProducts, totalInHandsQty, productTypeId } = product;
-console.log("rrr:",productDetails);
+                console.log("rrr:", productDetails);
                 if (!branchesMap.has(branchName)) {
                     branchesMap.set(branchName, {
                         branchName: branchName || 'N/A',
