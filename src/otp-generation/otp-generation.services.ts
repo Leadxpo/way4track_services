@@ -238,10 +238,12 @@ export class OTPGenerationService {
             };
             try {
                 await this.clientService.createClientDetails(clientDto);
+                return new CommonResponse(true, 200, "OTP verified. Proceed with password change.", clientDto);
             } catch (notificationError) {
                 console.error(`client failed: ${notificationError.message}`, notificationError.stack);
             }
-            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.",clientDto);
+        }else{
+            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.", {});
         }
     }
     // changing staff password
