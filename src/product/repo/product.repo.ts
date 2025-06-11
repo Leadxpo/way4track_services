@@ -91,7 +91,7 @@ export class ProductRepository extends Repository<ProductEntity> {
                 photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branches WHERE name = :branchName)', { branchName: req.branch });
             }
 
-            const productPhotos = await photoQuery.getRawMany();
+            // const productPhotos = await photoQuery.getRawMany();
 
             // Map photos to products
             // const productPhotoMap = new Map<string, string>();
@@ -102,27 +102,48 @@ export class ProductRepository extends Repository<ProductEntity> {
             // Transform data into the required format
             const branchesMap = new Map<string, any>();
 
+            // const branchesMap = new Map();
+
             productDetails.forEach((product) => {
-                const { productName, productType, branchName, totalProducts, totalInHandsQty, productTypeId } = product;
-                console.log("rrr:", productDetails);
-                if (!branchesMap.has(branchName)) {
-                    branchesMap.set(branchName, {
-                        branchName: branchName || 'N/A',
-                        products: []
+                const {
+                    productName,
+                    productType,
+                    branchName,
+                    totalProducts,
+                    inHandStock,
+                    productTypeId
+                } = product;
+
+                const branchKey = branchName || 'N/A';
+
+                if (!branchesMap.has(branchKey)) {
+                    branchesMap.set(branchKey, new Map());
+                }
+
+                const productTypeMap = branchesMap.get(branchKey);
+
+                if (!productTypeMap.has(productType)) {
+                    productTypeMap.set(productType, {
+                        productTypeid: Number(productTypeId) || 0,
+                        name: productName || 'N/A',
+                        type: productType || 'N/A',
+                        totalProducts: 0,
+                        totalInHandsQty: 0
                     });
                 }
 
-                branchesMap.get(branchName)?.products.push({
-                    id: Number(productTypeId) || 0,
-                    name: productName || 'N/A',
-                    type: productType || 'N/A',
-                    totalProducts: Number(totalProducts) || 0,
-                    totalInHandsQty: Number(totalInHandsQty) || 0,
-                    // photo: productPhotoMap.get(productTypeId) || null // Assign photo from the mapped result
-                });
+                const current = productTypeMap.get(productType);
+                current.totalProducts += Number(totalProducts) || 0;
+                current.totalInHandsQty += Number(inHandStock) || 0;
             });
 
-            return Array.from(branchesMap.values());
+            const result = Array.from(branchesMap.entries()).map(([branchName, productTypeMap]) => ({
+                branchName,
+                productTypes: Array.from(productTypeMap.values())
+            }));
+
+            console.log("Formatted Output:", result);
+            return result;
         } catch (error) {
             console.error('Error fetching product details by branch:', error);
             throw new Error('Failed to fetch product details by branch');
