@@ -241,7 +241,7 @@ export class OTPGenerationService {
             } catch (notificationError) {
                 console.error(`client failed: ${notificationError.message}`, notificationError.stack);
             }
-            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.",);
+            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.",clientDto);
         }
     }
     // changing staff password
