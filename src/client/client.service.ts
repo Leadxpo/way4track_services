@@ -242,7 +242,15 @@ export class ClientService {
     async getClientByPhoneNumber(req: ClientDto): Promise<CommonResponse> {
         let data = null;
 
-        data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber } });
+        data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber },relations: [
+            'order',
+            'order.deliveryAddressId',
+            'order.buildingAddressId',
+            'customerAddress',
+            'cart',
+            'refund',
+            'refund.deviceId'
+        ], });
 
         if (data) {
             return new CommonResponse(false, 75483, "client exists", data);

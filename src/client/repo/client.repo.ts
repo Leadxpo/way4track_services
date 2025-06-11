@@ -53,7 +53,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'vr.generation_date AS generationDate',
                 'vr.product_type AS productType',
                 'cl.status as status'
-
             ])
             .leftJoin('cl.voucherId', 'vr')
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
