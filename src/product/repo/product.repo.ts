@@ -88,7 +88,7 @@ export class ProductRepository extends Repository<ProductEntity> {
                 .andWhere('pt.unit_code = :unitCode', { unitCode: req.unitCode });
 
             if (req.branch) {
-                photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branch WHERE name = :branchName)', { branchName: req.branch });
+                photoQuery.andWhere('productAssign.branch_id IN (SELECT id FROM branches WHERE name = :branchName)', { branchName: req.branch });
             }
 
             const productPhotos = await photoQuery.getRawMany();
