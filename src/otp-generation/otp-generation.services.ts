@@ -237,13 +237,13 @@ export class OTPGenerationService {
                 status: ClientStatus.Active,
             };
             try {
-               const rrr= await this.clientService.createClientDetails(clientDto);
-                return new CommonResponse(true, 200, "OTP verified. client generated.", rrr);
+               const clientDetails= await this.clientService.createClientDetails(clientDto);
+                return new CommonResponse(true, 200, "OTP verified. client generated.", clientDetails);
             } catch (notificationError) {
                 console.error(`client failed: ${notificationError.message}`, notificationError.stack);
             }
         }else{
-            return new CommonResponse(true, 200, "OTP verified. client .", client);
+            return new CommonResponse(true, 200, "OTP verified. client exits.", client);
         }
     }
     // changing staff password
