@@ -90,11 +90,19 @@ export class OTPGenerationService {
         });
         await this.otpRepository.save(otpRecord);
 
-        return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} successfully for ${isExistingClient ? 'login' : 'registration'}`, {
-            otp, // testing ke liye bhej rahe hain, production mein hata dena warna naya tamasha ho jayega
-            sms: smsResponse,
-            clientExists: isExistingClient,
-        });
+        if (smsResponse.data) {
+            return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} successfully for ${isExistingClient ? 'login' : 'registration'}`, {
+                otp, // testing ke liye bhej rahe hain, production mein hata dena
+                sms: smsResponse.data,
+                clientExists: isExistingClient,
+            });
+        } else {
+            return new CommonResponse(false, 56416, `Failed to ${req.isResend ? "resend" : "send"} OTP`, {
+                sms: smsResponse.data || "SMS failed",
+            });
+        }
+
+
     }
 
     // Main exposed functions
@@ -233,7 +241,7 @@ export class OTPGenerationService {
             } catch (notificationError) {
                 console.error(`client failed: ${notificationError.message}`, notificationError.stack);
             }
-            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.");
+            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.",);
         }
     }
     // changing staff password
