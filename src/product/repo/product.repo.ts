@@ -94,16 +94,16 @@ export class ProductRepository extends Repository<ProductEntity> {
             const productPhotos = await photoQuery.getRawMany();
 
             // Map photos to products
-            const productPhotoMap = new Map<string, string>();
-            productPhotos.forEach(photo => {
-                productPhotoMap.set(photo.productTypeId, photo.productAssignPhoto);
-            });
+            // const productPhotoMap = new Map<string, string>();
+            // productPhotos.forEach(photo => {
+            //     productPhotoMap.set(photo.productTypeId, photo.productAssignPhoto);
+            // });
 
             // Transform data into the required format
             const branchesMap = new Map<string, any>();
 
             productDetails.forEach((product) => {
-                const { productId, productName, productType, branchName, totalProducts, totalInHandsQty, productTypeId } = product;
+                const { productName, productType, branchName, totalProducts, totalInHandsQty, productTypeId } = product;
 
                 if (!branchesMap.has(branchName)) {
                     branchesMap.set(branchName, {
@@ -113,12 +113,12 @@ export class ProductRepository extends Repository<ProductEntity> {
                 }
 
                 branchesMap.get(branchName)?.products.push({
-                    id: Number(productId) || 0,
+                    id: Number(productTypeId) || 0,
                     name: productName || 'N/A',
                     type: productType || 'N/A',
                     totalProducts: Number(totalProducts) || 0,
                     totalInHandsQty: Number(totalInHandsQty) || 0,
-                    photo: productPhotoMap.get(productTypeId) || null // Assign photo from the mapped result
+                    // photo: productPhotoMap.get(productTypeId) || null // Assign photo from the mapped result
                 });
             });
 

@@ -157,46 +157,15 @@ export class BranchService {
 
     async getBranchDetailsById(req: BranchIdDto): Promise<CommonResponse> {
         try {
-            console.log(req, "}}}}}}}}}}}}}}")
+
             const branch = await this.branchRepo.findOne({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
-                relations: ['staff', 'asserts', 'accounts'],
+                relations: ['staff', 'asserts', 'accounts','product'],
             });
-            console.log(branch, "::::::::::::::::")
 
             if (!branch) {
                 return new CommonResponse(false, 404, 'No Branch Found');
             }
-            // const data = {
-            //     branchId: branch.id,
-            //     branchName: branch.branchName,
-            //     branchNumber: branch.branchNumber,
-            //     address: branch.branchAddress,
-            //     branchOpening: branch.branchOpening,
-            //     addressLine1: branch.addressLine1,
-            //     city: branch.city,
-            //     addressLine2: branch.addressLine2,
-            //     state: branch.state,
-            //     email: branch.email,
-            //     pincode: branch.pincode,
-            //     branchPhoto: branch.branchPhoto,
-            //     companyCode: branch.companyCode,
-            //     unitCode: branch.unitCode,
-            //     staff: branch.staff.map(staff => ({
-            //         staffId: staff.staffId,
-            //         name: staff.name,
-            //         designation: staff.designation,
-            //         phoneNumber: staff.phoneNumber,
-            //         staffPhoto: staff.staffPhoto,
-            //     })),
-            //     asserts: branch.asserts.map(assert => ({
-            //         name: assert.assertsName,
-            //         photo: assert.assetPhoto,
-            //         amount: assert.assertsAmount,
-            //         type: assert.assetType
-            //     })),
-            // };
-            console.log(branch, "?/////////")
             return new CommonResponse(true, 200, 'Branch Retrieved Successfully', branch);
         } catch (error) {
             throw new ErrorResponse(500, error.message);
