@@ -7,13 +7,17 @@ import { NotificationRepository } from 'src/notifications/repo/notification.repo
 import axios from 'axios';
 import { StaffStatus } from 'src/staff/enum/staff-status';
 import { ClientRepository } from 'src/client/repo/client.repo';
+import { ClientDto } from 'src/client/dto/client.dto';
+import { ClientStatus } from 'src/client/enum/client-status.enum';
+import { ClientService } from 'src/client/client.service';
 
 @Injectable()
 export class OTPGenerationService {
     constructor(
         private readonly otpRepository: OTPRepository,
         private readonly staffRepo: StaffRepository,
-        private readonly clientRepo: ClientRepository
+        private readonly clientRepo: ClientRepository,
+        private readonly clientService: ClientService
 
     ) { }
 
@@ -206,7 +210,31 @@ export class OTPGenerationService {
             return new CommonResponse(false, 400, "OTP expired");
         }
 
-        return new CommonResponse(true, 200, "OTP verified. Proceed with password change.");
+        const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } })
+        if (!client) {
+            const clientDto: ClientDto = {
+                name: null,
+                branch: null,
+                phoneNumber: req.phoneNumber || "",
+                dob: null,
+                email: null,
+                address: null,
+                state: null,
+                companyCode: "WAY4TRACK",
+                unitCode: "WAY4",
+                hsnCode: null,
+                SACCode: null,
+                tds: false,
+                tcs: false,
+                status: ClientStatus.Active,
+            };
+            try {
+                await this.clientService.createClientDetails(clientDto);
+            } catch (notificationError) {
+                console.error(`client failed: ${notificationError.message}`, notificationError.stack);
+            }
+            return new CommonResponse(true, 200, "OTP verified. Proceed with password change.");
+        }
     }
     // changing staff password
     async changePassword(req: ChangePasswordDto): Promise<CommonResponse> {
