@@ -95,22 +95,22 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
             .groupBy('ve.voucher_id')
-            .addGroupBy('cl.name')
-            .addGroupBy('branch.name')
-            .addGroupBy('ve.generation_date')
-            .addGroupBy('ve.name')
-            .addGroupBy('cl.phone_number')
-            .addGroupBy('cl.email')
-            .addGroupBy('cl.address')
-            .addGroupBy('pr.product_name')
-            .addGroupBy('pr.product_description')
-            .addGroupBy('pr.price')
-            .addGroupBy('ve.expire_date')
-            .addGroupBy('ve.payment_status')
-            .addGroupBy('es.estimate_date')
-            .addGroupBy('es.expire_date')
-            .addGroupBy('es.id')  // Add es.id to GROUP BY
-            .getRawOne();
+            // .addGroupBy('cl.name')
+            // .addGroupBy('branch.name')
+            // .addGroupBy('ve.generation_date')
+            // .addGroupBy('ve.name')
+            // .addGroupBy('cl.phone_number')
+            // .addGroupBy('cl.email')
+            // .addGroupBy('cl.address')
+            // .addGroupBy('pr.product_name')
+            // .addGroupBy('pr.product_description')
+            // .addGroupBy('pr.price')
+            // .addGroupBy('ve.expire_date')
+            // .addGroupBy('ve.payment_status')
+            // .addGroupBy('es.estimate_date')
+            // .addGroupBy('es.expire_date')
+            // .addGroupBy('es.id')  // Add es.id to GROUP BY
+            // .getRawOne();
 
         return query;
     }
