@@ -449,7 +449,8 @@ export class ProductService {
 
     async getAllproductDetails(dto: CommonReq): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.find({ where: { companyCode: dto.companyCode, unitCode: dto.unitCode } });
+            const product = await this.productRepository.find({ where: { companyCode: dto.companyCode, unitCode: dto.unitCode },relations:['staffId','subDealerId','branchId'] });
+           
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
