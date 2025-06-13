@@ -4,6 +4,7 @@ export class ClientSearchDto {
     branchName?: ClientStatusEnum;
     clientId?: string
     name?: string
+    userName?: string
     companyCode?: string;
     unitCode?: string
 }

@@ -11,6 +11,7 @@ export class ClientDto {
     state: string;
     clientPhoto?: string;
     clientId?: string;
+    userName?: string;
     voucherId?: number
     companyCode: string;
     unitCode: string
