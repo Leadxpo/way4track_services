@@ -10,6 +10,7 @@ export class ClientAdapter {
     convertDtoToEntity(dto: ClientDto): ClientEntity {
         const entity = new ClientEntity();
         entity.name = dto.name;
+        entity.userName = dto.userName;
         entity.phoneNumber = dto.phoneNumber;
         const branchEntity = new BranchEntity();
         branchEntity.id = dto.branch;
@@ -44,6 +45,7 @@ export class ClientAdapter {
                 client.name,
                 client.phoneNumber,
                 client.clientId,
+                client.userName,
                 client.clientPhoto,
                 client?.branch?.id,
                 client?.branch?.branchName,

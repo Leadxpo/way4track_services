@@ -39,6 +39,7 @@ export class ClientRepository extends Repository<ClientEntity> {
         const query = await this.createQueryBuilder('cl')
             .select([
                 'cl.client_id AS clientId',
+                'cl.user_name AS userName',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
                 'vr.payment_status AS paymentStatus',
@@ -88,6 +89,9 @@ export class ClientRepository extends Repository<ClientEntity> {
         }
         if (req.name) {
             query.andWhere('cl.name LIKE :name', { name: `%${req.name}%` });
+        }
+        if (req.userName) {
+            query.andWhere('cl.user_name LIKE :userName', { userName: `%${req.userName}%` });
         }
         if (req.branchName) {
             query.andWhere('br.name = :branchName', { branchName: req.branchName });

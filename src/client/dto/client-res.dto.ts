@@ -5,6 +5,7 @@ export class ClientResDto {
     name: string;
     phoneNumber: string;
     clientId: string;
+    userName: string;
     clientPhoto: string;
     branchId: number;
     branchName: string;
@@ -21,6 +22,7 @@ export class ClientResDto {
         name: string,
         phoneNumber: string,
         clientId: string,
+        userName: string,
         clientPhoto: string,
         branchId: number,
         branchName: string,
@@ -37,6 +39,7 @@ export class ClientResDto {
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.clientId = clientId;
+        this.userName = userName;
         this.clientPhoto = clientPhoto
         this.branchId = branchId;
         this.branchName = branchName;

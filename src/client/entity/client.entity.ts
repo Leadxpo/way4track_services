@@ -39,8 +39,8 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => ReviewEntity, (requestRaiseEntity) => requestRaiseEntity.clientId)
     review: ReviewEntity[];
 
-    // @Column({ name: 'dob', type: 'date', nullable: true })
-    // dob: string;
+    @Column({ name: 'user_name', type: 'varchar', length: 100, nullable: true })
+    userName: string;
 
     @Column({ name: 'tds', type: 'boolean', default: false, nullable: true })
     tds: boolean;

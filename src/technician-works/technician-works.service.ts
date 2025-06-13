@@ -245,9 +245,6 @@ export class TechnicianService {
 
             // Generate Technician ID
             newTechnician.technicianNumber = await this.generateTechNumber();
-            console.log(newTechnician, "newTechnician");
-
-            await this.repo.insert(newTechnician);
             const client = await this.clientRepo.findOne({ where: { phoneNumber: req.phoneNumber } })
             if (!client) {
                 const clientDto: ClientDto = {
@@ -261,6 +258,7 @@ export class TechnicianService {
                     companyCode: req.companyCode ?? "",
                     unitCode: req.unitCode ?? "",
                     hsnCode: "",
+                    userName:newTechnician.userName,
                     SACCode: "",
                     tds: false,
                     tcs: false,
@@ -269,7 +267,16 @@ export class TechnicianService {
                 };
 
                 try {
-                    await this.clientService.createClientDetails(clientDto);
+                   const rrr= await this.clientService.createClientDetails(clientDto);
+                   console.log("aaa :",rrr)
+                   console.log("rrr :",rrr.data)
+                   if (rrr.data.clientId === 'string') {
+                    newTechnician.clientId = rrr.data.clientId;
+                }
+                    console.log(newTechnician, "newTechnician");
+
+                    await this.repo.insert(newTechnician);
+        
                 } catch (notificationError) {
                     console.error(`client failed: ${notificationError.message}`, notificationError.stack);
                 }

@@ -193,7 +193,7 @@ export class TechnicianWorksEntity extends BaseEntity {
     serviceOrProduct: string;
 
     @Column({ name: 'user_name', type: 'varchar', length: 100, nullable: true })
-    userName: string;
+    userName: string; 
 
     @Column({ name: 'remark', type: 'json', nullable: true })
     remark: Remarks[]
