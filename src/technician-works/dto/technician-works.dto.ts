@@ -26,7 +26,8 @@ export class TechnicianWorksDto {
     endDate: Date;
     description: string;
     staffId: number; branchId: number; productId: number;
-    vendorId: number; clientId: number; voucherId: number;
+    vendorId: number;
+    clientId: number; voucherId: number;
     workId: number;
     companyCode: string;
     unitCode: string;
