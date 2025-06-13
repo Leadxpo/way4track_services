@@ -271,7 +271,7 @@ export class TechnicianService {
                    console.log("aaa",rrr.data);
                    console.log("bbb",rrr.data.id);
                    console.log("ccc",JSON.parse(rrr.data.ClientEntity));
-                    newTechnician.clientId =JSON.parse(rrr.data.ClientEntity.id);
+                    newTechnician.clientId =JSON.parse(rrr.data.id);
                     console.log(newTechnician, "newTechnician");
 
                     await this.repo.insert(newTechnician);
