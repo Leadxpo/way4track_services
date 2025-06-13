@@ -269,7 +269,7 @@ export class TechnicianService {
                 try {
                    const rrr= await this.clientService.createClientDetails(clientDto);
                    console.log("bbb",rrr.data.id);
-                    newTechnician.clientId =rrr.data.id;
+                    newTechnician.clientId =rrr.data.id; 
                     console.log(newTechnician, "newTechnician");
 
                     await this.repo.insert(newTechnician);
