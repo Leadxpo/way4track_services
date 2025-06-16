@@ -20,8 +20,15 @@ export class DeviceController {
     @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('handleDeviceDetails')
     async handleDeviceDetails(@Body() dto: DeviceDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
-        try {
+        try {          
             if (dto.id) dto.id = Number(dto.id);
+            if (dto.isRelay) dto.isRelay = Boolean(dto.isRelay);
+            if (dto.relayAmt) dto.relayAmt = Number(dto.relayAmt);
+            if (dto.isSubscription) dto.isSubscription = Boolean(dto.isSubscription);
+            if (dto.subscriptionMonthlyAmt) dto.subscriptionMonthlyAmt = Number(dto.subscriptionMonthlyAmt);
+            if (dto.subscriptionYearlyAmt) dto.subscriptionYearlyAmt = Number(dto.subscriptionYearlyAmt);
+            if (dto.isNetwork) dto.isNetwork = Boolean(dto.isNetwork);
+            if (dto.amount) dto.amount = Number(dto.amount);
             return await this.service.handleDeviceDetails(dto, photo);
         } catch (error) {
             return new CommonResponse(false, 500, 'Error saving Device details');
