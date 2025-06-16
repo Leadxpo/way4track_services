@@ -41,8 +41,11 @@ export class ProductAppService {
             console.log(`File uploaded to GCS: ${uniqueFileName}`);
             filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
-
-        return this.update(dto, filePath);
+if (dto.id) {
+    return this.update(dto, filePath);
+}else{
+    return this.create(dto, filePath);
+}
 
     }
 

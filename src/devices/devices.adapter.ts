@@ -14,7 +14,6 @@ export class DeviceAdapter {
         entity.model = dto.model;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        entity.amount = dto.amount
         // ✅ New fields
         entity.name = dto.name;
         entity.state = dto.state;
@@ -27,6 +26,7 @@ export class DeviceAdapter {
         entity.isNetwork = dto.isNetwork;
         entity.discount = dto.discount;
         entity.description = dto.description;
+        entity.amount = dto.amount
 
         return entity;
     }
