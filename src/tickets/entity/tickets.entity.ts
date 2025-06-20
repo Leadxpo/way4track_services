@@ -22,7 +22,7 @@ export class TicketsEntity {
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     date: Date;
 
-    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.tickets)
+    @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.tickets, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
