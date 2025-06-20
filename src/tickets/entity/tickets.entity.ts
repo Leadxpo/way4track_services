@@ -6,18 +6,7 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
-// export enum AddressingDepartment {
-//     CEO = 'CEO',
-//     HR = 'HR',
-//     Accountant = 'Accountant',
-//     Operator = 'Operator',
-//     WarehouseManager = 'Warehouse Manager',
-//     BranchManager = 'Branch Manager',
-//     SubDealer = 'Sub Dealer',
-//     Technician = 'Technician',
-//     SalesMan = 'Sales Man',
-//     CallCenter = 'Call Center',
-// }
+
 @Entity('tickets')
 export class TicketsEntity {
     @PrimaryGeneratedColumn()
@@ -45,14 +34,6 @@ export class TicketsEntity {
 
     @Column({ type: 'enum', enum: WorkStatusEnum, name: 'work_status', default: WorkStatusEnum.PENDING, nullable: true })
     workStatus: WorkStatusEnum;
-
-    // @Column({
-    //     name: 'addressing_department',
-    //     type: 'enum',
-    //     enum: AddressingDepartment,
-    //     default: AddressingDepartment.CEO
-    // })
-    // addressingDepartment: AddressingDepartment;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

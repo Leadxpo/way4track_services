@@ -27,6 +27,8 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.requirement_details as requirementDetails',
                 'sa.address as address',
                 'sa.service as service',
+                'sa.paid_date as paidDate',
+                'sa.paid_amount as paidAmount',
                 'sa.visiting_number as visitingNumber',
                 'sa.leadStatus as leadStatus',
                 'branch.name AS branchName',
@@ -38,7 +40,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'allocate_st.phone_number AS allocatedStaffPhoneNumber'  // Renamed to avoid duplicate alias
             ])
             .leftJoin(StaffEntity, 'staff', 'sa.staff_id = staff.id')  // Use leftJoin instead of leftJoinAndSelect
-            .leftJoin(StaffEntity, 'allocate_st', 'sa.allocate_staff_id= staff.id')  // Use leftJoin instead of leftJoinAndSelect
+            .leftJoin(StaffEntity, 'allocate_st', 'sa.allocate_staff_id= allocate_st.id')  // Use leftJoin instead of leftJoinAndSelect
             .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
             .where('sa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('sa.unit_code = :unitCode', { unitCode: req.unitCode });

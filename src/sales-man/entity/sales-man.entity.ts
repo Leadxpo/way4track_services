@@ -55,6 +55,12 @@ export class SalesWorksEntity extends BaseEntity {
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
+    @Column({ name: 'paid_date', type: 'timestamp', nullable: true })
+    paidDate: Date;
+
+    @Column({ name: 'paid_amount', type: 'decimal', precision: 10, scale: 2, nullable: true })
+    paidAmount: number;
+        
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 

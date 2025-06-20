@@ -60,7 +60,6 @@ export class TicketsAdapter {
                 entity.branch?.id || 0,
                 entity.branch?.branchName || '',
                 entity.ticketNumber,
-                // entity.addressingDepartment,
                 entity.companyCode,
                 entity.unitCode,
                 entity.workStatus,

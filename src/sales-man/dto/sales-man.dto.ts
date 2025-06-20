@@ -18,12 +18,14 @@ export class SalesWorksDto {
     date?: Date;
     estimateDate?: Date;
     staffId?: number; // Can be changed to `number` if it's an ID reference
-    allocateStaffId?: number; // Can be changed to `number` if it's an ID reference
+    allocateStaffId?: number; 
     companyCode: string;
     leadStatus:LeadStatusEnum
     unitCode: string;
     createdAt?: Date;
     updatedAt?: Date;
+    paidDate?:Date;
+    paidAmount?: number; 
     name?: string;
     phoneNumber?: string;
     address?: string;

@@ -123,13 +123,14 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'ticket.ticket_number AS ticketNumber',
                 'ticket.problem AS problem',
                 'ticket.date AS date',
-                // 'ticket.addressing_department AS addressingDepartment',
-                'ticket.company_code AS companyCode',
-                'ticket.unit_code AS unitCode',
+                'branch.id AS branchId',
                 'branch.name AS branchName',
+                'staff.id AS staffId',
                 'staff.name AS staffName',
                 'sb.sub_dealer_id AS subDealerId',
                 'sb.name AS subDealerName',
+                'ticket.company_code AS companyCode',
+                'ticket.unit_code AS unitCode',
             ])
             .leftJoin('ticket.branch', 'branch')
             .leftJoin('ticket.staff', 'staff')

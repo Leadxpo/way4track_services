@@ -17,6 +17,8 @@ export class SalesWorksAdapter {
             unitCode: entity.unitCode,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
+            paidDate: entity.paidDate,
+            paidAmount: entity.paidAmount,
             name: entity.name,
             phoneNumber: entity.phoneNumber,
             address: entity.address,
@@ -58,6 +60,8 @@ export class SalesWorksAdapter {
         entity.unitCode = dto.unitCode;
         entity.createdAt = dto.createdAt;
         entity.updatedAt = dto.updatedAt;
+        entity.paidDate = dto.paidDate;
+        entity.paidAmount = dto.paidAmount;
         entity.name = dto.name;
         entity.phoneNumber = dto.phoneNumber;
         entity.address = dto.address;
