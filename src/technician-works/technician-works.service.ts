@@ -277,6 +277,12 @@ export class TechnicianService {
                 } catch (notificationError) {
                     console.error(`client failed: ${notificationError.message}`, notificationError.stack);
                 }
+            }else{
+                try {
+                     await this.repo.insert(newTechnician);
+                 } catch (notificationError) {
+                     console.error(`client failed: ${notificationError.message}`, notificationError.stack);
+                 }
             }
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
