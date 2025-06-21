@@ -15,7 +15,7 @@ export class AppointmentAdapter {
         entity.appointmentType = dto.appointmentType;
         entity.name = dto.name;
         entity.date = dto.date
-        entity.slot = dto.slot + ':00';
+        entity.slot = dto.slot;
         entity.period = dto.period;
         entity.description = dto.description;
         entity.companyCode = dto.companyCode

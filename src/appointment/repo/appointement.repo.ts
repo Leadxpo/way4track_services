@@ -37,7 +37,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
     
         // Execute the groupedBranches query
         const result = await groupedBranches.groupBy('branch.name').getRawMany();
-    
+     
         const appointments = this.createQueryBuilder('appointment')
             .select([
                 'appointment.id AS appointment_id',
