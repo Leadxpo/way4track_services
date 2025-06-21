@@ -50,6 +50,7 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
                 'branch.name AS branchName',
                 'appointment.appointment_type AS appointmentType',
                 'appointment.time AS slot',
+                'appointment.date AS date',
                 'appointment.description AS description',
                 'appointment.status AS status',
                 'staff.id AS staffId',
