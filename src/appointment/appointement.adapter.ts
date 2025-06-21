@@ -17,6 +17,7 @@ export class AppointmentAdapter {
         entity.date = dto.date
         entity.slot = dto.slot;
         entity.period = dto.period;
+        entity.status = dto.status;
         entity.description = dto.description;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
