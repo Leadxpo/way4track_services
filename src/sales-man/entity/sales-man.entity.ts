@@ -24,7 +24,7 @@ export class SalesWorksEntity extends BaseEntity {
     id: number;
 
     @Column({ name: 'visiting_card', type: 'varchar', length: 255, nullable: true })
-    visitingCard: string;
+    visitingCard: string; 
 
     @Column({ name: 'client_photo', type: 'varchar', length: 255, nullable: true })
     clientPhoto: string;

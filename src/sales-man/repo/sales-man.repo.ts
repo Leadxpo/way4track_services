@@ -31,6 +31,8 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.paid_amount as paidAmount',
                 'sa.visiting_number as visitingNumber',
                 'sa.leadStatus as leadStatus',
+                'sa.visiting_card as visitingCard',
+                'sa.client_photo as clientPhoto',
                 'branch.name AS branchName',
                 'sa.staff_id AS staffId',
                 'staff.name AS staffName',

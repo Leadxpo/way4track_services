@@ -58,7 +58,6 @@ export class PayrollService {
                 year
             },
         });
-        console.log(branch, "}}}}}}}}}}|||||")
 
         if (!branch) {
             return new CommonResponse(false, 35416, "There Is No List");
@@ -81,7 +80,6 @@ export class PayrollService {
                 year
             },
         });
-        console.log(branch, "||||||||||||||||||")
         if (!branch) {
             return new CommonResponse(false, 35416, "There Is No List");
         } else {

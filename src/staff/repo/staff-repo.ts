@@ -140,14 +140,14 @@ export class StaffRepository extends Repository<StaffEntity> {
 
             let lateDeductions = totalLateHours * perHourSalary || 0;
 
-            const grossSalary = Math.round(actualEarnedSalary + (isNaN(finalOTAmount) ? 0 : finalOTAmount));
+            const grossSalary = Math.round(actualEarnedSalary + (isNaN(finalOTAmount) ? 0 : finalOTAmount)+extraHalfSalary);
             const ESIC_Employee = Math.round(grossSalary * 0.0075) || 0;
             const ESIC_Employer = Math.round(grossSalary * 0.0325) || 0;
-            const PFDayWage = Math.round(actualSalary * 0.4) || 0;
-            const PF_Employee = Math.round(PFDayWage * 0.12) || 0;
+            const PFDayWage = Math.round(actualEarnedSalary * 0.4) || 0;
+            const PF_Employee = Math.round( PFDayWage* 0.12) || 0;
             const PF_Employer1 = Math.round(PFDayWage * 0.0833) || 0;
             const PF_Employer2 = Math.round(PFDayWage * 0.0367) || 0;
-            const updatedNetSalary = grossSalary - lateDeductions - PF_Employee + extraHalfSalary;
+            const updatedNetSalary = grossSalary - lateDeductions - PF_Employee;
             return {
                 staffId: record.staffId,
                 staffName: record.staffName,
@@ -168,6 +168,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 totalOTHours: totalOTHoursWorked,
                 OTAmount: isNaN(finalOTAmount) ? 0 : finalOTAmount,
                 lateDeductions: isNaN(lateDeductions) ? 0 : lateDeductions,
+                actualEarnedSalary,
                 grossSalary: isNaN(grossSalary) ? 0 : grossSalary,
                 ESIC_Employee,
                 ESIC_Employer,
@@ -444,7 +445,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                     `SUM(CASE WHEN LOWER(staff.designation) IN ('technician', 'sr. technician') THEN 1 ELSE 0 END) AS totalTechnicians`,
                     `SUM(CASE WHEN LOWER(staff.designation) = 'sales executive' THEN 1 ELSE 0 END) AS totalSales`,
                     `SUM(CASE WHEN LOWER(staff.designation) NOT IN ('technician','sr. technician', 'sales executive') THEN 1 ELSE 0 END) AS totalNonTechnicians`,
-                    ])
+                ])
                 .leftJoin(BranchEntity, 'branch', 'branch.id = staff.branch_id')
                 .leftJoinAndSelect(StaffEntity, 'branchManager', 'branchManager.branch_id = branch.id AND LOWER(staff.designation) = :managerDesignation', { managerDesignation: 'branch manager' })
                 .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
