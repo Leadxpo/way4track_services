@@ -33,11 +33,8 @@ export class VendorEntity {
   // @Column({ name: 'starting_date', type: 'date', nullable: true })
   // startingDate: Date;
 
-  @Column({ name: 'email', type: 'varchar', length: 150, nullable: true, unique: true })
+  @Column({ name: 'email', type: 'varchar', length: 150, nullable: true})
   emailId: string;
-
-  // @Column({ name: 'aadhar_number', type: 'varchar', length: 200, unique: true, nullable: true })
-  // aadharNumber: string;
 
   @Column({ name: 'address', type: 'text', nullable: true })
   address: string;
