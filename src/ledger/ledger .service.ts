@@ -78,7 +78,7 @@ export class LedgerService {
     async getLedgerDetailsById(dto: LedgerDto): Promise<CommonResponse> {
         try {
             const ledger = await this.ledgerRepository.findOne({
-                where: { id: dto.id },relations:['voucher']
+                where: { id: dto.id },relations:['voucher','groupId']
             });
 
             if (!ledger) {

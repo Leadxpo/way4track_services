@@ -72,7 +72,7 @@ export class LedgerAdapter {
                 id: v.id,
                 amount: v.amount,
                 createdAt: v.createdAt.toISOString(),
-                branchName: v.branchId.branchName,
+                branchName: v.branchId,
                 paymentType:v.paymentType,
                 voucherType:v.voucherType,
             })) || []

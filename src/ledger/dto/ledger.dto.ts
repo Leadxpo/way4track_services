@@ -2,6 +2,7 @@
 import { PaymentType } from "src/asserts/enum/payment-type.enum";
 import { RegistrationType } from "../entity/ledger.entity";
 import { VoucherTypeEnum } from "src/voucher/enum/voucher-type-enum";
+import { BranchEntity } from "src/branch/entity/branch.entity";
 
 
 export class LedgerDto {
@@ -28,7 +29,7 @@ export interface VoucherDto {
     id: number;
     amount: number;
     createdAt: string;
-    branchName: string;
+    branchName: BranchEntity;
     paymentType: PaymentType;
     voucherType: VoucherTypeEnum;
 
