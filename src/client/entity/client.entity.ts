@@ -48,7 +48,7 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'tcs', type: 'boolean', default: false, nullable: true })
     tcs: boolean;
 
-    @Column({ name: 'email', type: 'varchar', length: 150, unique: true, nullable: true })
+    @Column({ name: 'email', type: 'varchar', length: 150, nullable: true })
     email: string;
 
     @Column({ name: 'GST_number', type: 'varchar', length: 150, nullable: true })
