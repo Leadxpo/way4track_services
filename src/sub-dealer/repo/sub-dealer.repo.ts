@@ -27,9 +27,7 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
                 'sb.name AS name',
                 'sb.gst_number AS gstNumber',
                 'sb.starting_date AS joiningDate',
-                'vr.payment_status AS paymentStatus',
-                'vr.amount AS amount',
-                'vr.voucher_id as voucherId',
+                'sb.branch_id AS branch',
             ])
             .leftJoin('sb.voucherId', 'vr')
             .where(`sb.company_code = "${req.companyCode}"`)
