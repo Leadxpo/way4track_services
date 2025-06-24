@@ -34,6 +34,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.visiting_card as visitingCard',
                 'sa.client_photo as clientPhoto',
                 'branch.name AS branchName',
+                'branch.id AS branchId',
                 'sa.staff_id AS staffId',
                 'staff.name AS staffName',
                 'staff.phone_number AS staffPhoneNumber',  // Renamed to avoid duplicate alias
