@@ -24,7 +24,7 @@ export class ClientEntity extends BaseEntity {
     @Column({ name: 'name', type: 'varchar', length: 100, nullable: true })
     name: string;
 
-    @Column({ name: 'phone_number', type: 'varchar', length: 15, unique: true })
+    @Column({ name: 'phone_number', type: 'varchar', length: 15, unique: true ,nullable: true})
     phoneNumber: string;
 
     @Column({ name: 'client_id', type: 'varchar', length: 50, unique: true })

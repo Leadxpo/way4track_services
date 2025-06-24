@@ -369,8 +369,6 @@ export class ProductService {
             if (!designationEntity) {
                 throw new Error(`productType with ID '${productDto.productTypeId}' not found.`);
             }
-            console.log(designationEntity, 'designationEntity');
-
             productDto.productType = designationEntity.name; // Store name
             productDto.productTypeId = designationEntity;
             productDto.productName = designationEntity.name // Store relation
@@ -383,7 +381,7 @@ export class ProductService {
             if (!designationEntity) {
                 throw new Error(`branch with ID '${productDto.branchId}' not found.`);
             }
-            console.log(designationEntity, 'bramch');
+
         }
         if (productDto.staffId) {
             designationEntity = await this.staffRepo.findOne({
@@ -403,7 +401,6 @@ export class ProductService {
             if (!designationEntity) {
                 throw new Error(`subdealer with ID '${productDto.subDealerId}' not found.`);
             }
-            console.log(designationEntity, 'subdealer');
         }
 
 
@@ -415,7 +412,7 @@ export class ProductService {
             productType: productDto.productType,
             productName: productDto.productName
         }));
-        console.log(finalProductData, "/////")
+
         await this.productRepository.save(finalProductData);
         return new CommonResponse(true, 201, 'Products saved successfully');
     }

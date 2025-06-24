@@ -51,15 +51,12 @@ export class ClientService {
                 photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
             }
 
-            // const existingStaff = await this.clientRepository.findOne({
-            //     where: [{ id: dto.id }, { clientId: dto.clientId }],
-            // });
             if (dto.id || (dto.clientId && dto.clientId.trim() !== '')) {
-                console.log(dto, "updateClientDetails{{{{{{{{{{{{{")
+
                 return await this.updateClientDetails(dto, photoPath);
 
             } else {
-                console.log(dto, "createClientDetails{{{{{{{{{{{{{")
+
                 // Create a new client
                 return await this.createClientDetails(dto, photoPath);
             }
@@ -71,7 +68,6 @@ export class ClientService {
 
     async createClientDetails(dto: ClientDto, photoPath?: string | null): Promise<CommonResponse> {
         try {
-            console.log(dto, "KKKKKKKKKKKKKK")
             const entity = this.clientAdapter.convertDtoToEntity(dto);
             entity.clientId = `CLI-${(await this.clientRepository.count() + 1).toString().padStart(5, '0')}`;
 
