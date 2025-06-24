@@ -42,11 +42,6 @@ export class SubDealerRepository extends Repository<SubDealerEntity> {
             query.andWhere('sb.starting_date <= :toDate', { toDate: req.toDate });
         }
 
-        // Add conditional filtering based on paymentStatus
-        if (req.paymentStatus) {
-            query.andWhere('vr.payment_status = :paymentStatus', { paymentStatus: req.paymentStatus });
-        }
-
         // Execute the query and return the results
         const result = await query.getRawMany();
         return result;
