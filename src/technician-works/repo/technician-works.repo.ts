@@ -648,7 +648,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.subDealerId) {
             query.andWhere(`sb.sub_dealer_id=:subDealerId`, { subDealerId: req.subDealerId })
         }
-        query.orderBy('wa.start_date', 'ASC')
+        query.orderBy('wa.created_at', 'DESC')
         return await query.getRawMany();
     }
 

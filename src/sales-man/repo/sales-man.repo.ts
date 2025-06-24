@@ -22,7 +22,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
                 'sa.id as id',
                 'sa.date as date',
                 'sa.estimate_date as estimateDate',
-                'sa.name as name', 
+                'sa.name as name',
                 'sa.phone_number as phoneNumber',  // Sales phone number
                 'sa.requirement_details as requirementDetails',
                 'sa.address as address',
@@ -59,7 +59,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
         if (req.name) {
             query.andWhere('LOWER(sa.name) LIKE LOWER(:name)', { name: `%${req.name}%` });
         }
-
+        query.orderBy('wa.created_at', 'DESC')
         return query.getRawMany(); // Fetch sales details
     }
 
