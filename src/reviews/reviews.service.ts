@@ -49,7 +49,6 @@ export class ReviewService {
     async getReviewDetails(): Promise<CommonResponse> {
         try {
             const data = await this.repo.find({relations:['clientId','deviceId','orderId']});
-            console.log(data,"::::::::::::::::")
             return new CommonResponse(true, 200, 'Review list fetched', data);
         } catch (error) {
             throw new ErrorResponse(500, error.message);

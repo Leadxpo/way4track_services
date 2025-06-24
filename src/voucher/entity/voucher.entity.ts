@@ -73,9 +73,6 @@ export class VoucherEntity {
     @JoinColumn({ name: 'ledger_id' })
     ledgerId: LedgerEntity;
 
-    // @Column({ type: 'enum', enum: RoleEnum, name: 'role', default: RoleEnum.CLIENT, nullable: true })
-    // role: RoleEnum;
-
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;
 

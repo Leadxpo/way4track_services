@@ -32,13 +32,7 @@ export class VoucherDto {
     SGST?: number;
     CGST?: number;
     IGST?: number;
-
     subDealerId?: number;
-    // vendorId?: number;
-    // initialPayment?: number;
-    // numberOfEmi?: number;
-    // emiNumber?: number;
-    // emiAmount?: number;
     ifscCode?: string;
     bankAccountNumber?: string;
     paymentStatus?: PaymentStatus;
