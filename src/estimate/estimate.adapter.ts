@@ -56,7 +56,8 @@ export class EstimateAdapter {
                     quantity: productDetail.quantity,
                     costPerUnit: productDetail.costPerUnit,
                     totalCost: productDetail.totalCost,
-                    hsnCode: productDetail.hsnCode
+                    hsnCode: productDetail.hsnCode,
+                    description: productDetail.description
                 }))
                 : [];
         }
@@ -114,7 +115,8 @@ export class EstimateAdapter {
                     quantity: product.quantity,
                     costPerUnit: product.costPerUnit,
                     totalCost: product.totalCost,
-                    hsnCode: product.hsnCode
+                    hsnCode: product.hsnCode,
+                    description:product.description
                 })) ?? [],
                 entity.estimateId,
                 entity.invoiceId,

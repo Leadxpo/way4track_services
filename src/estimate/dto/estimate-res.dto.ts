@@ -42,6 +42,7 @@ export class EstimateResDto {
     costPerUnit: number;
     totalCost: number;
     hsnCode: string;
+    description:string;
   }[];
   estimateId?: string;
   invoiceId?: string;
@@ -88,6 +89,7 @@ export class EstimateResDto {
       costPerUnit: number;
       totalCost: number;
       hsnCode: string;
+      description:string;
     }[],
     estimateId?: string,
     invoiceId?: string,

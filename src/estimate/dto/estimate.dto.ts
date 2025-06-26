@@ -40,4 +40,5 @@ export class ProductDetailDto {
     costPerUnit: number;
     totalCost: number;
     hsnCode: string;
+    description:string;
 }

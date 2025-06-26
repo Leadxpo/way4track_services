@@ -85,6 +85,7 @@ export class EstimateEntity extends BaseEntity {
         costPerUnit: number;
         totalCost: number;
         hsnCode: string;
+        description:string;
     }[];
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
