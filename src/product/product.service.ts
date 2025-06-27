@@ -236,8 +236,6 @@ export class ProductService {
                 } else {
                     results.push(currentRow);
                 }
-
-                console.log(results, ">>>>>>>>>")
             }
             return results;
 
@@ -413,7 +411,10 @@ export class ProductService {
             ...excelRow,
             productTypeId: productDto.productTypeId,
             productType: productDto.productType,
-            productName: productDto.productName
+            productName: productDto.productName,
+            companyCode: productDto.companyCode,
+            unitCode: productDto.unitCode,
+
         }));
 
         await this.productRepository.save(finalProductData);
