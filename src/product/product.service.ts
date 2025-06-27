@@ -206,6 +206,7 @@ export class ProductService {
                     if (branchId && (!existing.branchId || existing.branchId.id !== branchId)) {
                         updateData.branchId = { id: branchId };
                         updateData.status = 'assigned'
+                        updateData.location = 'branch'
                         updateData.assignTime = assignTime
                         hasChanged = true;
                     }
@@ -213,6 +214,7 @@ export class ProductService {
                     if (subDealerId && (!existing.subDealerId || existing.subDealerId.id !== subDealerId)) {
                         updateData.subDealerId = { id: subDealerId };
                         updateData.status = 'assigned'
+                        updateData.location = 'subdealer'
                         updateData.assignTime = assignTime
                         hasChanged = true;
                     }
@@ -220,6 +222,7 @@ export class ProductService {
                     if (staffId && (!existing.staffId || existing.staffId.id !== staffId)) {
                         updateData.staffId = { id: staffId };
                         updateData.status = 'inHand'
+                        updateData.location = 'inHand'
                         hasChanged = true;
                     }
 
@@ -405,7 +408,7 @@ export class ProductService {
 
 
         const jsonData = await this.bulkUploadProducts(file, productDto?.subDealerId, productDto?.staffId, productDto?.branchId, productDto.assignTime);
-        console.log(jsonData, "jsonData")
+
         const finalProductData = jsonData.map((excelRow) => ({
             ...excelRow,
             productTypeId: productDto.productTypeId,

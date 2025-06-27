@@ -40,10 +40,10 @@ export class ProductDto {
   productStatus?: ProductStatusEnum
   productType?: string
   branchId?: number
+  location?:string
   subDealerId?: number
   staffId?: number
   assignTime?: Date;
-
 }
 
 
