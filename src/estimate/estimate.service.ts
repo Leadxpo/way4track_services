@@ -118,7 +118,7 @@ export class EstimateService {
 
             existingEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100;
             existingEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100;
-            console.log(existingEstimate)
+
             await this.estimateRepository.save(existingEstimate);
 
             return new CommonResponse(true, 200, 'Estimate details updated successfully');

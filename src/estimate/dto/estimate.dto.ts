@@ -21,14 +21,12 @@ export class EstimateDto {
     SCST?: number;
     CGST?: number;
     quantity: number;  // The total quantity for all products
-    // hsnCode?: string;
     productDetails?: ProductDetailDto[];
     cgstPercentage: number; // For temporary use
     scstPercentage: number; // For temporary use
     convertToInvoice: boolean;
     estimatePdfUrl: string;
     invoicePdfUrl: string
-    // Modified to use ProductDetailDto
 }
 
 
