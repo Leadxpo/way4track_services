@@ -59,7 +59,7 @@ export class SalesworkRepository extends Repository<SalesWorksEntity> {
         if (req.name) {
             query.andWhere('LOWER(sa.name) LIKE LOWER(:name)', { name: `%${req.name}%` });
         }
-        query.orderBy('wa.created_at', 'DESC')
+        query.orderBy('sa.created_at', 'DESC')
         return query.getRawMany(); // Fetch sales details
     }
 
