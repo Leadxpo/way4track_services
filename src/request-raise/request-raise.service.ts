@@ -9,19 +9,31 @@ import { NotificationEnum } from 'src/notifications/entity/notification.entity';
 import { NotificationService } from 'src/notifications/notification.service';
 import { RequestRaiseEntity } from './entity/request-raise.entity';
 import { CommonReq } from 'src/models/common-req';
-import { ClientEntity } from 'src/client/entity/client.entity';
+import { Storage } from '@google-cloud/storage';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 @Injectable()
 export class RequestRaiseService {
+    private storage: Storage;
+    private bucketName: string;
+
     constructor(
         private readonly requestAdapter: RequestRaiseAdapter,
         private readonly requestRepository: RequestRaiseRepository,
         private readonly notificationService: NotificationService
-    ) { }
+    ) {
+        this.storage = new Storage({
+            projectId: process.env.GCLOUD_PROJECT_ID ||
+                'sharontelematics-1530044111318',
+            keyFilename: process.env.GCLOUD_KEY_FILE || 'sharontelematics-1530044111318-0b877bc770fc.json',
+        });
 
-    async updateRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
+        this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
+    }
+
+    async updateRequestDetails(dto: RequestRaiseDto,filePath: string | null): Promise<CommonResponse> {
+        
         try {
             const existingRequest = await this.requestRepository.findOne({
                 where: { id: dto.id, requestId: dto.requestId }
@@ -30,10 +42,28 @@ export class RequestRaiseService {
             if (!existingRequest) {
                 return new CommonResponse(false, 4002, 'Request not found for the provided id.');
             }
+            if (filePath && existingRequest.image) {
+                const existingFilePath = existingRequest.image
+                    .replace(`https://storage.googleapis.com/${this.bucketName}/`, '')
+                    .trim(); // 🧼 Clean extra spaces
 
+                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                try {
+                    const [exists] = await file.exists(); // ✅ Check existence
+                    if (exists) {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } else {
+                        console.warn(`File not found in GCS, skipping delete: ${existingFilePath}`);
+                    }
+                } catch (error) {
+                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                }
+            }
             // Convert DTO to entity and merge the values
             const updatedEntity = this.requestAdapter.convertDtoToEntity(dto);
-
+            if (filePath) updatedEntity.image = filePath;
             // Manually assign updated fields to the existing entity
             Object.assign(existingRequest, updatedEntity);
 
@@ -53,7 +83,7 @@ export class RequestRaiseService {
     }
 
 
-    async createRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
+    async createRequestDetails(dto: RequestRaiseDto,filePath: string | null): Promise<CommonResponse> {
         let successResponse: CommonResponse;
         let entity: RequestRaiseEntity;
         try {
@@ -68,7 +98,9 @@ export class RequestRaiseService {
 
             const nextId = (lastRequest.max ?? 0) + 1;
             entity.requestId = `RR-${nextId.toString().padStart(5, '0')}`;
-
+            if (filePath) {
+                entity.image = filePath;
+            }
             const insertResult = await this.requestRepository.insert(entity);
 
             if (!insertResult.identifiers.length) {
@@ -94,13 +126,28 @@ export class RequestRaiseService {
 
 
 
-    async handleRequestDetails(dto: RequestRaiseDto): Promise<CommonResponse> {
+    async handleRequestDetails(dto: RequestRaiseDto,photo?: Express.Multer.File): Promise<CommonResponse> {
+        let filePath: string | null = null;
+        if (photo) {
+            const bucket = this.storage.bucket(this.bucketName);
+            const uniqueFileName = `request/${Date.now()}-${photo.originalname}`;
+            const file = bucket.file(uniqueFileName);
+
+            await file.save(photo.buffer, {
+                contentType: photo.mimetype,
+                resumable: false,
+            });
+
+            console.log(`File uploaded to GCS: ${uniqueFileName}`);
+            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+
         if (dto.id) {
             // Update if id or requestId is present
-            return await this.updateRequestDetails(dto);
+            return await this.updateRequestDetails(dto,filePath);
         } else {
             // Create if neither id nor requestId is present
-            return await this.createRequestDetails(dto);
+            return await this.createRequestDetails(dto,filePath);
         }
     }
 

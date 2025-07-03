@@ -25,6 +25,9 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'request_type', type: 'enum', enum: RequestType, default: RequestType.money })
     requestType: RequestType
 
+    @Column({ name: 'image', type: 'varchar', nullable: true })
+    image: string;
+  
     @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.pending })
     status: ClientStatusEnum
 

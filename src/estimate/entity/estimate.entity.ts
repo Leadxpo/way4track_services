@@ -9,7 +9,8 @@ import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGe
 
 export enum GSTORTDSEnum {
     GST = "GST",
-    TDS = "TDS"
+    TDS = "TDS",
+    IGST = "IGST"
 }
 @Entity('estimates')
 export class EstimateEntity extends BaseEntity {
@@ -99,7 +100,7 @@ export class EstimateEntity extends BaseEntity {
 
     @Column({ name: 'status', type: 'enum', nullable: true, enum: ClientStatusEnum })
     status: ClientStatusEnum;
-
+    
     @Column({ name: 'scst', type: 'float', nullable: true })
     SCST: number;
 

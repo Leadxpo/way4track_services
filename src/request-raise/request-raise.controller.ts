@@ -1,21 +1,35 @@
-import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, Put,    UploadedFiles,
+    UseInterceptors,
+    UploadedFile,
+ } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
 import { RequestRaiseIdDto } from './dto/request-raise-id.dto';
 import { RequestRaiseDto } from './dto/request-raise.dto';
 import { RequestRaiseService } from './request-raise.service';
 import { CommonReq } from 'src/models/common-req';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
+
+const multerOptions = {
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 1000000000,
+    },
+};
 
 @Controller('requests')
 export class RequestRaiseController {
     constructor(private readonly requestService: RequestRaiseService) { }
-
+    @UseInterceptors(FileInterceptor('photo', multerOptions))
     @Post('handleRequestDetails')
-    async handleRequestDetails(@Body() dto: RequestRaiseDto): Promise<CommonResponse> {
+    async handleRequestDetails(@Body() dto: RequestRaiseDto,
+    @UploadedFile() photo?: Express.Multer.File,
+): Promise<CommonResponse> {
         try {
             if (dto.id) {
                 dto.id = Number(dto.id);
             }
-            return await this.requestService.handleRequestDetails(dto);
+            return await this.requestService.handleRequestDetails(dto,photo);
         } catch (error) {
             console.error('Error in save request details in service:', error);
             return new CommonResponse(false, 500, 'Error saving request details');

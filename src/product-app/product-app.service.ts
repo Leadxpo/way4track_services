@@ -101,10 +101,11 @@ if (dto.id) {
             throw new ErrorResponse(500, error.message);
         }
     }
+    
     async update(dto: ProductAppDto, filePath: string | null): Promise<CommonResponse> {
         try {
             const existing = await this.repo.findOne({ where: { id: dto.id } });
-            console.log(existing, "?????????");
+
             if (!existing) throw new Error('app not found');
             if (filePath && existing.image) {
                 const existingFilePath = existing.image
@@ -125,8 +126,6 @@ if (dto.id) {
                     console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
-
-
             const updated = this.adapter.toEntity(dto);
             if (filePath) updated.image = filePath;
             Object.assign(existing, updated);

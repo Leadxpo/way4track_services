@@ -18,7 +18,7 @@ const multerOptions = {
         fileSize: 1000000000,
     },
 };
-@Controller('product-apps')
+@Controller('product-apps') 
 export class ProductAppController {
     constructor(private readonly service: ProductAppService) { }
 
