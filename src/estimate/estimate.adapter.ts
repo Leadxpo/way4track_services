@@ -14,6 +14,8 @@ export class EstimateAdapter {
         entity.id = dto.id;
         entity.buildingAddress = dto.buildingAddress;
         entity.shippingAddress = dto.shippingAddress;
+        entity.taxableState = dto.taxableState;
+        entity.supplyState = dto.supplyState;
         entity.estimateDate = dto.estimateDate;
         entity.expireDate = dto.expireDate;
         entity.productOrService = dto.productOrService;
@@ -101,6 +103,8 @@ export class EstimateAdapter {
                 entity.accountId,
                 entity.buildingAddress,
                 entity.shippingAddress,
+                entity.taxableState,
+                entity.supplyState,
                 entity.estimateDate,
                 entity.expireDate,
                 entity.productOrService,

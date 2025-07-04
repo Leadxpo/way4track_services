@@ -53,6 +53,12 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'varchar', length: 100, name: 'product_or_service', nullable: true })
     productOrService: string;
 
+    @Column({ type: 'varchar', length: 200, name: 'taxable_state', nullable: true })
+    taxableState: string;
+
+    @Column({ type: 'varchar', length: 200, name: 'supply_state', nullable: true })
+    supplyState: string;
+
     @Column({ type: 'text',  name: 'description', nullable: true })
     description: string;
 

@@ -7,6 +7,8 @@ export class EstimateDto {
     vendorId?: number;
     buildingAddress: string;
     shippingAddress: string;
+    taxableState: string;
+    supplyState: string;
     estimateDate: Date;
     accountId:string;
     expireDate: string;

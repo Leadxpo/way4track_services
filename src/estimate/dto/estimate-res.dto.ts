@@ -27,6 +27,8 @@ export class EstimateResDto {
   accountId: string;
   buildingAddress: string;
   shippingAddress: string;
+  taxableState: string;
+  supplyState: string;
   estimateDate: Date;
   expireDate: string;
   productOrService: string;
@@ -74,6 +76,8 @@ export class EstimateResDto {
     accountId: string,
     buildingAddress: string,
     shippingAddress: string,
+    taxableState: string,
+    supplyState: string,
     estimateDate: Date,
     expireDate: string,
     productOrService: string,
@@ -120,6 +124,8 @@ export class EstimateResDto {
     this.accountId = accountId;
     this.buildingAddress = buildingAddress;
     this.shippingAddress = shippingAddress;
+    this.taxableState = taxableState;
+    this.supplyState = supplyState;
     this.estimateDate = estimateDate;
     this.expireDate = expireDate;
     this.productOrService = productOrService;
