@@ -167,10 +167,6 @@ export class GetStaffResDto {
         this.bloodGroup = bloodGroup;
         this.joiningDate = joiningDate;
         this.beforeExperience = beforeExperience;
-        // this.previousCompany = previousCompany;
-        // this.previousDesignation = previousDesignation;
-        // this.totalExperience = totalExperience;
-        // this.previousSalary = previousSalary;
         this.bankName = bankName;
         this.accountNumber = accountNumber;
         this.ifscCode = ifscCode;
@@ -181,7 +177,6 @@ export class GetStaffResDto {
         this.department = department;
         this.monthlySalary = monthlySalary;
         this.salaryDate = salaryDate;
-        // this.salaryStatus = salaryStatus;
         this.bikeAllocation = bikeAllocation;
         this.vehiclePhoto = vehiclePhoto;
         this.bikeNumber = bikeNumber;

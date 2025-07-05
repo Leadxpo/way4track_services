@@ -3,6 +3,8 @@ export class ProductIdDto {
     companyCode: string;
     unitCode: string
     productName?: string
+    imeiNumber?: string
+    simNumber?: string
     productType?: string
     status: string;
     branchName?: string
