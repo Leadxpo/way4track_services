@@ -26,7 +26,7 @@ export class ProductEntity extends BaseEntity {
   @Column({ name: 'device_model', type: 'varchar', length: 50, nullable: true })
   deviceModel: string;
 
-  @Column({ name: 'in_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP'})
+  @Column({ name: 'in_date', type: 'datetime', default: () => 'CURRENT_TIMESTAMP'})
   inDate: Date;
 
   @Column({ name: 'imei_number', type: 'varchar', length: 20, nullable: true })

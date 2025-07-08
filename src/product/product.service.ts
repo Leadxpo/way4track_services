@@ -44,6 +44,8 @@ export class ProductService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
+
+
     async bulkUploadProducts(
         file: Express.Multer.File,
         subDealerId?: number,
@@ -51,19 +53,19 @@ export class ProductService {
         branchId?: number,
         assignTime?: Date
     ): Promise<any[]> {
-        console.log(file, "+++++++");
-
         const getCellValue = (cell: ExcelJS.Cell) => {
             if (cell.value === null || cell.value === undefined) return null;
             if (typeof cell.value === 'object') return (cell.value as any).text || cell.value.toString();
             return cell.value.toString();
         };
 
-        const parseDate = (dateString: string) => {
-            const parsedDate = new Date(dateString);
-            return isNaN(parsedDate.getTime()) ? null : parsedDate;
-        };
-
+        const parseDate = (dateString: string | undefined | null): Date => {
+            const parsed = new Date(dateString || '');
+            return isNaN(parsed.getTime()) || parsed.getTime() === 0
+              ? new Date() // fallback to current time
+              : parsed;
+          };
+          
         try {
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(file.buffer);
@@ -257,12 +259,16 @@ export class ProductService {
         } else {
             productEntity = new ProductEntity();
         }
+        function isValidDate(value: any): boolean {
+            return value instanceof Date && !isNaN(value.getTime());
+        }
 
         Object.assign(productEntity, {
             SNO: productDto.SNO ?? productEntity.SNO,
             productName: productDto.productName ?? productDto.productType,
-            inDate: productDto.inDate ?? productEntity.inDate,
-            categoryName: productDto.categoryName ?? productEntity.categoryName,
+            inDate: isValidDate(productDto.inDate)
+                ? new Date(productDto.inDate)
+                : new Date(), categoryName: productDto.categoryName ?? productEntity.categoryName,
             cost: productDto.cost ?? productEntity.cost,
             productDescription: productDto.productDescription ?? productEntity.productDescription,
             companyCode: productDto.companyCode ?? productEntity.companyCode,
@@ -450,8 +456,8 @@ export class ProductService {
 
     async getAllproductDetails(dto: CommonReq): Promise<CommonResponse> {
         try {
-            const product = await this.productRepository.find({ where: { companyCode: dto.companyCode, unitCode: dto.unitCode },relations:['staffId','subDealerId','branchId'] });
-           
+            const product = await this.productRepository.find({ where: { companyCode: dto.companyCode, unitCode: dto.unitCode }, relations: ['staffId', 'subDealerId', 'branchId'] });
+
             if (!product) {
                 return new CommonResponse(false, 404, 'product not found');
             }
