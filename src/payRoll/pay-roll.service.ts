@@ -21,7 +21,7 @@ export class PayrollService {
 
     async createOrUpdatePayroll(dtoArray: PayrollDto[]): Promise<CommonResponse> {
         const entities = this.adapter.toEntity(dtoArray);
-        console.log(dtoArray, "|||||||}}}}}}")
+
         const updatedEntities = await Promise.all(
             entities.map(async (entity) => {
                 if (entity.id) {

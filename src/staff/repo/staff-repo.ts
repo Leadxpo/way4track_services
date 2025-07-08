@@ -30,23 +30,14 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'br.name AS branch',
                 'sf.designation AS designation',
                 'sf.staff_photo AS staffPhoto',
-
                 'sf.carry_forward_leaves as carryForwardLeaves',
-
                 'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
                 'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
-
-
                 'sf.monthly_salary AS actualSalary',
-
                 'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN 1 ELSE 0 END) AS lateDays',
-
                 'SUM(CASE WHEN a.in_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalInTimeEarlyMinutes',
-
                 'SUM(CASE WHEN a.out_time_remark LIKE "%E%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalOutTimeEarlyMinutes',
-
                 'SUM(CASE WHEN a.in_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.in_time_remark) / 60, 0) ELSE 0 END) AS totalInTimeLateMinutes',
-
                 'SUM(CASE WHEN a.out_time_remark LIKE "%L%" THEN COALESCE(TIME_TO_SEC(a.out_time_remark) / 60, 0) ELSE 0 END) AS totalOutTimeLateMinutes',
                 ` SUM(
                     CASE 
