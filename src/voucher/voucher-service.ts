@@ -334,9 +334,6 @@ export class VoucherService {
                     }
                     const voucherAmount = Number(voucherEntity.amount);
                     const accountBalance = Number(fromAccount.totalAmount);
-                    console.log("voucherAmount :",voucherEntity)
-                    console.log("accountBalance :",accountBalance)
-
                     if (voucherAmount > accountBalance) {
                         throw new Error('Insufficient funds in the from account.');
                     }
