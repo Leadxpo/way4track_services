@@ -1,5 +1,3 @@
-import { GSTORTDSEnum } from "../entity/estimate.entity";
-
 export class EstimateDto {
     id?: number;
     clientId: string;
@@ -19,13 +17,18 @@ export class EstimateDto {
     unitCode: string;
     estimateId?: string;
     invoiceId?: string;
-    GSTORTDS?: GSTORTDSEnum;
+    prefix?: string;
+    invoicePrefix?: string;
+    isGST?: boolean;
+    isTDS?: boolean;
     SCST?: number;
     CGST?: number;
+    TDS?: number;
     quantity: number;  // The total quantity for all products
     productDetails?: ProductDetailDto[];
     cgstPercentage: number; // For temporary use
     scstPercentage: number; // For temporary use
+    tdsPercentage: number; // For temporary use
     convertToInvoice: boolean;
     estimatePdfUrl: string;
     invoicePdfUrl: string

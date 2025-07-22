@@ -247,8 +247,6 @@ export class StaffService {
             if (!existingStaff) {
                 return new CommonResponse(false, 4002, 'Staff not found for the provided ID.');
             }
-            console.log(existingStaff, "??????????????")
-
             // Check if designation has changed
             if (req.designation_id) {
                 const designationChanged = existingStaff.designationRelation?.id !== req.designation_id;

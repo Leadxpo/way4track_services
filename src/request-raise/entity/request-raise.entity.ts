@@ -25,8 +25,9 @@ export class RequestRaiseEntity extends BaseEntity {
     @Column({ name: 'request_type', type: 'enum', enum: RequestType, default: RequestType.money })
     requestType: RequestType
 
-    @Column({ name: 'image', type: 'varchar', nullable: true })
-    image: string;
+    @Column('json', { name: 'image', nullable: true })
+    image: string[]; // Store JSON string of image URLs
+
   
     @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.pending })
     status: ClientStatusEnum
@@ -45,13 +46,16 @@ export class RequestRaiseEntity extends BaseEntity {
 
     @ManyToOne(() => SubDealerEntity, (staffEntity) => staffEntity.request, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
-    subDealerId: SubDealerEntity;
+    subDealerId: SubDealerEntity; 
 
-    @Column({ name: 'description', type: 'text' })
+    @Column({ name: 'description', type: 'text',nullable: true })
     description: string;
 
     @Column({ name: 'request_for', type: 'text', nullable: true })
     requestFor: string;
+
+    @Column({ name: 'reply', type: 'text', nullable: true })
+    reply: string;
 
     @Column({ name: 'created_date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdDate: Date;

@@ -8,7 +8,7 @@ export class GetAssertsResDto {
     assertsName: string;
     assertsAmount: number;
     assetType: AssetType;
-    price: number;
+    taxableAmount: number;
     quantity: number;
     description: string;
     purchaseDate: Date;
@@ -28,8 +28,8 @@ export class GetAssertsResDto {
         branchName: string,
         assertsName: string,
         assertsAmount: number,
+        taxableAmount: number,
         assetType: AssetType,
-        price: number,
         quantity: number,
         description: string,
         purchaseDate: Date,
@@ -51,7 +51,7 @@ export class GetAssertsResDto {
         this.assertsName = assertsName;
         this.assertsAmount = assertsAmount;
         this.assetType = assetType;
-        this.price = price;
+        this.taxableAmount = taxableAmount;
         this.quantity = quantity;
         this.description = description;
         this.purchaseDate = purchaseDate;

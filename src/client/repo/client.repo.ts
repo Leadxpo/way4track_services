@@ -71,6 +71,7 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.id AS id',
                 'cl.client_id AS clientId',
                 'cl.phone_number AS phoneNumber',
+                'cl.client_photo AS clientPhoto',
                 'cl.name AS name',
                 'cl.GST_number AS gstNumber',
                 'br.name AS branch',

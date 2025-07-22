@@ -7,7 +7,7 @@ import { RequestRaiseIdDto } from './dto/request-raise-id.dto';
 import { RequestRaiseDto } from './dto/request-raise.dto';
 import { RequestRaiseService } from './request-raise.service';
 import { CommonReq } from 'src/models/common-req';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 
 const multerOptions = {
@@ -20,12 +20,12 @@ const multerOptions = {
 @Controller('requests')
 export class RequestRaiseController {
     constructor(private readonly requestService: RequestRaiseService) { }
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @UseInterceptors(FilesInterceptor('photo',10, multerOptions))
     @Post('handleRequestDetails')
     async handleRequestDetails(@Body() dto: RequestRaiseDto,
-    @UploadedFile() photo?: Express.Multer.File,
+    @UploadedFiles() photo: Express.Multer.File[],
 ): Promise<CommonResponse> {
-        try {
+        try { 
             if (dto.id) {
                 dto.id = Number(dto.id);
             }

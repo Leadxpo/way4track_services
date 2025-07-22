@@ -51,8 +51,10 @@ export class ProductService {
         subDealerId?: number,
         staffId?: number,
         branchId?: number,
-        assignTime?: Date
+        assignTime?: Date,
+        isReturn?: boolean
     ): Promise<any[]> {
+        
         const getCellValue = (cell: ExcelJS.Cell) => {
             if (cell.value === null || cell.value === undefined) return null;
             if (typeof cell.value === 'object') return (cell.value as any).text || cell.value.toString();
@@ -62,10 +64,10 @@ export class ProductService {
         const parseDate = (dateString: string | undefined | null): Date => {
             const parsed = new Date(dateString || '');
             return isNaN(parsed.getTime()) || parsed.getTime() === 0
-              ? new Date() // fallback to current time
-              : parsed;
-          };
-          
+                ? new Date() // fallback to current time
+                : parsed;
+        };
+
         try {
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(file.buffer);
@@ -191,44 +193,54 @@ export class ProductService {
                 if (existing) {
                     const updateData: any = {};
                     let hasChanged = false;
+                    console.log("inner type :",typeof(isReturn))
+                    if (isReturn===true) {
+                        console.log("warehouse :",isReturn)
+                        updateData.branchId = null;
+                        updateData.subDealerId = null;
+                        updateData.staffId = null;
+                        updateData.status = 'return'
+                        updateData.location = 'warehouse'
+                        updateData.assignTime = assignTime
+                        hasChanged = true;
+                    } else {
+                        console.log("others :",isReturn)
+                        for (const key of Object.keys(currentRow)) {
+                            const newValue = currentRow[key];
+                            if (
+                                newValue !== null &&
+                                newValue !== undefined &&
+                                newValue !== '' &&
+                                newValue !== existing[key]
+                            ) {
+                                updateData[key] = newValue;
+                                hasChanged = true;
+                            }
+                        }
 
-                    for (const key of Object.keys(currentRow)) {
-                        const newValue = currentRow[key];
-                        if (
-                            newValue !== null &&
-                            newValue !== undefined &&
-                            newValue !== '' &&
-                            newValue !== existing[key]
-                        ) {
-                            updateData[key] = newValue;
+                        if (branchId && (!existing.branchId || existing.branchId.id !== branchId)) {
+                            updateData.branchId = { id: branchId };
+                            updateData.status = 'assigned'
+                            updateData.location = 'branch'
+                            updateData.assignTime = assignTime
+                            hasChanged = true;
+                        }
+
+                        if (subDealerId && (!existing.subDealerId || existing.subDealerId.id !== subDealerId)) {
+                            updateData.subDealerId = { id: subDealerId };
+                            updateData.status = 'assigned'
+                            updateData.location = 'subdealer'
+                            updateData.assignTime = assignTime
+                            hasChanged = true;
+                        }
+
+                        if (staffId && (!existing.staffId || existing.staffId.id !== staffId)) {
+                            updateData.staffId = { id: staffId };
+                            updateData.status = 'inHand'
+                            updateData.location = 'inHand'
                             hasChanged = true;
                         }
                     }
-
-                    if (branchId && (!existing.branchId || existing.branchId.id !== branchId)) {
-                        updateData.branchId = { id: branchId };
-                        updateData.status = 'assigned'
-                        updateData.location = 'branch'
-                        updateData.assignTime = assignTime
-                        hasChanged = true;
-                    }
-
-                    if (subDealerId && (!existing.subDealerId || existing.subDealerId.id !== subDealerId)) {
-                        updateData.subDealerId = { id: subDealerId };
-                        updateData.status = 'assigned'
-                        updateData.location = 'subdealer'
-                        updateData.assignTime = assignTime
-                        hasChanged = true;
-                    }
-
-                    if (staffId && (!existing.staffId || existing.staffId.id !== staffId)) {
-                        updateData.staffId = { id: staffId };
-                        updateData.status = 'inHand'
-                        updateData.location = 'inHand'
-                        hasChanged = true;
-                    }
-
-
                     if (hasChanged) {
                         await this.productRepository.update(existing.id, updateData);
                         continue;
@@ -367,6 +379,7 @@ export class ProductService {
 
             productDto.vendorId = vendor.id;
         }
+
         let designationEntity = null;
         if (productDto.productTypeId) {
             designationEntity = await this.productTypeRepo.findOne({
@@ -380,6 +393,7 @@ export class ProductService {
             productDto.productTypeId = designationEntity;
             productDto.productName = designationEntity.name // Store relation
         }
+
         if (productDto.branchId) {
             designationEntity = await this.branchRepo.findOne({
                 where: { id: productDto.branchId }
@@ -398,7 +412,7 @@ export class ProductService {
             if (!designationEntity) {
                 throw new Error(`staff with ID '${productDto.staffId}' not found.`);
             }
-            console.log(designationEntity, 'staff');
+
         }
         if (productDto.subDealerId) {
             designationEntity = await this.subDalerRepo.findOne({
@@ -410,8 +424,8 @@ export class ProductService {
             }
         }
 
-
-        const jsonData = await this.bulkUploadProducts(file, productDto?.subDealerId, productDto?.staffId, productDto?.branchId, productDto.assignTime);
+console.log("type :",typeof(productDto.isReturn))
+        const jsonData = await this.bulkUploadProducts(file, productDto?.subDealerId, productDto?.staffId, productDto?.branchId, productDto.assignTime, productDto.isReturn);
 
         const finalProductData = jsonData.map((excelRow) => ({
             ...excelRow,

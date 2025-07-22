@@ -134,7 +134,6 @@ export class ProductAssignService {
             if (photoPath) {
                 entity.productAssignPhoto = photoPath;
             }
-            console.log(entity, "??????????????")
             await this.productAssignRepository.insert(entity);
 
             await this.assignProductsByImei(

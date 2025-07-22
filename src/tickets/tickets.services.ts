@@ -99,7 +99,7 @@ export class TicketsService {
 
     async getTicketDetailsById(req: TicketsIdDto): Promise<CommonResponse> {
         try {
-            const ticket = await this.ticketsRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['staff', 'branch', 'subDealerId', 'subDealerStaffId', 'designationRelation'] });
+            const ticket = await this.ticketsRepository.findOne({ where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['staff', 'branch', 'subDealerId', 'subDealerStaffId', 'designationRelation','reportingStaff'] });
 
             if (!ticket) {
                 return new CommonResponse(false, 404, 'Ticket not found');

@@ -62,7 +62,7 @@ export class AmenitiesService {
     async updateDeviceDetails(dto: AmenitiesDto, filePath: string | null): Promise<CommonResponse> {
         try {
             const existing = await this.repo.findOne({ where: { id: dto.id } });
-            console.log(existing, "?????????");
+
             if (!existing) throw new Error('amenities not found');
             if (filePath && existing.image) {
                 const existingFilePath = existing.image
@@ -155,7 +155,7 @@ export class AmenitiesService {
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
-            console.log(item, "??????????")
+
             if (!item) return new CommonResponse(false, 404, 'Device not found');
             return new CommonResponse(true, 200, 'Device fetched successfully', item);
         } catch (error) {
@@ -170,7 +170,6 @@ export class AmenitiesService {
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
                 relations: ['webProduct'],
             });
-            console.log(items, "??????????")
 
             if (!items || !items.length) return new CommonResponse(false, 404, 'Device not found');
 

@@ -60,6 +60,16 @@ export class VoucherController {
             return new CommonResponse(false, 500, 'Error fetching vouchers', error.message);
         }
     }
+    @Post('getVouchersByInvoice')
+    async getVouchersByInvoice(@Body() dto: { invoiceId: string }): Promise<CommonResponse> {
+        try {
+            const vouchers = await this.voucherService.getVouchersByInvoice(dto);
+            return vouchers
+        } catch (error) {
+            console.error('Error in get voucher by invoice details:', error);
+            return new CommonResponse(false, 500, 'Error fetching vouchers', error.message);
+        }
+    }
 
     @Post('getVoucherNamesDropDown')
     async getVoucherNamesDropDown(): Promise<CommonResponse> {

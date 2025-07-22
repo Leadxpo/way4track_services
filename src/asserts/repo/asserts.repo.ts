@@ -103,6 +103,7 @@ export class AssertsRepository extends Repository<AssertsEntity> {
                 'asset.purchase_date AS purchaseDate',
                 'asset.asserts_name AS assetName',
                 'asset.asserts_amount AS assetAmount',
+                'asset.taxable_amount AS taxableAmount',
                 'asset.quantity AS quantity'
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = asset.branch_id')

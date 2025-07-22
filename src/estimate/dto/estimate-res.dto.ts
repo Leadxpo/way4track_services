@@ -1,5 +1,3 @@
-import { GSTORTDSEnum } from "../entity/estimate.entity";
-
 export interface AccountDto {
   id: number;
   name: string;
@@ -48,9 +46,13 @@ export class EstimateResDto {
   }[];
   estimateId?: string;
   invoiceId?: string;
-  GSTORTDS?: GSTORTDSEnum;
+  prefix?: string;
+  invoicePrefix?: string;
+  isGST?: boolean;
+  isTDS?: boolean;
   SCST?: number;
   CGST?: number;
+  TDS?: number;
   vendorId?: number;
   vendorName?: string;
   vendorPhoneNumber?: string;
@@ -97,9 +99,13 @@ export class EstimateResDto {
     }[],
     estimateId?: string,
     invoiceId?: string,
-    GSTORTDS?: GSTORTDSEnum,
+    prefix?: string,
+    invoicePrefix?: string,
+    isGST?: boolean,
+    isTDS?: boolean,
     SCST?: number,
     CGST?: number,
+    TDS?: number,
     vendorId?: number,
     vendorName?: string,
     vendorPhoneNumber?: string,
@@ -136,9 +142,13 @@ export class EstimateResDto {
     this.products = products;
     this.estimateId = estimateId;
     this.invoiceId = invoiceId;
-    this.GSTORTDS = GSTORTDS;
+    this.prefix = prefix;
+    this.invoicePrefix = invoicePrefix;
+    this.isGST = isGST;
+    this.isTDS = isTDS;
     this.SCST = SCST;
     this.CGST = CGST;
+    this.TDS = TDS;
     this.vendorId = vendorId;
     this.vendorName = vendorName;
     this.vendorPhoneNumber = vendorPhoneNumber;

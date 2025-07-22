@@ -122,19 +122,24 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'ticket.id AS id',
                 'ticket.ticket_number AS ticketNumber',
                 'ticket.problem AS problem',
+                'ticket.remark AS remark',
                 'ticket.date AS date',
                 'branch.id AS branchId',
                 'branch.name AS branchName',
                 'staff.id AS staffId',
                 'staff.name AS staffName',
+                'repstaff.id AS reportingStaffId',
+                'repstaff.name AS reportingStaffName',
                 'sb.sub_dealer_id AS subDealerId',
                 'sb.name AS subDealerName',
+                'ticket.work_status AS ticketStatus',
                 'ticket.company_code AS companyCode',
                 'ticket.unit_code AS unitCode',
             ])
             .leftJoin('ticket.branch', 'branch')
             .leftJoin('ticket.staff', 'staff')
             .leftJoin(SubDealerEntity, 'sb', 'ticket.sub_dealer_id = sb.id')
+            .leftJoin('ticket.reportingStaff', 'repstaff')
             .leftJoinAndSelect(DesignationEntity, 'de', 'de.id = ticket.designation_id')
             .where('ticket.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ticket.unit_code = :unitCode', { unitCode: req.unitCode })

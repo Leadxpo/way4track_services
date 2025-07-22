@@ -1,28 +1,31 @@
-import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { CommonResponse } from 'src/models/common-response';
 import { DispatchService } from './dispatch.service';
 import { DispatchDto } from './dto/dispatch.dto';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonReq } from 'src/models/common-req';
 import * as multer from 'multer';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
+
 const multerOptions = {
     storage: multer.memoryStorage(),
     limits: {
         fileSize: 1000000000,
     },
 };
+
 @Controller('dispatch')
 export class DispatchController {
     constructor(private readonly dispatchService: DispatchService) { }
 
     @Post('handleDispatchDetails')
-    @UseInterceptors(FileInterceptor('dispatchBoximage', multerOptions))
-    async handleDispatchDetails(@Body() dto: DispatchDto, @UploadedFile() dispatchBoximage?: Express.Multer.File) {
+    @UseInterceptors(FilesInterceptor('dispatchBoximage',10, multerOptions))
+    async handleDispatchDetails(@Body() dto: DispatchDto, @UploadedFiles() dispatchBoximage: Express.Multer.File[]) {
         try {
             if (dto.id) {
                 dto.id = Number(dto.id);
             }
+
             return this.dispatchService.handleDispatchDetails(dto, dispatchBoximage);
 
         } catch (error) {

@@ -9,22 +9,23 @@ export class DispatchResponseDto {
     dispatchCompanyName?: string;
     dispatchDate?: string; // Formatted as ISO string
     arrivalDate?: string;
+    transUpdateUser?: string;
+    transDate?: string;
+    deliveredUpdateUser?: string;
+    deliveredDate?: string;
     status: DispatchStatus;
     transportId?: string;
     packageId?: string;
-    assignedProductsId?: number;
     receiverName?: string;
     dispatcherName?: string;
     trackingURL?: string;
     staffId?: string;
     staffName?: string;
-
-    clientId?: string;
-    clientName?: string;
-
     subDealerId?: string;
     subDealerName?: string;
-    dispatchBoximage?: string;
+    deliveryDescription?: string;
+    dispatchDescription?: string;
+    dispatchBoximage?: string[];
 
     constructor(
         id: number,
@@ -35,20 +36,23 @@ export class DispatchResponseDto {
         dispatchCompanyName?: string,
         dispatchDate?: Date,
         arrivalDate?: Date,
+        transUpdateUser?: string,
+        transDate?: Date,
+        deliveredUpdateUser?: string,
+        deliveredDate?: Date,    
         status: DispatchStatus = DispatchStatus.DISPATCHED,
         transportId?: string,
         packageId?: string,
-        assignedProductsId?: number,
         receiverName?: string,
         dispatcherName?: string,
         trackingURL?: string,
         staffId?: string,
         staffName?: string,
-        clientId?: string,
-        clientName?: string,
         subDealerId?: string,
         subDealerName?: string,
-        dispatchBoximage?: string
+        deliveryDescription?:string,
+        dispatchDescription?:string,
+        dispatchBoximage?: string[]
     ) {
         this.id = id;
         this.companyCode = companyCode;
@@ -58,19 +62,22 @@ export class DispatchResponseDto {
         this.dispatchCompanyName = dispatchCompanyName;
         this.dispatchDate = dispatchDate ? dispatchDate.toISOString() : undefined;
         this.arrivalDate = arrivalDate ? arrivalDate.toISOString() : undefined;
+        this.transUpdateUser = transUpdateUser;
+        this.transDate = transDate ? transDate.toISOString() : undefined;
+        this.deliveredUpdateUser = deliveredUpdateUser;
+        this.deliveredDate = deliveredDate ? deliveredDate.toISOString() : undefined;
         this.status = status;
         this.transportId = transportId;
         this.packageId = packageId;
-        this.assignedProductsId = assignedProductsId;
         this.receiverName = receiverName;
         this.dispatcherName = dispatcherName;
         this.trackingURL = trackingURL;
         this.staffId = staffId;
         this.staffName = staffName
-        this.clientId = clientId;
-        this.clientName = clientName
         this.subDealerId = subDealerId;
         this.subDealerName = subDealerName
+        this.deliveryDescription= deliveryDescription;
+        this.dispatchDescription= dispatchDescription;
         this.dispatchBoximage = dispatchBoximage
     }
 }

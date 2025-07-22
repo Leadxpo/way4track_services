@@ -16,8 +16,15 @@ export class TicketsEntity {
     @JoinColumn({ name: 'staff_id' })
     staff: StaffEntity;
 
+    @ManyToOne(() => StaffEntity, (branchEntity) => branchEntity.tickets, { nullable: true })
+    @JoinColumn({ name: 'reporting_staff_id' })
+    reportingStaff: StaffEntity;
+
     @Column({ name: 'problem', type: 'text', nullable: true })
     problem: string;
+
+    @Column({ name: 'remark', type: 'text', nullable: true })
+    remark: string;
 
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     date: Date;

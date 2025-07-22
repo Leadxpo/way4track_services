@@ -69,7 +69,7 @@ export class DeviceService {
     try {
       console.log(dto);
       const existing = await this.deviceRepository.findOne({ where: { id: dto.id } });
-      console.log(existing, "?????????");
+
       if (!existing) throw new Error('Device not found');
 
       if (filePath && existing.image) {

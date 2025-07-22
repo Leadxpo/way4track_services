@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { getManager } from 'typeorm';
 import { ClientEntity } from 'src/client/entity/client.entity';
 import { ClientRepository } from 'src/client/repo/client.repo';
 import { CommonResponse } from 'src/models/common-response';
@@ -73,30 +74,6 @@ export class EstimateService {
 
             let updatedProductDetails = productDetails;
 
-            // if (productDetails.length > 0) {
-            //     const productIds = productDetails
-            //         .map(p => p.productId && !isNaN(Number(p.productId)) ? Number(p.productId) : null)
-            //         .filter(id => id !== null);
-
-            //     const products = await this.productRepository.find({ where: { id: In(productIds) } });
-
-            //     if (products.length !== productIds.length) {
-            //         throw new Error('Some products in the provided details do not exist');
-            //     }
-
-            //     updatedProductDetails = productDetails.map(productDetail => {
-            //         const product = products.find(p => p.id === Number(productDetail.productId));
-            //         return {
-            //             productId: product.id,
-            //             productName: product.productName,
-            //             quantity: productDetail.quantity,
-            //             costPerUnit: product.cost,
-            //             totalCost: product.cost * productDetail.quantity,
-            //             hsnCode: product.hsnCode,
-            //         };
-            //     });
-            // }
-
             const totalAmount = updatedProductDetails.reduce((sum, product) => sum + product.totalCost, 0);
 
             existingEstimate.productDetails = updatedProductDetails;
@@ -105,18 +82,18 @@ export class EstimateService {
 
             if (estimatePdf) {
                 existingEstimate.estimatePdfUrl = await this.handleFileUpload(estimatePdf, existingEstimate.estimatePdfUrl, 'estimate_pdfs');
-                // dto.estimatePdfUrl = existingEstimate.estimatePdfUrl;
-
+                dto.estimatePdfUrl = existingEstimate.estimatePdfUrl;
             }
 
             if (dto.convertToInvoice) {
-                existingEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
+                // existingEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(existingEstimate.id));
                 if (invoicePath) {
                     existingEstimate.invoicePdfUrl = await this.handleFileUpload(invoicePath, existingEstimate.invoicePdfUrl, 'invoices_pdfs');
                 }
             }
 
             existingEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100;
+            existingEstimate.TDS = (totalAmount * (dto.tdsPercentage || 0)) / 100;
             existingEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100;
 
             await this.estimateRepository.save(existingEstimate);
@@ -200,15 +177,16 @@ export class EstimateService {
             newEstimate.clientId = client;
             newEstimate.productDetails = productDetailsArray;
             newEstimate.amount = totalAmount || 0;
-            newEstimate.estimateId = `EST-${(await this.estimateRepository.count() + 1).toString().padStart(4, '0')}`;
+            newEstimate.estimateId = dto.estimateId
             if (dto.convertToInvoice) {
-                newEstimate.invoiceId = this.generateInvoiceId(await this.getInvoiceCount(newEstimate.id));
+                newEstimate.invoiceId = dto.invoiceId;
                 if (invoicePath) {
                     newEstimate.invoicePdfUrl = await this.handleFileUpload(invoicePath, newEstimate.invoicePdfUrl, 'invoices_pdfs');
                 }
             }
 
             newEstimate.CGST = (totalAmount * (dto.cgstPercentage || 0)) / 100 || 0;
+            newEstimate.TDS = (totalAmount * (dto.tdsPercentage || 0)) / 100 || 0;
             newEstimate.SCST = (totalAmount * (dto.scstPercentage || 0)) / 100 || 0;
 
             if (estimatePdf) {
@@ -244,7 +222,7 @@ export class EstimateService {
             if (files?.invoicePDF?.length) {
                 invoicePath = await this.uploadFileToGCS(files.invoicePDF[0], 'invoice_Pdfs');
             }
-            return (dto.id && dto.id !== null) || (dto.estimateId && dto.estimateId.trim() !== '')
+            return (dto.id && dto.id !== null)
                 ? await this.updateEstimateDetails(dto, estimatePath, invoicePath)
                 : await this.createEstimateDetails(dto, estimatePath, invoicePath);
         } catch (error) {
@@ -307,6 +285,71 @@ export class EstimateService {
         }
     }
 
+    async getInvoiceDetails(req: EstimateIdDto): Promise<CommonResponse> {
+        try {
+            const invoice = await this.estimateRepository.findOne({
+                relations: ['clientId', 'products', 'vendorId', 'branchId'],  // ✅ Add 'vendorId' if needed
+                where: { invoiceId: req.invoiceId, companyCode: req.companyCode, unitCode: req.unitCode }
+            });
+
+            if (!invoice) {
+                return new CommonResponse(false, 404, 'Estimate not found');
+            }
+
+            const data = this.estimateAdapter.convertEntityToResDto([invoice]);
+
+            return new CommonResponse(true, 200, 'Invoice details fetched successfully', data);
+        } catch (error) {
+            console.error('Error fetching estimate details:', error);
+            throw new ErrorResponse(500, error.message);
+        }
+    }
+
+
+    async getEstimatePrefixDetails(req: EstimateIdDto): Promise<CommonResponse> {
+      try {
+        const entityManager = this.dataSource.manager;
+    
+        const result = await entityManager
+          .createQueryBuilder('estimates', 'e')
+          .select('e.prefix', 'prefix')
+          .addSelect('COUNT(*)', 'count')
+          .where('e.companyCode = :companyCode AND e.unitCode = :unitCode', {
+            companyCode: req.companyCode,
+            unitCode: req.unitCode,
+          })
+          .groupBy('e.prefix')
+          .getRawMany();
+    
+        return new CommonResponse(true, 200, 'Prefix counts fetched successfully', result);
+      } catch (error) {
+        console.error('Error fetching prefix counts:', error);
+        throw new ErrorResponse(500, error.message);
+      }
+    }
+
+    async getEstimatInvoicePrefixeDetails(req: EstimateIdDto): Promise<CommonResponse> {
+      try {
+        const entityManager = this.dataSource.manager;
+    
+        const result = await entityManager
+          .createQueryBuilder('estimates', 'e')
+          .select('e.invoice_prefix', 'invoicePrefix')
+          .addSelect('COUNT(*)', 'count')
+          .where('e.companyCode = :companyCode AND e.unitCode = :unitCode', {
+            companyCode: req.companyCode,
+            unitCode: req.unitCode,
+          })
+          .groupBy('e.invoice_prefix')
+          .getRawMany();
+    
+        return new CommonResponse(true, 200, 'Prefix counts fetched successfully', result);
+      } catch (error) {
+        console.error('Error fetching prefix counts:', error);
+        throw new ErrorResponse(500, error.message);
+      }
+    }
+    
     async getAllEstimateDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const estimate = await this.estimateRepository.find({

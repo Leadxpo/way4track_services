@@ -27,65 +27,77 @@ export class DispatchEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: true })
     unitCode: string;
 
+    
     @Column('varchar', { name: 'from_address', length: 255, nullable: true })
     fromAddress: string;
-
+    
     @Column('varchar', { name: 'to_address', length: 255, nullable: true })
     toAddress: string;
-
+    
     @Column('varchar', { name: 'dispatch_company_name', length: 100, nullable: true })
     dispatchCompanyName: string;
-
-    @Column('timestamp', { name: 'dispatch_date', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    
+    @Column('timestamp', { name: 'dispatch_date', nullable: true })
     dispatchDate: Date;
-
-    @Column('timestamp', { name: 'arrival_date', default: () => 'CURRENT_TIMESTAMP', nullable: true })
+    
+    @Column('timestamp', { name: 'arrival_date',  nullable: true })
     arrivalDate: Date;
-
+    
+    @Column('timestamp', { name: 'trans_date',  nullable: true })
+    transDate: Date;
+    
+    @Column('timestamp', { name: 'delivered_date',  nullable: true })
+    deliveredDate: Date;
+    
+    @Column('varchar', { name: 'transUpdate_user', length: 225, nullable: true })
+    transUpdateUser: string;
+    
+    @Column('varchar', { name: 'delivered_user', length: 225, nullable: true })
+    deliveredUpdateUser: string;
+    
+    
     @Column({
         type: 'enum',
         enum: DispatchStatus,
         default: DispatchStatus.DISPATCHED,
     })
     status: DispatchStatus;
-
-    @Column('varchar', { name: 'transport_id', length: 50, nullable: true })
+    
+    @Column('varchar', { name: 'transport_id', length: 100, nullable: true })
     transportId: string;
-
-    @Column('varchar', { name: 'package_id', length: 50, nullable: true })
+    
+    @Column('varchar', { name: 'package_id', length: 100, nullable: true })
     packageId: string;
-
+    
     @Column('varchar', { name: 'receiver_name', length: 100, nullable: true })
     receiverName: string;
-
+    
     @Column('varchar', { name: 'dispatcher_name', length: 100, nullable: true })
     dispatcherName: string;
-
+    
     @Column('varchar', { name: 'tracking_url', length: 255, nullable: true })
     trackingURL: string;
-
-    @Column('varchar', { name: 'dispatch_box_image', length: 255, nullable: true })
-    dispatchBoximage: string;
-
+    
+    @Column('json', { name: 'dispatch_box_images', nullable: true })
+    dispatchBoximage: string[]; // Store JSON string of image URLs
+    
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.dispatch, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
-
-    @ManyToOne(() => ProductAssignEntity, (ProductAssignEntity) => ProductAssignEntity.dispatch, { nullable: true })
-    @JoinColumn({ name: 'assigned_products_id' })
-    assignedProductsId: ProductAssignEntity;
-
-    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.dispatch, { nullable: true })
-    @JoinColumn({ name: 'client_id' })
-    clientId: ClientEntity;
-
+        
     @ManyToOne(() => SubDealerEntity, (SubDealerEntity) => SubDealerEntity.dispatch, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
+    
+    @Column('text', { name: 'dispatch_description', nullable: true })
+    dispatchDescription: string;
+
+    @Column('text', { name: 'delivery_description', nullable: true })
+    deliveryDescription: string;
 
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
-
+    
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 }

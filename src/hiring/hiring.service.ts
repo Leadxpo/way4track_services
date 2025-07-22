@@ -196,7 +196,6 @@ export class HiringService {
             });
         }
 
-        console.log(req.status, "????????");
         const result = await query.getRawMany();
         console.log(result, "PPPPPPPPPPP");
         return new CommonResponse(true, 200, 'Hiring details retrieved successfully', result);

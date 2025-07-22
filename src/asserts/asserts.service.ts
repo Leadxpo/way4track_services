@@ -67,7 +67,6 @@ export class AssertsService {
 
     async create(createAssertsDto: AssertsDto, photo: Express.Multer.File): Promise<CommonResponse> {
         try {
-            console.log(createAssertsDto, "+========");
 
             let entity: AssertsEntity | null = null;
 

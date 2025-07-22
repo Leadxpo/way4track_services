@@ -7,11 +7,6 @@ import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-export enum GSTORTDSEnum {
-    GST = "GST",
-    TDS = "TDS",
-    IGST = "IGST"
-}
 @Entity('estimates')
 export class EstimateEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
@@ -68,9 +63,6 @@ export class EstimateEntity extends BaseEntity {
     @Column({ type: 'float', name: 'quantity', nullable: true })
     quantity: number;
 
-    // @Column({ type: 'float', name: 'hsn_code', nullable: true })
-    // hsnCode: string;
-
     @OneToMany(() => ProductEntity, (product) => product.estimate)
     products: ProductEntity[];
 
@@ -101,8 +93,17 @@ export class EstimateEntity extends BaseEntity {
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
 
-    @Column({ name: 'gst/tds', type: 'enum', nullable: true, enum: GSTORTDSEnum })
-    GSTORTDS: GSTORTDSEnum;
+    @Column('varchar', { name: 'prefix', length: 100, nullable: true })
+    prefix: string;
+
+    @Column('varchar', { name: 'invoice_prefix', length: 100, nullable: true })
+    invoicePrefix: string;
+
+    @Column({ name: 'isGST', type: 'boolean', nullable: true })
+    isGST: boolean;
+
+    @Column({ name: 'isTDS', type: 'boolean', nullable: true })
+    isTDS: boolean;
 
     @Column({ name: 'status', type: 'enum', nullable: true, enum: ClientStatusEnum })
     status: ClientStatusEnum;
@@ -112,6 +113,9 @@ export class EstimateEntity extends BaseEntity {
 
     @Column({ name: 'cgst', type: 'float', nullable: true })
     CGST: number;
+
+    @Column({ name: 'tds', type: 'float', nullable: true })
+    TDS: number;
 
     @Column({ nullable: true })
     estimatePdfUrl: string;

@@ -44,6 +44,7 @@ export class ProductDto {
   subDealerId?: number
   staffId?: number
   assignTime?: Date;
+  isReturn:boolean;
 }
 
 

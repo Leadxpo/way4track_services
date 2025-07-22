@@ -32,7 +32,7 @@ export class RequestRaiseService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async updateRequestDetails(dto: RequestRaiseDto,filePath: string | null): Promise<CommonResponse> {
+    async updateRequestDetails(dto: RequestRaiseDto,photoPath?: string[] | []): Promise<CommonResponse> {
         
         try {
             const existingRequest = await this.requestRepository.findOne({
@@ -42,28 +42,33 @@ export class RequestRaiseService {
             if (!existingRequest) {
                 return new CommonResponse(false, 4002, 'Request not found for the provided id.');
             }
-            if (filePath && existingRequest.image) {
-                const existingFilePath = existingRequest.image
-                    .replace(`https://storage.googleapis.com/${this.bucketName}/`, '')
-                    .trim(); // 🧼 Clean extra spaces
-
-                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+            console.log("rrr :",(photoPath?.length > 0 && existingRequest?.image))
+            if (photoPath?.length > 0 && existingRequest?.image) {
+                let existingFiles: string[] = [];
 
                 try {
-                    const [exists] = await file.exists(); // ✅ Check existence
-                    if (exists) {
+                    existingFiles = existingRequest.image;
+                } catch (err) {
+                    // fallback in case it was stored as a string
+                    existingFiles = existingRequest.image;
+                }
+
+                for (const url of existingFiles) {
+                    const existingFilePath = url.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                    try {
                         await file.delete();
                         console.log(`Deleted old file from GCS: ${existingFilePath}`);
-                    } else {
-                        console.warn(`File not found in GCS, skipping delete: ${existingFilePath}`);
+                    } catch (error) {
+                        console.error(`Error deleting file from GCS: ${error.message}`);
                     }
-                } catch (error) {
-                    console.error(`Error deleting old file from GCS: ${error.message}`);
                 }
             }
+
             // Convert DTO to entity and merge the values
             const updatedEntity = this.requestAdapter.convertDtoToEntity(dto);
-            if (filePath) updatedEntity.image = filePath;
+            if (photoPath) updatedEntity.image = photoPath;
             // Manually assign updated fields to the existing entity
             Object.assign(existingRequest, updatedEntity);
 
@@ -71,7 +76,6 @@ export class RequestRaiseService {
             if (Object.keys(updatedEntity).length === 0) {
                 throw new Error("No update values found, skipping update operation.");
             }
-
             // Save the updated entity
             await this.requestRepository.save(existingRequest);
 
@@ -83,7 +87,7 @@ export class RequestRaiseService {
     }
 
 
-    async createRequestDetails(dto: RequestRaiseDto,filePath: string | null): Promise<CommonResponse> {
+    async createRequestDetails(dto: RequestRaiseDto,photoPath?: string[] | []): Promise<CommonResponse> {
         let successResponse: CommonResponse;
         let entity: RequestRaiseEntity;
         try {
@@ -98,8 +102,8 @@ export class RequestRaiseService {
 
             const nextId = (lastRequest.max ?? 0) + 1;
             entity.requestId = `RR-${nextId.toString().padStart(5, '0')}`;
-            if (filePath) {
-                entity.image = filePath;
+            if (photoPath) {
+                entity.image = photoPath;
             }
             const insertResult = await this.requestRepository.insert(entity);
 
@@ -126,28 +130,31 @@ export class RequestRaiseService {
 
 
 
-    async handleRequestDetails(dto: RequestRaiseDto,photo?: Express.Multer.File): Promise<CommonResponse> {
-        let filePath: string | null = null;
-        if (photo) {
+    async handleRequestDetails(dto: RequestRaiseDto,photo?: Express.Multer.File[]): Promise<CommonResponse> {
+        let photoPath: string[] = [];
+
+        if (photo && photo.length > 0) {
             const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `request/${Date.now()}-${photo.originalname}`;
-            const file = bucket.file(uniqueFileName);
 
-            await file.save(photo.buffer, {
-                contentType: photo.mimetype,
-                resumable: false,
-            });
+            for (const image of photo) {
+                const uniqueFileName = `request/${Date.now()}-${image.originalname}`;
+                const file = bucket.file(uniqueFileName);
 
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                await file.save(image.buffer, {
+                    contentType: image.mimetype,
+                    resumable: false,
+                });
+                photoPath.push(`https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`);
+            }
         }
 
-        if (dto.id) {
+
+        if (dto.id && dto.id !== null) {
             // Update if id or requestId is present
-            return await this.updateRequestDetails(dto,filePath);
+            return await this.updateRequestDetails(dto,photoPath);
         } else {
             // Create if neither id nor requestId is present
-            return await this.createRequestDetails(dto,filePath);
+            return await this.createRequestDetails(dto,photoPath);
         }
     }
 

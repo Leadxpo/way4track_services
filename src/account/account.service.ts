@@ -22,8 +22,6 @@ export class AccountService {
 
     async createAccount(dto: AccountDto): Promise<CommonResponse> {
         try {
-            console.log(dto, ">>>>>>>>>>>>>>>>");
-
             let internalMessage = dto.id ? " Updated Successfully" : " Created Successfully";
             const convertDto = this.adapter.toEntity(dto);
 

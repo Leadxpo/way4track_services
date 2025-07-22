@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationEnum } from 'src/notifications/entity/notification.entity';
 import { NotificationService } from 'src/notifications/notification.service';
-import { ProductEntity } from 'src/product/entity/product.entity';
 import { CommonResponse } from '../models/common-response';
 import { PaymentStatus } from 'src/product/dto/payment-status.enum';
-import { TechnicianWorksDto } from 'src/technician-works/dto/technician-works.dto';
 import { DispatchDto } from './dto/dispatch.dto';
 import { DispatchRepository } from './repo/dispatch.repo';
 import { DispatchAdapter } from './dispatch.adapter';
@@ -13,10 +11,8 @@ import { DispatchEntity } from './entity/dispatch.entity';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonReq } from 'src/models/common-req';
 import { StaffRepository } from 'src/staff/repo/staff-repo';
-import { ClientRepository } from 'src/client/repo/client.repo';
 import { Storage } from '@google-cloud/storage';
 import { SubDealerRepository } from 'src/sub-dealer/repo/sub-dealer.repo';
-import { ProductAssignRepository } from 'src/product-assign/repo/product-assign.repo';
 
 @Injectable()
 export class DispatchService {
@@ -27,9 +23,7 @@ export class DispatchService {
         private readonly repo: DispatchRepository,
         private readonly adapter: DispatchAdapter,
         private readonly staffRepository: StaffRepository,
-        private readonly clientRepository: ClientRepository,
         private readonly subDealerRepository: SubDealerRepository,
-        private readonly productAssignRepo: ProductAssignRepository,
     ) {
         this.storage = new Storage({
             projectId: process.env.GCLOUD_PROJECT_ID ||
@@ -40,22 +34,23 @@ export class DispatchService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleDispatchDetails(dto: DispatchDto, dispatchBoximage?: Express.Multer.File): Promise<CommonResponse> {
-        let photoPath: string | null = null
-        if (dispatchBoximage) {
+    async handleDispatchDetails(dto: DispatchDto, dispatchBoximage?: Express.Multer.File[]): Promise<CommonResponse> {
+        let photoPath: string[] = [];
+
+        if (dispatchBoximage && dispatchBoximage.length > 0) {
             const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `dispatch_photos/${Date.now()}-${dispatchBoximage.originalname}`;
-            const file = bucket.file(uniqueFileName);
 
-            await file.save(dispatchBoximage.buffer, {
-                contentType: dispatchBoximage.mimetype,
-                resumable: false,
-            });
+            for (const image of dispatchBoximage) {
+                const uniqueFileName = `dispatch_photos/${Date.now()}-${image.originalname}`;
+                const file = bucket.file(uniqueFileName);
 
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            photoPath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+                await file.save(image.buffer, {
+                    contentType: image.mimetype,
+                    resumable: false,
+                });
+                photoPath.push(`https://storage.googleapis.com/way4track-application/${uniqueFileName}`);
+            }
         }
-
         if (dto.id && dto.id !== null) {
             return await this.updateDispatchDetails(dto, photoPath);
         } else {
@@ -64,7 +59,7 @@ export class DispatchService {
     }
 
 
-    async updateDispatchDetails(dto: DispatchDto, photoPath?: string | null): Promise<CommonResponse> {
+    async updateDispatchDetails(dto: DispatchDto, photoPath?: string[]): Promise<CommonResponse> {
         try {
             const Dispatch = await this.repo.findOne({
                 where: { id: dto.id }
@@ -74,15 +69,28 @@ export class DispatchService {
                 throw new Error('Work Allocation not found');
             }
 
-            if (photoPath && Dispatch.dispatchBoximage) {
-                const existingFilePath = Dispatch.dispatchBoximage.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-                const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+            // Delete old files from GCS
+            console.log("rrr :",(photoPath?.length > 0 && Dispatch?.dispatchBoximage))
+            if (photoPath?.length > 0 && Dispatch?.dispatchBoximage) {
+                let existingFiles: string[] = [];
 
                 try {
-                    await file.delete();
-                    console.log(`Deleted old file from GCS: ${existingFilePath}`);
-                } catch (error) {
-                    console.error(`Error deleting old file from GCS: ${error.message}`);
+                    existingFiles = Dispatch.dispatchBoximage;
+                } catch (err) {
+                    // fallback in case it was stored as a string
+                    existingFiles = Dispatch.dispatchBoximage;
+                }
+
+                for (const url of existingFiles) {
+                    const existingFilePath = url.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+                    const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+
+                    try {
+                        await file.delete();
+                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
+                    } catch (error) {
+                        console.error(`Error deleting file from GCS: ${error.message}`);
+                    }
                 }
             }
 
@@ -90,22 +98,20 @@ export class DispatchService {
             const updatedDispatch = {
                 ...Dispatch,
                 ...entity,
-                dispatchBoximage: photoPath ?? Dispatch.dispatchBoximage,
+                dispatchBoximage: photoPath?.length > 0 ? photoPath : Dispatch.dispatchBoximage,
             };
 
             Object.assign(Dispatch, updatedDispatch);
-
-
             await this.repo.save(Dispatch);
 
-            return new CommonResponse(true, 200, 'Work allocation updated successfully with product details');
+            return new CommonResponse(true, 200, ' updated successfully with product details');
         } catch (error) {
             console.error(`Error updating work allocation: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to update work allocation: ${error.message}`);
         }
     }
 
-    async createDispatchDetails(dto: DispatchDto, photoPath?: string | null): Promise<CommonResponse> {
+    async createDispatchDetails(dto: DispatchDto, photoPath?: string[] | []): Promise<CommonResponse> {
         try {
             const newDispatch = await this.adapter.convertDtoToEntity(dto);
 
@@ -113,18 +119,6 @@ export class DispatchService {
                 const staff = await this.staffRepository.findOne({ where: { staffId: dto.staffId } });
                 if (!staff) throw new Error(`Staff with ID ${dto.staffId} not found`);
                 newDispatch.staffId = staff;
-            }
-
-            if (dto.assignedProductsId) {
-                const assignedProducts = await this.productAssignRepo.findOne({ where: { id: dto.assignedProductsId } });
-                if (!assignedProducts) throw new Error(`Staff with ID ${dto.assignedProductsId} not found`);
-                newDispatch.assignedProductsId = assignedProducts;
-            }
-
-            if (dto.clientId) {
-                const client = await this.clientRepository.findOne({ where: { clientId: dto.clientId } });
-                if (!client) throw new Error(`Client with ID ${dto.clientId} not found`);
-                newDispatch.clientId = client;
             }
 
             if (dto.subDealerId) {

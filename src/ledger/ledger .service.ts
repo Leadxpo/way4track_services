@@ -97,8 +97,6 @@ export class LedgerService {
                 .leftJoinAndSelect('ledger.groupId', 'group') // 👈 Ensure relations are fetched
                 .getMany();
 
-            console.log(ledgers, "????????")
-
             if (!ledgers.length) {
                 throw new NotFoundException('No ledgers found');
             }

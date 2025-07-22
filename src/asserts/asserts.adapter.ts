@@ -22,18 +22,15 @@ export class AssertsAdapter {
             entity.branchId?.branchName || '',
             entity.assertsName || '',
             entity.assertsAmount || 0,
+            entity.taxableAmount || 0,
             entity.assetType,
-            entity.assertsAmount || 0,
             entity.quantity || 0,
             entity.description || '',
             entity.purchaseDate || new Date(),
             entity.assetPhoto || '',
-            // entity.voucherId?.id || null,
-            // entity.voucherId?.voucherId || '',
             entity.paymentType,
             entity.companyCode,
             entity.unitCode,
-            // entity.emiNumber,
         );
     }
     async convertDtoToEntity(dto: AssertsDto): Promise<AssertsEntity> {
@@ -42,6 +39,7 @@ export class AssertsAdapter {
         entity.assertsName = dto.assertsName;
         entity.assetPhoto = dto.assetPhoto;
         entity.assertsAmount = dto.assertsAmount;
+        entity.taxableAmount = dto.taxableAmount;
         entity.assetType = dto.assetType;
         entity.quantity = dto.quantity;
         entity.description = dto.description;

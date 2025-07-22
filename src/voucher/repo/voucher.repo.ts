@@ -1429,7 +1429,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             req.companyCode,
             req.unitCode,
         ]);
-        console.log(result, "????????")
         return result;
     }
 
@@ -2102,7 +2101,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 trialBalance.suspenseAccount.push({ ledgerName, debitAmount, creditAmount });
             }
         });
-        console.log(trialBalance, "????????????????")
         return trialBalance;
     }
 

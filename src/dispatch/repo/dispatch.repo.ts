@@ -27,22 +27,23 @@ export class DispatchRepository extends Repository<DispatchEntity> {
                 'de.id as id',
                 'sf.name AS staffName',
                 'sb.name AS subDealerName',
-                'cl.name AS clientName',
                 'de.from_address as fromAddress',
                 'de.to_address as toAddress',
                 'de.dispatch_date as dispatchDate',
                 'de.arrival_date as arrivalDate',
+                'de.trans_date as transDate',
+                'de.delivered_date as deliveredDate',
                 'de.status as status',
                 'de.transport_id as transportId',
                 'de.package_id as packageId',
                 'de.receiver_name as receiverName',
                 'de.dispatcher_name as dispatcherName',
                 'de.tracking_url as trackingURL',
-
+                'de.dispatch_box_images as dispatchPicks',
                 'de.dispatch_company_name as dispatchCompanyName',
+                'de.dispatch_description as dispatchDescription',
 
             ])
-            .leftJoin(ClientEntity, 'cl', 'de.client_id = cl.id')
             .leftJoin(StaffEntity, 'sf', 'de.staff_id = sf.id')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = de.sub_dealer_id');
         query.andWhere('de.company_code = :companyCode', { companyCode: req.companyCode });

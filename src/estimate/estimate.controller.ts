@@ -38,8 +38,6 @@ export class EstimateController {
         }
     }
 
-
-
     @Post('deleteEstimateDetails')
     async deleteEstimateDetails(@Body() dto: EstimateIdDto): Promise<CommonResponse> {
         try {
@@ -54,6 +52,36 @@ export class EstimateController {
     async getEstimateDetails(@Body() req: EstimateIdDto): Promise<CommonResponse> {
         try {
             return await this.estimateService.getEstimateDetails(req);
+        } catch (error) {
+            console.error('Error in get estimate details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching estimate details');
+        }
+    }
+
+    @Post('getInvoiceDetails')
+    async getInvoiceDetails(@Body() req: EstimateIdDto): Promise<CommonResponse> {
+        try {
+            return await this.estimateService.getInvoiceDetails(req);
+        } catch (error) {
+            console.error('Error in get estimate details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching estimate details');
+        }
+    }
+
+    @Post('getEstimatPrefixeDetails')
+    async getEstimatPrefixeDetails(@Body() req: EstimateIdDto): Promise<CommonResponse> {
+        try {
+            return await this.estimateService.getEstimatePrefixDetails(req);
+        } catch (error) {
+            console.error('Error in get estimate details in service:', error);
+            return new CommonResponse(false, 500, 'Error fetching estimate details');
+        }
+    }
+
+    @Post('getEstimatInvoicePrefixeDetails')
+    async getEstimatInvoicePrefixeDetails(@Body() req: EstimateIdDto): Promise<CommonResponse> {
+        try {
+            return await this.estimateService.getEstimatInvoicePrefixeDetails(req);
         } catch (error) {
             console.error('Error in get estimate details in service:', error);
             return new CommonResponse(false, 500, 'Error fetching estimate details');

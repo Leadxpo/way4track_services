@@ -10,6 +10,7 @@ export class RequestRaiseDto {
     branch: number;
     description: string;
     requestFor: string;
+    reply?: string;
     createdDate: Date;
     status: ClientStatusEnum
     subDealerId: number
@@ -19,6 +20,8 @@ export class RequestRaiseDto {
     products?: RequestTypeProducts[];
     fromDate?: Date;
     toDate?: Date;
+    image: string[];
+
 }
 export class RequestTypeProducts {
     productType: string;

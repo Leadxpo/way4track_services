@@ -9,16 +9,20 @@ export class DispatchDto {
     dispatchCompanyName?: string;
     dispatchDate?: Date;
     arrivalDate?: Date;
+    transUpdateUser?: string;
+    transDate?: Date;
+    deliveredUpdateUser?: string;
+    deliveredDate?: Date;
     status: DispatchStatus;
     transportId?: string;
     packageId?: string;
-    assignedProductsId?: number;
     receiverName?: string;
     dispatcherName?: string;
     trackingURL?: string;
     staffId?: string;
-    clientId?: string;
     subDealerId?: string;
-    dispatchBoximage: string;
+    deliveryDescription?: string;
+    dispatchDescription?: string;
+    dispatchBoximage: string[];
 
 }

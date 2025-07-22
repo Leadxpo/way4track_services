@@ -4,7 +4,11 @@ export class GetTicketsResDto {
     staffId: number;
     staffName: string;
     staffNumber: string;
+    reportingStaffId: number;
+    reportingStaffName: string;
+    reportingStaffNumber: string;
     problem: string;
+    remark: string;
     date: Date;
     branchId: number;
     branchName: string;
@@ -23,7 +27,11 @@ export class GetTicketsResDto {
         staffId: number,
         staffName: string,
         staffNumber: string,
+        reportingStaffId: number,
+        reportingStaffName: string,
+        reportingStaffNumber: string,  
         problem: string,
+        remark: string,
         date: Date,
         branchId: number,
         branchName: string,
@@ -45,7 +53,11 @@ export class GetTicketsResDto {
         this.staffId = staffId;
         this.staffName = staffName;
         this.staffNumber = staffNumber;
+        this.reportingStaffId = reportingStaffId;
+        this.reportingStaffName = reportingStaffName;
+        this.reportingStaffNumber = reportingStaffNumber;
         this.problem = problem;
+        this.remark = remark;
         this.date = date;
         this.branchId = branchId;
         this.branchName = branchName;

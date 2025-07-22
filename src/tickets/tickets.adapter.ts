@@ -14,12 +14,19 @@ export class TicketsAdapter {
     convertDtoToEntity(dto: TicketsDto): TicketsEntity {
         const entity = new TicketsEntity();
         entity.problem = dto.problem;
+        entity.remark = dto.remark;
         entity.date = dto.date;
         // entity.addressingDepartment = dto.addressingDepartment
 
         const staff = new StaffEntity();
         staff.id = dto.staffId;
         entity.staff = staff;
+
+        if (dto.reportingStaffId) {
+            const repstaff = new StaffEntity();
+            repstaff.id = dto.reportingStaffId;
+            entity.reportingStaff = repstaff;
+        }
 
         if (dto.subDealerId) {
             const sub = new SubDealerEntity();
@@ -55,7 +62,11 @@ export class TicketsAdapter {
                 entity.staff?.id || null,
                 entity.staff?.name || '',
                 entity.staff?.phoneNumber || '',
+                entity.reportingStaff?.id || null,
+                entity.reportingStaff?.name || '',
+                entity.reportingStaff?.phoneNumber || '',
                 entity.problem,
+                entity.remark,
                 entity.date,
                 entity.branch?.id || 0,
                 entity.branch?.branchName || '',

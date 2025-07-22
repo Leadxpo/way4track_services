@@ -28,6 +28,9 @@ export class AssertsEntity {
     @Column({ name: 'asserts_amount', type: 'float', nullable: true })
     assertsAmount: number;
 
+    @Column({ name: 'taxable_amount', type: 'float', nullable: true })
+    taxableAmount: number;
+
     @Column({
         type: 'enum',
         enum: AssetType,
@@ -59,9 +62,6 @@ export class AssertsEntity {
         enum: PaymentType,
     })
     paymentType: PaymentType;
-
-    // @Column('int', { name: 'emi_number', nullable: true })
-    // emiNumber: number;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

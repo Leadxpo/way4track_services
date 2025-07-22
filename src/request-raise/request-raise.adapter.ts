@@ -10,13 +10,9 @@ import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 export class RequestRaiseAdapter {
     convertDtoToEntity(dto: RequestRaiseDto): RequestRaiseEntity {
         const entity = new RequestRaiseEntity();
-        entity.requestType = dto.requestType;
+        entity.requestType = dto.requestType; 
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
-        // const staff = new StaffEntity();
-        // staff.id = dto.staffID;
-        // entity.staffId = staff;
-
         const staffFrom = new StaffEntity();
         staffFrom.id = dto.requestFrom;
         entity.requestFrom = staffFrom;
@@ -39,6 +35,8 @@ export class RequestRaiseAdapter {
         entity.requestFor = dto.requestFor
         entity.fromDate = dto.fromDate
         entity.toDate = dto.toDate
+        entity.status = dto.status
+        entity.image = dto.image
         if (dto.id) {
             entity.id = dto.id;
         }
@@ -63,8 +61,10 @@ export class RequestRaiseAdapter {
             entity.subDealerId.name,
             entity.products,
             entity.requestFor,
+            entity.reply,
             entity.fromDate,
-            entity.toDate
+            entity.toDate,
+            entity.image
         );
     }
 }

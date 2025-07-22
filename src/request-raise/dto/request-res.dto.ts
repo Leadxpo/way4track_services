@@ -19,14 +19,15 @@ export class RequestResDto {
     subDealerName?: string
     products?: RequestTypeProducts[];
     requestFor: string;
+    reply: string;
     fromDate?: Date;
     toDate?: Date;
+    image: string[]
 
     constructor(
         id: number,
         requestType: RequestType,
         staffID: string,
-
         requestBY: string,
         requestTo: string,
         description: string,
@@ -40,9 +41,10 @@ export class RequestResDto {
         subDealerName?: string,
         products?: RequestTypeProducts[],
         requestFor?: string,
+        reply?: string,
         fromDate?: Date,
-        toDate?: Date
-
+        toDate?: Date,
+        image?: string[]
     ) {
         this.id = id;
         this.requestType = requestType;
@@ -60,8 +62,9 @@ export class RequestResDto {
         this.subDealerName = subDealerName
         this.products = products
         this.requestFor = requestFor
+        this.reply = reply
         this.fromDate = fromDate
         this.toDate = toDate
-
+        this.image = image
     }
 }

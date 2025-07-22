@@ -68,7 +68,6 @@ export class RefundService {
         try {
             console.log(dto);
             const existing = await this.repo.findOne({ where: { id: dto.id } });
-            console.log(existing, "?????????");
             if (!existing) throw new Error('Refund not found');
 
             if (filePath && existing.damageImage) {

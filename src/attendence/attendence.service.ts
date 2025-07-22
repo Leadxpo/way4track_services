@@ -131,7 +131,7 @@ export class AttendanceService {
             }
 
             const entity = this.adapter.toEntity(dto);
-            console.log(entity, "????????")
+
             // Merge existing Attendance details with new data
             const updatedAttendance = {
                 ...existingAttendance,

@@ -290,7 +290,6 @@ export class PermissionsService {
             if (!staffDesignation) {
                 throw new ErrorResponse(5419, 'Staff designation is missing or invalid');
             }
-            console.log(staffDesignation, "???????????????")
             // Fetch the default permissions for the staff's designation
             const designationRes = await this.designationSerie.getDesignation({
                 designation: staffDesignation.designation,

@@ -23,20 +23,23 @@ export class DispatchAdapter {
             dispatchCompanyName: entity.dispatchCompanyName,
             dispatchDate: entity.dispatchDate?.toISOString(),
             arrivalDate: entity.arrivalDate?.toISOString(),
+            transUpdateUser: entity.transUpdateUser,
+            transDate: entity.transDate?.toISOString(),
+            deliveredUpdateUser: entity.deliveredUpdateUser,
+            deliveredDate: entity.deliveredDate?.toISOString(),
             status: entity.status,
             transportId: entity.transportId,
             packageId: entity.packageId,
-            assignedProductsId: entity.assignedProductsId ? entity.assignedProductsId.id : null, // ✅ Safe check
             receiverName: entity.receiverName,
             dispatcherName: entity.dispatcherName,
             trackingURL: entity.trackingURL,
             staffId: entity.staffId?.staffId || null,
             staffName: entity.staffId?.name || null,
-            clientId: entity.clientId?.clientId || null,
-            clientName: entity.clientId?.name || null,
             subDealerId: entity.subDealerId?.subDealerId || null,
             subDealerName: entity.subDealerId?.name || null,
-            dispatchBoximage: entity.dispatchBoximage || ""
+            deliveryDescription: entity.deliveryDescription,
+            dispatchDescription: entity.dispatchDescription,
+            dispatchBoximage: entity.dispatchBoximage || []
         };
     }
 
@@ -54,30 +57,25 @@ export class DispatchAdapter {
         entity.dispatchCompanyName = dto.dispatchCompanyName;
         entity.dispatchDate = dto.dispatchDate;
         entity.arrivalDate = dto.arrivalDate;
+        entity.transUpdateUser = dto.transUpdateUser;
+        entity.transDate = dto.transDate;
+        entity.deliveredDate = dto.deliveredDate;
+        entity.deliveredUpdateUser = dto.deliveredUpdateUser;
         entity.status = dto.status;
         entity.transportId = dto.transportId;
         entity.packageId = dto.packageId;
-
         entity.receiverName = dto.receiverName;
         entity.dispatcherName = dto.dispatcherName;
         entity.trackingURL = dto.trackingURL;
         const staff = new StaffEntity()
         staff.staffId = dto.staffId
         entity.staffId = staff
-        const client = new ClientEntity()
-        client.clientId = dto.clientId
-        entity.clientId = client
         const sub = new SubDealerEntity()
         sub.subDealerId = dto.subDealerId
         entity.subDealerId = sub
-        if (dto.assignedProductsId) {
-            const product = new ProductAssignEntity()
-            product.id = dto.assignedProductsId
-            entity.assignedProductsId = product
-        }
-
+        entity.deliveryDescription = dto.deliveryDescription
+        entity.dispatchDescription = dto.dispatchDescription
         entity.dispatchBoximage = dto.dispatchBoximage
-
         return entity;
     }
 }
