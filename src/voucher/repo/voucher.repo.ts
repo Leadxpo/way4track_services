@@ -928,20 +928,24 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
     async getLast30DaysCreditAndDebitPercentages(req: { companyCode: string, unitCode: string, branchName?: string }) {
         const query = this.createQueryBuilder('ve')
-            .select([
-                `branch.name AS branchName`,
-                `ROUND(
-                    COALESCE(SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END), 0) / 
-                    NULLIF(SUM(ve.amount), 0) * 100, 2
-                ) AS creditPercentage`,
-                `ROUND(
-                    COALESCE(SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END), 0) / 
-                    NULLIF(SUM(ve.amount), 0) * 100, 2
-                ) AS debitPercentage`
-            ])
+            .select('branch.name', 'branchName')
+            .addSelect(`
+    ROUND(
+      COALESCE(SUM(CASE WHEN ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END), 0) / 
+      NULLIF(SUM(CASE WHEN ve.voucher_type IN ('SALES', 'PURCHASE') THEN ve.amount ELSE 0 END), 0) * 100,
+      2
+    )
+  `, 'creditPercentage')
+            .addSelect(`
+    ROUND(
+      COALESCE(SUM(CASE WHEN ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END), 0) / 
+      NULLIF(SUM(CASE WHEN ve.voucher_type IN ('SALES', 'PURCHASE') THEN ve.amount ELSE 0 END), 0) * 100,
+      2
+    )
+  `, 'debitPercentage')
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.voucher_type IN (:...types)', {
-                types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE]
+                types: [VoucherTypeEnum.SALES, VoucherTypeEnum.PURCHASE]
             })
             .andWhere('ve.generation_date >= CURDATE() - INTERVAL 30 DAY')
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
@@ -951,11 +955,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             query.andWhere('branch.name = :branchName', { branchName: req.branchName });
         }
 
-        query
-            .groupBy('branch.name') // Use groupBy instead of addGroupBy
-            .orderBy('branch.name', 'ASC');
+        query.groupBy('branch.name').orderBy('branch.name', 'ASC');
 
         return query.getRawMany();
+
     }
 
     async getProductsPhotos(req: {
