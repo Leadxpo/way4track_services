@@ -130,6 +130,8 @@ export class TicketsRepository extends Repository<TicketsEntity> {
                 'staff.name AS staffName',
                 'repstaff.id AS reportingStaffId',
                 'repstaff.name AS reportingStaffName',
+                'ticket.designation_id AS designationRelation',
+                'de.designation AS designation',
                 'sb.sub_dealer_id AS subDealerId',
                 'sb.name AS subDealerName',
                 'ticket.work_status AS ticketStatus',

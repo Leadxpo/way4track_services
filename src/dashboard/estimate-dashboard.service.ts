@@ -246,7 +246,7 @@ export class EstimateDashboardService {
 
     async getEstimates(req: {
         fromDate?: string; toDate?: string; status?: ClientStatusEnum; companyCode?: string;
-        unitCode?: string
+        unitCode?: string;branch?:number
     }): Promise<CommonResponse> {
         const VendorData = await this.repo.getEstimates(req)
         if (!VendorData) {

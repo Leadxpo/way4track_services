@@ -46,6 +46,9 @@ export class AccountService {
                 companyCode: req.companyCode,
                 unitCode: req.unitCode,
             },
+            order: {
+                createdAt: 'DESC'  // <- this is what adds the descending sort
+            }
         });
 
         const dtoData = this.adapter.convertEntityToDto(entities);

@@ -59,9 +59,6 @@ export class StaffController {
         return this.staffService.handleStaffDetails(dto, files);
     }
 
-
-
-
     @Post('deletestaffDetails')
     async deletestaffDetails(@Body() dto: StaffIdDto): Promise<CommonResponse> {
         try {

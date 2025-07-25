@@ -175,11 +175,11 @@ export class DispatchService {
         try {
             const allocation = await this.repo.find({
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
-                relations: ['staffId', 'clientId', 'subDealerId']
+                relations: ['staffId', 'clientId', 'subDealerId'],
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                }
             });
-            console.log(allocation,
-                ">>>>>>>>>"
-            )
             if (!allocation) {
                 return new CommonResponse(false, 404, 'Work Allocation not found');
             } else {

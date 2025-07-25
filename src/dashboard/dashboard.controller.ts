@@ -313,7 +313,7 @@ export class DashboardController {
     @Post('getEstimates')
     async getEstimates(@Body() req: {
         fromDate?: string; toDate?: string; status?: ClientStatusEnum; companyCode?: string;
-        unitCode?: string
+        unitCode?: string;branch:number
     }): Promise<CommonResponse> {
         try {
             return await this.estimateDashboardService.getEstimates(req)

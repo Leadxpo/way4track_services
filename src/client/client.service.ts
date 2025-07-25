@@ -171,7 +171,13 @@ export class ClientService {
 
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const client = await this.clientRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['customerAddress', 'cart', 'order', 'refund'] });
+            const client = await this.clientRepository.find({
+                where: { companyCode: req.companyCode, unitCode: req.unitCode }, 
+                relations: ['customerAddress', 'cart', 'order', 'refund'], 
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                }
+            });
             if (!client) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
@@ -238,15 +244,17 @@ export class ClientService {
     async getClientByPhoneNumber(req: ClientDto): Promise<CommonResponse> {
         let data = null;
 
-        data = await this.clientRepository.findOne({ where: { phoneNumber: req.phoneNumber },relations: [
-            'order',
-            'order.deliveryAddressId',
-            'order.buildingAddressId',
-            'customerAddress',
-            'cart',
-            'refund',
-            'refund.deviceId'
-        ], });
+        data = await this.clientRepository.findOne({
+            where: { phoneNumber: req.phoneNumber }, relations: [
+                'order',
+                'order.deliveryAddressId',
+                'order.buildingAddressId',
+                'customerAddress',
+                'cart',
+                'refund',
+                'refund.deviceId'
+            ],
+        });
 
         if (data) {
             return new CommonResponse(false, 75483, "client exists", data);

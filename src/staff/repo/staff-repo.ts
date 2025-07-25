@@ -310,7 +310,9 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.staff_id AS staffId',
                 'staff.name AS staffName',
                 'staff.designation AS designation',
-                'staff.phone_number AS phoneNumber',
+                'staff.office_email AS email',
+                'staff.office_phone_number AS phoneNumber',
+                'staff.address AS address',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })

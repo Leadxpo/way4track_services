@@ -53,6 +53,9 @@ export class AssertsService {
             const assert = await this.assertsRepository.find({
                 relations: ['branchId'],
                 where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                }
             });
 
             if (!assert) {

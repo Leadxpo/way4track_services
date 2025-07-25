@@ -160,6 +160,9 @@ export class VendorService {
       const vendor = await this.vendorRepository.find({
         where: { companyCode: req.companyCode, unitCode: req.unitCode },
         relations: ['branch'],
+        order: {
+          createdAt: 'DESC'  // <- this is what adds the descending sort
+      }
       });
 
       if (!vendor) {

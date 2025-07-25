@@ -187,15 +187,6 @@ export class VoucherEntity {
     @JoinColumn({ name: 'payment_to' })
     paymentTo: StaffEntity;
 
-    // @Column('decimal', { name: 'initial_payment', precision: 10, scale: 2, nullable: true })
-    // initialPayment: number;
-
-    // @Column('int', { name: 'emi_count', nullable: true })
-    // numberOfEmi: number;
-
-    // @Column('int', { name: 'emi_number', nullable: true })
-    // emiNumber: number;
-
     @OneToMany(() => AssertsEntity, (voucher) => voucher.voucherId)
     assert: AssertsEntity[];
 

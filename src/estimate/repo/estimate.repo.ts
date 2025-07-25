@@ -17,11 +17,13 @@ export class EstimateRepository extends Repository<EstimateEntity> {
         fromDate?: string;
         toDate?: string;
         status?: ClientStatusEnum;
+        branch?:number;
         companyCode?: string;
         unitCode?: string;
     }) {
         const fromDate = req.fromDate || '';
         const toDate = req.toDate || '';
+        const branch = req.branch || '';
 
         const query = this.createQueryBuilder('estimate')
             .select([
@@ -31,6 +33,7 @@ export class EstimateRepository extends Repository<EstimateEntity> {
                 'estimate.estimate_date AS estimateDate',
                 'estimate.expire_date AS expiryDate',
                 'estimate.amount AS estimateAmount',
+                'branch.name As estimateBranch',
                 'estimate.shipping_address AS shippingAddress',
                 'estimate.product_details as productDetails'
             ])
@@ -50,6 +53,10 @@ export class EstimateRepository extends Repository<EstimateEntity> {
 
         if (req.status) {
             query.andWhere('estimate.status = :status', { status: req.status });
+        }
+
+        if (req.branch) {
+            query.andWhere('estimate.branch_id = :branchId', { branchId: req.branch });
         }
 
         const result = await query.getRawMany();

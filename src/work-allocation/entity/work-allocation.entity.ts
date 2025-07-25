@@ -36,9 +36,6 @@ export class WorkAllocationEntity extends BaseEntity {
     @Column({ name: 'date', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: true })
     date: Date;
 
-    // @Column({ name: 'install', type: 'boolean', default: false })
-    // install: boolean;
-
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.workAllocation, { nullable: true })
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;

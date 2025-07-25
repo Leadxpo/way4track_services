@@ -27,7 +27,7 @@ export class VendorRepository extends Repository<VendorEntity> {
             ])
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
-
+            .orderBy('ve.created_at', 'DESC'); // 👈 add this line
         const result = await query.getRawMany();
         return result;
     }

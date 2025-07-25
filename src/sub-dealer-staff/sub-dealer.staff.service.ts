@@ -124,7 +124,11 @@ export class SubDealerStaffService {
 
     async getSubDealerStaffDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const SubDealerStaff = await this.repo.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['subDealerId'] });
+            const SubDealerStaff = await this.repo.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, 
+                relations: ['subDealerId'],
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                } });
             if (!SubDealerStaff) {
                 return new CommonResponse(false, 404, 'SubDealerStaff not found');
             }

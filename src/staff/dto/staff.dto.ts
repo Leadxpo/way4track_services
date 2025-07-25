@@ -2,6 +2,7 @@ import { AccountType, Gender, YesNo } from "../entity/staff.entity";
 import { AttendanceStatus } from "../enum/attendence-status.enum";
 import { Letters, Qualification } from "../enum/qualifications.enum";
 import { StaffStatus } from "../enum/staff-status";
+
 export class StaffDto {
     id?: number;
     name: string;

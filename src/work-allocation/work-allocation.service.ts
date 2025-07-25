@@ -151,7 +151,10 @@ export class WorkAllocationService {
             console.log(req, "req")
             const allocation = await this.workAllocationRepository.find({
                 where: { id: req.id, companyCode: req.companyCode, unitCode: req.unitCode },
-                relations: ['staffId', 'clientId', 'voucherId']
+                relations: ['staffId', 'clientId', 'voucherId'],
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                }
             });
             console.log(allocation, "allocation")
 

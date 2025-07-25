@@ -117,4 +117,11 @@ export class ClientEntity extends BaseEntity {
 
     @Column({ name: 'status', type: 'enum', enum: ClientStatus, default: ClientStatus.Active, nullable: true })
     status: ClientStatus
+
+    @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+  
+    @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
+  
 }

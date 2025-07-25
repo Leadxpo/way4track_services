@@ -302,5 +302,6 @@ export class StaffEntity extends BaseEntity {
 
   @OneToMany(() => ProductEntity, (asserts) => asserts.staffId)
   product: ProductEntity[];
+  
 
 }

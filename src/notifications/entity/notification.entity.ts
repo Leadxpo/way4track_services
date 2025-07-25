@@ -27,9 +27,6 @@ export class NotificationEntity {
     @Column({ default: false, name: 'is_read' })
     isRead: boolean;
 
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
-
     @Column({
         name: 'notification_type',
         type: 'enum',
@@ -58,4 +55,11 @@ export class NotificationEntity {
     @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.note, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })
     subDealerId: SubDealerEntity;
+  
+    @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+  
+    @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
+    
 }

@@ -139,7 +139,10 @@ export class HiringService {
 
     async getHiringDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const hiring = await this.hiringRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const hiring = await this.hiringRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                } });
             if (!hiring.length) {
                 throw new ErrorResponse(404, 'Hiring record not found');
             }
@@ -197,7 +200,7 @@ export class HiringService {
         }
 
         const result = await query.getRawMany();
-        console.log(result, "PPPPPPPPPPP");
+
         return new CommonResponse(true, 200, 'Hiring details retrieved successfully', result);
     }
 

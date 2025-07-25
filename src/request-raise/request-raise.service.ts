@@ -188,7 +188,11 @@ export class RequestRaiseService {
 
     async getAllRequestDetails(req: CommonReq): Promise<CommonResponse> {
         try {
-            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId', 'requestFrom', 'requestTo', 'subDealerId'], where: { companyCode: req.companyCode, unitCode: req.unitCode } });
+            const request = await this.requestRepository.find({ relations: ['staffId', 'branchId', 'requestFrom', 'requestTo', 'subDealerId'], 
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                order: {
+                createdAt: 'DESC'  // <- this is what adds the descending sort
+            } });
             if (!request) {
                 return new CommonResponse(false, 404, 'Request not found');
             }

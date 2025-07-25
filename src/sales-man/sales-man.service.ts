@@ -56,7 +56,10 @@ export class SalesWorksService {
 
 
     async findAll(): Promise<CommonResponse> {
-        const branch: SalesWorksEntity[] = await this.salesWorksRepository.find({relations: ['staffId','allocateStaffId']
+        const branch: SalesWorksEntity[] = await this.salesWorksRepository.find({relations: ['staffId','allocateStaffId'],
+            order: {
+                createdAt: 'DESC'  // <- this is what adds the descending sort
+            }
         });
 
         // Convert each entity in the array to DTO

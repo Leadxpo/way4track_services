@@ -149,7 +149,10 @@ export class SubDealerService {
 
   async getSubDealerDetails(req: CommonReq): Promise<CommonResponse> {
     try {
-      const subDealer = await this.subDealerRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'] });
+      const subDealer = await this.subDealerRepository.find({ where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['branch'],
+        order: {
+          createdAt: 'DESC'  // <- this is what adds the descending sort
+      } });
       if (!subDealer) {
         return new CommonResponse(false, 404, 'SubDealer not found');
       }

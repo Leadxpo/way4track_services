@@ -60,6 +60,7 @@ export class VoucherResDto {
     //     name: string; quantity: number; amount: number
     // }[];
     dueDate: Date;
+    createdAt:Date
     productDetails?: ProductDetailDto[];
     constructor(
         id: number,
@@ -112,6 +113,7 @@ export class VoucherResDto {
         //     name: string; quantity: number; amount: number
         // }[],
         dueDate?: Date,
+        createdAt?: Date,
         productDetails?: ProductDetailDto[]
 
     ) {
@@ -165,6 +167,7 @@ export class VoucherResDto {
         this.paymentTo = paymentTo
         this.receiptPdfUrl = receiptPdfUrl
         this.dueDate = dueDate
+        this.createdAt = createdAt
         this.productDetails = productDetails
     }
 }

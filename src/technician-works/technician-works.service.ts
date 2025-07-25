@@ -657,8 +657,7 @@ export class TechnicianService {
 
     async getSucessPaymentsForTable
         (req: BranchChartDto): Promise<CommonResponse> {
-        const VoucherData = await this.repo.getSucessPaymentsForTable
-            (req)
+        const VoucherData = await this.repo.getSucessPaymentsForTable(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
@@ -669,8 +668,7 @@ export class TechnicianService {
 
     async getAllPaymentsForTable
         (req: BranchChartDto): Promise<CommonResponse> {
-        const VoucherData = await this.repo.getAllPaymentsForTable
-            (req)
+        const VoucherData = await this.repo.getAllPaymentsForTable(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {
@@ -681,8 +679,7 @@ export class TechnicianService {
 
     async getPendingPaymentsForTable
         (req: BranchChartDto): Promise<CommonResponse> {
-        const VoucherData = await this.repo.getPendingPaymentsForTable
-            (req)
+        const VoucherData = await this.repo.getPendingPaymentsForTable(req)
         if (!VoucherData) {
             return new CommonResponse(false, 56416, "Data Not Found With Given Input", [])
         } else {

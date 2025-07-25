@@ -354,7 +354,10 @@ export class EstimateService {
         try {
             const estimate = await this.estimateRepository.find({
                 relations: ['clientId', 'products', 'vendorId', 'branchId'],  // ✅ Add 'vendorId' if needed
-                where: { companyCode: req.companyCode, unitCode: req.unitCode }
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                order: {
+                    createdAt: 'DESC'  // <- this is what adds the descending sort
+                }
             });
 
             if (!estimate) {

@@ -163,6 +163,7 @@ export class VoucherAdapter {
           voucher.staffId?.name || "",
           voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
           voucher?.dueDate ? voucher.dueDate : null,
+          voucher.createdAt,
           voucher?.productDetails ? voucher.productDetails : [],
         );
       });
@@ -221,6 +222,7 @@ export class VoucherAdapter {
           voucher.staffId?.name || "",
           voucher.estimate?.receiptPdfUrl ? voucher.estimate.receiptPdfUrl : "",
           voucher?.dueDate ? voucher.dueDate : null,
+          voucher?.createdAt ? voucher.createdAt : null,
           voucher?.productDetails ? voucher.productDetails : [],
         )
       ];

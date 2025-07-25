@@ -686,6 +686,9 @@ export class VoucherService {
     async getAllVouchers(): Promise<VoucherResDto[]> {
         const vouchers = await this.voucherRepository.find({
             relations: ['branchId', 'ledgerId', 'fromAccount', 'toAccount'], // make sure this is included
+            order: {
+                createdAt: 'DESC'  // <- this is what adds the descending sort
+            }
         });
         return this.voucherAdapter.entityToDto(vouchers);
     }
