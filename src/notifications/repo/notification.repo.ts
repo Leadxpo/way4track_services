@@ -57,7 +57,7 @@ export class NotificationRepository extends Repository<NotificationEntity> {
         }
 
         const notifications = await notificationsQuery
-            .orderBy('created_at', 'ASC')
+            .orderBy('nt.created_at', 'ASC')
             .getRawMany();
 
         return { result, notifications };
