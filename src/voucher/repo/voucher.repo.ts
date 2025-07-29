@@ -896,36 +896,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-    // async getExpenseData(req: CommonReq): Promise<any> {
-    //     const query = this.createQueryBuilder('ve')
-    //         .select('SUM(ve.amount) AS totalExpenses')
-    //         .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
-    //         .andWhere('ve.product_type = :productType', { productType: ProductType.expanses })
-    //         .andWhere('DATE(ve.generationDate) BETWEEN DATE_SUB(CURDATE(), INTERVAL 30 DAY) AND CURDATE()')
-    //         .andWhere(`ve.company_code = "${req.companyCode}"`)
-    //         .andWhere(`ve.unit_code = "${req.unitCode}"`)
-    //     const last30DaysResult = await query.getRawOne();
-    //     const weekQuery = this.createQueryBuilder('ve')
-    //         .select('SUM(ve.amount) AS totalExpenses')
-    //         .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
-    //         .andWhere('ve.product_type = :productType', { productType: ProductType.expanses })
-    //         .andWhere('DATE(ve.generationDate) BETWEEN DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND CURDATE()')
-    //         .andWhere(`ve.company_code = "${req.companyCode}"`)
-    //         .andWhere(`ve.unit_code = "${req.unitCode}"`)
-    //     const last7DaysResult = await weekQuery.getRawOne();
-    //     const last30DaysExpenses = last30DaysResult.totalExpenses;
-    //     const last7DaysExpenses = last7DaysResult.totalExpenses;
-    //     let percentageChange = 0;
-    //     if (last7DaysExpenses && last30DaysExpenses) {
-    //         percentageChange = ((last30DaysExpenses - last7DaysExpenses) / last7DaysExpenses) * 100;
-    //     }
-
-    //     return {
-    //         last30DaysExpenses: last30DaysExpenses,
-    //         percentageChange: percentageChange.toFixed(2),
-    //     };
-    // }
-
     async getLast30DaysCreditAndDebitPercentages(req: { companyCode: string, unitCode: string, branchName?: string }) {
         const query = this.createQueryBuilder('ve')
             .select('branch.name', 'branchName')
@@ -1347,53 +1317,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query.getRawMany();
     }
 
-    // async getSalesBreakdown(req: BranchChartDto) {
-    //     const query = await this.createQueryBuilder('ve')
-    //         .select([
-    //             `YEAR(ve.generation_date) AS year`, // Selecting Year
-    //             `branch.id AS branchId`,
-    //             `branch.name AS branchName`,
-    //             `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS totalSalesAmount`, // Changed to sum extractedAmount
-    //             `SUM(JSON_EXTRACT(ve.product_details, '$[*].totalCost')) AS extractedAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Rectifications')
-    //             ) AS rectificationsAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Renewables')
-    //             ) AS renewablesAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'Replacements')
-    //             ) AS replacementsAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ProductSales')
-    //             ) AS productSalesAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'ServiceSales')
-    //             ) AS serviceSalesAmount`,
-    //             `SUM(
-    //                 JSON_EXTRACT(ve.product_details, '$[*].totalCost') 
-    //                 * (JSON_UNQUOTE(JSON_EXTRACT(ve.product_details, '$[*].type')) = 'others')
-    //             ) AS otherSalesAmount`
-    //         ])
-    //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-    //         .where(`YEAR(ve.generation_date) = :year`, { year: req.date }) // Filtering by selected year
-    //         .andWhere('ve.voucher_type = :voucherType', { voucherType: VoucherTypeEnum.SALES })
-    //         .andWhere(`ve.company_code = :companyCode`, { companyCode: req.companyCode })
-    //         .andWhere(`ve.unit_code = :unitCode`, { unitCode: req.unitCode })
-    //         // .andWhere(`ve.payment_status = :pendingStatus`, { pendingStatus: PaymentStatus.PENDING })
-    //         .groupBy('YEAR(ve.generation_date), branch.id, branch.name') // Grouping by Year & Branch
-    //         .orderBy('YEAR(ve.generation_date)', 'ASC')
-    //         .addOrderBy('branch.name', 'ASC')
-    //         .getRawMany();
-    //     console.log(query, "?>>>>>>>>>")
-    //     return query;
-    // }
-
     async getSalesBreakdown(req: BranchChartDto) {
         const entityManager = this.dataSource.manager;
 
@@ -1676,6 +1599,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END) AS ReceivableAmount`,
                 `SUM(CASE WHEN ve.payment_status = 'PENDING' AND ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END) AS PayableAmount`,
                 `SUM(CASE WHEN ve.voucher_type = 'SALES' THEN ve.amount ELSE 0 END) AS SalesAmount`,
+                `SUM(CASE WHEN ve.voucher_type = 'PURCHASE' THEN ve.amount ELSE 0 END) AS PurchaseAmount`,
             ])
             .leftJoin('branches', 'branch', 'branch.id = ve.branch_id')
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
@@ -1711,7 +1635,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query.getRawOne(); // Returns a single object instead of an array
     }
 
-    async getSolidLiquidCash(req: CommonReq) {
+    async getSolidLiquidCash(req: CommonReq) { 
         // 1️⃣ Get total balance in all accounts from `AccountEntity` (No need for payment type filtering)
         const bankBalanceResult = await this.dataSource
             .getRepository(AccountEntity)
@@ -1722,24 +1646,24 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .getRawOne();
 
         // 2️⃣ Get transactions from vouchers that affect banks (receipt & payment)
-        const bankTransactions = await this.dataSource
-            .getRepository(VoucherEntity)
-            .createQueryBuilder('ve')
-            .select([
-                `SUM(CASE 
-                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
-                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
-                    ELSE 0 
-                END) AS bankTransactions`,
-            ])
-            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .setParameters({
-                bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
-                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE], // Increase bank balance
-                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE], // Decrease bank balance
-            })
-            .getRawOne();
+        // const bankTransactions = await this.dataSource
+        //     .getRepository(VoucherEntity)
+        //     .createQueryBuilder('ve')
+        //     .select([
+        //         `SUM(CASE 
+        //             WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+        //             WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+        //             ELSE 0 
+        //         END) AS bankTransactions`,
+        //     ])
+        //     .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+        //     .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+        //     .setParameters({
+        //         bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
+        //         positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE], // Increase bank balance
+        //         negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE], // Decrease bank balance
+        //     })
+        //     .getRawOne();
 
         // 3️⃣ Get solid cash (only transactions with `payment_type = cash`)
         const solidCashResult = await this.dataSource
@@ -1754,8 +1678,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             ])
             .setParameters({
                 cash: PaymentType.CASH,
-                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
-                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                positiveVouchers: [VoucherTypeEnum.RECEIPT,VoucherTypeEnum.CONTRA],
+                negativeVouchers: [VoucherTypeEnum.PAYMENT],
             })
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
@@ -1763,7 +1687,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return {
             solidCash: parseFloat(solidCashResult?.solidCash || 0),
-            liquidCash: parseFloat(bankBalanceResult?.bankBalance || 0) + parseFloat(bankTransactions?.bankTransactions || 0),
+            liquidCash: parseFloat(bankBalanceResult?.bankBalance || 0),
         };
     }
 
@@ -1783,27 +1707,27 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .getRawMany();
 
         // 2️⃣ Get bank transactions from VoucherEntity (both positive & negative)
-        const bankTransactions = await this.dataSource
-            .getRepository(VoucherEntity)
-            .createQueryBuilder('ve')
-            .select([
-                'br.name AS branchName',
-                `SUM(CASE 
-                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
-                    WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
-                    ELSE 0 
-                END) AS bankTransactions`,
-            ])
-            .leftJoin('branches', 'br', 'br.id = ve.branch_id')
-            .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
-            .groupBy('br.name')
-            .setParameters({
-                bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
-                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
-                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
-            })
-            .getRawMany();
+        // const bankTransactions = await this.dataSource
+        //     .getRepository(VoucherEntity)
+        //     .createQueryBuilder('ve')
+        //     .select([
+        //         'br.name AS branchName',
+        //         `SUM(CASE 
+        //             WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...positiveVouchers) THEN ve.amount 
+        //             WHEN ve.payment_type IN (:...bankPayments) AND ve.voucher_type IN (:...negativeVouchers) THEN -ve.amount 
+        //             ELSE 0 
+        //         END) AS bankTransactions`,
+        //     ])
+        //     .leftJoin('branches', 'br', 'br.id = ve.branch_id')
+        //     .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
+        //     .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
+        //     .groupBy('br.name')
+        //     .setParameters({
+        //         bankPayments: [PaymentType.BANK, PaymentType.UPI, PaymentType.CARD, PaymentType.cheque],
+        //         positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
+        //         negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+        //     })
+        //     .getRawMany();
 
         // 3️⃣ Get branch-wise solid cash (cash transactions from VoucherEntity)
         const solidCashResults = await this.dataSource
@@ -1823,8 +1747,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .groupBy('br.name')
             .setParameters({
                 cash: PaymentType.CASH,
-                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE],
-                negativeVouchers: [VoucherTypeEnum.PAYMENT, VoucherTypeEnum.CREDITNOTE],
+                positiveVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.CONTRA],
+                negativeVouchers: [VoucherTypeEnum.PAYMENT],
             })
             .getRawMany();
 
@@ -1841,16 +1765,16 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         });
 
         // Add bank transactions to liquid cash
-        bankTransactions.forEach(row => {
-            if (!branchWiseData.has(row.branchName)) {
-                branchWiseData.set(row.branchName, {
-                    branchName: row.branchName || 'Unknown Branch',
-                    liquidCash: 0,
-                    solidCash: 0,
-                });
-            }
-            branchWiseData.get(row.branchName)!.liquidCash += parseFloat(row.bankTransactions || '0');
-        });
+        // bankTransactions.forEach(row => {
+        //     if (!branchWiseData.has(row.branchName)) {
+        //         branchWiseData.set(row.branchName, {
+        //             branchName: row.branchName || 'Unknown Branch',
+        //             liquidCash: 0,
+        //             solidCash: 0,
+        //         });
+        //     }
+        //     branchWiseData.get(row.branchName)!.liquidCash += parseFloat(row.bankTransactions || '0');
+        // });
 
         // Populate solid cash data
         solidCashResults.forEach(row => {

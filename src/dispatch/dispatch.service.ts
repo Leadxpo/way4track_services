@@ -133,7 +133,7 @@ export class DispatchService {
             await this.repo.insert(newDispatch);
             return new CommonResponse(true, 200, 'Work allocation and technician details created successfully');
         } catch (error) {
-            console.error(`Error creating work allocation details: ${error.message}`, error.stack);
+            console.error(`Error creating dispatch details: ${error.message}`, error.stack);
             throw new ErrorResponse(500, `Failed to create work allocation details: ${error.message}`);
         }
     }
