@@ -2,6 +2,9 @@ import { NotificationEnum } from "../entity/notification.entity";
 
 export class CreateNotificationDto {
     userId: number;
+    requestId?:number;
+    ticketId?:number;
+    notificationToId?: number; // <--- Make it optional
     message: string;
     branchId?: number;
     notificationType: NotificationEnum;
@@ -21,6 +24,7 @@ export class GetNotificationDto {
     branchId: number;
     branchName: string;
     userId: number;
+    notificationTo: number;
     createdAt: Date;
     notificationType: NotificationEnum;
     unitCode: string;
@@ -36,6 +40,7 @@ export class GetNotificationDto {
         branchId: number,
         branchName: string,
         userId: number,
+        notificationTo: number,
         createdAt: Date,
         notificationType: NotificationEnum,
         unitCode: string,
@@ -51,6 +56,7 @@ export class GetNotificationDto {
         this.branchId = branchId;
         this.branchName = branchName;
         this.userId = userId;
+        this.notificationTo = notificationTo;
         this.createdAt = createdAt;
         this.notificationType = notificationType;
         this.unitCode = unitCode;

@@ -50,6 +50,16 @@ export class VoucherController {
         }
     }
 
+    @Post('getVoucherInvoices')
+    async getVoucherInvoices(@Body() dto: { ledgerId: number }): Promise<CommonResponse> {
+        try {
+            return await this.voucherService.getVoucherInvoices(dto);
+        } catch (error) {
+            console.error('Error in getVoucherInvoices:', error);
+            return new CommonResponse(false, 500, 'Error getting voucher invoices', error.message);
+        }
+    }
+    
     @Post('getAllVouchers')
     async getAllVouchers(): Promise<CommonResponse> {
         try {

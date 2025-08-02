@@ -22,8 +22,8 @@ export class NotificationController {
 
     @Post('getAllNotifications')
     async getAllNotifications(@Body() req: {
-        ticketNumber?: string; branchName?: string; staffName?: string, companyCode?: string,
-        unitCode?: string
+        ticketNumber?: string; requestNumber?: string;branchName?: string; notifyStaffId?: number; companyCode?: string;
+        unitCode?: string;subDealerId?: string;
     }) {
         try {
             return this.notificationService.getAllNotifications(req);

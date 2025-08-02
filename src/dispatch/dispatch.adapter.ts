@@ -21,7 +21,7 @@ export class DispatchAdapter {
             fromAddress: entity.fromAddress,
             toAddress: entity.toAddress,
             dispatchCompanyName: entity.dispatchCompanyName,
-            dispatchDate: entity.dispatchDate?.toISOString(),
+            dispatchDate: entity.dispatchDate?.toISOString(), 
             arrivalDate: entity.arrivalDate?.toISOString(),
             transUpdateUser: entity.transUpdateUser,
             transDate: entity.transDate?.toISOString(),

@@ -55,8 +55,6 @@ export class TicketsService {
 
             // newTicket.ticketNumber = `Tickets-${(await this.ticketsRepository.count() + 1).toString().padStart(5, '0')}`;
 
-
-            console.log('New Ticket Data:', newTicket);
             await this.ticketsRepository.insert(newTicket); // 
 
             // Handle notifications after the ticket is saved

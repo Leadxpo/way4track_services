@@ -93,18 +93,19 @@ export class RequestRaiseService {
         try {
             entity = this.requestAdapter.convertDtoToEntity(dto);
             entity.id = null;
-
-
             const lastRequest = await this.requestRepository
                 .createQueryBuilder("Request")
                 .select("MAX(Request.id)", "max")
                 .getRawOne();
+            console.log("rrr dto :", dto)
 
             const nextId = (lastRequest.max ?? 0) + 1;
             entity.requestId = `RR-${nextId.toString().padStart(5, '0')}`;
             if (photoPath) {
                 entity.image = photoPath;
             }
+
+            console.log("rrr:",entity)
             const insertResult = await this.requestRepository.insert(entity);
 
             if (!insertResult.identifiers.length) {

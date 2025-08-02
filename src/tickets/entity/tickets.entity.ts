@@ -1,10 +1,11 @@
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { DesignationEntity } from 'src/designation/entity/designation.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 
 @Entity('tickets')
@@ -53,6 +54,10 @@ export class TicketsEntity {
 
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
+
+    @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.ticket)
+    notifications: NotificationEntity[];
+
 
     @ManyToOne(() => SubDealerEntity, (requestRaiseEntity) => requestRaiseEntity.tickets, { nullable: true })
     @JoinColumn({ name: 'sub_dealer_id' })

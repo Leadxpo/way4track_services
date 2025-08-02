@@ -33,7 +33,7 @@ export class RequestRaiseAdapter {
         entity.createdDate = dto.createdDate;
         entity.products = dto.products
         entity.requestFor = dto.requestFor
-        entity.fromDate = dto.fromDate
+        entity.fromDate =dto.fromDate
         entity.toDate = dto.toDate
         entity.status = dto.status
         entity.image = dto.image

@@ -29,16 +29,20 @@ export class NotificationService {
         let message: string;
         let createdAt: Date;
         let user: any;
+        let ticket: any;
+        let notificationTo: any;
         let branch: any;
+        let request:any
         let companyCode: string;
         let unitCode: string;
         let subDealer: any;
 
-
         if (type === NotificationEnum.Request && entity instanceof RequestRaiseEntity) {
-            message = entity.description;
+            message = entity.requestFor;
             createdAt = entity.createdDate;
-            user = entity.staffId; // Assuming staffId is a number
+            user = entity.requestFrom; // Assuming staffId is a number
+            notificationTo = entity.requestTo; // Assuming staffId is a number
+            request = entity.id; // Assuming staffId is a number
             branch = entity.branchId; // Assuming branchId is a number
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
@@ -46,13 +50,14 @@ export class NotificationService {
             message = entity.problem;
             createdAt = entity.date;
             user = entity.staff; // Assuming staff is an object
+            ticket = entity.id; // Assuming staffId is a number
+            notificationTo = entity.reportingStaff; // Assuming staffId is a number
             branch = entity.branch; // Assuming branch is an object
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         }
         else if (type === NotificationEnum.TechnicianWorks && 'workStatus' in entity && 'subDealerId' in entity) {
             const subDealerId = typeof entity.subDealerId === 'object' ? entity.subDealerId.id : entity.subDealerId;
-
             if (!subDealerId) {
                 console.warn('SubDealerId is missing or invalid for notification type TechnicianWorks');
                 return;
@@ -76,14 +81,16 @@ export class NotificationService {
             message,
             createdAt,
             isRead: false,
+            requestId: typeof request === 'object' ? request.id : request, // Fallback for primitive,
+            ticketId: typeof ticket === 'object' ? ticket.id : ticket, // Fallback for primitive,
             notificationType: type,
             userId: typeof user === 'object' ? user.id : user, // Fallback for primitive
+            notificationToId: typeof notificationTo === 'object' ? notificationTo.id : notificationTo, // Fallback for primitive
             branchId: typeof branch === 'object' ? branch.id : branch, // Fallback for primitive
             companyCode,
             unitCode,
             subDealerId: typeof subDealer === 'object' ? subDealer.id : subDealer
         });
-
         await this.notificationRepository.insert(notificationEntity);
     }
 
@@ -107,8 +114,8 @@ export class NotificationService {
     }
 
     async getAllNotifications(req: {
-        branch?: string, companyCode?: string
-        , unitCode?: string
+        ticketNumber?: string; requestNumber?: string; branchName?: string; notifyStaffId?: number; companyCode?: string;
+        unitCode?: string; subDealerId?: string;
     }): Promise<CommonResponse> {
         const data = await this.notificationRepository.getAllNotifications(req)
         if (!data) {

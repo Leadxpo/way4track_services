@@ -2,6 +2,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -38,13 +39,21 @@ export class NotificationEntity {
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
-    @ManyToOne(() => StaffEntity, (user) => user.notifications, { eager: true })
+    @ManyToOne(() => StaffEntity, (user) => user.notifications, { eager: true ,nullable:true})
     @JoinColumn({ name: 'staff_id' })
     user: StaffEntity;
 
-    @ManyToOne(() => RequestRaiseEntity, (user) => user.notifications, { eager: true })
+    @ManyToOne(() => StaffEntity, (user) => user.notificationsTo, { eager: true,nullable:true })
+    @JoinColumn({ name: 'notification_to' })
+    notificationTo: StaffEntity;
+
+    @ManyToOne(() => RequestRaiseEntity, (user) => user.notifications, { eager: true,nullable:true })
     @JoinColumn({ name: 'request_id' })
     request: RequestRaiseEntity;
+
+    @ManyToOne(() => TicketsEntity, (user) => user.notifications, { eager: true,nullable:true })
+    @JoinColumn({ name: 'ticket_id' })
+    ticket: TicketsEntity;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

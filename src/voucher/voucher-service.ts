@@ -186,35 +186,36 @@ export class VoucherService {
                 console.log("toAccount :", existingVoucher.toAccount.totalAmount, '===', typeof (existingVoucher.toAccount.totalAmount))
                 console.log("newAmount :", newAmount)
 
+                if (existingVoucher.fromAccount) {
 
-                // ========================
-                // 3. Reverse Old Balances
-                // ========================
-                switch (existingVoucher.voucherType) {
-                    case VoucherTypeEnum.RECEIPT:
-                        if (fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) - Number(oldAmount);
-                        break;
-                    // case VoucherTypeEnum.DEBITNOTE:
+                    // ========================
+                    // 3. Reverse Old Balances
+                    // ========================
+                    switch (existingVoucher.voucherType) {
+                        case VoucherTypeEnum.RECEIPT:
+                            if (fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) - Number(oldAmount);
+                            break;
+                        // case VoucherTypeEnum.DEBITNOTE:
 
-                    case VoucherTypeEnum.PAYMENT:
-                        if (fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) + Number(oldAmount);
-                        break;
-                    // case VoucherTypeEnum.CREDITNOTE:
-                    case VoucherTypeEnum.CONTRA:
-                        console.log("old contra")
-                        if (existingVoucher.fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) + Number(oldAmount);
-                        if (existingVoucher.toAccount) existingVoucher.toAccount.totalAmount = Number(existingVoucher.toAccount.totalAmount) - Number(oldAmount);
-                        break;
-                    // case VoucherTypeEnum.JOURNAL:
-                    //     if (voucherDto.journalType === DebitORCreditEnum.Credit && toAccount)
-                    //         existingVoucher.fromAccount.totalAmount += oldAmount;
-                    //     else if (toAccount)
-                    //         existingVoucher.toAccount.totalAmount -= oldAmount;
-                    //     break;
+                        case VoucherTypeEnum.PAYMENT:
+                            if (fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) + Number(oldAmount);
+                            break;
+                        // case VoucherTypeEnum.CREDITNOTE:
+                        case VoucherTypeEnum.CONTRA:
+                            console.log("old contra")
+                            if (existingVoucher.fromAccount) existingVoucher.fromAccount.totalAmount = Number(existingVoucher.fromAccount.totalAmount) + Number(oldAmount);
+                            if (existingVoucher.toAccount) existingVoucher.toAccount.totalAmount = Number(existingVoucher.toAccount.totalAmount) - Number(oldAmount);
+                            break;
+                        // case VoucherTypeEnum.JOURNAL:
+                        //     if (voucherDto.journalType === DebitORCreditEnum.Credit && toAccount)
+                        //         existingVoucher.fromAccount.totalAmount += oldAmount;
+                        //     else if (toAccount)
+                        //         existingVoucher.toAccount.totalAmount -= oldAmount;
+                        //     break;
+                    }
+                    const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
+                    await this.accountRepository.save(oldAccountsToSave);
                 }
-                const oldAccountsToSave = [existingVoucher.fromAccount, existingVoucher.toAccount].filter(Boolean) as AccountEntity[];
-                await this.accountRepository.save(oldAccountsToSave);
-
                 if (voucherDto.fromAccount) {
                     fromAccount = await this.accountRepository.findOne({ where: { id: voucherDto.fromAccount } });
                     if (!fromAccount) throw new Error("From account not found.");
@@ -230,40 +231,33 @@ export class VoucherService {
                 // ========================
                 // 4. Apply New Balances
                 // ========================
-                switch (voucherEntity.voucherType) {
-                    case VoucherTypeEnum.RECEIPT:
-                        if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) + Number(newAmount);
-                        break;
-                    // case VoucherTypeEnum.DEBITNOTE:
-                    case VoucherTypeEnum.PAYMENT:
-                        if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) - Number(newAmount);
-                        break;
-                    // case VoucherTypeEnum.CREDITNOTE:
-                    case VoucherTypeEnum.CONTRA:
-                        if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) - Number(newAmount);
-                        if (toAccount) toAccount.totalAmount = Number(toAccount.totalAmount) + Number(newAmount);
-                        break;
-                    // case VoucherTypeEnum.JOURNAL:
-                    //     if (voucherDto.journalType === DebitORCreditEnum.Credit && fromAccount)
-                    //         fromAccount.totalAmount -= newAmount;
-                    //     else if (toAccount)
-                    //         toAccount.totalAmount += newAmount;
-                    //     break;
-                }
-                console.log("new_fromAccount", fromAccount.totalAmount)
-                console.log("new_toAccount", toAccount.totalAmount)
+                if (voucherDto.fromAccount) {
 
-                const accountsToSave = [fromAccount, toAccount].filter(Boolean) as AccountEntity[];
-                await this.accountRepository.save(accountsToSave);
-            }
+                    switch (voucherEntity.voucherType) {
+                        case VoucherTypeEnum.RECEIPT:
+                            if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) + Number(newAmount);
+                            break;
+                        // case VoucherTypeEnum.DEBITNOTE:
+                        case VoucherTypeEnum.PAYMENT:
+                            if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) - Number(newAmount);
+                            break;
+                        // case VoucherTypeEnum.CREDITNOTE:
+                        case VoucherTypeEnum.CONTRA:
+                            if (fromAccount) fromAccount.totalAmount = Number(fromAccount.totalAmount) - Number(newAmount);
+                            if (toAccount) toAccount.totalAmount = Number(toAccount.totalAmount) + Number(newAmount);
+                            break;
+                        // case VoucherTypeEnum.JOURNAL:
+                        //     if (voucherDto.journalType === DebitORCreditEnum.Credit && fromAccount)
+                        //         fromAccount.totalAmount -= newAmount;
+                        //     else if (toAccount)
+                        //         toAccount.totalAmount += newAmount;
+                        //     break;
+                    }
+                    console.log("new_fromAccount", fromAccount.totalAmount)
+                    console.log("new_toAccount", toAccount.totalAmount)
 
-            // ========================
-            // 5. Estimate Association
-            // ========================
-            if (voucherDto.invoiceId && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
-                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoiceId } });
-                if (estimate) {
-                    voucherEntity.estimate = estimate;
+                    const accountsToSave = [fromAccount, toAccount].filter(Boolean) as AccountEntity[];
+                    await this.accountRepository.save(accountsToSave);
                 }
             }
             voucherEntity.invoiceId = voucherDto.invoiceId;
@@ -387,67 +381,53 @@ export class VoucherService {
                     }
                 }
 
-                if (voucherDto.paymentType && !voucherDto.fromAccount) {
-                    throw new Error("Missing 'fromAccount' for a voucher that requires payment.");
+                if (voucherDto.paymentType && voucherDto.fromAccount) {
+
+                    const voucherAmount = Number(voucherEntity.amount);
+                    let accountBalance = fromAccount ? Number(fromAccount.totalAmount || 0) : 0;
+
+                    switch (voucherEntity.voucherType) {
+                        case VoucherTypeEnum.RECEIPT:
+                            if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
+                            break;
+
+                        // case VoucherTypeEnum.DEBITNOTE:
+                            //     if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
+                            // break;
+
+                        case VoucherTypeEnum.PAYMENT:
+                            if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
+                            break;
+
+                        // case VoucherTypeEnum.CREDITNOTE:
+                            //     if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
+                            // break;
+
+                        case VoucherTypeEnum.CONTRA:
+                            if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
+                            if (toAccount) toAccount.totalAmount = Number(toAccount.totalAmount) + voucherAmount;
+                            break;
+
+                        // case VoucherTypeEnum.JOURNAL:
+                            //     if (voucherDto.journalType === DebitORCreditEnum.Credit) {
+                            //         fromAccount.totalAmount = accountBalance - voucherAmount;
+                            //     }
+                            //     else {
+                            //         toAccount.totalAmount += voucherAmount;
+                            //     }
+                            // break;
+
+                        default:
+                            throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
+                    }
+
+                    const accountsToSave = [fromAccount, toAccount].filter(account => account !== null) as AccountEntity[];
+                    await this.accountRepository.save(accountsToSave);
                 }
-
-                const voucherAmount = Number(voucherEntity.amount);
-                let accountBalance = fromAccount ? Number(fromAccount.totalAmount || 0) : 0;
-
-                switch (voucherEntity.voucherType) {
-                    case VoucherTypeEnum.RECEIPT:
-                        if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
-                        break;
-
-                    // case VoucherTypeEnum.DEBITNOTE:
-                    //     if (fromAccount) fromAccount.totalAmount = accountBalance + voucherAmount;
-                    //     break;
-
-                    case VoucherTypeEnum.PAYMENT:
-                        if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
-                        break;
-
-                    // case VoucherTypeEnum.CREDITNOTE:
-                    //     if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
-                    //     break;
-
-                    case VoucherTypeEnum.CONTRA:
-                        if (fromAccount) fromAccount.totalAmount = accountBalance - voucherAmount;
-                        if (toAccount) toAccount.totalAmount = Number(toAccount.totalAmount) + voucherAmount;
-                        break;
-
-                    // case VoucherTypeEnum.JOURNAL:
-                    //     if (voucherDto.journalType === DebitORCreditEnum.Credit) {
-                    //         fromAccount.totalAmount = accountBalance - voucherAmount;
-                    //     }
-                    //     else {
-                    //         toAccount.totalAmount += voucherAmount;
-                    //     }
-                    //     break;
-
-                    default:
-                        throw new Error(`Unhandled voucher type: ${voucherEntity.voucherType}`);
-                }
-
-                const accountsToSave = [fromAccount, toAccount].filter(account => account !== null) as AccountEntity[];
-                await this.accountRepository.save(accountsToSave);
             }
-
             voucherEntity.voucherId = generatedVoucherId;
 
-            if (voucherDto.invoiceId && voucherEntity.voucherType === VoucherTypeEnum.RECEIPT) {
-                console.log("Attempting to find estimate for invoice:", voucherDto.invoiceId);
-                const estimate = await this.estimateRepo.findOne({ where: { invoiceId: voucherDto.invoiceId } });
 
-                if (estimate) {
-                    voucherEntity.estimate = estimate;
-                    // if (receiptPdf) {
-                    //     console.log("Updating receiptPdfUrl with:", receiptPdf);
-                    //     estimate.receiptPdfUrl = receiptPdf;
-                    //     await this.estimateRepo.save(estimate);
-                    // }
-                }
-            }
 
             voucherEntity.invoiceId = voucherDto.invoiceId;
             await this.voucherRepository.insert(voucherEntity);
@@ -458,6 +438,24 @@ export class VoucherService {
             throw new ErrorResponse(error?.code || 5416, `Failed to create voucher details: ${error.message}`);
         }
     }
+
+    async getVoucherInvoices(req: { ledgerId: number }) {
+        const ledger = await this.ledgerRepo.findOne({ where: { id: req.ledgerId } });
+
+        if (!ledger) {
+            throw new NotFoundException('Ledger not found.');
+        }
+        const pendingVouchers = await this.voucherRepository.find({
+            where: {
+                ledgerId: ledger, // Use the full entity instead of ledger.id
+                paymentStatus: In([PaymentStatus.COMPLETED, PaymentStatus.PARTIALLY_PAID]),
+            },
+            select: ['invoiceId', 'voucherType', 'amount', 'paidAmount', 'reminigAmount'],
+            relations: ['branchId']// Return only invoiceId and amount
+        });
+        return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
+    }
+
 
     async getPendingVouchers(req: { ledgerId: number }) {
         const ledger = await this.ledgerRepo.findOne({ where: { id: req.ledgerId } });
@@ -475,6 +473,7 @@ export class VoucherService {
         });
         return { status: true, errorCode: 201, data: pendingVouchers, internalMessage: "" };
     }
+
 
     async getBankAmount(req: VoucherDto) {
         let fromAccount: AccountEntity | null = null;
@@ -673,7 +672,6 @@ export class VoucherService {
             //     return await this.createOrPayEmi(voucherDto);
             // }
 
-            console.log(`🆕 Creating new voucher withhhh ID: ${voucherDto.fromAccount}`);
             return await this.createVoucher(voucherDto);
 
         } catch (error) {
@@ -698,7 +696,7 @@ export class VoucherService {
             where: { invoiceId: String(dto.invoiceId) },
             relations: ['branchId', 'ledgerId'], // make sure this is included
         });
-        return new CommonResponse(true, 200, 'Voucher search by invoiceID successfully',vouchers);
+        return new CommonResponse(true, 200, 'Voucher search by invoiceID successfully', vouchers);
     }
 
     async deleteVoucherDetails(dto: { voucherId: string }): Promise<CommonResponse> {
