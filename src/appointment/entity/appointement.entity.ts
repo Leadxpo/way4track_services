@@ -11,6 +11,7 @@ export enum AppointmentType {
 }
 
 export enum AppointmentStatus {
+    PENDING = 'pending',
     ACCEPTED = 'accepted',
     REJECTED = 'rejected',
     SENT = 'sent',
