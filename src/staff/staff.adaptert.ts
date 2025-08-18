@@ -49,6 +49,7 @@ export class StaffAdapter {
         // entity.salaryStatus = dto.salaryStatus;
         entity.bikeAllocation = dto.bikeAllocation;
         entity.vehiclePhoto = dto.vehiclePhoto;
+        entity.bikeName = dto.bikeName;
         entity.bikeNumber = dto.bikeNumber;
         entity.mobileAllocation = dto.mobileAllocation;
         entity.mobileBrand = dto.mobileBrand;
@@ -57,6 +58,8 @@ export class StaffAdapter {
         entity.terminationDate = dto.terminationDate;
         entity.resignationDate = dto.resignationDate;
         entity.finalSettlementDate = dto.finalSettlementDate;
+        entity.finalSettlementAmt = dto.finalSettlementAmt;
+        entity.insuranceCompanyName = dto.insuranceCompanyName;
         entity.insuranceNumber = dto.insuranceNumber;
         entity.insuranceEligibilityDate = dto.insuranceEligibilityDate;
         entity.insuranceExpiryDate = dto.insuranceExpiryDate;
@@ -116,10 +119,6 @@ export class StaffAdapter {
                 staffMember.bloodGroup,
                 staffMember.joiningDate,
                 staffMember.beforeExperience,
-                // staffMember.previousCompany,
-                // staffMember.previousDesignation,
-                // staffMember.totalExperience,
-                // staffMember.previousSalary,
                 staffMember.bankName,
                 staffMember.accountNumber,
                 staffMember.ifscCode,
@@ -133,6 +132,7 @@ export class StaffAdapter {
                 // staffMember.salaryStatus,
                 staffMember.bikeAllocation,
                 staffMember.vehiclePhoto,
+                staffMember.bikeName,
                 staffMember.bikeNumber,
                 staffMember.mobileAllocation,
                 staffMember.mobileBrand,
@@ -141,6 +141,8 @@ export class StaffAdapter {
                 staffMember.terminationDate ? staffMember.terminationDate : null,
                 staffMember.resignationDate ? staffMember.resignationDate : null,
                 staffMember.finalSettlementDate ? staffMember.finalSettlementDate : null,
+                staffMember.finalSettlementAmt ? staffMember.finalSettlementAmt : null,
+                staffMember.insuranceCompanyName,
                 staffMember.insuranceNumber,
                 staffMember.insuranceEligibilityDate ? staffMember.insuranceEligibilityDate : null,
                 staffMember.insuranceExpiryDate ? staffMember.insuranceExpiryDate : null,

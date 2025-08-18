@@ -2,6 +2,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { RequestRaiseEntity } from 'src/request-raise/entity/request-raise.entity';
 import { StaffEntity } from 'src/staff/entity/staff.entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
+import { TechnicianWorksEntity } from 'src/technician-works/entity/technician-works.entity';
 import { TicketsEntity } from 'src/tickets/entity/tickets.entity';
 import {
     Entity,
@@ -42,6 +43,10 @@ export class NotificationEntity {
     @ManyToOne(() => StaffEntity, (user) => user.notifications, { eager: true ,nullable:true})
     @JoinColumn({ name: 'staff_id' })
     user: StaffEntity;
+
+    @ManyToOne(() => TechnicianWorksEntity, (work) => work.notifications, { eager: true ,nullable:true})
+    @JoinColumn({ name: 'tech_work_id' })
+    techWork: TechnicianWorksEntity;
 
     @ManyToOne(() => StaffEntity, (user) => user.notificationsTo, { eager: true,nullable:true })
     @JoinColumn({ name: 'notification_to' })

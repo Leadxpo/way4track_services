@@ -26,27 +26,27 @@ export class OTPGenerationService {
     }
     // send change password OTP
     private async handleOtpSend(req: OTPDto): Promise<CommonResponse> {
-        const staff = await this.staffRepo.findOne({ where: { staffId: req.staffId } });
+        const staff = await this.staffRepo.findOne({ where: { staffId: req.staffId,phoneNumber:req.phoneNumber } });
 
         if (!staff) {
             return new CommonResponse(false, 404, "Staff not found");
         }
 
-        const ceo = await this.staffRepo.findOne({
-            where: {
-                companyCode: staff.companyCode,
-                designation: "CEO",
-                status: StaffStatus.ACTIVE,
-            },
-        });
+        // const ceo = await this.staffRepo.findOne({
+        //     where: {
+        //         companyCode: staff.companyCode,
+        //         designation: "CEO",
+        //         status: StaffStatus.ACTIVE,
+        //     },
+        // });
 
-        if (!ceo || !ceo.phoneNumber) {
-            return new CommonResponse(false, 404, "CEO not found for this staff");
-        }
-        console.log("rrr :", ceo.phoneNumber)
+        // if (!ceo || !ceo.phoneNumber) {
+        //     return new CommonResponse(false, 404, "CEO not found for this staff");
+        // }
+
         const otp = this.generateOtp();
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-        const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${ceo.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20${otp}.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`);
+        const smsResponse = await axios.get(`https://pgapi.smartping.ai/fe/api/v1/send?username=sharontelematics.trans&password=bisrm&unicode=false&from=SHARTE&to=${req.phoneNumber}&text=A%20staff%20member%20has%20requested%20a%20password%20reset.%20Your%20OTP%20is%20${otp}.%20Do%20not%20share%20this%20with%20anyone%20%5Cn%20SHARTE%2C&dltContentId=1707174731086483991`);
 
         const otpRecord = this.otpRepository.create({
             staffId: staff.staffId,
@@ -57,7 +57,7 @@ export class OTPGenerationService {
         await this.otpRepository.save(otpRecord);
 
         if (smsResponse.data) {
-            return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} to CEO successfully`, {
+            return new CommonResponse(true, 200, `OTP ${req.isResend ? "resent" : "sent"} successfully`, {
                 sms: smsResponse.data,
             });
         } else {

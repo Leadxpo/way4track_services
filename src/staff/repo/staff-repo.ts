@@ -30,6 +30,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'br.name AS branch',
                 'sf.designation AS designation',
                 'sf.staff_photo AS staffPhoto',
+                'sf.staff_status AS staffStatus',
                 'sf.carry_forward_leaves as carryForwardLeaves',
                 'SUM(CASE WHEN a.status = "P" THEN 1 ELSE 0 END) AS presentDays',
                 'SUM(CASE WHEN a.status = "L" THEN 1 ELSE 0 END) AS leaveDays',
@@ -204,6 +205,7 @@ export class StaffRepository extends Repository<StaffEntity> {
                 sf.email AS email,
                 sf.aadhar_number AS aadharNumber,
                 sf.address AS address,
+                'sf.staff_status AS staffStatus',
                 br.name AS branchName,
                 a.in_time AS inTime,
                 a.out_time AS outTime,
@@ -284,11 +286,12 @@ export class StaffRepository extends Repository<StaffEntity> {
             .leftJoin('sf.permissions', 'pa')
             .leftJoin(BranchEntity, 'branch', 'branch.id=sf.branch_id')
             .where(
-                `sf.staff_id = :staffId AND sf.password = :password AND sf.designation = :designation`,
+                `sf.staff_id = :staffId AND sf.password = :password AND sf.designation = :designation AND sf.staff_status = :status`,
                 {
                     staffId: req.staffId,
                     password: req.password,
                     designation: req.designation,
+                    status:"ACTIVE"
                 }
             )
             .andWhere(
@@ -339,7 +342,7 @@ export class StaffRepository extends Repository<StaffEntity> {
     async getStaff(req: { companyCode: string, unitCode: string, staffId?: string }) {
         const query = this.createQueryBuilder('staff')
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
+            // .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('staff.designation IN (:...designations)', {
                 designations: ['Accountant', 'Warehouse Manager', 'HR'],
@@ -402,9 +405,10 @@ export class StaffRepository extends Repository<StaffEntity> {
             .select([
                 'staff.staff_id AS staffId',
                 'staff.name AS staffName',
-                'staff.phone_number AS phoneNumber',
-                'staff.email AS email',
+                'staff.office_phone_number AS phoneNumber',
+                'staff.officeEmail AS email',
                 'staff.id as id',
+                'staff.termination_date as terminationDate',
                 'staff.designation AS staffDesignation', // Use proper designation
                 'branch.name AS branchName',
                 // Branch manager information

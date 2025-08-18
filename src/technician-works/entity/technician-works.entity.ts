@@ -9,11 +9,12 @@ import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { WorkAllocationEntity } from 'src/work-allocation/entity/work-allocation.entity';
 import { WorkStatusEnum } from 'src/work-allocation/enum/work-status-enum';
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Remarks } from '../dto/technician-works.dto';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
 import { ProductTypeEntity } from 'src/product-type/entity/product-type.entity';
 import { SubDelaerStaffEntity } from 'src/sub-dealer-staff/entity/sub-dealer-staff.entity';
+import { NotificationEntity } from 'src/notifications/entity/notification.entity';
 
 @Entity('technician_works')
 export class TechnicianWorksEntity extends BaseEntity {
@@ -134,6 +135,10 @@ export class TechnicianWorksEntity extends BaseEntity {
     @ManyToOne(() => WorkAllocationEntity, (workAllocationEntity) => workAllocationEntity.technician, { nullable: true })
     @JoinColumn({ name: 'work_id' })
     workId: WorkAllocationEntity;
+
+    @OneToMany(() => NotificationEntity, (NotificationEntity) => NotificationEntity.techWork)
+    notifications: NotificationEntity[];
+
 
     @Column('varchar', { name: 'company_code', length: 200, nullable: false })
     companyCode: string;

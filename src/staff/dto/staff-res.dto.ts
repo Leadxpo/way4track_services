@@ -43,6 +43,7 @@ export class GetStaffResDto {
     // salaryStatus: SalaryStatus;
     bikeAllocation: YesNo;
     vehiclePhoto?: string;
+    bikeName?: string;
     bikeNumber?: string;
     mobileAllocation: YesNo;
     mobileBrand?: string;
@@ -51,6 +52,8 @@ export class GetStaffResDto {
     terminationDate?: Date;
     resignationDate?: Date;
     finalSettlementDate?: Date;
+    finalSettlementAmt?: string;
+    insuranceCompanyName?: string
     insuranceNumber?: string;
     insuranceEligibilityDate?: Date;
     insuranceExpiryDate?: Date;
@@ -109,8 +112,8 @@ export class GetStaffResDto {
         department: string | undefined,
         monthlySalary: number | undefined,
         salaryDate: Date | undefined,
-        // salaryStatus: SalaryStatus,
         bikeAllocation: YesNo,
+        bikeName: string | undefined,
         vehiclePhoto: string | undefined,
         bikeNumber: string | undefined,
         mobileAllocation: YesNo,
@@ -120,6 +123,8 @@ export class GetStaffResDto {
         terminationDate: Date | undefined,
         resignationDate: Date | undefined,
         finalSettlementDate: Date | undefined,
+        finalSettlementAmt: string | undefined,
+        insuranceCompanyName: string | undefined,
         insuranceNumber: string | undefined,
         insuranceEligibilityDate: Date | undefined,
         insuranceExpiryDate: Date | undefined,
@@ -179,6 +184,7 @@ export class GetStaffResDto {
         this.salaryDate = salaryDate;
         this.bikeAllocation = bikeAllocation;
         this.vehiclePhoto = vehiclePhoto;
+        this.bikeName = bikeName;
         this.bikeNumber = bikeNumber;
         this.mobileAllocation = mobileAllocation;
         this.mobileBrand = mobileBrand;
@@ -187,6 +193,8 @@ export class GetStaffResDto {
         this.terminationDate = terminationDate;
         this.resignationDate = resignationDate;
         this.finalSettlementDate = finalSettlementDate;
+        this.finalSettlementAmt = finalSettlementAmt;
+        this.insuranceCompanyName = insuranceCompanyName;
         this.insuranceNumber = insuranceNumber;
         this.insuranceEligibilityDate = insuranceEligibilityDate;
         this.insuranceExpiryDate = insuranceExpiryDate;

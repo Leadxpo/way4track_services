@@ -36,6 +36,7 @@ export class StaffDto {
     salaryDate?: Date;
     staffStatus: StaffStatus;
     bikeAllocation: YesNo;
+    bikeName?: string;
     vehiclePhoto?: string;
     bikeNumber?: string;
     mobileAllocation: YesNo;
@@ -45,6 +46,8 @@ export class StaffDto {
     terminationDate?: Date;
     resignationDate?: Date;
     finalSettlementDate?: Date;
+    finalSettlementAmt?:string;
+    insuranceCompanyName?:string
     insuranceNumber?: string;
     insuranceEligibilityDate?: Date;
     insuranceExpiryDate?: Date;
@@ -66,7 +69,6 @@ export class StaffDto {
     experienceDetails?: Experience[]
     accountBranch?: string;
     uniqueId?: string;
-
 }
 
 export class Qualifications {

@@ -79,7 +79,6 @@ export class StaffService {
                 console.log(designationEntity, 'designationEntity');
 
                 newStaff.designation = designationEntity.designation;
-                console.log(newStaff.designation, "::::::::::::::::::::::::") // Store name
                 newStaff.designationRelation = designationEntity; // Store relation
             }
 
@@ -579,7 +578,7 @@ export class StaffService {
 
 
     async getStaffNamesDropDown(): Promise<CommonResponse> {
-        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId'], relations: ['designationRelation'] });
+        const data = await this.staffRepository.find({ select: ['name', 'id', 'staffId'], relations: ['designationRelation'],where:{status:StaffStatus.ACTIVE} });
         if (data.length) {
             return new CommonResponse(true, 75483, "Data Retrieved Successfully", data)
         } else {

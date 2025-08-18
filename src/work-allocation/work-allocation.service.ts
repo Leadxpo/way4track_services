@@ -59,10 +59,6 @@ export class WorkAllocationService {
             // }
 
             // updatedWorkAllocation.productDetails = updatedProductDetails;
-            console.log(workAllocation, "++++++}}}}}}}}}}}")
-
-            console.log(updatedWorkAllocation, "{{{{{{{{{{{}}}}}}}}}}}}")
-
             // Merge updated details into the existing work allocation
             Object.assign(workAllocation, updatedWorkAllocation);
 

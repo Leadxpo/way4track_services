@@ -165,6 +165,9 @@ export class StaffEntity extends BaseEntity {
   @Column({ name: 'bike_number', type: 'varchar', length: 200, nullable: true })
   bikeNumber: string;
 
+  @Column({ name: 'bike_name', type: 'varchar', length: 200, nullable: true })
+  bikeName: string;
+
   @Column({ name: 'mobile_allocation', type: 'enum', enum: YesNo, nullable: true })
   mobileAllocation: YesNo;
 
@@ -188,6 +191,12 @@ export class StaffEntity extends BaseEntity {
 
   @Column({ name: 'final_settlement_date', type: 'date', nullable: true, default: null })
   finalSettlementDate: Date;
+
+  @Column({ name: 'insurance_company_name', type: 'varchar', length: 250, nullable: true })
+  insuranceCompanyName: string;
+
+  @Column({ name: 'final_settlement_amt', type: 'varchar', length: 250, nullable: true })
+  finalSettlementAmt: string;
 
   @Column({ name: 'insurance_number', type: 'varchar', length: 250, nullable: true })
   insuranceNumber: string;

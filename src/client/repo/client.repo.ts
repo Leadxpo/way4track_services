@@ -85,6 +85,7 @@ export class ClientRepository extends Repository<ClientEntity> {
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
+            .orderBy('cl.created_at', 'DESC')
         if (req.clientId) {
             query.andWhere('cl.client_id = :clientId', { clientId: req.clientId });
         }

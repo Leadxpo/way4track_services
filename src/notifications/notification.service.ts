@@ -30,6 +30,7 @@ export class NotificationService {
         let createdAt: Date;
         let user: any;
         let ticket: any;
+        let techWork:any;
         let notificationTo: any;
         let branch: any;
         let request:any
@@ -69,6 +70,7 @@ export class NotificationService {
             message = `Pending payment for activated work: ${pending.totalActivateWork || 0}, pending: ${pending.totalPendingWork || 0}, total amount: ₹${pending.totalAmount || 0}`;
             createdAt = new Date();
             subDealer = subDealerId;
+            techWork=entity.id;
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         }

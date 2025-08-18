@@ -107,7 +107,10 @@ export class AppointmentService {
         try {
             const appointments = await this.appointmentRepository.find({
                 where: { companyCode: dto.companyCode, unitCode: dto.unitCode },
-                relations: ['voucherId', 'clientId', 'staffId', 'branchId']
+                relations: ['voucherId', 'clientId', 'staffId', 'branchId'],
+                order: {
+                    createdAt: 'DESC' // or 'ASC' if you want oldest first
+                }
             });
 
 
