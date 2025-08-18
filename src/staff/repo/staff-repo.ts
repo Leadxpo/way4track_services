@@ -316,10 +316,11 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.office_email AS email',
                 'staff.office_phone_number AS phoneNumber',
                 'staff.address AS address',
+                'staff.staff_status AS status',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
+            // .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.staffId) {
@@ -410,13 +411,13 @@ export class StaffRepository extends Repository<StaffEntity> {
                 'staff.id as id',
                 'staff.termination_date as terminationDate',
                 'staff.designation AS staffDesignation', // Use proper designation
+                'staff.staff_status as status',
                 'branch.name AS branchName',
-                // Branch manager information
                 'branchManager.name AS branchManagerName',
                 'branchManager.phone_number AS branchManagerPhoneNumber',
             ])
             .where('staff.company_code = :companyCode', { companyCode: req.companyCode })
-            .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
+            // .andWhere('staff.staff_status = :status', { status: 'ACTIVE' })
             .andWhere('staff.unit_code = :unitCode', { unitCode: req.unitCode });
 
         if (req.branchName) {
