@@ -17,7 +17,6 @@ export class VoucherDto {
     amount?: number; // nullable if not always provided
     reminigAmount?: number; // Fixed the typo "reminingAmount"
     paymentType: PaymentType;
-    clientId: string;
     staffId: number;
     paymentTo: string; // staff name
     accountNumber?: number; // assuming this is the account number from the account entity

@@ -43,7 +43,6 @@ export class EstimateRepository extends Repository<EstimateEntity> {
             .leftJoin('estimate.products', 'pa')
             .where('estimate.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('estimate.unit_code = :unitCode', { unitCode: req.unitCode });
-
         if (req.fromDate || req.toDate) {
             query.andWhere('estimate.estimate_date BETWEEN :fromDate AND :toDate', {
                 fromDate,

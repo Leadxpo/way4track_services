@@ -760,8 +760,8 @@ export class DashboardController {
 
     @Post('getReceiptData')
     async getReceiptData(@Body() req: {
-        voucherId?: string; clientName?: string; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        voucherId?: string; clientName?: string; paymentStatus?: PaymentStatus; companyCode?: string;fromDate?:Date;
+        unitCode?: string;toDate?:Date;
     }): Promise<CommonResponse> {
         try {
             return await this.voucherDashboardService.getReceiptData(req)

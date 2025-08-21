@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { AccountEntity } from "src/account/entity/account.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
-import { ClientEntity } from "src/client/entity/client.entity";
 import { EstimateEntity } from "src/estimate/entity/estimate.entity";
 import { CommonReq } from "src/models/common-req";
 import { PaymentStatus } from "src/product/dto/payment-status.enum";
@@ -37,14 +36,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.name AS name',
                 'branch.id AS branchId',
                 've.ledgerId AS ledgerId',
-                'cl.name AS clientName',
+                'lg.name AS name',
                 've.generation_date AS generationDate',
                 'es.estimate_date as estimateDate',
                 'es.expire_date AS expireDate',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .leftJoinAndSelect(AccountEntity, 'from_ac', 'from_ac.id = ve.from_account_id')
@@ -73,21 +72,18 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.voucher_id AS ReciptId',
                 'es.invoice_id as InvoiceId',
                 've.name AS name',
-                'cl.name AS clientName',
+                'lg.name AS name',
                 'es.estimate_date as estimateDate',
                 'es.expire_date AS expireDate',
                 've.generation_date AS generationDate',
                 've.expire_date AS expireDate',
                 've.payment_status AS paymentStatus',
-                'cl.phone_number AS phoneNumber',
-                'cl.email AS email',
-                'cl.address AS address',
                 'pr.product_name AS productName',
                 'pr.product_description AS productDescription',
                 'pr.price AS productPrice',
                 'es.invoicePdfUrl'
             ])
-            .leftJoinAndSelect(ClientEntity, 'cl', 'cl.client_id = ve.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.invoice_id')
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .leftJoinAndSelect(ProductEntity, 'pr', 've.product=pr.id')
@@ -95,13 +91,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
             .groupBy('ve.voucher_id')
-            .addGroupBy('cl.name')
+            .addGroupBy('lg.name')
             .addGroupBy('branch.name')
             .addGroupBy('ve.generation_date')
             .addGroupBy('ve.name')
-            .addGroupBy('cl.phone_number')
-            .addGroupBy('cl.email')
-            .addGroupBy('cl.address')
             .addGroupBy('pr.product_name')
             .addGroupBy('pr.product_description')
             .addGroupBy('pr.price')
@@ -115,7 +108,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query;
     }
 
-
     async getReceiptDataForReport(filters: {
         voucherId?: string; companyCode?: string;
         unitCode?: string
@@ -125,14 +117,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.voucher_id AS receiptId',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
-                'cl.name AS clientName',
+                'lg.name AS ledgerName',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
                 'branch.name AS branchName',
                 'es.receiptPdfUrl'
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoinAndSelect(EstimateEntity, 'es', 've.invoice_id = es.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
@@ -143,22 +135,23 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const result = await query.getRawMany();
         return result;
     }
+
     async getReceiptData(filters: {
-        voucherId?: string; clientName?: string; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        voucherId?: string; ledgerName?: string; paymentStatus?: PaymentStatus; companyCode?: string;fromDate?:Date;
+        unitCode?: string;toDate?:Date;
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
                 've.voucher_id AS receiptId',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
-                'cl.name AS clientName',
+                'lg.name AS ledgerName',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
                 'branch.name AS branchName',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.RECEIPT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
             .andWhere(`ve.unit_code = "${filters.unitCode}"`)
@@ -167,14 +160,20 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             query.andWhere('ve.voucher_id = :voucherId', { voucherId: filters.voucherId });
         }
 
-        if (filters.clientName) {
-            query.andWhere('cl.name LIKE :clientName', { clientName: `%${filters.clientName}%` });
+        if (filters.ledgerName) {
+            query.andWhere('lg.name LIKE :ledgerName', { ledgerName: `%${filters.ledgerName}%` });
         }
 
         if (filters.paymentStatus) {
             query.andWhere('ve.payment_status = :paymentStatus', { paymentStatus: filters.paymentStatus });
         }
+        if (filters.fromDate) {
+            query.andWhere('ve.created_at >= :fromDate', { fromDate: filters.fromDate });
+        }
 
+        if (filters.toDate) {
+            query.andWhere('ve.created_at <= :toDate', { toDate: filters.toDate });
+        }
         // Execute the query
         const result = await query.getRawMany();
         return result;
@@ -187,14 +186,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const query = this.createQueryBuilder('ve')
             .select([
                 've.voucher_id AS paymentId',
-                'cl.name AS clientName',
+                'lg.name AS name',
                 've.generation_date AS generationDate',
                 'ac.account_name AS accountTo',
                 'ac.account_number AS accountNumber',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoin(AccountEntity, 'ac', 'ac.id=ve.to_account_id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PAYMENT })
             .andWhere(`ve.company_code = "${filters.companyCode}"`)
@@ -233,13 +232,13 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'br.name AS branchName',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
-                // 'vn.name AS vendorName',
+                'lg.name AS name',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = ve.branch_id')
             // .leftJoin(VendorEntity, 'vn', 've.vendor_id=vn.id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .where('ve.voucher_type = :type', { type: VoucherTypeEnum.PURCHASE })
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -255,10 +254,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     }) {
         const query = this.createQueryBuilder('ve')
             .select([
-                'cl.name AS clientName',
-                'cl.phone_number AS phoneNumber',
-                'cl.client_id AS clientId',
-                'cl.address AS address',
+                'lg.name AS name',
                 've.voucher_id AS voucherId',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
@@ -269,32 +265,17 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 'SUM(ve.amount) AS totalAmount'
             ])
             .leftJoin(ProductEntity, 'pa', 've.product_id = pa.id')
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             // Optional filters based on provided phoneNumber, companyCode, and unitCode
             .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
             .andWhere('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode });
-        query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
-
-
-        // If phoneNumber is provided, filter by phoneNumber
-        // if (req.phoneNumber) {
-        //     query.andWhere('cl.phone_number = :phoneNumber', { phoneNumber: req.phoneNumber });
-        // }
 
         // Group by necessary fields
-        query.groupBy('cl.client_id')
-            .addGroupBy('cl.name')
-            .addGroupBy('cl.phone_number')
-            .addGroupBy('cl.address')
-            .addGroupBy('cl.address')
-
+        query.groupBy('ve.ledger_id')
+            .addGroupBy('lg.name')
             .addGroupBy('ve.voucher_id');
         // query.groupBy('ve.voucher_id')
-        //     .addGroupBy('cl.name')
-        //     .addGroupBy('cl.phone_number')
-        //     .addGroupBy('cl.client_id')
-        //     .addGroupBy('cl.address')
         //     .addGroupBy('ve.generation_date')
         //     .addGroupBy('ve.purpose')
         //     .addGroupBy('ve.name')
@@ -313,19 +294,13 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //     const query = this.createQueryBuilder('ve')
     //         .select([
     //             've.voucher_id AS ledgerId',
-    //             'cl.name AS clientName',
+    //             'lg.name AS name',
     //             'sb.name AS subDealerName',
     //             'vr.name AS vendorName',
     //             've.generation_date AS generationDate',
     //             've.purpose AS purpose',
-    //             'cl.phone_number AS phoneNumber',
     //             'sb.sub_dealer_id AS subDealerId',
-    //             'cl.client_id  as clientId',
     //             'vr.vendor_id AS vendorId',
-    //             'cl.email AS clientEmail',
-    //             'cl.address AS clientAddress',
-    //             'cl.client_photo AS clientPhoto',
-    //             'cl.GST_number AS clientGSTNumber',
     //             'sb.sub_dealer_phone_number AS subDealerPhoneNumber',
     //             'sb.gst_number AS subDealerGSTNumber',
     //             'sb.address AS subDealerAddress',
@@ -345,7 +320,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //              SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`
     //         ])
     //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-    //         .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+    //         .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
     //         .leftJoin(SubDealerEntity, 'sb', 've.sub_dealer_id = sb.id')
     //         .leftJoin(VendorEntity, 'vr', 've.vendor_id = vr.id')
     //         .where('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
@@ -370,7 +345,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     // async getLedgerDataForReport(req: {
     //     fromDate?: string;
     //     toDate?: string;
-    //     clientName?: string;
+    //     ledgerName?: string;
     //     companyCode?: string;
     //     unitCode?: string;
     // }) {
@@ -378,15 +353,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //         .select([
     //             've.voucher_id AS voucherId',
     //             've.name AS name',
-    //             'cl.name AS clientName',
+    //             'lg.name AS name',
     //             've.generation_date AS generationDate',
     //             've.expire_date AS expireDate',
     //             've.payment_status AS paymentStatus',
-    //             'cl.phone_number AS phoneNumber',
-    //             'cl.email AS email',
-    //             'cl.address AS address',
-    //             'cl.client_photo as clientPhoto',
-    //             'cl.GST_number as GSTNumber',
     //             've.voucher_type AS voucherType',
     //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
     //             `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
@@ -396,7 +366,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //             'branch.name AS branchName',
     //         ])
     //         .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-    //         .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+    //         .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
     //         .where('ve.voucher_type IN (:...types)', {
     //             types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE],
     //         })
@@ -409,18 +379,15 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //         query.andWhere(`ve.generation_date<= :toDate`, { toDate: req.toDate });
     //     }
     //     if (req.clientName) {
-    //         query.andWhere('cl.name = :clientName', { clientName: req.clientName });
+    //         query.andWhere('lg.name = :name', { ledgerName: req.ledgerName });
     //     }
     //     query.groupBy('ve.voucher_id')
     //         .addGroupBy('ve.name')
-    //         .addGroupBy('cl.name')
+    //         .addGroupBy('lg.name')
     //         .addGroupBy('branch.name')
     //         .addGroupBy('ve.generation_date')
     //         .addGroupBy('ve.expire_date')
     //         .addGroupBy('ve.payment_status')
-    //         .addGroupBy('cl.phone_number')
-    //         .addGroupBy('cl.email')
-    //         .addGroupBy('cl.address')
     //         .addGroupBy('ve.purpose')
     //         .orderBy('YEAR(ve.generation_date)', 'ASC')
     //         .addOrderBy('MONTH(ve.generation_date)', 'ASC');
@@ -433,20 +400,17 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //         .select([
     //             've.voucher_id AS voucherId',
     //             've.name AS name',
-    //             'cl.name AS clientName',
+    //             'lg.name AS name',
     //             've.generation_date AS generationDate',
     //             've.expire_date AS expireDate',
     //             've.payment_status AS paymentStatus',
-    //             'cl.phone_number AS phoneNumber',
-    //             'cl.email AS email',
-    //             'cl.address AS address',
     //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) AS creditAmount`,
     //             `SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS debitAmount`,
     //             `SUM(CASE WHEN ve.product_type IN ('service', 'product', 'sales') THEN ve.amount ELSE 0 END) - SUM(CASE WHEN ve.product_type IN ('expanses', 'salaries') THEN ve.amount ELSE 0 END) AS balanceAmount`,
     //             've.purpose AS purpose',
     //             'branch.name AS branchName',
     //         ])
-    //         .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+    //         .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
     //         .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
     //         .where(`ve.voucher_id = "${req.voucherId}"`)
     //         .andWhere('ve.voucher_type IN (:...types)', { types: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.PAYMENT, VoucherTypeEnum.PURCHASE] })
@@ -454,14 +418,11 @@ export class VoucherRepository extends Repository<VoucherEntity> {
     //         .andWhere(`ve.unit_code = "${req.unitCode}"`)
     //         .groupBy('ve.voucher_id')
     //         .addGroupBy('ve.name')
-    //         .addGroupBy('cl.name')
+    //         .addGroupBy('lg.name')
     //         .addGroupBy('branch.name')
     //         .addGroupBy('ve.generation_date')
     //         .addGroupBy('ve.expire_date')
     //         .addGroupBy('ve.payment_status')
-    //         .addGroupBy('cl.phone_number')
-    //         .addGroupBy('cl.email')
-    //         .addGroupBy('cl.address')
     //         .addGroupBy('ve.purpose')
     //         .getRawOne();
 
@@ -475,7 +436,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         const query = this.createQueryBuilder('ve')
             .select([
                 've.voucher_id AS ledgerId',
-                'cl.name AS clientName',
+                'lg.name AS name',
                 've.generation_date AS generationDate',
                 've.purpose AS purpose',
                 've.payment_status AS paymentStatus',
@@ -488,7 +449,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 've.voucher_type AS voucherType',
             ])
             .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoinAndSelect(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoinAndSelect(AccountEntity, 'from_ac', 've.from_account_id = from_ac.id')
             .leftJoinAndSelect(AccountEntity, 'to_ac', 've.from_account_id = to_ac.id')
             .where(`ve.company_code = "${req.companyCode}"`)
@@ -506,7 +467,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         }
 
         query.groupBy('ve.voucher_id')
-            .addGroupBy('cl.name')
+            .addGroupBy('lg.name')
             .addGroupBy('branch.name')
             .addGroupBy('ve.generation_date')
             .addGroupBy('ve.purpose')
@@ -607,6 +568,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return query
 
     }
+
     async get4YearWiseCreditAndDebitPercentages(req: BranchChartDto): Promise<any> {
         const year = Number(req.date);
         if (!year || isNaN(year)) {
@@ -756,8 +718,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-
-
     async getDayBookDataForReport(req: {
         fromDate?: string;
         toDate?: string;
@@ -866,14 +826,14 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 've.voucher_id AS expansesId',
                 've.name AS name',
-                'cl.name AS clientName',
+                'lg.name AS name',
                 've.generation_date AS generationDate',
                 've.payment_status AS paymentStatus',
                 've.amount AS amount',
                 'branch.name as branchName',
                 've.payment_type as paymentMode'
             ])
-            .leftJoin(ClientEntity, 'cl', 've.client_id = cl.id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
             .andWhere(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
@@ -1545,7 +1505,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return await query.getRawMany();
     }
-
 
     async getPurchaseDataForTable(req: {
         fromDate?: string;

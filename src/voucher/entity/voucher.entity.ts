@@ -6,7 +6,6 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { PaymentStatus } from 'src/product/dto/payment-status.enum';
 import { ProductType } from 'src/product/dto/product-type.enum';
-import { ClientEntity } from 'src/client/entity/client.entity';
 // import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
 import { SubDealerEntity } from 'src/sub-dealer/entity/sub-dealer.entity';
@@ -173,11 +172,6 @@ export class VoucherEntity {
     })
     productType: ProductType;
 
-
-
-    @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.voucherId, { nullable: true })
-    @JoinColumn({ name: 'client_id' })
-    clientId: ClientEntity;
 
     @ManyToOne(() => StaffEntity, (StaffEntity) => StaffEntity.voucherId, { nullable: true })
     @JoinColumn({ name: 'staff_id' })

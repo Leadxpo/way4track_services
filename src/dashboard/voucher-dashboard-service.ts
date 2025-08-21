@@ -45,8 +45,8 @@ export class VoucherDashboardService {
     }
 
     async getReceiptData(req: {
-        voucherId?: string; clientName?: string; paymentStatus?: PaymentStatus; companyCode?: string;
-        unitCode?: string
+        voucherId?: string; ledgerName?: string; paymentStatus?: PaymentStatus; companyCode?: string;fromDate?:Date;
+        unitCode?: string;toDate?:Date;
     }): Promise<CommonResponse> {
         const VoucherData = await this.voucherRepository.getReceiptData(req)
         if (!VoucherData) {

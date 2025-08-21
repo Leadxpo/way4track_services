@@ -7,7 +7,7 @@ export class RequestRaiseDto {
     // staffID: number;
     requestTo: number;
     requestFrom: number;
-    branch: number;
+    branch?: number;
     description: string;
     requestFor: string;
     reply?: string;

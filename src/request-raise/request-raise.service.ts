@@ -234,10 +234,12 @@ export class RequestRaiseService {
                 'req.created_date AS requestDate',
                 'req.request_type AS requestType',
                 'req.status AS status',
-                'sf.name AS RequestTo'
+                'st.name AS RequestTo',
+                'sf.name AS RequestFrom'
             ])
             .leftJoin(BranchEntity, 'branch', 'req.branch_id = branch.id')
-            .leftJoin(StaffEntity, 'sf', 'req.request_to = sf.id')
+            .leftJoin(StaffEntity, 'st', 'req.request_to = st.id')
+            .leftJoin(StaffEntity, 'sf', 'req.request_from = sf.id')
             .where('req.company_code = :companyCode', { companyCode: filter.companyCode })
             .andWhere('req.unit_code = :unitCode', { unitCode: filter.unitCode })
             .orderBy('req.created_date', 'DESC');

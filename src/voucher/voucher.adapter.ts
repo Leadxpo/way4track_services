@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { VoucherDto } from "./dto/voucher.dto";
 import { VoucherEntity } from "./entity/voucher.entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
-import { ClientEntity } from "src/client/entity/client.entity";
 import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 // import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { AccountEntity } from "src/account/entity/account.entity";
@@ -35,11 +34,6 @@ export class VoucherAdapter {
       fromAccount.id = dto.fromAccount;
       entity.fromAccount = fromAccount;
     }
-    // Client
-    const client = new ClientEntity();
-    client.clientId = dto.clientId;
-    entity.clientId = client;
-
     const staff = new StaffEntity();
     staff.id = dto.staffId;
     entity.staffId = staff;
@@ -124,8 +118,6 @@ export class VoucherAdapter {
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
-          voucher.clientId?.clientId || "",
-          voucher.clientId?.name || "Unknown",
           voucher.ledgerId?.id || 0,
           voucher.ledgerId?.name || "Unknown",
           voucher.staffId?.staffId || "",
@@ -179,8 +171,6 @@ export class VoucherAdapter {
           voucher.purpose,
           voucher.creditAmount,
           voucher.paymentType,
-          voucher.clientId?.clientId || "",
-          voucher.clientId?.name || "Unknown",
           voucher.ledgerId?.id || 0,
           voucher.ledgerId?.name || "Unknown",
           voucher.staffId?.staffId || "",

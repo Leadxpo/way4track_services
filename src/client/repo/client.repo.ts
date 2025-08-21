@@ -22,13 +22,9 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
                 'cl.state AS state',
-                'vr.payment_status AS paymentStatus',
-                'vr.amount AS amount',
-                'vr.voucher_id as voucherId',
                 'cl.status as status'
 
             ])
-            .leftJoin('cl.voucherId', 'vr')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
             .getRawMany();
@@ -42,25 +38,16 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.user_name AS userName',
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
-                'vr.payment_status AS paymentStatus',
-                'vr.amount AS amount',
-                'vr.voucher_id AS voucherId',
-                'vr.quantity as quantity',
                 'br.name AS branchName',
                 'cl.email AS email',
                 'cl.address AS address',
                 'cl.state AS state',
-                'vr.name AS voucherName',
-                'vr.generation_date AS generationDate',
-                'vr.product_type AS productType',
                 'cl.status as status'
             ])
-            .leftJoin('cl.voucherId', 'vr')
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.client_id='${req.clientId}'`)
             .andWhere(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
-            .groupBy(`vr.voucher_id `)
             .getRawMany();
         return query;
     }
@@ -81,7 +68,6 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.state AS state',
                 'cl.status as status'
             ])
-            .leftJoin('cl.voucherId', 'vr')
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
@@ -98,8 +84,16 @@ export class ClientRepository extends Repository<ClientEntity> {
         if (req.branchName) {
             query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
+        if (req.fromDate) {
+            query.andWhere('cl.created_at >= :fromDate', { fromDate: req.fromDate });
+        }
+
+        if (req.toDate) {
+            query.andWhere('cl.created_at <= :toDate', { toDate: req.toDate });
+        }
+
         const result = await query
-            .groupBy(`vr.voucher_id, cl.client_id, cl.phone_number, cl.name,  vr.payment_status, vr.amount, br.name, cl.email,cl.address, vr.name, vr.generation_date, vr.product_type`)
+            .groupBy(` cl.client_id, cl.phone_number, cl.name, br.name, cl.email,cl.address`)
             .getRawMany();
 
         return result;

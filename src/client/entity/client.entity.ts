@@ -76,9 +76,6 @@ export class ClientEntity extends BaseEntity {
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
 
-    @OneToMany(() => VoucherEntity, (voucher) => voucher.clientId)
-    voucherId: VoucherEntity[];
-
     @OneToMany(() => CartEntity, (voucher) => voucher.client)
     cart: CartEntity[];
 

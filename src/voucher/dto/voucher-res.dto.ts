@@ -16,8 +16,6 @@ export class VoucherResDto {
     purpose: string;
     creditAmount: number;
     paymentType: PaymentType;
-    clientId: string;
-    clientName: string;
     ledgerId: number;
     ledgerName: string;
     staffId: string;
@@ -71,8 +69,6 @@ export class VoucherResDto {
         purpose: string,
         creditAmount: number,
         paymentType: PaymentType,
-        clientId: string,
-        clientName: string,
         ledgerId: number,
         ledgerName: string,
         staffId: string,
@@ -125,8 +121,6 @@ export class VoucherResDto {
         this.purpose = purpose;
         this.creditAmount = creditAmount;
         this.paymentType = paymentType;
-        this.clientId = clientId;
-        this.clientName = clientName;
         this.ledgerId = ledgerId;
         this.ledgerName = ledgerName;
         this.staffId = staffId;
