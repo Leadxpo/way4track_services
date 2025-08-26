@@ -4,6 +4,8 @@ import { PaymentType } from "../enum/payment-type.enum";
 export class GetAssertsResDto {
     id: number;
     branchId: number;
+    createdBy: number;
+    createdByName: string;
     branchName: string;
     assertsName: string;
     assertsAmount: number;
@@ -13,8 +15,6 @@ export class GetAssertsResDto {
     description: string;
     purchaseDate: Date;
     assetPhoto: string;
-    // voucherEntity: number;
-    // voucherId: string;
     paymentType: PaymentType;
     initialPayment?: number;
     numberOfEmi?: number;
@@ -25,6 +25,8 @@ export class GetAssertsResDto {
     constructor(
         id: number,
         branchId: number,
+        createdBy: number,
+        createdByName: string,
         branchName: string,
         assertsName: string,
         assertsAmount: number,
@@ -34,8 +36,6 @@ export class GetAssertsResDto {
         description: string,
         purchaseDate: Date,
         assetPhoto: string,
-        // voucherEntity: number,
-        // voucherId: string,
         paymentType: PaymentType,
         companyCode: string,
         unitCode: string,
@@ -47,6 +47,8 @@ export class GetAssertsResDto {
     ) {
         this.id = id;
         this.branchId = branchId;
+        this.createdBy = createdBy;
+        this.createdByName = createdByName;
         this.branchName = branchName;
         this.assertsName = assertsName;
         this.assertsAmount = assertsAmount;
@@ -56,8 +58,6 @@ export class GetAssertsResDto {
         this.description = description;
         this.purchaseDate = purchaseDate;
         this.assetPhoto = assetPhoto;
-        // this.voucherId = voucherId;
-        // this.voucherId = voucherId;
         this.paymentType = paymentType;
         this.initialPayment = initialPayment;
         this.numberOfEmi = numberOfEmi;

@@ -26,8 +26,7 @@ export class RequestRaiseEntity extends BaseEntity {
     requestType: RequestType
 
     @Column('json', { name: 'image', nullable: true })
-    image: string[]; // Store JSON string of image URLs
-
+    image: string[]; // Store JSON string of image URLs 
   
     @Column({ name: 'status', type: 'enum', enum: ClientStatusEnum, default: ClientStatusEnum.pending })
     status: ClientStatusEnum

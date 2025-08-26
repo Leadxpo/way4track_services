@@ -258,7 +258,7 @@ export class TechnicianService {
                     companyCode: req.companyCode ?? "",
                     unitCode: req.unitCode ?? "",
                     hsnCode: "",
-                    userName:newTechnician.userName,
+                    userName: newTechnician.userName,
                     SACCode: "",
                     tds: false,
                     tcs: false,
@@ -267,23 +267,32 @@ export class TechnicianService {
                 };
 
                 try {
-                   const rrr= await this.clientService.createClientDetails(clientDto);
-                   console.log("bbb",rrr.data.id);
-                    newTechnician.clientId =rrr.data.id; 
+                    const rrr = await this.clientService.createClientDetails(clientDto);
+                    console.log("bbb", rrr.data.id);
+                    newTechnician.clientId = rrr.data.id;
                     console.log(newTechnician, "newTechnician");
 
                     await this.repo.insert(newTechnician);
-        
+
                 } catch (notificationError) {
                     console.error(`client failed: ${notificationError.message}`, notificationError.stack);
                 }
-            }else{
+            } else {
                 try {
-                     await this.repo.insert(newTechnician);
-                 } catch (notificationError) {
-                     console.error(`client failed: ${notificationError.message}`, notificationError.stack);
-                 }
+                    await this.repo.insert(newTechnician);
+                } catch (notificationError) {
+                    console.error(`client failed: ${notificationError.message}`, notificationError.stack);
+                }
             }
+
+            if (newTechnician.paymentStatus === PaymentStatus.PENDING) {
+                try {
+                    await this.notificationService.createNotification(newTechnician, NotificationEnum.TechnicianWorks);
+                } catch (notificationError) {
+                    console.error(`Notification failed: ${notificationError.message}`, notificationError.stack);
+                }
+            }
+
             return new CommonResponse(true, 65152, 'Technician Details Created Successfully', newTechnician.id);
         } catch (error) {
             console.error('Error creating Technician details:', error);

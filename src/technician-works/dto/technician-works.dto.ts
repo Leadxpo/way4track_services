@@ -58,6 +58,8 @@ export class TechnicianWorksDto {
     paidAmount?: number;
     subDealerStaffId?: number
     fromStaffId?: number
+    allocatedBy?: number
+    allocatedDate?: Date
     convertToInvoice: boolean;
 }
 export class Requirements {

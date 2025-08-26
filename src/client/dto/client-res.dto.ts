@@ -16,6 +16,8 @@ export class ClientResDto {
     unitCode: string
     status: ClientStatus
     GSTNumber: string;
+    createdBy: number;
+    createdByName: string;
 
     constructor(
         id: number,
@@ -32,9 +34,10 @@ export class ClientResDto {
         companyCode: string,
         unitCode: string,
         status: ClientStatus,
-        GSTNumber: string
-
-    ) {
+        GSTNumber: string,
+        createdBy: number,
+        createdByName: string
+        ) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -50,5 +53,7 @@ export class ClientResDto {
         this.unitCode = unitCode
         this.status = status
         this.GSTNumber = GSTNumber
+        this.createdBy = createdBy
+        this.createdByName = createdByName
     }
 }

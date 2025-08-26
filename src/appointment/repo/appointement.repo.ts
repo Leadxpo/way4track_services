@@ -53,12 +53,18 @@ export class AppointmentRepository extends Repository<AppointmentEntity> {
                 'appointment.date AS date',
                 'appointment.description AS description',
                 'appointment.status AS status',
+                'appointment.call_type AS callType',
+                'appointment.service AS service',
+                'appointment.image AS image',
                 'staff.id AS staffId',
                 'staff.name AS assignedTo',
+                'cr_st.id AS createdById',
+                'cr_st.name AS createdByName',
             ])
             .leftJoin(ClientEntity, 'client', 'appointment.client_id = client.id')
             .leftJoin(BranchEntity, 'branch', 'branch.id = appointment.branch_id')
             .leftJoin(StaffEntity, 'staff', 'staff.id = appointment.staff_id')
+            .leftJoin(StaffEntity, 'cr_st', 'cr_st.id = appointment.created_by')
             .where('appointment.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('appointment.unit_code = :unitCode', { unitCode: req.unitCode });
     

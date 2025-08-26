@@ -37,6 +37,7 @@ export class TechnicianWorksAdapter {
         entity.vehiclePhoto3 = dto.vehiclePhoto3;
         entity.vehiclePhoto4 = dto.vehiclePhoto4;
         entity.startDate = dto.startDate
+        entity.allocatedDate = dto.allocatedDate
         entity.endDate = dto.endDate;
         entity.convertToInvoice = dto.convertToInvoice
         // Assign related entities by their IDs
@@ -60,6 +61,11 @@ export class TechnicianWorksAdapter {
             const from = new StaffEntity();
             from.id = dto.fromStaffId;
             entity.fromStaffId = from;
+        }
+        if (dto.allocatedBy) {
+            const allocatedBy = new StaffEntity();
+            allocatedBy.id = dto.allocatedBy;
+            entity.allocatedBy = allocatedBy;
         }
         if (dto.branchId) {
             const branch = new BranchEntity();
@@ -142,7 +148,6 @@ export class TechnicianWorksAdapter {
         entity.pendingDate = dto.pendingDate
         entity.completedDate = dto.completedDate
         entity.userName = dto.userName
-
         entity.paidAmount = dto.paidAmount
 
         return entity;

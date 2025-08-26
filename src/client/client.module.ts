@@ -9,12 +9,15 @@ import { BranchModule } from 'src/branch/branch.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { DevicesModule } from 'src/devices/devices.module';
 import { ReviewsModule } from 'src/reviews/reviews.module';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { StaffModule } from 'src/staff/staff.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([ClientEntity]),
+    imports: [TypeOrmModule.forFeature([ClientEntity,StaffEntity]),
     forwardRef(() => BranchModule),
     forwardRef(() => DevicesModule),
     forwardRef(() => ReviewsModule),
+    forwardRef(() => StaffModule),
     MulterModule.register({
         dest: './uploads',
     }),],

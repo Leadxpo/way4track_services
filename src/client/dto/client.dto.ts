@@ -22,5 +22,5 @@ export class ClientDto {
     status: ClientStatus
     branchName?: string;
     GSTNumber?: string;
-
+    createdBy?: number;
 }

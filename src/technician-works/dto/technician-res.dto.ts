@@ -12,7 +12,6 @@ export class TechnicianWorksResponseDto {
     vehicleType: string;
     vehicleNumber: string;
     description: string;
-
     chassisNumber: string;
     engineNumber: string;
     vehiclePhoto1?: string;
@@ -25,7 +24,6 @@ export class TechnicianWorksResponseDto {
     vehiclePhoto8?: string;
     vehiclePhoto9?: string;
     vehiclePhoto10?: string;
-
     staffId: number;
     branchId: number;
     productId: number;
@@ -40,7 +38,6 @@ export class TechnicianWorksResponseDto {
     phoneNumber: string;
     simNumber: string;
     address: string;
-
     screenShot?: string
     supportId?: number
     supportName?: string
@@ -63,8 +60,9 @@ export class TechnicianWorksResponseDto {
     paidAmount?: number
     subDealerStaffId?: number
     fromStaffId?: number
+    allocatedBy?: number
+    allocatedDate?: Date;
     convertToInvoice?: boolean;
-
     constructor(
         id: number,
         service: string,
@@ -122,9 +120,9 @@ export class TechnicianWorksResponseDto {
         paidAmount?: number,
         subDealerStaffId?: number,
         fromStaffId?: number,
+        allocatedBy?: number,
+        allocatedDate?: Date,   
         convertToInvoice?: boolean
-
-
     ) {
         this.id = id;
         this.service = service;
@@ -182,6 +180,8 @@ export class TechnicianWorksResponseDto {
         this.paidAmount = paidAmount
         this.subDealerStaffId = subDealerStaffId
         this.fromStaffId = fromStaffId
+        this.allocatedBy = allocatedBy
+        this.allocatedDate = allocatedDate
         this.convertToInvoice = convertToInvoice
     }
 }

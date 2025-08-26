@@ -16,6 +16,7 @@ export enum LeadStatusEnum {
     PAYMENT_PENDING = "paymentPending",
     PARTIALLY_PAID = "partiallyPaid",
     COMPLETED = 'completed',
+    NOT_INTERESTED = 'notInterested',
 }
 
 @Entity('sales')

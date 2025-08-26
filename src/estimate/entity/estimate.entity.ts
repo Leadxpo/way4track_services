@@ -2,6 +2,7 @@ import { BranchEntity } from "src/branch/entity/branch.entity";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { ClientStatusEnum } from "src/client/enum/client-status.enum";
 import { ProductEntity } from "src/product/entity/product.entity";
+import { StaffEntity } from "src/staff/entity/staff.entity";
 import { VendorEntity } from "src/vendor/entity/vendor.entity";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
 import { WorkAllocationEntity } from "src/work-allocation/entity/work-allocation.entity";
@@ -23,6 +24,10 @@ export class EstimateEntity extends BaseEntity {
     @ManyToOne(() => BranchEntity, (BranchEntity) => BranchEntity.estimate, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branchId: BranchEntity;
+
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.estimate)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: StaffEntity;
 
     @Column({ type: 'varchar', length: 255, name: 'building_address', nullable: true })
     buildingAddress: string;

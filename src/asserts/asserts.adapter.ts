@@ -8,17 +8,19 @@ import { PaymentType } from "./enum/payment-type.enum";
 import { VoucherTypeEnum } from "src/voucher/enum/voucher-type-enum";
 import { BranchRepository } from "src/branch/repo/branch.repo";
 
-
 @Injectable()
 export class AssertsAdapter {
     constructor(
         private readonly voucherRepository: VoucherRepository,
         private readonly branchRepository: BranchRepository
     ) { }
+    // Adapter
     convertEntityToDto(entity: AssertsEntity): GetAssertsResDto {
         return new GetAssertsResDto(
             entity.id,
             entity.branchId?.id || 0,
+            entity.createdBy?.id || 0,
+            entity.createdBy?.name || '',
             entity.branchId?.branchName || '',
             entity.assertsName || '',
             entity.assertsAmount || 0,
@@ -26,17 +28,18 @@ export class AssertsAdapter {
             entity.assetType,
             entity.quantity || 0,
             entity.description || '',
-            entity.purchaseDate || new Date(),
+            entity.purchaseDate ?? new Date(),  // Fallback to current date if null/undefined
             entity.assetPhoto || '',
             entity.paymentType,
-            entity.companyCode,
-            entity.unitCode,
+            entity.companyCode || '',
+            entity.unitCode || '',
         );
     }
     async convertDtoToEntity(dto: AssertsDto): Promise<AssertsEntity> {
         const entity = new AssertsEntity()
-
         entity.assertsName = dto.assertsName;
+        entity.createdBy.id,
+        entity.createdBy.name,
         entity.assetPhoto = dto.assetPhoto;
         entity.assertsAmount = dto.assertsAmount;
         entity.taxableAmount = dto.taxableAmount;
@@ -55,7 +58,7 @@ export class AssertsAdapter {
                 throw new Error(`Branch with ID ${dto.branchId} not found`);
             }
 
-            entity.branchId = branchEntity; 
+            entity.branchId = branchEntity;
         }
 
         if (dto.id) {

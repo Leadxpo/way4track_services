@@ -8,6 +8,7 @@ import {
 import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { VoucherEntity } from 'src/voucher/entity/voucher.entity';
 import { PaymentType } from '../enum/payment-type.enum';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 export enum AssetType {
     OFFICE_ASSET = 'office asset',
@@ -62,6 +63,10 @@ export class AssertsEntity {
         enum: PaymentType,
     })
     paymentType: PaymentType;
+
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.assert)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: StaffEntity;
 
     @Column('varchar', { name: 'company_code', length: 20, nullable: false })
     companyCode: string;

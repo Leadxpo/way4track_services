@@ -11,6 +11,7 @@ export class AssertsDto {
     paymentType: PaymentType;
     assetType: AssetType;
     branchId?: number;
+    createdBy?: number;
     description?: string;
     companyCode: string;
     unitCode: string

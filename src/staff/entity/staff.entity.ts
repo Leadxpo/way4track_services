@@ -19,6 +19,9 @@ import { Letters } from '../enum/qualifications.enum';
 import { Experience } from '../dto/staff.dto';
 import { ProductEntity } from 'src/product/entity/product.entity';
 import { SalesWorksEntity } from 'src/sales-man/entity/sales-man.entity';
+import { AssertsEntity } from 'src/asserts/entity/asserts-entity';
+import { ClientEntity } from 'src/client/entity/client.entity';
+import { EstimateEntity } from 'src/estimate/entity/estimate.entity';
 
 
 export enum Gender {
@@ -251,11 +254,26 @@ export class StaffEntity extends BaseEntity {
   @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.staffId)
   technician: TechnicianWorksEntity[];
 
+  @OneToMany(() => ClientEntity, (ClientEntity) => ClientEntity.createdBy)
+  client: ClientEntity[];
+
+  @OneToMany(() => EstimateEntity, (EstimateEntity) => EstimateEntity.createdBy)
+  estimate: EstimateEntity[];
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.fromStaffId)
+  fromTechnician: TechnicianWorksEntity[];
+
+  @OneToMany(() => TechnicianWorksEntity, (TechnicianWorksEntity) => TechnicianWorksEntity.allocatedBy)
+  allocatedStaffBy: TechnicianWorksEntity[];
+
   @OneToMany(() => SalesWorksEntity, (SalesWorksEntity) => SalesWorksEntity.staffId)
   salesWork: SalesWorksEntity[];
 
   @OneToMany(() => PermissionEntity, (PermissionEntity) => PermissionEntity.staffId)
   permissions: PermissionEntity[];
+
+  @OneToMany(() => AssertsEntity, (AssertsEntity) => AssertsEntity.createdBy)
+  assert: AssertsEntity[];
 
   @OneToMany(() => DispatchEntity, (DispatchEntity) => DispatchEntity.staffId)
   dispatch: DispatchEntity[];

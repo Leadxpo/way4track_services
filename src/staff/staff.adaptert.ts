@@ -124,7 +124,7 @@ export class StaffAdapter {
                 staffMember.ifscCode,
                 staffMember.address,
                 staffMember.branch ? staffMember.branch.id : null, // ✅ Handle null branch
-                staffMember.branch ? staffMember.branch.branchName : null,
+                staffMember.branchName,
                 staffMember.accountType,
                 staffMember.department,
                 staffMember.monthlySalary,

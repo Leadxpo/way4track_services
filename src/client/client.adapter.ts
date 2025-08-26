@@ -3,6 +3,7 @@ import { BranchEntity } from 'src/branch/entity/branch.entity';
 import { ClientResDto } from './dto/client-res.dto';
 import { ClientDto } from './dto/client.dto';
 import { ClientEntity } from './entity/client.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 
 @Injectable()
@@ -15,6 +16,9 @@ export class ClientAdapter {
         const branchEntity = new BranchEntity();
         branchEntity.id = dto.branch;
         entity.branch = branchEntity;
+        const staffEntity = new StaffEntity();
+        staffEntity.id = dto.createdBy;
+        entity.createdBy = staffEntity;
         entity.clientPhoto = dto.clientPhoto
         entity.email = dto.email;
         entity.address = dto.address;
@@ -55,7 +59,9 @@ export class ClientAdapter {
                 client.companyCode,
                 client.unitCode,
                 client.status,
-                client.GSTNumber
+                client.GSTNumber,
+                client.createdBy.id,
+                client.createdBy.name
             );
         });
     }

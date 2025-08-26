@@ -110,7 +110,6 @@ export class SalesWorksService {
             }
 
             // Parse requirementDetails
-            console.log("requirementDetails", dto.requirementDetails);
 
             if (typeof dto.requirementDetails === "string") {
                 try {
@@ -131,8 +130,6 @@ export class SalesWorksService {
                 quantity: requirementDetail.quantity,
             }));
 
-
-            console.log("service", dto.service)
             // Parse service array
             if (typeof dto.service === "string") {
                 try {

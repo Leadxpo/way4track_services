@@ -18,12 +18,17 @@ export class AppointmentAdapter {
         entity.slot = dto.slot;
         entity.period = dto.period;
         entity.status = dto.status;
+        entity.callType = dto.callType;
+        entity.service = dto.service;
         entity.description = dto.description;
         entity.companyCode = dto.companyCode
         entity.unitCode = dto.unitCode
         const staff = new StaffEntity();
         staff.id = dto.assignedTo;
         entity.staffId = staff;
+        const createdBy = new StaffEntity();
+        createdBy.id = dto.createdBy;
+        entity.createdBy = createdBy;
         if (dto.voucherId) {
             const voucher = new VoucherEntity();
             voucher.id = dto.voucherId;
@@ -60,12 +65,15 @@ export class AppointmentAdapter {
                 entity.branchId?.branchName || '',
                 entity.appointmentType,
                 entity.staffId?.id || 0,
+                entity.createdBy?.id || 0,
                 entity.staffId?.name || '',
                 formattedDate,
                 formattedTime,
                 entity.period,
                 entity.description,
                 entity.status,
+                entity.callType,
+                entity.service,
                 entity.appointmentId,
                 entity.companyCode,
                 entity.unitCode,

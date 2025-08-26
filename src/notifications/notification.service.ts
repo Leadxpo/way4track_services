@@ -57,27 +57,61 @@ export class NotificationService {
             companyCode = entity.companyCode;
             unitCode = entity.unitCode;
         }
-        else if (type === NotificationEnum.TechnicianWorks && 'workStatus' in entity && 'subDealerId' in entity) {
-            const subDealerId = typeof entity.subDealerId === 'object' ? entity.subDealerId.id : entity.subDealerId;
-            if (!subDealerId) {
+        else if (
+            type === NotificationEnum.TechnicianWorks &&
+            entity instanceof TechnicianWorksEntity
+          ) {
+            
+            // Case 1: Sub-dealer assigned
+            if ('subDealerId' in entity) {
+              const subDealerId =
+                typeof entity.subDealerId === 'object'
+                  ? entity.subDealerId.id
+                  : entity.subDealerId;
+          
+              if (!subDealerId) {
                 console.warn('SubDealerId is missing or invalid for notification type TechnicianWorks');
                 return;
+              }
+          
+              message = `Work has been allocated to sub-dealer staff: ${entity.subDealerStaffId || 'N/A'}`;
+              createdAt = new Date();
+              subDealer = subDealerId;
+              techWork = entity.id;
+              companyCode = entity.companyCode;
+              unitCode = entity.unitCode;
             }
-
-            const pendingWorks = await this.technicianWorksRepository.getSubDealerPendingPayments({ subDealerId });
-            const pending = pendingWorks?.subDealer || {};
-
-            message = `Pending payment for activated work: ${pending.totalActivateWork || 0}, pending: ${pending.totalPendingWork || 0}, total amount: ₹${pending.totalAmount || 0}`;
-            createdAt = new Date();
-            subDealer = subDealerId;
-            techWork=entity.id;
-            companyCode = entity.companyCode;
-            unitCode = entity.unitCode;
-        }
-
-        else {
+          
+            // Case 2: Staff assigned (no sub-dealer)
+            else if ('staffId' in entity) {
+                const techEntity = entity as TechnicianWorksEntity;
+              const staffId =
+                typeof techEntity.staffId === 'object'
+                  ? techEntity.staffId.id
+                  : techEntity.staffId;
+          
+              if (!staffId) {
+                console.warn('StaffId is missing or invalid for notification type TechnicianWorks');
+                return;
+              }
+          
+              message = `Work has been allocated to staff: ${techEntity.staffId.name || 'N/A'}`;
+              createdAt = new Date();
+              user = staffId;
+              techWork = techEntity.id;
+              companyCode = techEntity.companyCode;
+              unitCode = techEntity.unitCode;
+            }
+          
+            // Case 3: Neither sub-dealer nor staff ID
+            else {
+              console.warn('Entity lacks both subDealerId and staffId for TechnicianWorks notification');
+              return;
+            }
+          } else {
             throw new Error('Invalid entity type or notification type.');
-        }
+          }
+          
         //&& entity.install
         const notificationEntity = this.notificationAdapter.convertDtoToEntity({
             message,

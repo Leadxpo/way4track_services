@@ -4,6 +4,7 @@ import { AssertsEntity, AssetType } from "../entity/asserts-entity";
 import { BranchEntity } from "src/branch/entity/branch.entity";
 import { CommonReq } from "src/models/common-req";
 import { VoucherEntity } from "src/voucher/entity/voucher.entity";
+import { StaffEntity } from "src/staff/entity/staff.entity";
 
 @Injectable()
 export class AssertsRepository extends Repository<AssertsEntity> {
@@ -104,9 +105,12 @@ export class AssertsRepository extends Repository<AssertsEntity> {
                 'asset.asserts_name AS assetName',
                 'asset.asserts_amount AS assetAmount',
                 'asset.taxable_amount AS taxableAmount',
-                'asset.quantity AS quantity'
+                'asset.quantity AS quantity',
+                'asset.created_by AS createBy',
+                'staff.name AS createByName'
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = asset.branch_id')
+            .leftJoin(StaffEntity, 'staff', 'staff.id = asset.created_by')
             .where('asset.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('asset.unit_code = :unitCode', { unitCode: req.unitCode });
 

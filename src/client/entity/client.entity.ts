@@ -15,6 +15,7 @@ import { OrderEntity } from 'src/orders/entity/orders.entity';
 import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
 import { RefundEntity } from 'src/refund/entity/refund.entity';
 import { ReviewEntity } from 'src/reviews/entity/reviews-entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 @Entity('client')
 export class ClientEntity extends BaseEntity {
@@ -75,6 +76,10 @@ export class ClientEntity extends BaseEntity {
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.client, { nullable: true })
     @JoinColumn({ name: 'branch_id' })
     branch: BranchEntity;
+
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.client)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: StaffEntity;
 
     @OneToMany(() => CartEntity, (voucher) => voucher.client)
     cart: CartEntity[];

@@ -7,12 +7,15 @@ import { EstimateRepository } from './repo/estimate.repo';
 import { EstimateAdapter } from './estimate.adapter';
 import { ClientModule } from 'src/client/client.module';
 import { ProductModule } from 'src/product/product.module';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
+import { StaffModule } from 'src/staff/staff.module';
 
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([EstimateEntity]),
+    imports: [TypeOrmModule.forFeature([EstimateEntity,StaffEntity]),
     forwardRef(() => ClientModule),
+    forwardRef(() => StaffModule),
     forwardRef(() => ProductModule)],
     controllers: [EstimateController],
     providers: [EstimateService, EstimateRepository, EstimateAdapter],

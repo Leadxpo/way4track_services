@@ -104,9 +104,16 @@ export class TechnicianWorksEntity extends BaseEntity {
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
 
-    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.technician, { nullable: true })
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.fromTechnician, { nullable: true })
     @JoinColumn({ name: 'from_staff_id' })
     fromStaffId: StaffEntity;
+
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.allocatedStaffBy, { nullable: true })
+    @JoinColumn({ name: 'allocated_by' })
+    allocatedBy: StaffEntity;
+
+    @Column({ name: 'allocated_date', type: 'timestamp', nullable: true })
+    allocatedDate: Date;
 
     @ManyToOne(() => BranchEntity, (branchEntity) => branchEntity.technician, { nullable: true })
     @JoinColumn({ name: 'branch_id' })

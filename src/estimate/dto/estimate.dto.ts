@@ -32,6 +32,7 @@ export class EstimateDto {
     convertToInvoice: boolean;
     estimatePdfUrl: string;
     invoicePdfUrl: string
+    createdBy: number;
 }
 
 

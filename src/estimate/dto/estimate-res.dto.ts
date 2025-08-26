@@ -58,8 +58,9 @@ export class EstimateResDto {
   vendorPhoneNumber?: string;
   estimatePdfUrl: string;
   invoicePdfUrl: string;
-
-  constructor(
+  createdBy: number;
+  createdByName: string;
+constructor(
     id: number,
     clientId: string,
     clientName: string,
@@ -110,7 +111,10 @@ export class EstimateResDto {
     vendorName?: string,
     vendorPhoneNumber?: string,
     estimatePdfUrl?: string,
-    invoicePdfUrl?: string
+    invoicePdfUrl?: string,
+    createdBy?: number,
+    createdByName?: string
+
   ) {
     this.id = id;
     this.clientId = clientId;
@@ -154,5 +158,7 @@ export class EstimateResDto {
     this.vendorPhoneNumber = vendorPhoneNumber;
     this.estimatePdfUrl = estimatePdfUrl ?? '';
     this.invoicePdfUrl = invoicePdfUrl ?? '';
+    this.createdBy = createdBy ?? null;
+    this.createdByName = createdByName ?? '';
   }
 }

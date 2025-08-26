@@ -17,6 +17,17 @@ export enum AppointmentStatus {
     SENT = 'sent',
 }
 
+export enum Service {
+    RENEWAL = 'RENEWAL',
+    SALE_PITCHING = 'SALE_PITCHING',
+    FOLLOW_UP = 'FOLLOW_UP',
+}
+
+export enum CallType {
+    INBOND = 'INBOND',
+    OUTBOND = 'OUTBOND',
+}
+
 export enum TimePeriodEnum {
     AM = 'AM',
     PM = 'PM'
@@ -72,9 +83,29 @@ export class AppointmentEntity {
     })
     status: AppointmentStatus;
 
+    @Column({
+        name: 'call_type',
+        type: 'enum',
+        enum: CallType,
+        default: CallType.INBOND,
+    })
+    callType: CallType;
+
+    @Column({
+        name: 'service',
+        type: 'enum',
+        enum: Service,
+        default: Service.RENEWAL,
+    })
+    service: Service;
+
     @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.appointment)
     @JoinColumn({ name: 'staff_id' })
     staffId: StaffEntity;
+
+    @ManyToOne(() => StaffEntity, (staffEntity) => staffEntity.appointment)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: StaffEntity;
 
     @ManyToOne(() => ClientEntity, (ClientEntity) => ClientEntity.appiontment)
     @JoinColumn({ name: 'client_id' })
@@ -93,4 +124,8 @@ export class AppointmentEntity {
 
     @Column('varchar', { name: 'unit_code', length: 20, nullable: false })
     unitCode: string;
+
+    @Column('json', { name: 'image', nullable: true })
+    image: string[]; // Store JSON string of image URLs 
+
 }

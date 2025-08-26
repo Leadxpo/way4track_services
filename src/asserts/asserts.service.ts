@@ -81,7 +81,7 @@ export class AssertsService {
                 }
 
                 // Merge new data into the existing entity, EXCLUDING branchId
-                const { branchId,...rest } = createAssertsDto;
+                const { branchId,createdBy,...rest } = createAssertsDto;
 
                 entity = this.assertsRepository.merge(entity, rest);
 

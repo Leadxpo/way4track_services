@@ -192,6 +192,10 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'st.name AS backSupportterName',
                 'st.phone_number AS backSupportterPhoneNumber',
                 'st.email AS backSupportterNameEmail',
+                'al_staff.name AS allocatedName',
+                'al_staff.phone_number AS allocatedPhoneNumber',
+                'al_staff.email AS allocatedNameEmail',
+                'wa.allocated_date as allocatedDate',
                 'wa.amount as amount',
                 'wa.end_date AS endDate',
                 'wa.installation_address as installationAddress',
@@ -209,10 +213,10 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'pt.name as applicationName',
                 'wa.user_name as userName',
                 'wa.paid_amount as paidAmount'
-
             ])
             .leftJoinAndSelect(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
             .leftJoinAndSelect(StaffEntity, 'staff', 'staff.id = wa.staff_id')
+            .leftJoinAndSelect(StaffEntity, 'al_staff', 'al_staff.id = wa.allocated_by')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .leftJoin(ProductTypeEntity, 'pt', 'pt.id = wa.application_id')
             .leftJoinAndSelect(BranchEntity, 'br', 'staff.branch_id = br.id')
@@ -223,7 +227,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
         if (req.status) {
             query.andWhere(`wa.work_status=:status`, { status: req.status })
         }
-        query.orderBy('wa.start_date', 'ASC')
+        query.orderBy('wa.start_date', 'DESC')
 
         const result = await query.getRawMany();
         return result;
@@ -611,12 +615,16 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'sb .name as subDealerName',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.sub_dealer_phone_number as subDealerPhoneNumber',
+                'al_staff.name AS allocatedName',
+                'al_staff.phone_number AS allocatedPhoneNumber',
+                'al_staff.email AS allocatedNameEmail',
                 'subst.staff_id as subDealerStaffId',
                 'wa.remark as remark',
                 'wa.paid_amount as paidAmount'
             ])
             .leftJoin(StaffEntity, 'staff', 'staff.id = wa.staff_id')
             .leftJoin(StaffEntity, 'st', 'st.id = wa.back_supporter_id')
+            .leftJoin(StaffEntity, 'al_staff', 'al_staff.id = wa.allocated_by')
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .leftJoin(SubDelaerStaffEntity, 'subst', 'subst.id = wa.sub_dealer_staff_id')
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')

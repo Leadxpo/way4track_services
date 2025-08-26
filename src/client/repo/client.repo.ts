@@ -22,8 +22,8 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.phone_number AS phoneNumber',
                 'cl.name AS name',
                 'cl.state AS state',
-                'cl.status as status'
-
+                'cl.status as status',
+                'cl.created_by as createdBy'
             ])
             .where(`cl.company_code = "${req.companyCode}"`)
             .andWhere(`cl.unit_code = "${req.unitCode}"`)
@@ -42,7 +42,8 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.email AS email',
                 'cl.address AS address',
                 'cl.state AS state',
-                'cl.status as status'
+                'cl.status as status',
+                'cl.created_by as createdBy'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.client_id='${req.clientId}'`)
@@ -66,7 +67,9 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.email AS email',
                 'cl.address AS address',
                 'cl.state AS state',
-                'cl.status as status'
+                'cl.status as status',
+                'cl.created_by as createdBy'
+
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.company_code = "${req.companyCode}"`)

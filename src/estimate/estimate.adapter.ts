@@ -5,6 +5,7 @@ import { EstimateDto } from './dto/estimate.dto';
 import { EstimateEntity } from './entity/estimate.entity';
 import { VendorEntity } from 'src/vendor/entity/vendor.entity';
 import { BranchEntity } from 'src/branch/entity/branch.entity';
+import { StaffEntity } from 'src/staff/entity/staff.entity';
 
 
 @Injectable()
@@ -37,6 +38,10 @@ export class EstimateAdapter {
         const vendorEntity = new VendorEntity();
         vendorEntity.id = dto.vendorId;
         entity.vendorId = vendorEntity;
+
+        const staffEntity = new StaffEntity();
+        staffEntity.id = dto.createdBy;
+        entity.createdBy = staffEntity;
 
         // entity.hsnCode = dto.hsnCode;
         entity.quantity = dto.quantity;
@@ -139,7 +144,9 @@ export class EstimateAdapter {
                 entity.vendorId?.name ?? null,
                 entity.vendorId?.vendorPhoneNumber ?? null,
                 entity.estimatePdfUrl,
-                entity.invoicePdfUrl
+                entity.invoicePdfUrl,
+                entity.createdBy.id,
+                entity.createdBy.name
             );
         });
     }
