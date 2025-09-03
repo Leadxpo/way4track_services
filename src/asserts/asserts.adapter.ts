@@ -19,7 +19,7 @@ export class AssertsAdapter {
         return new GetAssertsResDto(
             entity.id,
             entity.branchId?.id || 0,
-            entity.createdBy?.id || 0,
+            entity.createdBy?.id || null,
             entity.createdBy?.name || '',
             entity.branchId?.branchName || '',
             entity.assertsName || '',

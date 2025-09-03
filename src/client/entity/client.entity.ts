@@ -90,13 +90,13 @@ export class ClientEntity extends BaseEntity {
     @OneToMany(() => AppointmentEntity, (asserts) => asserts.clientId)
     appiontment: AppointmentEntity[];
 
-    @OneToMany(() => EstimateEntity, (asserts) => asserts.clientId)
+    @OneToMany(() => EstimateEntity, (estimate) => estimate.clientId)
     estimate: EstimateEntity[];
 
-    @OneToMany(() => WorkAllocationEntity, (asserts) => asserts.clientId)
+    @OneToMany(() => WorkAllocationEntity, (works) => works.clientId)
     workAllocation: WorkAllocationEntity[];
 
-    @OneToMany(() => LedgerEntity, (asserts) => asserts.clientId)
+    @OneToMany(() => LedgerEntity, (ledger) => ledger.clientId)
     ledger: LedgerEntity[];
 
     @Column({ name: 'client_photo', type: 'text', nullable: true })

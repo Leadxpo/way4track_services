@@ -174,8 +174,6 @@ export class StaffService {
             newStaff.qualifications = qualifications;
             newStaff.experienceDetails = experience;
 
-            console.log(newStaff, ">>>>>>>>>>");
-
             // Save Staff Record
             await this.staffRepository.save(newStaff);
 
@@ -269,7 +267,6 @@ export class StaffService {
                 ...existingStaff,
                 ...this.adapter.convertDtoToEntity(req)
             };
-            console.log(updatedStaff, "?>>>>>>>>>>>>>>")
             // Handle designation change
 
 

@@ -1928,7 +1928,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
             })
             .getRawMany();
-        console.log(ledgerTransactions, ">>>>>>>>")
         // Define the structure of the Trial Balance
         const trialBalance = {
             assets: [],
@@ -2929,8 +2928,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             })
             .getRawMany();
 
-        console.log(ledgerTransactions, ">>>>>>>>");
-
         // **Define the structured response**
         const loansandinterstAmounts = {
             loans: [],
@@ -2998,8 +2995,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 creditVouchers: [VoucherTypeEnum.RECEIPT, VoucherTypeEnum.DEBITNOTE]
             })
             .getRawMany();
-
-        console.log(ledgerTransactions, ">>>>>>>>");
 
         // **Define the structured response**
         const loansandinterstAmounts = {

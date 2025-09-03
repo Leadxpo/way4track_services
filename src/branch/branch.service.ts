@@ -138,7 +138,6 @@ export class BranchService {
             where: { companyCode: req.companyCode, unitCode: req.unitCode },
             relations: ['accounts'],
         });
-        console.log(branch, ">>>>>")
         if (!branch.length) {
             return new CommonResponse(false, 35416, "There Is No List");
         } else {

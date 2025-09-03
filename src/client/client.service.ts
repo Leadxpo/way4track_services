@@ -172,17 +172,19 @@ export class ClientService {
     async getClientDetails(req: CommonReq): Promise<CommonResponse> {
         try {
             const client = await this.clientRepository.find({
-                where: { companyCode: req.companyCode, unitCode: req.unitCode }, 
-                relations: ['customerAddress', 'cart', 'order', 'refund'], 
+                where: { companyCode: req.companyCode, unitCode: req.unitCode },
+                relations: ['customerAddress', 'cart', 'order', 'refund'],
                 order: {
                     createdAt: 'DESC'  // <- this is what adds the descending sort
                 }
             });
-            if (!client) {
+            if (!client || client.length === 0) {
                 return new CommonResponse(false, 404, 'Client not found');
             }
             else {
+                console.log("aaa :::", client)
                 const data = this.clientAdapter.convertEntityToDto(client)
+                console.log("kkk :::", data)
                 return new CommonResponse(true, 200, 'Client details fetched successfully', data);
             }
         } catch (error) {

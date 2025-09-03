@@ -145,8 +145,8 @@ export class EstimateAdapter {
                 entity.vendorId?.vendorPhoneNumber ?? null,
                 entity.estimatePdfUrl,
                 entity.invoicePdfUrl,
-                entity.createdBy.id,
-                entity.createdBy.name
+                entity.createdBy?.id ?? null,
+                entity.createdBy?.name ?? null
             );
         });
     }

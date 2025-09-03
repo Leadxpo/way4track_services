@@ -44,6 +44,7 @@ export class ClientAdapter {
 
     convertEntityToDto(entity: ClientEntity[]): ClientResDto[] {
         return entity.map((client) => {
+            console.log("rrr :::",client)
             return new ClientResDto(
                 client.id,
                 client.name,
@@ -60,8 +61,8 @@ export class ClientAdapter {
                 client.unitCode,
                 client.status,
                 client.GSTNumber,
-                client.createdBy.id,
-                client.createdBy.name
+                client.createdBy?.id ?? null,
+                client.createdBy?.name ?? null
             );
         });
     }

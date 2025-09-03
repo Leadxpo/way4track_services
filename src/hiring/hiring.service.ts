@@ -33,10 +33,8 @@ export class HiringService {
         try {
             let resumePath: string | undefined;
             let entity: HiringEntity;
-            console.log(dto, ":::::::::::::::::")
             if (dto.id) {
                 entity = await this.hiringRepository.findOne({ where: { id: dto.id } });
-                console.log(entity, ">>>>>>>>>")
                 if (!entity) {
                     throw new ErrorResponse(404, 'details not found');
                 }

@@ -60,8 +60,6 @@ export class WebsiteProductController {
 
     }
   ): Promise<CommonResponse> {
-    console.log(dto, "//////");
-    console.log(photos, "llll");
     try {
       if (dto.id) dto.id = Number(dto.id);
       return await this.service.handleWebsiteProductDetails(dto, photos);

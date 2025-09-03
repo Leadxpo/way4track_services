@@ -65,7 +65,7 @@ export class AppointmentAdapter {
                 entity.branchId?.branchName || '',
                 entity.appointmentType,
                 entity.staffId?.id || 0,
-                entity.createdBy?.id || 0,
+                entity.createdBy?.id || null,
                 entity.staffId?.name || '',
                 formattedDate,
                 formattedTime,
