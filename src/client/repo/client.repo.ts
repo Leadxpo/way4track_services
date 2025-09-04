@@ -84,13 +84,15 @@ export class ClientRepository extends Repository<ClientEntity> {
         if (req.userName) {
             query.andWhere('cl.user_name LIKE :userName', { userName: `%${req.userName}%` });
         }
+        if (req.phoneNumber) {
+            query.andWhere('cl.phone_number LIKE :phoneNumber', { phoneNumber: `%${req.phoneNumber}%` });
+        }
         if (req.branchName) {
             query.andWhere('br.name = :branchName', { branchName: req.branchName });
         }
         if (req.fromDate) {
             query.andWhere('cl.created_at >= :fromDate', { fromDate: req.fromDate });
         }
-
         if (req.toDate) {
             query.andWhere('cl.created_at <= :toDate', { toDate: req.toDate });
         }
