@@ -36,8 +36,6 @@ export class AmenitiesService {
                 contentType: photo.mimetype,
                 resumable: false,
             });
-
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
             filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
 
@@ -75,7 +73,6 @@ export class AmenitiesService {
                     const [exists] = await file.exists(); // ✅ Check existence
                     if (exists) {
                         await file.delete();
-                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
                     } else {
                         console.warn(`File not found in GCS, skipping delete: ${existingFilePath}`);
                     }

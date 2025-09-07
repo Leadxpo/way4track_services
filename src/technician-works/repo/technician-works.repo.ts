@@ -14,6 +14,7 @@ import { SubDealerEntity } from "src/sub-dealer/entity/sub-dealer.entity";
 import { ServiceTypeEntity } from "src/service-type/entity/service.entity";
 import { ProductTypeEntity } from "src/product-type/entity/product-type.entity";
 import { SubDelaerStaffEntity } from "src/sub-dealer-staff/entity/sub-dealer-staff.entity";
+import { ApplicationEntity } from "src/application/entity/application-entity";
 
 
 
@@ -159,6 +160,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.id as id',
                 'wa.convert_to_invoice as convertToInvoice',
                 'wa.service AS service',
+                'protyp.name AS applicationName',
+                'wa.user_name AS userName',
                 'wa.payment_status AS paymentStatus',
                 'wa.start_date AS startDate',
                 'staff.name AS staffName',
@@ -567,6 +570,8 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.id as id',
                 'wa.convert_to_invoice as convertToInvoice',
                 'wa.service AS service',
+                'protyp.name AS applicationName',
+                'wa.user_name AS userName',
                 'wa.payment_status AS paymentStatus',
                 'wa.start_date AS startDate',
                 'staff.name AS staffName',
@@ -628,6 +633,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
             .leftJoin(SubDealerEntity, 'sb', 'sb.id = wa.sub_dealer_id')
             .leftJoin(SubDelaerStaffEntity, 'subst', 'subst.id = wa.sub_dealer_staff_id')
             .leftJoin(BranchEntity, 'br', 'br.id = wa.branch_id')
+            .leftJoin(ProductTypeEntity, 'protyp', 'protyp.id = wa.application_id')
             .leftJoin(ClientEntity, 'client', 'wa.client_id = client.id')
             .where('wa.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('wa.unit_code = :unitCode', { unitCode: req.unitCode })

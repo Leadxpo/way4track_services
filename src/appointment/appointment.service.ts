@@ -41,7 +41,6 @@ export class AppointmentService {
             if (!existingAppointment) {
                 return new CommonResponse(false, 4002, 'Appointment not found for the provided details.');
             }
-            console.log("rrr :",(photoPath?.length > 0 && existingAppointment?.image))
             if (photoPath?.length > 0 && existingAppointment?.image) {
                 let existingFiles: string[] = [];
 
@@ -58,7 +57,6 @@ export class AppointmentService {
 
                     try {
                         await file.delete();
-                        console.log(`Deleted old file from GCS: ${existingFilePath}`);
                     } catch (error) {
                         console.error(`Error deleting file from GCS: ${error.message}`);
                     }

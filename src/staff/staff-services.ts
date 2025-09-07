@@ -452,7 +452,7 @@ export class StaffService {
     async getStaffDetailsById(req: StaffIdDto): Promise<CommonResponse> {
         try {
             const staff = await this.staffRepository.createQueryBuilder('staff')
-                .leftJoinAndSelect(BranchEntity, 'branch', 'branch.id = staff.branch_id')
+                .leftJoinAndSelect('staff.branch','branch')
                 .leftJoinAndSelect('staff.voucherId', 'voucher')
                 .leftJoinAndSelect('staff.staffFrom', 'staffFrom')
                 .leftJoinAndSelect('staff.staffTo', 'staffTo')

@@ -34,10 +34,6 @@ export class StaffAdapter {
         entity.bloodGroup = dto.bloodGroup;
         entity.joiningDate = dto.joiningDate;
         entity.beforeExperience = dto.beforeExperience;
-        // entity.previousCompany = dto.previousCompany;
-        // entity.previousDesignation = dto.previousDesignation;
-        // entity.totalExperience = dto.totalExperience;
-        // entity.previousSalary = dto.previousSalary;
         entity.bankName = dto.bankName;
         entity.accountNumber = dto.accountNumber;
         entity.ifscCode = dto.ifscCode;
@@ -46,7 +42,6 @@ export class StaffAdapter {
         entity.department = dto.department;
         entity.monthlySalary = dto.monthlySalary;
         entity.salaryDate = dto.salaryDate;
-        // entity.salaryStatus = dto.salaryStatus;
         entity.bikeAllocation = dto.bikeAllocation;
         entity.vehiclePhoto = dto.vehiclePhoto;
         entity.bikeName = dto.bikeName;
@@ -83,10 +78,11 @@ export class StaffAdapter {
             const branchEntity = new BranchEntity();
             branchEntity.id = dto.branch;
             entity.branch = branchEntity;
-
+        }else{
+            entity.branch = null;
         }
         entity.experienceDetails = dto.experienceDetails
-        entity.branchName = dto.branchName;
+        entity.branchName = dto.branchName && dto.branchName.trim() !== "" ? dto.branchName : null;;
         entity.uniqueId = dto.uniqueId
         return entity;
     }
@@ -123,8 +119,8 @@ export class StaffAdapter {
                 staffMember.accountNumber,
                 staffMember.ifscCode,
                 staffMember.address,
-                staffMember.branch ? staffMember.branch.id : null, // ✅ Handle null branch
-                staffMember.branchName,
+                staffMember.branch ? staffMember.branch.id : null,
+                staffMember.branchName ? staffMember.branchName : null ,
                 staffMember.accountType,
                 staffMember.department,
                 staffMember.monthlySalary,
