@@ -160,7 +160,6 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'wa.id as id',
                 'wa.convert_to_invoice as convertToInvoice',
                 'wa.service AS service',
-                'protyp.name AS applicationName',
                 'wa.user_name AS userName',
                 'wa.payment_status AS paymentStatus',
                 'wa.start_date AS startDate',
