@@ -49,9 +49,9 @@ export class NotificationRepository extends Repository<NotificationEntity> {
                 'staff.id AS userId',
                 'staff.staff_id AS staffId',
                 'staff.name AS user',
-                'notifyTO.id AS notifyToId',
-                'notifyTO.staff_id AS notifyToStaffId',
-                'notifyTO.name AS notifyToName',
+                'notifyTo.id AS notifyToId',
+                'notifyTo.staff_id AS notifyToStaffId',
+                'notifyTo.name AS notifyToName',
                 'nt.notification_type as notificationType',
                 'sb.sub_dealer_id as subDealerId',
                 'sb.name as subDealerName'
