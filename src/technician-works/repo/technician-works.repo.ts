@@ -695,7 +695,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
                 'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
                 'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CASE WHEN wa.work_status = :pending AND wa.accept_start_date IS NOT NULL THEN 1 ELSE 0 END) AS totalPendingWork',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
             ])
             .groupBy('br.name');
@@ -706,7 +706,7 @@ export class TechinicianWoksRepository extends Repository<TechnicianWorksEntity>
                 'SUM(CASE WHEN wa.work_status = :install THEN 1 ELSE 0 END) AS totalInstallWork',
                 'SUM(CASE WHEN wa.work_status = :accept THEN 1 ELSE 0 END) AS totalAcceptWork',
                 'SUM(CASE WHEN wa.work_status = :activate THEN 1 ELSE 0 END) AS totalActivateWork',
-                'SUM(CASE WHEN wa.work_status = :pending THEN 1 ELSE 0 END) AS totalPendingWork',
+                'SUM(CASE WHEN wa.work_status = :pending AND wa.accept_start_date IS NOT NULL THEN 1 ELSE 0 END) AS totalPendingWork',
                 'SUM(CASE WHEN wa.work_status = :completed THEN 1 ELSE 0 END) AS totalCompletedWork',
             ])
             .groupBy('sb.sub_dealer_id');
