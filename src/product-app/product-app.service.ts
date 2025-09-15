@@ -26,29 +26,106 @@ export class ProductAppService {
         this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
     }
 
-    async handleUpdateAppDetails(dto: ProductAppDto, photo?: Express.Multer.File): Promise<CommonResponse> {
-        let filePath: string | null = null;
-        if (photo) {
+    private async uploadToGCS(file: Express.Multer.File, fileName: string): Promise<void> {
+        try {
             const bucket = this.storage.bucket(this.bucketName);
-            const uniqueFileName = `app_photos/${Date.now()}-${photo.originalname}`;
-            const file = bucket.file(uniqueFileName);
-
-            await file.save(photo.buffer, {
-                contentType: photo.mimetype,
-                resumable: false,
+            const gcsFile = bucket.file(fileName);
+          
+            await gcsFile.save(file.buffer, {
+              contentType: file.mimetype,
+              resumable: false,
             });
+          
+            console.log(`Uploaded: ${fileName}`);
+        } catch (error) {
+            console.log(`Uploaded fsild due to \n ${error}`);
 
-            console.log(`File uploaded to GCS: ${uniqueFileName}`);
-            filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
         }
-if (dto.id) {
-    return this.update(dto, filePath);
-}else{
-    return this.create(dto, filePath);
-}
+      }
+      
 
-    }
-
+      async handleUpdateAppDetails(
+        dto: ProductAppDto,
+        pointFiles?: Express.Multer.File[],
+        photo?: Express.Multer.File
+      ): Promise<CommonResponse> {
+        let filePath: string | null = null;
+      
+        // Upload app photo
+        if (photo) {
+          const bucket = this.storage.bucket(this.bucketName);
+          const uniqueFileName = `app_photos/${Date.now()}-${photo.originalname}`;
+          const file = bucket.file(uniqueFileName);
+      
+          await file.save(photo.buffer, {
+            contentType: photo.mimetype,
+            resumable: false,
+          });
+      
+          console.log(`Photo uploaded: ${uniqueFileName}`);
+          filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+        }
+      
+        // Build pointMap from DTO fields
+        const pointMap: Record<number, any> = {};
+      
+        for (const [key, value] of Object.entries(dto)) {
+          const match = key.match(/^points\[(\d+)\]\.(title|desc)$/);
+          if (match) {
+            const index = parseInt(match[1], 10);
+            const field = match[2];
+      
+            if (!pointMap[index]) pointMap[index] = {};
+            pointMap[index][field] = value;
+          }
+        }
+      
+        // Map uploaded point files
+        if (pointFiles) {
+          pointFiles.forEach((file) => {
+            const match = file.fieldname.match(/^points\[(\d+)\]\.file$/);
+      
+            if (match) {
+              const index = parseInt(match[1], 10);
+              if (!pointMap[index]) pointMap[index] = {};
+      
+              const uniqueFileName = `app_points/${Date.now()}-${file.originalname}`;
+              pointMap[index]._fileUpload = {
+                file,
+                uniqueFileName,
+              };
+            }
+          });
+        }
+      
+        // Upload point files to GCS and build final `points` array
+        const points = [];
+      
+        for (const index of Object.keys(pointMap)) {
+          const item = pointMap[Number(index)];
+          let fileUrl: string | null = null;
+      
+          if (item._fileUpload) {
+            await this.uploadToGCS(item._fileUpload.file, item._fileUpload.uniqueFileName);
+            fileUrl = `https://storage.googleapis.com/${this.bucketName}/${item._fileUpload.uniqueFileName}`;
+          }
+      
+          points.push({
+            title: item.title || '',
+            desc: item.desc || '',
+            file: fileUrl,
+          });
+        }
+      
+        dto.points = points;
+      
+        if (dto.id) {
+          return this.update(dto, filePath);
+        } else {
+          return this.create(dto, filePath);
+        }
+      }
+      
     async handleBulkProductApp(
         dtoList: ProductAppDto[],
         photos?: Express.Multer.File[],

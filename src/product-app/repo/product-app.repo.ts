@@ -12,6 +12,4 @@ export class ProductAppRepository extends Repository<ProductAppEntity> {
     constructor(private dataSource: DataSource) {
         super(ProductAppEntity, dataSource.createEntityManager());
     }
-
-
 }

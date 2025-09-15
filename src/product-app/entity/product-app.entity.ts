@@ -41,6 +41,6 @@ export class ProductAppEntity {
 
   @Column('json', { name: 'points' })
   points: {
-    title: string; desc: string;
+    title: string; desc: string, file:string;
   }[];
 }

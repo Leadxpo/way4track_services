@@ -7,7 +7,7 @@ export class ProductAppDto {
     webProductId?: number;
     companyCode: string;
     unitCode: string;
-    points: { title: string; desc: string }[];
+    points: { title: string; desc: string,file:string }[];
 }
 export class ProductAppListDto {
     dtoList: ProductAppDto[]; // this will be parsed from JSON
