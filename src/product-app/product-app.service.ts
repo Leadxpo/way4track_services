@@ -192,7 +192,7 @@ export class ProductAppService {
 
         const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
-        try {
+        try { 
           const [exists] = await file.exists();
           if (exists) {
             await file.delete();
