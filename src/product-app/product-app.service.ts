@@ -118,8 +118,9 @@ export class ProductAppService {
     }
 
     dto.points = points;
-    console.log("ID:::", dto.id)
-    if (dto.id) {
+
+    if (dto.id && !isNaN(Number(dto.id))) {
+      dto.id = Number(dto.id);
       return this.update(dto, filePath);
     } else {
       return this.create(dto, filePath);
@@ -192,7 +193,7 @@ export class ProductAppService {
 
         const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
-        try { 
+        try {
           const [exists] = await file.exists();
           if (exists) {
             await file.delete();
@@ -214,11 +215,11 @@ export class ProductAppService {
       existing.unitCode = dto.unitCode;
       existing.companyCode = dto.companyCode;
       existing.updatedAt = new Date();
-      
+
       if (filePath) {
         existing.image = filePath;
       }
-      
+
       if (dto.points) {
         existing.points = dto.points.map(point => ({
           title: point.title,
