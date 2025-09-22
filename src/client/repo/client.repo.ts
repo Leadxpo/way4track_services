@@ -68,8 +68,8 @@ export class ClientRepository extends Repository<ClientEntity> {
                 'cl.address AS address',
                 'cl.state AS state',
                 'cl.status as status',
-                'cl.created_by as createdBy'
-
+                'cl.created_by as createdBy',
+                'cl.created_at as createdDate'
             ])
             .leftJoin(BranchEntity, 'br', 'br.id = cl.branch_id')
             .where(`cl.company_code = "${req.companyCode}"`)

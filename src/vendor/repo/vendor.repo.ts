@@ -13,6 +13,8 @@ export class VendorRepository extends Repository<VendorEntity> {
     }
 
     async getVendorData(req: {
+        fromDate?: Date,
+        toDate?: Date,
         companyCode?: string,
         unitCode?: string
     }) {
@@ -24,10 +26,18 @@ export class VendorRepository extends Repository<VendorEntity> {
                 've.GST_number AS GSTNumber',
                 've.state AS state',
                 've.bank_details AS bankDetails',
+                've.created_at as createdAt'
             ])
             .where(`ve.company_code = "${req.companyCode}"`)
             .andWhere(`ve.unit_code = "${req.unitCode}"`)
             .orderBy('ve.created_at', 'DESC'); // 👈 add this line
+        if (req.fromDate) {
+            query.andWhere('ve.created_at >= :fromDate', { fromDate: req.fromDate });
+        }
+        if (req.toDate) {
+            query.andWhere('ve.created_at <= :toDate', { toDate: req.toDate });
+        }
+
         const result = await query.getRawMany();
         return result;
     }
