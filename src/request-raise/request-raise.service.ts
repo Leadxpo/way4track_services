@@ -253,7 +253,7 @@ export class RequestRaiseService {
         }
 
         if (filter.requestType) {
-            query.andWhere('req.request_type) = :requestType', { requestType: filter.requestType });
+            query.andWhere('req.request_type = :requestType', { requestType: filter.requestType });
         }
 
         if (filter.fromDate) {
