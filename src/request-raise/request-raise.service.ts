@@ -221,7 +221,7 @@ export class RequestRaiseService {
 
 
     async getRequests(filter: {
-        fromDate?: Date; toDate?: Date;
+        fromDate?: Date; toDate?: Date;requestType:string;
         branchName?: string; staffId?: string; companyCode?: string;
         unitCode?: string;
     }) {
@@ -250,6 +250,10 @@ export class RequestRaiseService {
 
         if (filter.branchName) {
             query.andWhere('branch.name = :branchName', { branchName: filter.branchName });
+        }
+
+        if (filter.requestType) {
+            query.andWhere('req.request_type) = :requestType', { requestType: filter.requestType });
         }
 
         if (filter.fromDate) {

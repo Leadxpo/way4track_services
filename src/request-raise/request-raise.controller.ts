@@ -83,7 +83,7 @@ export class RequestRaiseController {
 
     @Post('getRequestsBySearch')
     async getRequests(@Body() req: {
-        fromDate?: Date; toDate?: Date;
+        fromDate?: Date; toDate?: Date;requestType:string;
         branchName?: string; staffId?: string; companyCode?: string;
         unitCode?: string;
     }) {

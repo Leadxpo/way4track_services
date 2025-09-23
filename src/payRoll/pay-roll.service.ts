@@ -5,7 +5,7 @@ import { PayrollDto } from './dto/payroll.dto';
 import { PayrollRepository } from './repo/payroll.repo';
 import { PayrollAdapter } from './pay-roll.adapter';
 import { CommonResponse } from 'src/models/common-response';
-
+import { Between } from 'typeorm';
 
 @Injectable()
 export class PayrollService {
@@ -66,6 +66,34 @@ export class PayrollService {
         }
     }
 
+
+    async getPayDateRangeRoll(req: { staffId: string; fromDate: Date; toDate: Date }): Promise<CommonResponse> {
+        const { staffId, fromDate, toDate } = req;
+    
+        if (!fromDate || !toDate || isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            return new CommonResponse(false, 35416, "Invalid date range provided.");
+        }
+    
+        const fromMonth = fromDate.getMonth() + 1;
+        const fromYear = fromDate.getFullYear();
+        const toMonth = toDate.getMonth() + 1;
+        const toYear = toDate.getFullYear();
+    
+        const payrolls = await this.payrollRepo.find({
+            where: {
+                staffId: staffId,
+                year: Between(fromYear, toYear),
+                month: Between(fromMonth, toMonth),
+            },
+        });
+    
+        if (!payrolls || payrolls.length === 0) {
+            return new CommonResponse(false, 35416, "No payroll records found in the given range.");
+        }
+    
+        return new CommonResponse(true, 200, "Payroll records retrieved successfully.", payrolls);
+    }
+        
     async getPayRollDetails(req: { month: string; year: string }): Promise<CommonResponse> {
         const month = Number(req.month);
         const year = Number(req.year);

@@ -31,6 +31,16 @@ export class PayRollController {
         }
     }
 
+    @Post('getPayDateRangeRoll')
+    async getPayDateRangeRoll(@Body() req: { staffId: string; fromDate: Date; toDate: Date }): Promise<CommonResponse> {
+        try {
+            return this.ticketsService.getPayDateRangeRoll(req);
+        } catch (error) {
+            console.log("Error in create address in services..", error);
+            return new CommonResponse(false, 500, 'Error fetching branch type details');
+        }
+    }
+
     @Post('getPayRollDetails')
     async getPayRollDetails(@Body() req: { month: string; year: string }): Promise<CommonResponse> {
         try {
