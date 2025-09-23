@@ -68,16 +68,19 @@ export class PayrollService {
 
 
     async getPayDateRangeRoll(req: { staffId: string; fromDate: Date; toDate: Date }): Promise<CommonResponse> {
-        const { staffId, fromDate, toDate } = req;
+        const { staffId } = req;
     
-        if (!fromDate || !toDate || isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        const from = new Date(req.fromDate);
+        const to = new Date(req.toDate);
+    
+        if (isNaN(from.getTime()) || isNaN(to.getTime())) {
             return new CommonResponse(false, 35416, "Invalid date range provided.");
         }
     
-        const fromMonth = fromDate.getMonth() + 1;
-        const fromYear = fromDate.getFullYear();
-        const toMonth = toDate.getMonth() + 1;
-        const toYear = toDate.getFullYear();
+        const fromMonth = from.getMonth() + 1;
+        const fromYear = from.getFullYear();
+        const toMonth = to.getMonth() + 1;
+        const toYear = to.getFullYear();
     
         const payrolls = await this.payrollRepo.find({
             where: {
@@ -93,7 +96,7 @@ export class PayrollService {
     
         return new CommonResponse(true, 200, "Payroll records retrieved successfully.", payrolls);
     }
-        
+            
     async getPayRollDetails(req: { month: string; year: string }): Promise<CommonResponse> {
         const month = Number(req.month);
         const year = Number(req.year);
