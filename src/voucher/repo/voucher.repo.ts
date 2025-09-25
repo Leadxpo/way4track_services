@@ -688,7 +688,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) - 
                  SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS balanceAmount`
             ])
-            .where('DATE_FORMAT(ve.generation_date, "%Y-%m") = :date')
+            .where('ve.generation_date = :date')
             .andWhere('ve.company_code = :companyCode')
             .andWhere('ve.unit_code = :unitCode')
             .andWhere('ve.voucher_type IN (:...allVouchers)')
