@@ -17,8 +17,8 @@ export class DeviceEntity {
     @Column({ name: 'web_product_name', type: 'varchar', length: 100, nullable: false })
     webProductName: string;
 
-    @Column({ name: 'image', type: 'varchar', length: 200, nullable: true })
-    image: string;
+    @Column('json', { name: 'images', nullable: true })
+    images: { image: string }[];
 
     @Column({ name: 'model', type: 'varchar', length: 255, nullable: true })
     model: string;
@@ -73,6 +73,9 @@ export class DeviceEntity {
 
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
+    
+    @Column('json', { name: 'applications', nullable: true })
+    applications: { name: string; photo?: string; desc: string; link: string }[];
 }
 
 

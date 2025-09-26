@@ -24,40 +24,78 @@ export class DeviceService {
     this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
   }
 
-  async handleDeviceDetails(dto: DeviceDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+  async handleDeviceDetails(
+    dto: DeviceDto, 
+    photos?: Express.Multer.File[],
+    applicationPhotos?: Express.Multer.File[],
+  ): Promise<CommonResponse> {
     try {
 
-      let filePath: string | null = null;
-      if (photo) {
-        const bucket = this.storage.bucket(this.bucketName);
-        const uniqueFileName = `device_photos/${Date.now()}-${photo.originalname}`;
-        const file = bucket.file(uniqueFileName);
+      let imageUrls: { image: string }[] = [];
+      let applicationPhotoUrls: string[] = [];
+      
+      const bucket = this.storage.bucket(this.bucketName);
+      
+      if (photos && photos.length > 0) {
+        
+        for (const photo of photos) {
+          const uniqueFileName = `device_photos/${Date.now()}-${Math.random()}-${photo.originalname}`;
+          const file = bucket.file(uniqueFileName);
 
-        await file.save(photo.buffer, {
-          contentType: photo.mimetype,
-          resumable: false,
-        });
+          await file.save(photo.buffer, {
+            contentType: photo.mimetype,
+            resumable: false,
+          });
 
-        // console.log(`File uploaded to GCS: ${uniqueFileName}`);
-        filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+          const filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+          imageUrls.push({ image: filePath });
+        }
       }
+
+      if (applicationPhotos?.length && dto.applications?.length) {
+        for (let i = 0; i < applicationPhotos.length; i++) {
+          const photo = applicationPhotos[i];
+          if (!dto.applications[i]) continue;
+
+          const uniqueFileName = `application_photos/${Date.now()}-${Math.random()}-${photo.originalname}`;
+          const file = bucket.file(uniqueFileName);
+          await file.save(photo.buffer, { 
+            contentType: photo.mimetype, 
+            resumable: false 
+          });
+  
+          // Only replace photo for this index
+          const filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+          dto.applications[i].photo = filePath
+        }
+      }
+
       console.log(dto,"testing dto")
       if (dto.id) {
-        return this.updateDeviceDetails(dto, filePath);
+        return this.updateDeviceDetails(dto, imageUrls);
       } else {
-        return this.createDeviceDetails(dto, filePath);
+        return this.createDeviceDetails(dto, imageUrls);
       }
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
   }
 
-  async createDeviceDetails(dto: DeviceDto, filePath: string | null): Promise<CommonResponse> {
+  async createDeviceDetails(
+    dto: DeviceDto, 
+    imageUrls: { image: string }[]
+  ): Promise<CommonResponse> {
     try {
       const entity = this.adapter.convertDtoToEntity(dto);
-      if (filePath) {
-        entity.image = filePath;
+      
+      if (imageUrls.length > 0) {
+        entity.images = imageUrls;
       }
+      
+      if (dto.applications && dto.applications.length > 0) {
+        entity.applications = dto.applications;
+      }
+
       await this.deviceRepository.insert(entity);
       return new CommonResponse(true, 201, 'Device created successfully');
     } catch (error) {
@@ -65,30 +103,60 @@ export class DeviceService {
     }
   }
 
-  async updateDeviceDetails(dto: DeviceDto, filePath: string | null): Promise<CommonResponse> {
+  async updateDeviceDetails(dto: DeviceDto, imageUrls: { image: string }[]): Promise<CommonResponse> {
     try {
       console.log(dto);
       const existing = await this.deviceRepository.findOne({ where: { id: dto.id } });
 
       if (!existing) throw new Error('Device not found');
 
-      if (filePath && existing.image) {
-        const existingFilePath = existing.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-        const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+      if (imageUrls.length > 0 && existing.images && existing.images.length > 0) {
+         for (const oldImage of existing.images) {
+          const existingFilePath = oldImage.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+          const file = this.storage.bucket(this.bucketName).file(existingFilePath);
 
-        try {
-          await file.delete();
-          console.log(`Deleted old file from GCS: ${existingFilePath}`);
-        } catch (error) {
-          console.error(`Error deleting old file from GCS: ${error.message}`);
+          try {
+            await file.delete();
+            console.log(`Deleted old file from GCS: ${existingFilePath}`);
+          } catch (error) {
+            console.error(`Error deleting old file from GCS: ${error.message}`);
+          }
+        }
+      }
+
+      if (dto.applications?.length && existing.applications?.length) {
+        for (let i = 0; i < dto.applications.length; i++) {
+          const newPhoto = dto.applications[i].photo;
+          const oldPhoto = existing.applications[i]?.photo;
+
+          if (newPhoto && oldPhoto) {
+            const existingFilePath = oldPhoto.replace(
+              `https://storage.googleapis.com/${this.bucketName}/`, 
+              ''
+            );
+            const file = this.storage.bucket(this.bucketName).file(existingFilePath);
+            
+            try {
+              await file.delete();
+              console.log(`Deleted old application photo: ${existingFilePath}`);
+            } catch (error) {
+              console.error(`Error deleting application photo from GCS: ${error.message}`);
+            }
+          }
         }
       }
 
       const updated = this.adapter.convertDtoToEntity(dto);
-      if (filePath) updated.image = filePath;
+      if (imageUrls.length > 0) {
+        updated.images = imageUrls;
+      }
+
+      if (dto.applications?.length > 0) {
+        updated.applications = dto.applications;
+      }
 
       Object.assign(existing, updated);
-      await this.deviceRepository.save(existing); // ✅ Save the merged result
+      await this.deviceRepository.save(existing);
 
       return new CommonResponse(true, 200, 'Device updated successfully');
     } catch (error) {
