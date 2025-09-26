@@ -10,11 +10,12 @@ export class DeviceAdapter {
         entity.webProduct = new WebsiteProductEntity();
         entity.webProduct.id = dto.webProductId;
         entity.webProductName = dto.webProductName;
-        entity.image = dto.image;
+        entity.images = dto.images;
         entity.model = dto.model;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        // ✅ New fields
+
+        entity.applications = dto.applications;
         entity.name = dto.name;
         entity.state = dto.state;
         entity.city = dto.city;
@@ -36,12 +37,13 @@ export class DeviceAdapter {
             id: entity.id,
             webProductId: entity.webProduct?.id,
             webProductName: entity.webProductName,
-            image: entity.image,
+            images: entity.images,
             model: entity.model,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
 
             // ✅ New fields
+            applications: entity.applications,
             name: entity.name,
             state: entity.state,
             city: entity.city,

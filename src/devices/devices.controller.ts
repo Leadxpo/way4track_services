@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFile, UploadedFiles } from '@nestjs/common';
 
 import { CommonResponse } from 'src/models/common-response';
 import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
@@ -7,7 +7,7 @@ import { CommonReq } from 'src/models/common-req';
 import { DeviceService } from './devices.service';
 import { DeviceDto } from './dto/devices.dto';
 import * as multer from 'multer';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor,FileFieldsInterceptor } from '@nestjs/platform-express';
 const multerOptions = {
     storage: multer.memoryStorage(),
     limits: {
@@ -17,9 +17,21 @@ const multerOptions = {
 @Controller('device')
 export class DeviceController {
     constructor(private readonly service: DeviceService) { }
-    @UseInterceptors(FileInterceptor('photo', multerOptions))
+    @UseInterceptors(
+      FileFieldsInterceptor(
+        [
+          { name: 'photos', maxCount: 10 },
+          { name: 'applicationPhotos', maxCount: 10 },
+        ],
+        multerOptions,
+      ),
+    )
     @Post('handleDeviceDetails')
-    async handleDeviceDetails(@Body() dto: DeviceDto, @UploadedFile() photo?: Express.Multer.File): Promise<CommonResponse> {
+    async handleDeviceDetails(
+      @Body() dto: DeviceDto,
+      @UploadedFiles() files: { photos?: Express.Multer.File[]; applicationPhotos?: Express.Multer.File[] },
+    ): Promise<CommonResponse> {
+    
         try {          
             if (dto.id) dto.id = Number(dto.id);
             if (dto.isRelay) dto.isRelay = Boolean(dto.isRelay);
@@ -29,7 +41,7 @@ export class DeviceController {
             if (dto.subscriptionYearlyAmt) dto.subscriptionYearlyAmt = Number(dto.subscriptionYearlyAmt);
             if (dto.isNetwork) dto.isNetwork = Boolean(dto.isNetwork);
             if (dto.amount) dto.amount = Number(dto.amount);
-            return await this.service.handleDeviceDetails(dto, photo);
+            return await this.service.handleDeviceDetails(dto, files.photos, files.applicationPhotos);
         } catch (error) {
             return new CommonResponse(false, 500, 'Error saving Device details');
         }

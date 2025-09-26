@@ -2,7 +2,7 @@ export class DeviceDto {
   id?: number;
   webProductId: number;
   webProductName: string;
-  image?: string;
+  images?: { image: string }[];
   model?: string;
   companyCode: string;
   unitCode: string
@@ -18,4 +18,5 @@ export class DeviceDto {
   discount?: number;
   description?: string;
   amount: number;
+  applications?: { name: string; photo?: string; desc: string; link: string }[];
 }
