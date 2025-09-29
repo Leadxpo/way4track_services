@@ -17,6 +17,7 @@ export class CreateOrderDto {
     deliveryAddressId?: number
     buildingAddressId?: number
     description: string;
+    batchId: string;
     orderItems: {
         name: string;
         qty: number;

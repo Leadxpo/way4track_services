@@ -10,6 +10,7 @@ export class OrderAdapter {
     entity.paymentStatus = dto.paymentStatus;
     entity.orderDate = dto.orderDate;
     entity.delivaryDate = dto.delivaryDate;
+    entity.batchId = dto.batchId;
     entity.orderStatus = dto.orderStatus;
     entity.companyCode = dto.companyCode;
     entity.unitCode = dto.unitCode;
@@ -31,6 +32,7 @@ export class OrderAdapter {
       totalAmount: entity.totalAmount,
       paymentStatus: entity.paymentStatus,
       orderDate: entity.orderDate,
+      batchId: entity.batchId,
       orderStatus: entity.orderStatus,
       orderItems: entity.orderItems,
       companyCode: entity.companyCode,

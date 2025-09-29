@@ -122,6 +122,8 @@ export class OrderEntity {
     desc: string;
   }[];
 
+  @Column("varchar", { name: "batch_id", length: 220, nullable: true })
+  batchId: string;
 
   @OneToMany(() => RefundEntity, (requestRaiseEntity) => requestRaiseEntity.order)
   refund: RefundEntity[];

@@ -11,10 +11,10 @@ export class DeviceAdapter {
         entity.webProduct.id = dto.webProductId;
         entity.webProductName = dto.webProductName;
         entity.image = dto.image;
+        entity.points = dto.points
         entity.model = dto.model;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
-        // ✅ New fields
         entity.name = dto.name;
         entity.state = dto.state;
         entity.city = dto.city;
@@ -23,6 +23,8 @@ export class DeviceAdapter {
         entity.isSubscription = dto.isSubscription;
         entity.subscriptionMonthlyAmt = dto.subscriptionMonthlyAmt;
         entity.subscriptionYearlyAmt = dto.subscriptionYearlyAmt;
+        entity.network4gAmt = dto.network4gAmt;
+        entity.network2gAmt = dto.network2gAmt;
         entity.isNetwork = dto.isNetwork;
         entity.discount = dto.discount;
         entity.description = dto.description;
@@ -37,11 +39,10 @@ export class DeviceAdapter {
             webProductId: entity.webProduct?.id,
             webProductName: entity.webProductName,
             image: entity.image,
+            points: entity.points,
             model: entity.model,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
-
-            // ✅ New fields
             name: entity.name,
             state: entity.state,
             city: entity.city,
@@ -50,6 +51,8 @@ export class DeviceAdapter {
             isSubscription: entity.isSubscription,
             subscriptionMonthlyAmt: entity.subscriptionMonthlyAmt,
             subscriptionYearlyAmt: entity.subscriptionYearlyAmt,
+            network2gAmt: entity.network2gAmt,
+            network4gAmt: entity.network4gAmt,
             isNetwork: entity.isNetwork,
             discount: entity.discount,
             description: entity.description,

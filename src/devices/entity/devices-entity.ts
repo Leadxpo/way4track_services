@@ -17,8 +17,8 @@ export class DeviceEntity {
     @Column({ name: 'web_product_name', type: 'varchar', length: 100, nullable: false })
     webProductName: string;
 
-    @Column({ name: 'image', type: 'varchar', length: 200, nullable: true })
-    image: string;
+    @Column('simple-array', { name: 'image', nullable: true })
+    image: string[];
 
     @Column({ name: 'model', type: 'varchar', length: 255, nullable: true })
     model: string;
@@ -68,12 +68,22 @@ export class DeviceEntity {
     @Column({ name: 'is_network', type: 'boolean', default: false })
     isNetwork: boolean;
 
+    @Column({ name: 'network_2g_amt', type: 'float', nullable: true })
+    network2gAmt: number;
+
+    @Column({ name: 'network_4g_amt', type: 'float', nullable: true })
+    network4gAmt: number;
+
     @Column({ name: 'discount', type: 'float', nullable: true })
     discount: number;
 
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;
-}
+    
+    @Column('json', { name: 'points', nullable: true })
+    points: { title: string; desc: string; file: string }[];
+    
+} 
 
 
 

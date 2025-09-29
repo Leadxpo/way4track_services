@@ -24,78 +24,121 @@ export class DeviceService {
     this.bucketName = process.env.GCLOUD_BUCKET_NAME || 'way4track-application';
   }
 
-  async handleDeviceDetails(dto: DeviceDto, photo?: Express.Multer.File): Promise<CommonResponse> {
+  async handleDeviceDetails(
+    dto: DeviceDto,
+    mediaFiles?: Express.Multer.File[],
+    pointFiles?: Express.Multer.File[],
+  ): Promise<CommonResponse> {
     try {
-
-      let filePath: string | null = null;
-      if (photo) {
-        const bucket = this.storage.bucket(this.bucketName);
-        const uniqueFileName = `device_photos/${Date.now()}-${photo.originalname}`;
-        const file = bucket.file(uniqueFileName);
-
-        await file.save(photo.buffer, {
-          contentType: photo.mimetype,
-          resumable: false,
-        });
-
-        // console.log(`File uploaded to GCS: ${uniqueFileName}`);
-        filePath = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+      const bucket = this.storage.bucket(this.bucketName);
+  
+      // ✅ Upload media files
+      const uploadedMediaUrls: string[] = [];
+  
+      if (mediaFiles?.length) {
+        for (const file of mediaFiles) {
+          const uniqueFileName = `device_media/${Date.now()}-${file.originalname}`;
+          const gcsFile = bucket.file(uniqueFileName);
+  
+          await gcsFile.save(file.buffer, {
+            contentType: file.mimetype,
+            resumable: false,
+          });
+  
+          const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+          uploadedMediaUrls.push(publicUrl);
+        }
+        dto.image = uploadedMediaUrls;
       }
-      console.log(dto,"testing dto")
-      if (dto.id) {
-        return this.updateDeviceDetails(dto, filePath);
-      } else {
-        return this.createDeviceDetails(dto, filePath);
-      }
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-    }
-  }
-
-  async createDeviceDetails(dto: DeviceDto, filePath: string | null): Promise<CommonResponse> {
-    try {
-      const entity = this.adapter.convertDtoToEntity(dto);
-      if (filePath) {
-        entity.image = filePath;
-      }
-      await this.deviceRepository.insert(entity);
-      return new CommonResponse(true, 201, 'Device created successfully');
-    } catch (error) {
-      throw new ErrorResponse(500, error.message);
-    }
-  }
-
-  async updateDeviceDetails(dto: DeviceDto, filePath: string | null): Promise<CommonResponse> {
-    try {
-      console.log(dto);
-      const existing = await this.deviceRepository.findOne({ where: { id: dto.id } });
-
-      if (!existing) throw new Error('Device not found');
-
-      if (filePath && existing.image) {
-        const existingFilePath = existing.image.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
-        const file = this.storage.bucket(this.bucketName).file(existingFilePath);
-
-        try {
-          await file.delete();
-          console.log(`Deleted old file from GCS: ${existingFilePath}`);
-        } catch (error) {
-          console.error(`Error deleting old file from GCS: ${error.message}`);
+  
+      // ✅ Upload point files and match to dto.points
+      if (pointFiles?.length && dto.points?.length) {
+        for (let i = 0; i < pointFiles.length; i++) {
+          const file = pointFiles[i];
+          const uniqueFileName = `device_points/${Date.now()}-${file.originalname}`;
+          const gcsFile = bucket.file(uniqueFileName);
+  
+          await gcsFile.save(file.buffer, {
+            contentType: file.mimetype,
+            resumable: false,
+          });
+  
+          const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${uniqueFileName}`;
+  
+          // ✅ Assign to corresponding point
+          if (dto.points[i]) dto.points[i].file = publicUrl;
         }
       }
-
+  
+      if (dto.id) {
+        return this.updateDeviceDetails(dto);
+      } else {
+        return this.createDeviceDetails(dto);
+      }
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
+  
+  async createDeviceDetails(dto: DeviceDto): Promise<CommonResponse> {
+    try {
+      const entity = this.adapter.convertDtoToEntity(dto);
+     await this.deviceRepository.insert(entity);
+      return new CommonResponse(true, 201, 'Device created successfully',entity);
+    } catch (error) {
+      throw new ErrorResponse(500, error.message);
+    }
+  }
+  
+  async updateDeviceDetails(dto: DeviceDto): Promise<CommonResponse> {
+    try {
+      const existing = await this.deviceRepository.findOne({ where: { id: dto.id } });
+      if (!existing) throw new Error('Device not found');
+  
+      // ✅ 1. Delete old media files if new ones are uploaded
+      if (dto.image?.length && existing.image?.length) {
+        for (const oldFile of existing.image) {
+          const path = oldFile.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+          const gcsFile = this.storage.bucket(this.bucketName).file(path);
+  
+          try {
+            await gcsFile.delete();
+            console.log(`Deleted old media file from GCS: ${path}`);
+          } catch (err) {
+            console.error(`Error deleting media file from GCS: ${path}`, err.message);
+          }
+        }
+      }
+  
+      // ✅ 2. Delete old point files if new points are uploaded
+      if (dto.points?.length && existing.points?.length) {
+        for (const oldPoint of existing.points) {
+          if (oldPoint.file) {
+            const path = oldPoint.file.replace(`https://storage.googleapis.com/${this.bucketName}/`, '');
+            const gcsFile = this.storage.bucket(this.bucketName).file(path);
+  
+            try {
+              await gcsFile.delete();
+              console.log(`Deleted old point file from GCS: ${path}`);
+            } catch (err) {
+              console.error(`Error deleting point file from GCS: ${path}`, err.message);
+            }
+          }
+        }
+      }
+  
+      // ✅ 3. Merge new data
       const updated = this.adapter.convertDtoToEntity(dto);
-      if (filePath) updated.image = filePath;
-
+  
       Object.assign(existing, updated);
-      await this.deviceRepository.save(existing); // ✅ Save the merged result
-
+      await this.deviceRepository.save(existing);
+  
       return new CommonResponse(true, 200, 'Device updated successfully');
     } catch (error) {
       throw new ErrorResponse(500, error.message);
     }
   }
-
+  
   async deleteDeviceDetails(dto: HiringIdDto): Promise<CommonResponse> {
     try {
       const existing = await this.deviceRepository.findOne({ where: { id: dto.id, companyCode: dto.companyCode, unitCode: dto.unitCode } });

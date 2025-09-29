@@ -14,6 +14,7 @@ import { OrderEntity } from "./entity/orders.entity";
 import { ErrorResponse } from "src/models/error-response";
 import { DeleteDto } from "src/cart/dto/cart.dto";
 import { DeviceRepository } from "src/devices/repo/devices.repo";
+import { randomUUID } from "crypto";
 @Injectable()
 export class OrderService {
   constructor(
@@ -23,25 +24,35 @@ export class OrderService {
   ) { }
 
   async handleCreateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
-    console.log("payload :", dto)
+    console.log("payload :", dto);
     try {
-      let entity: OrderEntity;
-      if (dto.id) {
-        entity = await this.repo.findOne({ where: { id: dto.id } });
-        if (!entity) return new CommonResponse(false, 404, "order not found");
-        Object.assign(entity, this.adapter.toEntity(dto));
-        await this.repo.save(entity);
-        return new CommonResponse(true, 200, "order updated");
-      } else {
-        entity = this.adapter.toEntity(dto);
-        await this.repo.save(entity);
-        return new CommonResponse(true, 201, "Payment Successfully and Order Created");
+      // Validate input
+      if (!dto.orderItems || dto.orderItems.length === 0) {
+        return new CommonResponse(false, 400, "Order items are required");
       }
+  
+      // Create separate order for each item
+      const createdOrders = [];
+      const batchId = randomUUID();
+      for (const item of dto.orderItems) {
+        const singleOrderDto = {
+          ...dto,
+          orderItems: [item], // Only one item per order
+          batchId:batchId
+        };
+  
+        const entity = this.adapter.toEntity(singleOrderDto);
+        const savedOrder = await this.repo.save(entity);
+        createdOrders.push(savedOrder);
+      }
+  
+      return new CommonResponse(true, 201, `${createdOrders.length} order(s) created successfully`, createdOrders);
     } catch (error) {
+      console.error("Order creation failed:", error);
       throw new ErrorResponse(500, error.message);
     }
   }
-
+  
   // async deleteOrder(dto: HiringIdDto): Promise<CommonResponse> {
   //     try {
   //         const existing = await this.repo.findOne({ where: { id: dto.id } });
