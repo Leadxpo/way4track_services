@@ -30,6 +30,7 @@ export class DeviceController {
         }
     ): Promise<CommonResponse> {
         try {
+            console.log("Received dto:::", dto);
             if (dto.id) dto.id = Number(dto.id);
             if (dto.isRelay) dto.isRelay = Boolean(dto.isRelay);
             if (dto.relayAmt) dto.relayAmt = Number(dto.relayAmt);
@@ -46,7 +47,7 @@ export class DeviceController {
                 points.push({
                     title: dto[`points[${i}].title`] || '',
                     desc: dto[`points[${i}].desc`] || dto[`points[${i}].dest`] || '',
-                    file: '' // Will be set after upload
+                    file: dto[`points[${i}].file`] || '',
                 });
                 i++;
             }
