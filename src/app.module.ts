@@ -98,6 +98,8 @@ import { BlogEntity } from './blogs/entity/blog.entity';
 import { BlogModule } from './blogs/blog.module';
 import { RefundModule } from './refund/refund.module';
 import { RefundEntity } from './refund/entity/refund.entity';
+import { DemoLeadModule } from './demo-lead/demoLead.module';
+import { DemoLeadEntity } from './demo-lead/entity/demoLead.entity';
 
 
 @Module({
@@ -109,12 +111,13 @@ import { RefundEntity } from './refund/entity/refund.entity';
       username: 'root',
       password: 'ravikumar',
       database: 'localdb',
-      entities: [AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity,PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity],
+      entities: [AssertsEntity, DemoLeadEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, AccountEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity],
       synchronize: true,
       logging: true,
     }),
-    TypeOrmModule.forFeature([AssertsEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity,PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity]),
+    TypeOrmModule.forFeature([AssertsEntity, DemoLeadEntity, BranchEntity, ClientEntity, StaffEntity, VendorEntity, SubDealerEntity, ProductEntity, RequestRaiseEntity, VoucherEntity, WorkAllocationEntity, HiringEntity, TicketsEntity, AppointmentEntity, ProductAssignEntity, AttendanceEntity, EstimateEntity, PermissionEntity, NotificationEntity, TechnicianWorksEntity, LettersEntity, DispatchEntity, ProductTypeEntity, OtpEntity, DesignationEntity, SalesWorksEntity, PayrollEntity, LedgerEntity, GroupsEntity, VehicleTypeEntity, ServiceTypeEntity, SubDelaerStaffEntity, PromoEntity, WebsiteProductEntity, DeviceEntity, ApplicationEntity, AmenitiesEntity, ReviewEntity, PromotionEntity, AddressEntity, CartEntity, OrderEntity, ProductAppEntity, TransactionEntity, BlogEntity, RefundEntity]),
     BranchModule,
+    DemoLeadModule,
     AssertModule,
     ClientModule,
     StaffModule,
@@ -135,7 +138,6 @@ import { RefundEntity } from './refund/entity/refund.entity';
     PermissionModule,
     AccountModule,
     NotificationModule,
-    // EMIModule,
     TechnicianModule,
     LettersModule,
     DispatchModule,
