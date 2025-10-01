@@ -46,7 +46,7 @@ export class DeviceController {
                 points.push({
                     title: dto[`points[${i}].title`] || '',
                     desc: dto[`points[${i}].desc`] || dto[`points[${i}].dest`] || '',
-                    file: '' // Will be set after upload
+                    file: dto[`points[${i}].file`] || '',
                 });
                 i++;
             }

@@ -33,5 +33,6 @@ export class PromotionEntity extends BaseEntity {
         name: string
         photo?: string;
         desc: string;
+        link: string;
     }[];
 }
