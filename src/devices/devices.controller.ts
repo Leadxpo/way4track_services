@@ -53,10 +53,6 @@ export class DeviceController {
             dto.points = points;
             const mediaFiles = files?.mediaFiles || [];
             const pointFiles = files?.pointFiles || [];
-            console.log("dto:::", dto);
-            console.log("mediaFiles:::", files?.mediaFiles);
-            console.log("pointFiles:::", files?.pointFiles);
-
             return await this.service.handleDeviceDetails(dto, mediaFiles, pointFiles);
         } catch (error) {
             return new CommonResponse(false, 500, 'Error saving Device details');
