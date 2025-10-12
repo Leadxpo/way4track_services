@@ -734,7 +734,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `ve.generation_date AS generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
                 `ve.voucher_id AS voucherId`, 
-                'lg.name AS name',
+                'lg.name AS ledgerName',
                 `ve.voucher_type AS voucherType`,
                 `ve.purpose AS purpose`,
                 `SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount`,
