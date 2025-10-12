@@ -744,7 +744,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `branch.name AS branchName`
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
-            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id') 
+            .leftJoin(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .where('ve.voucher_type IN (:...allVouchers)')
             .andWhere('ve.company_code = :companyCode')
             .andWhere('ve.unit_code = :unitCode');
