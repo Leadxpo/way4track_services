@@ -734,7 +734,9 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `ve.generation_date AS generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
                 `ve.voucher_id AS voucherId`,
+                'lg.name AS name',
                 `ve.voucher_type AS voucherType`,
+                `ve. AS voucherType`,
                 `ve.purpose AS purpose`,
                 `SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount`,
                 `SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount`,
@@ -743,6 +745,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `branch.name AS branchName`
             ])
             .leftJoin(BranchEntity, 'branch', 'branch.id = ve.branch_id')
+            .leftJoinAndSelect(LedgerEntity, 'lg', 've.ledger_id = lg.id')
             .where('ve.voucher_type IN (:...allVouchers)')
             .andWhere('ve.company_code = :companyCode')
             .andWhere('ve.unit_code = :unitCode');
