@@ -765,7 +765,8 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             DATE(ve.generation_date), 
             ve.voucher_id, 
             ve.purpose,
-            branch.name
+            branch.name,
+            lg.name
         `)
             .orderBy('YEAR(ve.generation_date)', 'ASC')
             .addOrderBy('MONTH(ve.generation_date)', 'ASC')
