@@ -736,7 +736,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
                 `ve.voucher_id AS voucherId`,
                 'lg.name AS name',
                 `ve.voucher_type AS voucherType`,
-                `ve. AS voucherType`,
                 `ve.purpose AS purpose`,
                 `SUM(CASE WHEN ve.voucher_type IN (:...debitVouchers) THEN ve.amount ELSE 0 END) AS debitAmount`,
                 `SUM(CASE WHEN ve.voucher_type IN (:...creditVouchers) THEN ve.amount ELSE 0 END) AS creditAmount`,
