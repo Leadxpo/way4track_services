@@ -1318,7 +1318,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return result;
     }
 
-
     async getSalesForTable(req: {
         fromDate?: string;
         toDate?: string;
@@ -1390,7 +1389,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere('ve.payment_status = :pendingStatus', { pendingStatus: PaymentStatus.PENDING })
-            .andWhere('ve.voucher_type = :voucherType', { voucherType: VoucherTypeEnum.PURCHASE });
+            .andWhere('ve.voucher_type = :voucherType', { voucherType: VoucherTypeEnum.PAYMENT });
 
         if (req.fromDate) {
             query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
@@ -1436,7 +1435,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .where('ve.company_code = :companyCode', { companyCode: req.companyCode })
             .andWhere('ve.unit_code = :unitCode', { unitCode: req.unitCode })
             .andWhere(`ve.payment_status = :pendingStatus`, { pendingStatus: PaymentStatus.PENDING })
-            .andWhere(`ve.voucher_type = :voucherType`, { voucherType: VoucherTypeEnum.SALES })
+            .andWhere(`ve.voucher_type = :voucherType`, { voucherType: VoucherTypeEnum.RECEIPT })
 
         if (req.fromDate) {
             query.andWhere('ve.generation_date >= :fromDate', { fromDate: req.fromDate });
@@ -2558,7 +2557,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         return await query.getRawMany();
     }
 
-
     async generateIncomeStatement(req: {
         year?: number
     }) {
@@ -2597,7 +2595,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             netIncome,
         };
     }
-
 
     private async getTotalByVoucherType(voucherType: VoucherTypeEnum, year: number): Promise<number> {
         const result = await this
@@ -2753,8 +2750,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
         };
     }
 
-
-
     async getBankStmtForReport(req: {
         fromDate?: string;
         toDate?: string;
@@ -2836,7 +2831,6 @@ export class VoucherRepository extends Repository<VoucherEntity> {
 
         return await query.getRawMany();
     }
-
 
     async getCashStmtForReport(req: {
         fromDate?: string;
