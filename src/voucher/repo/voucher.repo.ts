@@ -733,7 +733,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 `ve.generation_date AS generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
-                `ve.voucher_id AS voucherId`,
+                `ve.voucher_id AS voucherId`, 
                 'lg.name AS name',
                 `ve.voucher_type AS voucherType`,
                 `ve.purpose AS purpose`,
