@@ -38,6 +38,7 @@ export class OrderService {
         const singleOrderDto = {
           ...dto,
           orderItems: [item], // Only one item per order
+          totalAmount:item.amount,
           batchId:batchId
         };
   

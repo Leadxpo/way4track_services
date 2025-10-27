@@ -733,7 +733,7 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             .select([
                 `ve.generation_date AS generationDate`,
                 `DATE_FORMAT(ve.generation_date, '%Y-%m') AS date`,
-                `ve.voucher_id AS voucherId`, 
+                `ve.voucher_id AS voucherId`,
                 'lg.name AS ledgerName',
                 `ve.voucher_type AS voucherType`,
                 `ve.purpose AS purpose`,
@@ -763,10 +763,10 @@ export class VoucherRepository extends Repository<VoucherEntity> {
             YEAR(ve.generation_date), 
             MONTH(ve.generation_date), 
             DATE(ve.generation_date), 
-            ve.voucher_id, 
+            ve.voucher_id,
             ve.purpose,
-            branch.name,
-            lg.name
+            lg.name,
+            branch.name
         `)
             .orderBy('YEAR(ve.generation_date)', 'ASC')
             .addOrderBy('MONTH(ve.generation_date)', 'ASC')

@@ -117,6 +117,8 @@ export class OrderEntity {
     amount: number;
     deviceId: string;
     is_relay: boolean;
+    city?: string;
+    state?: string;
     network: string;
     subscriptionType: string;
     desc: string;

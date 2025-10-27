@@ -25,6 +25,8 @@ export class CreateOrderDto {
         deviceId: string;
         is_relay: boolean;
         network: string;
+        city?: string;
+        state?: string;    
         subscriptionType: string;
         desc: string;
     }[];

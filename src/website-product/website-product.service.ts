@@ -209,10 +209,6 @@ export class WebsiteProductService {
           }
         )
         .getMany();
-      console.log(items, ":::::::::::::::::::::");
-      // const items = await this.websiteProductRepository.find({
-      //     where: { companyCode: req.companyCode, unitCode: req.unitCode }, relations: ['device', 'amenities', 'application']
-      // });
 
       if (!items || !items.length)
         return new CommonResponse(false, 404, "WebsiteProduct not found");

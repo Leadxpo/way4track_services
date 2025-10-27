@@ -42,6 +42,12 @@ export class CartEntity {
   @JoinColumn({ name: 'device_id' })
   device: DeviceEntity;
 
+  @Column({ name: "city", type: "varchar", length: 255, nullable: true })
+  city: string;
+
+  @Column({ name: "state", type: "varchar", length: 255, nullable: true })
+  state: string;
+
   @Column('varchar', { name: 'company_code', length: 20, nullable: false })
   companyCode: string;
 

@@ -11,6 +11,8 @@ export class CreateCartDto {
     pincode?: string;
     subscription?: SubscriptionType;
     totalAmount?: string;
+    city?: string;
+    state?: string;
     clientId?: number;
     deviceId?: number;
     companyCode: string;
@@ -26,6 +28,8 @@ export class CartResponseDto {
     pincode: string;
     subscription: SubscriptionType;
     totalAmount: string;
+    city?: string;
+    state?: string;
     companyCode: string;
     unitCode: string;
     createdAt: Date;

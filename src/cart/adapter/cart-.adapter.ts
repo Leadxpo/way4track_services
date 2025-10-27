@@ -18,6 +18,8 @@ export class CartAdapter {
         entity.pincode = dto.pincode;
         entity.subscription = dto.subscription;
         entity.totalAmount = dto.totalAmount;
+        entity.city = dto.city;
+        entity.state = dto.state;
         entity.companyCode = dto.companyCode;
         entity.unitCode = dto.unitCode;
         entity.client = dto.clientId ? { id: dto.clientId } as any : null;
@@ -38,6 +40,8 @@ export class CartAdapter {
             pincode: entity.pincode,
             subscription: entity.subscription,
             totalAmount: entity.totalAmount,
+            city: entity.city,
+            state: entity.state,
             companyCode: entity.companyCode,
             unitCode: entity.unitCode,
             createdAt: entity.createdAt,
