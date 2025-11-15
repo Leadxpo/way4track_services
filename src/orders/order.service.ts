@@ -19,6 +19,7 @@ import { ClientEntity } from "src/client/entity/client.entity";
 import { orderCancelTemplate } from "src/templates/orderCancelTemplate";
 import { orderDeliveredTemplate } from "src/templates/orderDeliveredTemplate";
 import { orderMailTemplate } from "src/templates/orderMail";
+import { sendMail } from "./utility/sendMail";
 @Injectable()
 export class OrderService {
   constructor(

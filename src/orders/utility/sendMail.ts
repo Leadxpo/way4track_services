@@ -2,7 +2,7 @@
 const axios = require("axios");
 
 // Reusable mail function
-async function sendMail({ to, subject, html }) {
+export async function sendMail({ to, subject, html }) {
   try {
     const response = await axios.post("https://app.smtpprovider.com/api/send-mail/", {
       to,
@@ -26,5 +26,3 @@ async function sendMail({ to, subject, html }) {
     };
   }
 }
-
-module.exports = sendMail;
