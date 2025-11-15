@@ -18,6 +18,7 @@ import { randomUUID } from "crypto";
 import { ClientEntity } from "src/client/entity/client.entity";
 import { orderCancelTemplate } from "src/templates/orderCancelTemplate";
 import { orderDeliveredTemplate } from "src/templates/orderDeliveredTemplate";
+import { orderMailTemplate } from "src/templates/orderMail";
 @Injectable()
 export class OrderService {
   constructor(

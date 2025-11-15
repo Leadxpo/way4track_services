@@ -1,6 +1,6 @@
 // templates/orderMail.js
 
-function orderMailTemplate({ order_id, name, order_summary, order_total,  support_email }) {
+export function orderMailTemplate({ order_id, name, order_summary, order_total,  support_email }) {
     return `
   <!doctype html>
   <html>
@@ -62,5 +62,4 @@ function orderMailTemplate({ order_id, name, order_summary, order_total,  suppor
   </html>`;
   }
   
-  module.exports = orderMailTemplate;
   
