@@ -35,7 +35,7 @@ export class OrderService {
       if (!dto.orderItems || dto.orderItems.length === 0) {
         return new CommonResponse(false, 400, "Order items are required");
       }
-  
+
       // Create separate order for each item
       const createdOrders = [];
       const batchId = randomUUID();
@@ -43,75 +43,83 @@ export class OrderService {
         const singleOrderDto = {
           ...dto,
           orderItems: [item], // Only one item per order
-          totalAmount:item.amount,
-          batchId:batchId 
+          totalAmount: item.amount,
+          batchId: batchId
         };
-  
+
         const entity = this.adapter.toEntity(singleOrderDto);
         const savedOrder = await this.repo.save(entity);
         createdOrders.push(savedOrder);
       }
-        // Generate HTML using reusable template
-        const html = orderMailTemplate({
-          order_id: dto.razorpay_order_id,          // Razorpay generated order ID
-          name: dto.name,      // Ensure this field exists in CreateOrderDto
-          order_summary: dto.orderItems,    // Whatever format you pass (string or list)
-          order_total: dto.totalAmount,
-          support_email: "support@way4track.com"
-        });
-    const clientDetails=await ClientEntity.findOne({where:{id:dto.clientId}})
-        // Send email
-        const mailResponse = await sendMail({
-          to: clientDetails.email || "ark.kumar03@gmail.com",   // send to customer
-          subject: "Order Confirmation",
-          html
-        });
-  
-      return new CommonResponse(true, 201, `${createdOrders.length} order(s) created successfully`, createdOrders);
+      // Generate HTML using reusable template
+      const html = orderMailTemplate({
+        order_id: dto.razorpay_order_id,          // Razorpay generated order ID
+        name: dto.name,      // Ensure this field exists in CreateOrderDto
+        order_summary: dto.orderItems,    // Whatever format you pass (string or list)
+        order_total: dto.totalAmount,
+        support_email: "support@way4track.com"
+      });
+      const clientDetails = await ClientEntity.findOne({ where: { id: dto.clientId } })
+      // Send email
+      const mailResponse = await sendMail({
+        to: clientDetails.email || "ark.kumar03@gmail.com",   // send to customer
+        subject: "Order Confirmation",
+        html
+      });
+
+      return new CommonResponse(
+        true,
+        201,
+        `${createdOrders.length} order(s) created successfully`,
+        {
+          orders: createdOrders,
+          mail: mailResponse.data
+        }
+      );
     } catch (error) {
       console.error("Order creation failed:", error);
       throw new ErrorResponse(500, error.message);
     }
   }
-  
+
   async UpdateOrder(dto: CreateOrderDto): Promise<CommonResponse> {
     console.log("payload :", dto);
-  
+
     try {
       // Convert and save order
       const entity = this.adapter.toEntity(dto);
       const savedOrder = await this.repo.save(entity);
-  
+
       // Fetch client details
       const clientDetails = await ClientEntity.findOne({
         where: { id: dto.clientId }
       });
-  
+
       if (!clientDetails) {
         return new CommonResponse(false, 404, "Client not found");
       }
-  
+
       // -------- EMAIL LOGIC BY ORDER STATUS -------- //
       switch (dto.orderStatus) {
-        
+
         /*---------------------------------------------------------
           1. PENDING
         ---------------------------------------------------------*/
         case OrderStatus.PENDING:
           return new CommonResponse(true, 200, "Order is pending", savedOrder);
-  
+
         /*---------------------------------------------------------
           2. ORDER SUCCESS
         ---------------------------------------------------------*/
         case OrderStatus.ORDERSUCESS:
           return new CommonResponse(true, 200, "Order success", savedOrder);
-  
+
         /*---------------------------------------------------------
           3. ABORTED
         ---------------------------------------------------------*/
         case OrderStatus.ABORTED:
           return new CommonResponse(true, 200, "Order aborted", savedOrder);
-  
+
         /*---------------------------------------------------------
           4. ORDER CANCELLED → SEND CANCEL EMAIL
         ---------------------------------------------------------*/
@@ -122,13 +130,13 @@ export class OrderService {
             cancellation_reason: dto.description || "The order was cancelled.",
             support_email: "support@way4track.com",
           });
-  
+
           const cancelMailResponse = await sendMail({
             to: clientDetails.email,
             subject: "Your Order Has Been Cancelled",
             html: cancelHtml
           });
-  
+
           return new CommonResponse(
             true,
             200,
@@ -136,19 +144,19 @@ export class OrderService {
             { mailResponse: cancelMailResponse, order: savedOrder }
           );
         }
-        
+
         /*---------------------------------------------------------
           5. ORDER RECEIVED (Warehouse)
         ---------------------------------------------------------*/
         case OrderStatus.Received:
           return new CommonResponse(true, 200, "Order received", savedOrder);
-  
+
         /*---------------------------------------------------------
           6. ORDER DISPATCHED (Shipping)
         ---------------------------------------------------------*/
         case OrderStatus.Dispatched:
           return new CommonResponse(true, 200, "Order dispatched", savedOrder);
-  
+
         /*---------------------------------------------------------
           7. ORDER DELIVERED → SEND DELIVERY EMAIL
         ---------------------------------------------------------*/
@@ -156,17 +164,17 @@ export class OrderService {
           const deliveredHtml = orderDeliveredTemplate({
             order_id: dto.razorpay_order_id,
             name: dto.name,
-            delivery_address: dto.deliveryAddressId|| "Customer address not available",
+            delivery_address: dto.deliveryAddressId || "Customer address not available",
             delivered_at: dto.delivaryDate || new Date().toLocaleString(),
             support_email: "support@way4track.com",
           });
-  
+
           const deliveredMailResponse = await sendMail({
             to: clientDetails.email,
             subject: "Your Order Has Been Delivered",
             html: deliveredHtml
           });
-  
+
           return new CommonResponse(
             true,
             200,
@@ -174,42 +182,42 @@ export class OrderService {
             { mailResponse: deliveredMailResponse, order: savedOrder }
           );
         }
-  
+
         /*---------------------------------------------------------
           8. RETURN REQUEST RAISED
         ---------------------------------------------------------*/
         case OrderStatus.request_raised:
           return new CommonResponse(true, 200, "Return request raised", savedOrder);
-  
+
         /*---------------------------------------------------------
           9. RETURN APPROVED
         ---------------------------------------------------------*/
         case OrderStatus.request_approved:
           return new CommonResponse(true, 200, "Return request approved", savedOrder);
-  
+
         /*---------------------------------------------------------
           10. RETURN REJECTED
         ---------------------------------------------------------*/
         case OrderStatus.request_reject:
           return new CommonResponse(true, 200, "Return request rejected", savedOrder);
-  
+
         /*---------------------------------------------------------
           11. RETURN COMPLETED
         ---------------------------------------------------------*/
         case OrderStatus.request_sucess:
           return new CommonResponse(true, 200, "Return request completed", savedOrder);
-  
+
         // ---------------------------------------------------------
         default:
           return new CommonResponse(false, 400, "Unknown order status");
       }
-  
+
     } catch (error) {
       console.error("Order creation failed:", error);
       throw new ErrorResponse(500, error.message);
     }
   }
-    
+
   // async deleteOrder(dto: HiringIdDto): Promise<CommonResponse> {
   //     try {
   //         const existing = await this.repo.findOne({ where: { id: dto.id } });
@@ -275,10 +283,10 @@ export class OrderService {
   async getOrderById(dto: HiringIdDto): Promise<CommonResponse> {
     try {
       console.log(dto);
-     
+
       const entity = await this.repo.findOne({
         where: { id: dto.id },
-        relations: ["client", "deliveryAddressId", "buildingAddressId", "refund",'refund.deviceId'],
+        relations: ["client", "deliveryAddressId", "buildingAddressId", "refund", 'refund.deviceId'],
       });
       if (!entity) return new CommonResponse(false, 404, "order not found");
       return new CommonResponse(
@@ -293,7 +301,7 @@ export class OrderService {
   }
 
   async getOrderWithProductDetails(dto: HiringIdDto): Promise<CommonResponse> {
-    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId", "refund",'refund.deviceId'] });
+    const order = await this.repo.findOne({ where: { id: dto.id }, relations: ['client', "deliveryAddressId", "buildingAddressId", "refund", 'refund.deviceId'] });
     if (!order) {
       throw new NotFoundException("Order not found");
     }
