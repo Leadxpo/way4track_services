@@ -46,24 +46,17 @@ export class DemoLeadEntity {
     @Column({ name: 'email', type: 'varchar', length: 100 })
     clientEmail: string;
 
-    @Column({ name: 'address', type: 'varchar', length: 100 })
-    clientAddress: string;
-
-    @Column({ name: 'date', type: 'date', nullable: true })
-    date: string | null;
-
+    @Column("json", { name: "selected_products" })
+    selectedProducts:[];
+  
+    @Column({ name: "total_products_selected", type: "int", nullable: true })
+    totalProductsSelected: number;
+  
     @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
     @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
-
-    @Column({ name: 'time', type: 'time' })
-    slot: string;
-
-    @Column({ name: 'period', type: 'enum', enum: TimePeriodEnum,nullable:true })
-    period: TimePeriodEnum;
-
 
     @Column({ name: 'description', type: 'text', nullable: true })
     description: string;

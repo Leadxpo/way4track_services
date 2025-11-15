@@ -3,10 +3,12 @@ import { HiringIdDto } from 'src/hiring/dto/hiring-id.dto';
 import { CommonResponse } from 'src/models/common-response';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/order.dto';
+// import  orderMailTemplate  from '../templates/orderMail';
 const Razorpay = require('razorpay');
 import * as crypto from 'crypto';
 import orders from 'razorpay/dist/types/orders';
 import { error } from 'console';
+import { ClientEntity } from 'src/client/entity/client.entity';
 
 const razorpayInstance = new Razorpay({
   key_id: process.env.KEY_ID || 'rzp_test_NPT4UOaHTgxvZj',
@@ -20,23 +22,35 @@ export class OrderController {
   @Post('CreateOrder')
   async CreateOrder(@Body() dto: CreateOrderDto): Promise<CommonResponse> {
     try {
+      // Convert id to number (if coming as string)
       if (dto.id) dto.id = Number(dto.id);
+  
+      // Razorpay amount conversion
       const amount = dto.totalAmount;
+  
       const options = {
-        amount: amount * 100,
+        amount: amount * 100,     // Razorpay requires paise
         currency: 'INR',
-        receipt: crypto.randomBytes(10).toString('hex'), // ✅ will now work
+        receipt: crypto.randomBytes(10).toString('hex'),
       };
-
+  
+      // Create Razorpay order
       const order = await razorpayInstance.orders.create(options);
-
-      return new CommonResponse(true, 200, 'Payment order created successfully', order);
+    
+      // Return response
+      return new CommonResponse(
+        true,
+        200,
+        'Payment order created successfully',
+        { razorpayOrder: order }
+      );
+  
     } catch (error) {
-      console.error('Error creating Razorpay order:', error);
+      console.error('Error creating order:', error);
       return new CommonResponse(false, 500, 'Error creating payment order');
     }
   }
-
+  
   @Post('OrderVerify')
   async OrderVerify(@Body() dto: any): Promise<CommonResponse> {
     try {
@@ -77,6 +91,17 @@ export class OrderController {
     try {
       if (dto.id) dto.id = Number(dto.id);
       return await this.service.handleCreateOrder(dto);
+    } catch (error) {
+      console.error('Error saving order:', error);
+      return new CommonResponse(false, 500, 'Error saving order');
+    }
+  }
+
+  @Post('UpdateOrder')
+  async UpdateOrder(@Body() dto: CreateOrderDto): Promise<CommonResponse> {
+    try {
+      if (dto.id) dto.id = Number(dto.id);
+      return await this.service.UpdateOrder(dto);
     } catch (error) {
       console.error('Error saving order:', error);
       return new CommonResponse(false, 500, 'Error saving order');
