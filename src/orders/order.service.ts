@@ -43,7 +43,7 @@ export class OrderService {
           ...dto,
           orderItems: [item], // Only one item per order
           totalAmount:item.amount,
-          batchId:batchId
+          batchId:batchId 
         };
   
         const entity = this.adapter.toEntity(singleOrderDto);
