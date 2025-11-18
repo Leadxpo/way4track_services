@@ -36,7 +36,7 @@ export class OrderController {
   
       // Create Razorpay order
       const order = await razorpayInstance.orders.create(options);
-    
+    console.log(":::::::::",order)
       // Return response
       return new CommonResponse(
         true,
