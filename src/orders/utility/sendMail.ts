@@ -7,7 +7,7 @@ export async function sendMail({ to, subject, html }) {
     const response = await axios.post("https://app.smtpprovider.com/api/send-mail/", {
       to,
       from: "info@sharontelematics.org",
-      from_name: "ARK",
+      from_name: "WAY4TRACK",
       subject,
       body: html,
       token: "19a04d6ae3e382a86229740a17307c22"

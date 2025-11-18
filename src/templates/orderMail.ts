@@ -1,6 +1,7 @@
 // templates/orderMail.js
 
 export function orderMailTemplate({ order_id, name, order_summary, order_total,  support_email }) {
+  console.log("order_summary",order_summary)
     return `
   <!doctype html>
   <html>
