@@ -11,6 +11,7 @@ export class BlogAdapter {
         entity.image = dto.image;
         entity.title = dto.title;
         entity.pdfFile = dto.pdfFile;
+        entity.description = dto.description;
         return entity;
     }
 
@@ -21,7 +22,8 @@ export class BlogAdapter {
             webProductName: entity.webProductName,
             image: entity.image,
             title: entity.title,
-            pdfFile: entity.pdfFile
+            pdfFile: entity.pdfFile,
+            description:entity.description
         };
     }
 }

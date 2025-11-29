@@ -5,4 +5,5 @@ export class CreateBlogDto {
     image?: string;
     title?: string;
     pdfFile?: string;
+    description?: string; 
 }

@@ -21,6 +21,9 @@ export class BlogEntity {
     @Column({ name: 'title', type: 'varchar', length: 255, nullable: true })
     title: string;
 
+    @Column({ name: 'description', type: 'text', nullable: true })
+    description: string;
+
     @Column({ name: 'pdf_file', type: 'varchar', nullable: true })
     pdfFile: string;
 }
