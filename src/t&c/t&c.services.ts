@@ -54,7 +54,7 @@ export class TermsAndConditionService {
 
     const data = this.repo.create({
       ...dto,
-      Image: photoUrl, // ensure your entity contains "photo" column
+      image: photoUrl, // ensure your entity contains "photo" column
     });
 
     return this.repo.save(data);
@@ -86,7 +86,7 @@ export class TermsAndConditionService {
   ) {
     const record = await this.findOne(id);
 
-    let photoUrl = record.Image; // keep old image
+    let photoUrl = record.image; // keep old image
 
     if (photo) {
       photoUrl = await this.uploadToGCS(photo);

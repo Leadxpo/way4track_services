@@ -1,7 +1,7 @@
 export default class TermsAndConditionDto {
   id?: number;
   termsAndCondition: string;
-  Image: string;
+  image?: string;
   companyCode: string
   unitCode: string
 }

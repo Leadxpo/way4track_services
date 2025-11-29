@@ -9,7 +9,7 @@ export class TermsAndConditionEntity {
   termsAndCondition: string;
   
   @Column({ name: 'image', type: 'varchar', length: 500 })
-  Image: string;
+  image: string;
   
   @Column({ name: 'companyCode', type: 'varchar', length: 500 })
   companyCode: string;
