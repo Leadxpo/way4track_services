@@ -8,7 +8,7 @@ export class TermsAndConditionEntity {
   @Column({ name: 'termsAndCondition', type: 'varchar', length: 500 })
   termsAndCondition: string;
   
-  @Column({ name: 'image', type: 'varchar', length: 500 })
+  @Column({ name: 'image', type: 'varchar', length: 500,nullable:true})
   image: string;
   
   @Column({ name: 'companyCode', type: 'varchar', length: 500 })
