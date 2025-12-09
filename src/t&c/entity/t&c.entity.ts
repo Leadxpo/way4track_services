@@ -5,7 +5,7 @@ export class TermsAndConditionEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'termsAndCondition', type: 'varchar', length: 500 })
+  @Column({ name: 'termsAndCondition', type: 'text', })
   termsAndCondition: string;
   
   @Column({ name: 'image', type: 'varchar', length: 500,nullable:true})
